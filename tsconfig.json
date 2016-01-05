@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "commonjs",
+    "noEmitOnError": false,
+    "rootDir": ".",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": false,
+    "sourceRoot": "",
+    "inlineSourceMap": false,
+    "inlineSources": false
+  },
+  "files": [
+    "app/app.ts",
+    "app/providers/server.ts",
+    "app/providers/contests.ts",
+    "app/providers/facebook.ts",
+    "app/components/contest-chart/contest-chart.ts",
+    "app/components/contest-list/contest-list.ts",
+    "app/pages/login/login.ts",
+    "app/pages/tabs/tabs.ts",
+    "app/pages/running-contests/my-contests.ts",
+    "app/pages/running-contests/running-contests.ts",
+    "app/pages/running-contests/recently-finished-contests.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compileOnSave": false
+}

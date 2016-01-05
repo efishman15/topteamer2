@@ -1,0 +1,67 @@
+.login-page .game-header {
+  color: #FFFFFF;
+  font-weight: bolder;
+  padding-top: 40px;
+}
+
+.login-page .game-sub-header {
+  color: #FFFFFF;
+}
+
+.center {
+  text-align: center;
+}
+
+.login-page .bg-home {
+  background-image: url('../../img/bg_home.jpg');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  height: 100%;
+}
+
+.bar-footer {
+  bottom: 0 !important;
+  position: absolute;
+  border-top-width: 1px;
+  border-bottom-width: 0;
+  background-position: top;
+  height: 20px;
+}
+
+
+.login-page .language {
+  color: #000000;
+  font-size: 80%;
+  cursor: pointer;
+  text-align: center;
+}
+
+.login-page .language:hover {
+  text-decoration: underline;
+}
+
+.button-facebook {
+  color: #fff;
+  background-color: #3b5998;
+  border-color: rgba(0, 0, 0, 0.2)
+}
+
+.button-facebook:hover, .button-facebook:focus, .button-facebook:active, .button-facebook.active, .open > .dropdown-toggle.button-facebook {
+  color: #fff;
+  background-color: #2d4373;
+  border-color: rgba(0, 0, 0, 0.2)
+}
+
+.button-facebook:active, .button-facebook.active, .open > .dropdown-toggle.button-facebook {
+  background-image: none
+}
+
+.button-facebook.disabled, .button-facebook[disabled], fieldset[disabled] .button-facebook, .button-facebook.disabled:hover, .button-facebook[disabled]:hover, fieldset[disabled] .button-facebook:hover, .button-facebook.disabled:focus, .button-facebook[disabled]:focus, fieldset[disabled] .button-facebook:focus, .button-facebook.disabled:active, .button-facebook[disabled]:active, fieldset[disabled] .button-facebook:active, .button-facebook.disabled.active, .button-facebook[disabled].active, fieldset[disabled] .button-facebook.active {
+  background-color: #3b5998;
+  border-color: rgba(0, 0, 0, 0.2)
+}
+
+.button-facebook .badge {
+  color: #3b5998;
+  background-color: #fff
+}

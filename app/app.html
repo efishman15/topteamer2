@@ -1,0 +1,29 @@
+
+<!-- left menu -->
+<ion-menu [content]="content">
+
+  <ion-toolbar>
+    <ion-title>Account</ion-title>
+  </ion-toolbar>
+
+  <ion-content>
+
+    <ion-list>
+
+      <button ion-item *ngFor="#p of pages" (click)="openPage(p, false, true)">
+        <icon item-left [name]="p.icon"></icon>
+        {{p.title}}
+      </button>
+
+    </ion-list>
+  </ion-content>
+
+</ion-menu>
+
+
+<!-- main navigation -->
+<ion-nav id="nav" [root]="root" #content swipe-back-enabled="false"></ion-nav>
+
+
+<!-- where popups/actionsheets/modals are added -->
+<ion-overlay></ion-overlay>

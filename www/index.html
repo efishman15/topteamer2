@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Top Teamer</title>
+  <!--<meta http-equiv="Content-Security-Policy" content="script-src 'self' https://maps.gstatic.com/ https://*.googleapis.com/ http://localhost:* 'unsafe-inline' 'unsafe-eval'">-->
+  <meta http-equiv="Content-Security-Policy" content="script-src * 'unsafe-inline' 'unsafe-eval'">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- ionic dynamically decides which stylesheet to load -->
+  <link ios-href="build/css/app.ios.css" rel="stylesheet">
+  <link md-href="build/css/app.md.css" rel="stylesheet">
+
+  <script src="lib/fusioncharts-3.9.0/fusioncharts.js"></script>
+  <script src="lib/fusioncharts-3.9.0/fusioncharts.charts.js"></script>
+  <script src="lib/flurry/flurry.min.js"></script>
+
+  <script type="text/javascript">
+    function loadJsFile(filename) {
+      var fileReference = document.createElement("script");
+      fileReference.setAttribute("type", "text/javascript");
+      fileReference.setAttribute("src", filename);
+      document.getElementsByTagName("head")[0].appendChild(fileReference);
+    }
+  </script>
+
+</head>
+<body>
+
+  <!-- <ion-app> is where the app's HTML loads -->
+  <ion-app id="myApp"></ion-app>
+
+  <!-- cordova.js required for cordova apps -->
+  <script src="cordova.js"></script>
+
+  <!-- the bundle which is built from the app's source code -->
+  <script src="build/js/app.bundle.js"></script>
+
+</body>
+</html>

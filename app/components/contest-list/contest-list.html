@@ -1,0 +1,8 @@
+<div *ngFor="#contestChart of contestCharts, #i = index">
+  <contest-chart id="{{i}}"
+                 width="{{server.settings.charts.size.width}}"
+                 height="{{server.settings.charts.size.height}}"
+                 [(contestChart)]="contestCharts[i]"
+                 (select)="selectContest($event)">
+  </contest-chart>
+</div>
