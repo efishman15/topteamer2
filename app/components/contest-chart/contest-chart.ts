@@ -21,7 +21,7 @@ export class ContestChartComponent {
     FusionCharts.ready(() => {
       var chart = new FusionCharts({
         type: "column2d",
-        renderAt: 'fc' + this.id + '-container',
+        renderAt: this.id + '-container',
         width: this.width,
         height: this.height,
         dataFormat: 'json',

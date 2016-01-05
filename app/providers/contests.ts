@@ -12,6 +12,7 @@ export let prepareContestChart = (contest, timeMode) => {
   var contestSubCaptionColor;
 
   var contestChart = JSON.parse(JSON.stringify(server.settings.charts.contest));
+  contestChart.contest = contest;
 
   contestChart.data = [];
   var teamsOrder;

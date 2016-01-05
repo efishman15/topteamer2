@@ -8,6 +8,7 @@ exports.prepareContestChart = function (contest, timeMode) {
     var contestSubCaption;
     var contestSubCaptionColor;
     var contestChart = JSON.parse(JSON.stringify(server.settings.charts.contest));
+    contestChart.contest = contest;
     contestChart.data = [];
     var teamsOrder;
     var direction = server.currentLanguage.direction;

@@ -1,5 +1,5 @@
 <div *ngFor="#contestChart of contestCharts, #i = index">
-  <contest-chart id="{{i}}"
+  <contest-chart id="{{tab}}-{{contestCharts[i].contest._id}}"
                  width="{{server.settings.charts.size.width}}"
                  height="{{server.settings.charts.size.height}}"
                  [(contestChart)]="contestCharts[i]"

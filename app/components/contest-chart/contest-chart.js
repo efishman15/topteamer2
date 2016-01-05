@@ -16,7 +16,7 @@ var ContestChartComponent = (function () {
         FusionCharts.ready(function () {
             var chart = new FusionCharts({
                 type: "column2d",
-                renderAt: 'fc' + _this.id + '-container',
+                renderAt: _this.id + '-container',
                 width: _this.width,
                 height: _this.height,
                 dataFormat: 'json',
