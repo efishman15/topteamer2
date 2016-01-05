@@ -21,14 +21,12 @@ var ContestListComponent = (function () {
             }
         };
         this.server = server_1.Server.getInstance();
-        console.log('contest list constructed');
     }
     ContestListComponent.prototype.selectContest = function (contest) {
         this.select.next(contest);
     };
     ContestListComponent.prototype.refresh = function () {
         var _this = this;
-        console.log('refreshing...');
         var postData = { 'tab': this.tab };
         this.server.post('contests/list', postData).then(function (contests) {
             _this.contests = contests;

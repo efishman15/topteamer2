@@ -24,7 +24,6 @@ export class ContestListComponent {
 
   constructor() {
     this.server = Server.getInstance();
-    console.log('contest list constructed');
   }
 
   selectContest(contest:Object) {
@@ -32,7 +31,6 @@ export class ContestListComponent {
   }
 
   refresh() {
-    console.log('refreshing...');
     var postData = {'tab': this.tab};
     this.server.post('contests/list', postData).then((contests) => {
       this.contests = contests;
