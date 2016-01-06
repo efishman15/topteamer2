@@ -10,6 +10,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('angular2/core');
 var ContestChartComponent = (function () {
     function ContestChartComponent() {
+        var _this = this;
+        this.contestSelected = new core_1.EventEmitter();
+        this.teamSelected = new core_1.EventEmitter();
+        this.events = {
+            "dataplotClick": function (eventObj, dataObj) {
+                if (_this.contestChart.contest.state === 'join') {
+                    _this.teamSelected.next({ 'teamId': dataObj.dataIndex, 'source': 'bar', 'contest': _this.contestChart.contest });
+                    _this.chartTeamEventHandled = true;
+                }
+            },
+            "dataLabelClick": function (eventObj, dataObj) {
+                if (_this.contestChart.contest.state === 'join') {
+                    _this.teamSelected.next({ 'teamId': dataObj.dataIndex, 'source': 'label', 'contest': _this.contestChart.contest });
+                    _this.chartTeamEventHandled = true;
+                }
+            },
+            "chartClick": function (eventObj, dataObj) {
+                if (!_this.chartTeamEventHandled) {
+                    _this.contestSelected.next({ 'contest': _this.contestChart.contest });
+                }
+                _this.chartTeamEventHandled = false;
+            }
+        };
     }
     ContestChartComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -42,9 +65,13 @@ var ContestChartComponent = (function () {
         __metadata('design:type', Object)
     ], ContestChartComponent.prototype, "contestChart", void 0);
     __decorate([
-        core_1.Input(), 
+        core_1.Output(), 
         __metadata('design:type', Object)
-    ], ContestChartComponent.prototype, "events", void 0);
+    ], ContestChartComponent.prototype, "contestSelected", void 0);
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], ContestChartComponent.prototype, "teamSelected", void 0);
     ContestChartComponent = __decorate([
         core_1.Component({
             selector: 'contest-chart',

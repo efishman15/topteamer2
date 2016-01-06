@@ -7,8 +7,8 @@
 
 <ion-content>
 
-  <contest-list tab="mine">
-
+  <contest-list tab="mine"
+                (contestSelected)="onContestSelected($event)">
   </contest-list>
 
 </ion-content>

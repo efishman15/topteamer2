@@ -11,7 +11,8 @@ import * as contestsService from '../../providers/contests';
 
 export class ContestListComponent {
   @Input() tab:String;
-  @Output() select:EventEmitter<any> = new EventEmitter();
+  @Output() contestSelected = new EventEmitter();
+  @Output() teamSelected = new EventEmitter();
 
   contests:Array<Object>;
   contestCharts:Array<Object>;
@@ -40,6 +41,15 @@ export class ContestListComponent {
       }
     });
   }
+
+  onContestSelected(data) {
+    this.contestSelected.next(data);
+  }
+
+  onTeamSelected(data) {
+    this.teamSelected.next(data);
+  }
+
 }
 
 

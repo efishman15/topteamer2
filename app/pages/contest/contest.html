@@ -1,0 +1,86 @@
+<ion-navbar *navbar>
+  <button menuToggle>
+    <icon menu></icon>
+  </button>
+  <ion-title>{{server.translate('WHO_IS_SMARTER_QUESTION')}}</ion-title>
+</ion-navbar>
+
+<div class="card">
+
+  <div
+    class="item contest-leader-background item-avatar-{{server.currentLanguage.align}}">
+    <img src="{{contestChart.contest.creator.avatar}}">
+    <h2 class="contest-leader-row1">{{server.translate('CREATED_BY',{name : contestChart.contest.creator.name})}}</h2>
+    <p class="contest-leader-row2">{{contestChart.contest.timePhrase.text}}</p>
+  </div>
+
+  <div class="item item-body contest-chart-background">
+
+    <contest-chart id="contest-{{contestChart.contest._id}}"
+                   width="{{server.settings.charts.size.width}}"
+                   height="{{server.settings.charts.size.height}}"
+                   [(contestChart)]="contestChart">
+    </contest-chart>
+
+    <div class="padding-top center">
+
+      <div class="animate-switch-container" *ngSwitch="contestChart.contest.state">
+        <div class="animate-switch" *ngSwitchWhen="play">
+          <button danger class="item button button-small no-wrap-text"
+                  (click)="playContest()">{{server.translate('PLAY_CONTEST')}}
+          </button>
+        </div>
+        <div class="animate-switch" *ngSwitchWhen="join">
+          <button danger style="width: {{server.settings.charts.size.width / 2}}px;"
+                  class="item button button-small join-contest no-wrap-text"
+                  (click)="joinContest(0,'button')">{{server.translate('JOIN_TEAM', {team :
+            contestChart.contest.teams[0].name})}}
+          </button>
+          <button danger style="width: {{server.settings.charts.size.width / 2}}px;"
+                  class="item button button-small join-contest no-wrap-text"
+                  (click)="joinContest(1,'button')">{{server.translate('JOIN_TEAM', {team :
+            contestChart.contest.teams[1].name})}}
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <div class="padding-top">
+      <div class="pointer contest-footer-text float-{{server.currentLanguage.align}}" (click)="showParticipants()">
+        {{server.translate('CONTEST_LEADER')}}: {{contestChart.contest.leader.name}}
+      </div>
+      <div class="pointer contest-footer-text float-{{server.currentLanguage.oppositeAlign}}"
+           (click)="showParticipants()">{{server.translate('CONTEST_LEADERS_MORE')}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="animateResults" class="padding-left padding-right">
+  <div class="item item-divider center long-animated {{lastQuizResults.data.animation}}">
+    <h2>{{server.translate(lastQuizResults.data.clientKey + '_TITLE')}}</h2>
+    <h3>{{server.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
+    <i class="balanced pointer contest-animation-share-image android-share-alt"
+       style="{{server.settings.currentLanguage.oppositeAlign}}: 10px;"
+       (click)="share()"></i>
+  </div>
+</div>
+
+<div class="bar bar-footer">
+  <a class="tab-button" (click)="share()">
+    <i class="icon android-share-alt"></i>
+    <p>{{server.translate('SHARE')}}</p>
+  </a>
+  <a class="tab-button" (click)="like()">
+    <i class="icon thumbsup"></i>
+    <p>{{server.translate('LIKE')}}</p>
+  </a>
+  <a class="tab-button" (click)="switchTeams()" *ngIf="contestChart.contest.state==='play'">
+    <i class="icon arrow-swap"></i>
+    <p>{{server.translate('SWITCH_TEAMS')}}</p>
+  </a>
+  <a class="tab-button" (click)="editContest()">
+    <i class="icon edit"></i>
+    <p>{{server.translate('EDIT_CONTEST')}}</p>
+  </a>
+</div>

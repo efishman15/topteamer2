@@ -58,6 +58,9 @@ var topTeamerApp = (function () {
         //1. Global Exception handler - to write to flurry
         //2. Global page change detection to report to flurry about page navigations
         //3. Catch resume on mobile and call initBranch again
+        //4. Catch http 401 errors and re-login
+        //5. Catch server popup messages and display a modal popup.
+        //6. Flurry events
         var _this = this;
         this.platform.ready().then(function () {
             _this.declareStringFormat();

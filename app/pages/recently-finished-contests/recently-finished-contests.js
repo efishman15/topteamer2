@@ -11,14 +11,19 @@ var ionic_1 = require('ionic/ionic');
 var core_1 = require('angular2/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var server_1 = require('../../providers/server');
+var contest_1 = require('../contest/contest');
 var RecentlyFinishedContestsPage = (function () {
     function RecentlyFinishedContestsPage(app) {
         this.app = app;
+        this.nav = this.app.getComponent('nav');
         this.server = server_1.Server.getInstance();
     }
     RecentlyFinishedContestsPage.prototype.onPageDidEnter = function () {
         this.app.setTitle(this.server.translate('RECENTLY_FINISHED_CONTESTS'));
         this.contestList.refresh();
+    };
+    RecentlyFinishedContestsPage.prototype.onContestSelected = function (data) {
+        this.nav.push(contest_1.ContestPage, { 'contest': data.contest });
     };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 

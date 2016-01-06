@@ -14,7 +14,8 @@ var contestsService = require('../../providers/contests');
 var ContestListComponent = (function () {
     function ContestListComponent() {
         var _this = this;
-        this.select = new core_1.EventEmitter();
+        this.contestSelected = new core_1.EventEmitter();
+        this.teamSelected = new core_1.EventEmitter();
         this.events = {
             "chartClick": function (eventObj, dataObj) {
                 _this.selectContest(eventObj.sender.args.dataSource.contest);
@@ -36,14 +37,24 @@ var ContestListComponent = (function () {
             }
         });
     };
+    ContestListComponent.prototype.onContestSelected = function (data) {
+        this.contestSelected.next(data);
+    };
+    ContestListComponent.prototype.onTeamSelected = function (data) {
+        this.teamSelected.next(data);
+    };
     __decorate([
         core_1.Input(), 
         __metadata('design:type', String)
     ], ContestListComponent.prototype, "tab", void 0);
     __decorate([
         core_1.Output(), 
-        __metadata('design:type', core_1.EventEmitter)
-    ], ContestListComponent.prototype, "select", void 0);
+        __metadata('design:type', Object)
+    ], ContestListComponent.prototype, "contestSelected", void 0);
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], ContestListComponent.prototype, "teamSelected", void 0);
     ContestListComponent = __decorate([
         core_1.Component({
             selector: 'contest-list',

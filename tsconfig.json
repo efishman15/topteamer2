@@ -22,7 +22,8 @@
     "app/pages/tabs/tabs.ts",
     "app/pages/my-contests/my-contests.ts",
     "app/pages/running-contests/running-contests.ts",
-    "app/pages/recently-finished-contests/recently-finished-contests.ts"
+    "app/pages/recently-finished-contests/recently-finished-contests.ts",
+    "app/pages/contest/contest.ts"
   ],
   "exclude": [
     "node_modules"

@@ -3,6 +3,7 @@
                  width="{{server.settings.charts.size.width}}"
                  height="{{server.settings.charts.size.height}}"
                  [(contestChart)]="contestCharts[i]"
-                 (select)="selectContest($event)">
+                 (contestSelected)="onContestSelected($event)"
+                 (teamSelected)="onTeamSelected($event)">
   </contest-chart>
 </div>
