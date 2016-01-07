@@ -10,29 +10,56 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var server_1 = require('../../providers/server');
-var contestsService = require('../../providers/contests');
 var ContestPage = (function () {
     function ContestPage(app, params) {
         this.contestChart = {};
         this.app = app;
-        this.params = params;
         this.server = server_1.Server.getInstance();
+        this.contestChart = params.data.contestChart;
     }
     ContestPage.prototype.onPageWillEnter = function () {
-        var _this = this;
         this.app.setTitle(this.server.translate('WHO_SMARTER_QUESTION'));
-        var contestId;
-        if (this.params.data.contest) {
-            contestId = this.params.data.contest._id;
+    };
+    ContestPage.prototype.playContest = function (source) {
+        //TODO: play contest
+        alert('play contest, source: ' + source);
+    };
+    ContestPage.prototype.showParticipants = function (source) {
+        //TODO: show participants
+        alert('show participants, source: ' + source);
+    };
+    ContestPage.prototype.joinContest = function (team, source) {
+        //TODO: join contest
+        alert('join contest, team:' + team + ", source:" + source);
+    };
+    ContestPage.prototype.switchTeams = function (source) {
+        //TODO: switch teams
+        alert('switch teams, source:' + source);
+    };
+    ContestPage.prototype.editContest = function () {
+        //TODO: edit contest
+        alert('edit contest');
+    };
+    ContestPage.prototype.share = function () {
+        //TODO: share
+        alert('share');
+    };
+    ContestPage.prototype.like = function () {
+        //TODO: like
+        alert('like');
+    };
+    ContestPage.prototype.onTeamSelected = function (data) {
+        if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
+            this.switchTeams(data.source);
         }
         else {
-            contestId = this.params.data.contestId;
+            this.joinContest(data.teamId, data.source);
         }
-        var postData = { 'contestId': contestId };
-        this.server.post('contests/get', postData).then(function (contest) {
-            _this.contestChart = contestsService.prepareContestChart(contest, "starts");
-            console.log("this.contestChart=" + JSON.stringify(_this.contestChart));
-        });
+    };
+    ContestPage.prototype.onContestSelected = function (data) {
+        if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
+            this.playContest('chart');
+        }
     };
     ContestPage = __decorate([
         ionic_1.Page({

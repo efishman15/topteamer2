@@ -12,27 +12,23 @@ export class ContestChartComponent {
   @Input() height:Number;
   @Input() contestChart:Object;
 
-  chartTeamEventHandled : boolean;
+  chartTeamEventHandled:boolean;
 
   @Output() contestSelected = new EventEmitter();
   @Output() teamSelected = new EventEmitter();
 
-  events : Object = {
+  events:Object = {
     "dataplotClick": (eventObj, dataObj) => {
-      if (this.contestChart.contest.state === 'join') {
-        this.teamSelected.next({'teamId' : dataObj.dataIndex, 'source' : 'bar', 'contest' : this.contestChart.contest});
-        this.chartTeamEventHandled = true;
-      }
+      this.teamSelected.next({'teamId': dataObj.dataIndex, 'source': 'bar', 'contest': this.contestChart.contest});
+      this.chartTeamEventHandled = true;
     },
     "dataLabelClick": (eventObj, dataObj) => {
-      if (this.contestChart.contest.state === 'join') {
-        this.teamSelected.next({'teamId' : dataObj.dataIndex, 'source' : 'label', 'contest' : this.contestChart.contest});
-        this.chartTeamEventHandled = true;
-      }
+      this.teamSelected.next({'teamId': dataObj.dataIndex, 'source': 'label', 'contest': this.contestChart.contest});
+      this.chartTeamEventHandled = true;
     },
     "chartClick": (eventObj, dataObj) => {
       if (!this.chartTeamEventHandled) {
-        this.contestSelected.next({'contest' : this.contestChart.contest})
+        this.contestSelected.next({'contest': this.contestChart.contest})
       }
       this.chartTeamEventHandled = false;
     }

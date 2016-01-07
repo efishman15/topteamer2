@@ -1,4 +1,6 @@
 import {Server} from './server';
+import {NavController} from "ionic-framework/ionic";
+import {ContestPage} from '../pages/contest/contest'
 
 //------------------------------------------------------
 //-- prepareContestChart
@@ -28,7 +30,7 @@ export let prepareContestChart = (contest, timeMode) => {
 
   setTimePhrase(contest, timeMode);
 
-  if (timeMode === 'ends' && contest.status === 'finished') {
+  if (contest.status === 'finished') {
     //Contest Finished
     contestCaption = server.translate('WHO_IS_SMARTER_QUESTION_CONTEST_FINISHED');
 
@@ -103,6 +105,15 @@ export let prepareContestChart = (contest, timeMode) => {
   return contestChart;
 
 };
+
+export let openContest = (server: Server, nav: NavController, contestId: string) => {
+
+  var postData = {'contestId': contestId};
+  server.post('contests/get', postData).then((contest) => {
+    nav.push(ContestPage, {'contestChart' : prepareContestChart(contest, "starts")});
+  });
+
+}
 
 //Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
 function setTimePhrase(contest, timeMode) {

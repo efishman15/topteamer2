@@ -11,7 +11,7 @@ var ionic_1 = require('ionic/ionic');
 var core_1 = require('angular2/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var server_1 = require('../../providers/server');
-var contest_1 = require('../contest/contest');
+var contestsService = require('../../providers/contests');
 var RunningContestsPage = (function () {
     function RunningContestsPage(app) {
         this.app = app;
@@ -23,7 +23,7 @@ var RunningContestsPage = (function () {
         this.contestList.refresh();
     };
     RunningContestsPage.prototype.onContestSelected = function (data) {
-        this.nav.push(contest_1.ContestPage, { 'contest': data.contest });
+        contestsService.openContest(this.server, this.nav, data.contest._id);
     };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 

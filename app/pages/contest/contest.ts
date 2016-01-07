@@ -2,8 +2,6 @@ import {IonicApp, Page, Component, NavParams} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {Server} from '../../providers/server';
-import * as contestsService from '../../providers/contests';
-
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
@@ -14,31 +12,66 @@ export class ContestPage {
 
   server:Server;
   app:IonicApp;
-  params:NavParams;
   contestChart:Object = {};
 
   constructor(app:IonicApp, params:NavParams) {
     this.app = app;
-    this.params = params;
     this.server = Server.getInstance();
+    this.contestChart = params.data.contestChart;
   }
 
   onPageWillEnter() {
     this.app.setTitle(this.server.translate('WHO_SMARTER_QUESTION'));
+  }
 
-    var contestId;
-    if (this.params.data.contest) {
-      contestId = this.params.data.contest._id;
+  playContest(source) {
+    //TODO: play contest
+    alert('play contest, source: ' + source);
+  }
+
+  showParticipants(source) {
+    //TODO: show participants
+    alert('show participants, source: ' + source);
+  }
+
+  joinContest(team, source) {
+    //TODO: join contest
+    alert('join contest, team:' + team + ", source:" + source);
+  }
+
+  switchTeams(source) {
+    //TODO: switch teams
+    alert('switch teams, source:' + source);
+  }
+
+  editContest() {
+    //TODO: edit contest
+    alert('edit contest');
+  }
+
+  share() {
+    //TODO: share
+    alert('share');
+  }
+
+  like() {
+    //TODO: like
+    alert('like');
+  }
+
+  onTeamSelected(data) {
+    if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
+      this.switchTeams(data.source);
     }
     else {
-      contestId = this.params.data.contestId;
+      this.joinContest(data.teamId, data.source);
     }
-
-    var postData = {'contestId': contestId};
-    this.server.post('contests/get', postData).then((contest) => {
-      this.contestChart = contestsService.prepareContestChart(contest, "starts");
-      console.log("this.contestChart=" + JSON.stringify(this.contestChart));
-    });
-
   }
+
+  onContestSelected(data) {
+    if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
+      this.playContest('chart');
+    }
+  }
+
 }

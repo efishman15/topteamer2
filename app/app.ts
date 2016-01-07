@@ -66,13 +66,12 @@ class topTeamerApp {
 
   initApp() {
 
-    //TODO:
-    //1. Global Exception handler - to write to flurry
-    //2. Global page change detection to report to flurry about page navigations
-    //3. Catch resume on mobile and call initBranch again
-    //4. Catch http 401 errors and re-login
-    //5. Catch server popup messages and display a modal popup.
-    //6. Flurry events
+    //TODO: Global Exception handler - to write to flurry
+    //TODO: Global page change detection to report to flurry about page navigations
+    //TODO: Catch resume on mobile and call initBranch again
+    //TODO: Catch http 401 errors and re-login
+    //TODO: Catch server popup messages and display a modal popup.
+    //TODO: Flurry events
 
     this.platform.ready().then(() => {
 

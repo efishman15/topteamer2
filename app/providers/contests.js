@@ -1,4 +1,5 @@
 var server_1 = require('./server');
+var contest_1 = require('../pages/contest/contest');
 //------------------------------------------------------
 //-- prepareContestChart
 //------------------------------------------------------
@@ -19,7 +20,7 @@ exports.prepareContestChart = function (contest, timeMode) {
         teamsOrder = [1, 0];
     }
     setTimePhrase(contest, timeMode);
-    if (timeMode === 'ends' && contest.status === 'finished') {
+    if (contest.status === 'finished') {
         //Contest Finished
         contestCaption = server.translate('WHO_IS_SMARTER_QUESTION_CONTEST_FINISHED');
         if (contest.teams[0].chartValue > contest.teams[1].chartValue) {
@@ -82,6 +83,12 @@ exports.prepareContestChart = function (contest, timeMode) {
     contestChart.chart.subCaption = contestSubCaption;
     contestChart.chart.subCaptionFontColor = contestSubCaptionColor;
     return contestChart;
+};
+exports.openContest = function (server, nav, contestId) {
+    var postData = { 'contestId': contestId };
+    server.post('contests/get', postData).then(function (contest) {
+        nav.push(contest_1.ContestPage, { 'contestChart': exports.prepareContestChart(contest, "starts") });
+    });
 };
 //Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
 function setTimePhrase(contest, timeMode) {

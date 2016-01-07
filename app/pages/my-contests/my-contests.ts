@@ -3,6 +3,7 @@ import {ViewChild} from 'angular2/core';
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Server} from '../../providers/server';
 import {ContestPage} from '../contest/contest'
+import * as contestsService from '../../providers/contests';
 
 @Page({
   templateUrl: 'build/pages/my-contests/my-contests.html',
@@ -28,7 +29,7 @@ export class MyContestsPage {
   }
 
   onContestSelected(data) {
-    this.nav.push(ContestPage, {'contest' : data.contest});
+    contestsService.openContest(this.server, this.nav, data.contest._id);
   }
 
 }

@@ -15,16 +15,12 @@ var ContestChartComponent = (function () {
         this.teamSelected = new core_1.EventEmitter();
         this.events = {
             "dataplotClick": function (eventObj, dataObj) {
-                if (_this.contestChart.contest.state === 'join') {
-                    _this.teamSelected.next({ 'teamId': dataObj.dataIndex, 'source': 'bar', 'contest': _this.contestChart.contest });
-                    _this.chartTeamEventHandled = true;
-                }
+                _this.teamSelected.next({ 'teamId': dataObj.dataIndex, 'source': 'bar', 'contest': _this.contestChart.contest });
+                _this.chartTeamEventHandled = true;
             },
             "dataLabelClick": function (eventObj, dataObj) {
-                if (_this.contestChart.contest.state === 'join') {
-                    _this.teamSelected.next({ 'teamId': dataObj.dataIndex, 'source': 'label', 'contest': _this.contestChart.contest });
-                    _this.chartTeamEventHandled = true;
-                }
+                _this.teamSelected.next({ 'teamId': dataObj.dataIndex, 'source': 'label', 'contest': _this.contestChart.contest });
+                _this.chartTeamEventHandled = true;
             },
             "chartClick": function (eventObj, dataObj) {
                 if (!_this.chartTeamEventHandled) {
