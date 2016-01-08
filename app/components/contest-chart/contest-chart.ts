@@ -1,4 +1,5 @@
 import {Component, Input, EventEmitter, Output} from 'angular2/core';
+import {Client} from '../../providers/client';
 
 @Component({
   selector: 'contest-chart',
@@ -13,17 +14,26 @@ export class ContestChartComponent {
   @Input() contestChart:Object;
 
   chartTeamEventHandled:boolean;
+  client: Client;
 
   @Output() contestSelected = new EventEmitter();
   @Output() teamSelected = new EventEmitter();
 
   events:Object = {
     "dataplotClick": (eventObj, dataObj) => {
-      this.teamSelected.next({'teamId': dataObj.dataIndex, 'source': 'bar', 'contest': this.contestChart.contest});
+      var teamId = dataObj.dataIndex;
+      if (this.client.currentLanguage.direction === 'rtl') {
+        teamId = 1 - teamId;
+      }
+      this.teamSelected.next({'teamId': teamId, 'source': 'bar', 'contest': this.contestChart.contest});
       this.chartTeamEventHandled = true;
     },
     "dataLabelClick": (eventObj, dataObj) => {
-      this.teamSelected.next({'teamId': dataObj.dataIndex, 'source': 'label', 'contest': this.contestChart.contest});
+      var teamId = dataObj.dataIndex;
+      if (this.client.currentLanguage.direction === 'rtl') {
+        teamId = 1 - teamId;
+      }
+      this.teamSelected.next({'teamId': teamId, 'source': 'label', 'contest': this.contestChart.contest});
       this.chartTeamEventHandled = true;
     },
     "chartClick": (eventObj, dataObj) => {
@@ -35,7 +45,7 @@ export class ContestChartComponent {
   };
 
   constructor() {
-
+    this.client = Client.getInstance();
   }
 
   ngOnInit() {

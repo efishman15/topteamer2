@@ -2,14 +2,14 @@ import {Page} from 'ionic/ionic';
 import {MyContestsPage} from '../my-contests/my-contests';
 import {RunningContestsPage} from '../running-contests/running-contests';
 import {RecentlyFinishedContestsPage} from '../recently-finished-contests/recently-finished-contests';
-import {Server} from '../../providers/server';
+import {Client} from '../../providers/client';
 
 @Page({
   templateUrl: 'build/pages/tabs/tabs.html'
 })
 export class TabsPage {
 
-  server: Server;
+  client: Client;
 
   private rootMyContestsPage;
   private rootRunningContestsPage;
@@ -21,6 +21,6 @@ export class TabsPage {
     this.rootRunningContestsPage = RunningContestsPage;
     this.rootRecentlyFinishedContestsPage = RecentlyFinishedContestsPage;
 
-    this.server = Server.getInstance();
+    this.client = Client.getInstance();
   }
 }

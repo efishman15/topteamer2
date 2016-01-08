@@ -1,7 +1,8 @@
 import {IonicApp, Page, Component, NavParams} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
-import {Server} from '../../providers/server';
+import {Client} from '../../providers/client';
+import * as contestsService from '../../providers/contests';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
@@ -10,18 +11,16 @@ import {Server} from '../../providers/server';
 
 export class ContestPage {
 
-  server:Server;
-  app:IonicApp;
+  client:Client;
   contestChart:Object = {};
 
-  constructor(app:IonicApp, params:NavParams) {
-    this.app = app;
-    this.server = Server.getInstance();
+  constructor(params:NavParams) {
+    this.client = Client.getInstance();
     this.contestChart = params.data.contestChart;
   }
 
   onPageWillEnter() {
-    this.app.setTitle(this.server.translate('WHO_SMARTER_QUESTION'));
+    this.client.ionicApp.setTitle(this.client.translate('WHO_SMARTER_QUESTION'));
   }
 
   playContest(source) {
@@ -35,13 +34,23 @@ export class ContestPage {
   }
 
   joinContest(team, source) {
-    //TODO: join contest
-    alert('join contest, team:' + team + ", source:" + source);
+
+    var postData = {'contestId' : this.contestChart.contest._id, 'teamId': team};
+    this.client.serverPost('contests/join', postData).then( (data) => {
+
+      FlurryAgent.logEvent('contest/join', {
+        'contestId': this.contestChart.contest._id,
+        'team': '' + team,
+        'sourceClick': source
+      });
+
+      this.contestChart = contestsService.prepareContestChart(data.contest, 'starts');
+
+    });
   }
 
   switchTeams(source) {
-    //TODO: switch teams
-    alert('switch teams, source:' + source);
+    this.joinContest(1 - this.contestChart.contest.myTeam, source);
   }
 
   editContest() {
@@ -73,5 +82,4 @@ export class ContestPage {
       this.playContest('chart');
     }
   }
-
 }

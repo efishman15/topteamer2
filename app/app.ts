@@ -2,28 +2,22 @@ import {App, IonicApp, Platform, Config} from 'ionic/ionic';
 import {TabsPage} from './pages/tabs/tabs';
 import {LoginPage} from './pages/login/login';
 import * as facebookService from './providers/facebook';
-import {Server} from './providers/server';
+import {Client} from './providers/client';
 import {NavController,Menu} from "ionic-framework/ionic";
 
 @App({
   templateUrl: 'app.html',
   moduleId: 'build/app.html',
-  providers: [Server]
+  providers: [Client]
 })
 class topTeamerApp {
 
   pages:Array<Object>;
-  server:Server;
-  app:IonicApp;
-  platform:Platform;
-  nav:NavController;
-  menu:Menu;
+  client:Client;
 
-  constructor(app:IonicApp, platform:Platform, server:Server) {
+  constructor(ionicApp:IonicApp, platform:Platform, client:Client) {
 
-    this.app = app;
-    this.platform = platform;
-    this.server = server;
+    this.client = client;
 
     // create an list of pages that can be navigated to from the menu
     // the menu only works after login
@@ -33,15 +27,7 @@ class topTeamerApp {
       {title: 'Login', page: LoginPage, icon: 'log-in'},
     ];
 
-    server.init(platform).then(() => {
-      this.nav = this.app.getComponent('nav');
-      this.menu = this.app.getComponent('leftMenu');
-
-      var dir = document.createAttribute("dir");
-      dir.value = server.currentLanguage.direction;
-      this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
-      this.menu.side = server.currentLanguage.align;
-      this.menu.id = server.currentLanguage.align + "Menu";
+    client.init(ionicApp, platform).then(() => {
       this.initApp();
     });
 
@@ -49,9 +35,9 @@ class topTeamerApp {
 
   openPage(page, isRoot, isFromMenu) {
     if (isRoot) {
-      this.nav.setRoot(page).then(() => {
+      this.client.nav.setRoot(page).then(() => {
         if (isFromMenu) {
-          this.menu.close();
+          this.client.menu.close();
         }
       });
     }
@@ -73,7 +59,7 @@ class topTeamerApp {
     //TODO: Catch server popup messages and display a modal popup.
     //TODO: Flurry events
 
-    this.platform.ready().then(() => {
+    this.client.platform.ready().then(() => {
 
       this.declareStringFormat();
       this.declareRequestAnimationFrame();
@@ -105,9 +91,9 @@ class topTeamerApp {
 
     var myApp = document.getElementById("myApp");
     if (myApp) {
-      if (containerWidth > this.server.settings.general.webCanvasWidth) {
-        myApp.style.width = this.server.settings.general.webCanvasWidth + "px";
-        myApp.style.marginLeft = (containerWidth - this.server.settings.general.webCanvasWidth) / 2 + "px";
+      if (containerWidth > this.client.settings.general.webCanvasWidth) {
+        myApp.style.width = this.client.settings.general.webCanvasWidth + "px";
+        myApp.style.marginLeft = (containerWidth - this.client.settings.general.webCanvasWidth) / 2 + "px";
       }
     }
 
@@ -162,7 +148,7 @@ class topTeamerApp {
     }
 
     cordova.getAppVersion((version) => {
-      server.user.clientInfo.appVersion = version;
+      client.user.clientInfo.appVersion = version;
       FlurryAgent.setAppVersion("" + version);
 
       this.initFacebook();
@@ -191,7 +177,8 @@ class topTeamerApp {
 
         if (data.data_parsed && data.data_parsed.contestId) {
           //Will go to this contest
-          server.deepLinkContestId = data.data_parsed.contestId;
+          //TODO: Deep linking
+          client.deepLinkContestId = data.data_parsed.contestId;
         }
       }
       catch (e) {
@@ -211,7 +198,7 @@ class topTeamerApp {
   initFacebook() {
     facebookService.getLoginStatus().then((result) => {
       if (result.connected) {
-        this.server.facebookConnect(result.response.authResponse).then(() => {
+        this.client.facebookServerConnect(result.response.authResponse).then(() => {
           this.openPage(TabsPage, true, false);
         })
       }

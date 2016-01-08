@@ -11,14 +11,14 @@ var ionic_1 = require('ionic/ionic');
 var my_contests_1 = require('../my-contests/my-contests');
 var running_contests_1 = require('../running-contests/running-contests');
 var recently_finished_contests_1 = require('../recently-finished-contests/recently-finished-contests');
-var server_1 = require('../../providers/server');
+var client_1 = require('../../providers/client');
 var TabsPage = (function () {
     function TabsPage() {
         // set the root pages for each tab
         this.rootMyContestsPage = my_contests_1.MyContestsPage;
         this.rootRunningContestsPage = running_contests_1.RunningContestsPage;
         this.rootRecentlyFinishedContestsPage = recently_finished_contests_1.RecentlyFinishedContestsPage;
-        this.server = server_1.Server.getInstance();
+        this.client = client_1.Client.getInstance();
     }
     TabsPage = __decorate([
         ionic_1.Page({

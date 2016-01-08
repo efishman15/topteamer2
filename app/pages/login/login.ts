@@ -1,7 +1,6 @@
 import {IonicApp, Page, NavController} from 'ionic/ionic';
 import {TabsPage} from '../tabs/tabs';
-import {SignupPage} from '../signup/signup';
-import {Server} from '../../providers/server';
+import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
 
 @Page({
@@ -9,29 +8,23 @@ import * as facebookService from '../../providers/facebook';
 })
 export class LoginPage {
 
-  _server:Server;
+  client:Client;
 
-  constructor(nav:NavController, app:IonicApp) {
-    this.nav = nav;
-    this.app = app;
-    this._server = Server.getInstance();
-  }
-
-  get server() {
-    return this._server;
+  constructor() {
+    this.client = Client.getInstance();
   }
 
   login() {
     facebookService.login().then((response) => {
-      this.nav.pop(LoginPage);
-      this._server.facebookConnect(response.authResponse).then(() => {
-        this.nav.push(TabsPage);
+      this.client.nav.pop(LoginPage);
+      this.client.facebookServerConnect(response.authResponse).then(() => {
+        this.client.nav.push(TabsPage);
       })
     });
   };
 
   changeLanguage(language) {
-    this._server.user.settings.language = language;
+    this.client.user.settings.language = language;
     localStorage.setItem('language', language);
   }
 

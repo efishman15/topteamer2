@@ -9,42 +9,32 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var tabs_1 = require('../tabs/tabs');
-var server_1 = require('../../providers/server');
+var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
 var LoginPage = (function () {
-    function LoginPage(nav, app) {
-        this.nav = nav;
-        this.app = app;
-        this._server = server_1.Server.getInstance();
+    function LoginPage() {
+        this.client = client_1.Client.getInstance();
     }
-    Object.defineProperty(LoginPage.prototype, "server", {
-        get: function () {
-            return this._server;
-        },
-        enumerable: true,
-        configurable: true
-    });
     LoginPage.prototype.login = function () {
         var _this = this;
         facebookService.login().then(function (response) {
-            _this.nav.pop(LoginPage);
-            _this._server.facebookConnect(response.authResponse).then(function () {
-                _this.nav.push(tabs_1.TabsPage);
+            _this.client.nav.pop(LoginPage);
+            _this.client.facebookServerConnect(response.authResponse).then(function () {
+                _this.client.nav.push(tabs_1.TabsPage);
             });
         });
     };
     ;
     LoginPage.prototype.changeLanguage = function (language) {
-        this._server.user.settings.language = language;
+        this.client.user.settings.language = language;
         localStorage.setItem('language', language);
     };
     LoginPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/login/login.html'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavController !== 'undefined' && ionic_1.NavController) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [])
     ], LoginPage);
     return LoginPage;
-    var _a, _b;
 })();
 exports.LoginPage = LoginPage;

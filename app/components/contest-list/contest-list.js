@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('angular2/core');
 var contest_chart_1 = require('../contest-chart/contest-chart');
-var server_1 = require('../../providers/server');
+var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestListComponent = (function () {
     function ContestListComponent() {
@@ -21,7 +21,7 @@ var ContestListComponent = (function () {
                 _this.selectContest(eventObj.sender.args.dataSource.contest);
             }
         };
-        this.server = server_1.Server.getInstance();
+        this.client = client_1.Client.getInstance();
     }
     ContestListComponent.prototype.selectContest = function (contest) {
         this.select.next(contest);
@@ -29,7 +29,7 @@ var ContestListComponent = (function () {
     ContestListComponent.prototype.refresh = function () {
         var _this = this;
         var postData = { 'tab': this.tab };
-        this.server.post('contests/list', postData).then(function (contests) {
+        this.client.serverPost('contests/list', postData).then(function (contests) {
             _this.contests = contests;
             _this.contestCharts = [];
             for (var i = 0; i < contests.length; i++) {
@@ -41,7 +41,8 @@ var ContestListComponent = (function () {
         this.contestSelected.next(data);
     };
     ContestListComponent.prototype.onTeamSelected = function (data) {
-        this.teamSelected.next(data);
+        //This is not a mistake - on chart lists - any click in any area should "select" the entire contest
+        this.contestSelected.next(data);
     };
     __decorate([
         core_1.Input(), 

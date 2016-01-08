@@ -8,6 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('angular2/core');
+var client_1 = require('../../providers/client');
 var ContestChartComponent = (function () {
     function ContestChartComponent() {
         var _this = this;
@@ -15,11 +16,19 @@ var ContestChartComponent = (function () {
         this.teamSelected = new core_1.EventEmitter();
         this.events = {
             "dataplotClick": function (eventObj, dataObj) {
-                _this.teamSelected.next({ 'teamId': dataObj.dataIndex, 'source': 'bar', 'contest': _this.contestChart.contest });
+                var teamId = dataObj.dataIndex;
+                if (_this.client.currentLanguage.direction === 'rtl') {
+                    teamId = 1 - teamId;
+                }
+                _this.teamSelected.next({ 'teamId': teamId, 'source': 'bar', 'contest': _this.contestChart.contest });
                 _this.chartTeamEventHandled = true;
             },
             "dataLabelClick": function (eventObj, dataObj) {
-                _this.teamSelected.next({ 'teamId': dataObj.dataIndex, 'source': 'label', 'contest': _this.contestChart.contest });
+                var teamId = dataObj.dataIndex;
+                if (_this.client.currentLanguage.direction === 'rtl') {
+                    teamId = 1 - teamId;
+                }
+                _this.teamSelected.next({ 'teamId': teamId, 'source': 'label', 'contest': _this.contestChart.contest });
                 _this.chartTeamEventHandled = true;
             },
             "chartClick": function (eventObj, dataObj) {
@@ -29,6 +38,7 @@ var ContestChartComponent = (function () {
                 _this.chartTeamEventHandled = false;
             }
         };
+        this.client = client_1.Client.getInstance();
     }
     ContestChartComponent.prototype.ngOnInit = function () {
         var _this = this;

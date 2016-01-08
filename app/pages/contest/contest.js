@@ -9,16 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
-var server_1 = require('../../providers/server');
+var client_1 = require('../../providers/client');
+var contestsService = require('../../providers/contests');
 var ContestPage = (function () {
-    function ContestPage(app, params) {
+    function ContestPage(params) {
         this.contestChart = {};
-        this.app = app;
-        this.server = server_1.Server.getInstance();
+        this.client = client_1.Client.getInstance();
         this.contestChart = params.data.contestChart;
     }
     ContestPage.prototype.onPageWillEnter = function () {
-        this.app.setTitle(this.server.translate('WHO_SMARTER_QUESTION'));
+        this.client.ionicApp.setTitle(this.client.translate('WHO_SMARTER_QUESTION'));
     };
     ContestPage.prototype.playContest = function (source) {
         //TODO: play contest
@@ -29,12 +29,19 @@ var ContestPage = (function () {
         alert('show participants, source: ' + source);
     };
     ContestPage.prototype.joinContest = function (team, source) {
-        //TODO: join contest
-        alert('join contest, team:' + team + ", source:" + source);
+        var _this = this;
+        var postData = { 'contestId': this.contestChart.contest._id, 'teamId': team };
+        this.client.serverPost('contests/join', postData).then(function (data) {
+            FlurryAgent.logEvent('contest/join', {
+                'contestId': _this.contestChart.contest._id,
+                'team': '' + team,
+                'sourceClick': source
+            });
+            _this.contestChart = contestsService.prepareContestChart(data.contest, 'starts');
+        });
     };
     ContestPage.prototype.switchTeams = function (source) {
-        //TODO: switch teams
-        alert('switch teams, source:' + source);
+        this.joinContest(1 - this.contestChart.contest.myTeam, source);
     };
     ContestPage.prototype.editContest = function () {
         //TODO: edit contest
@@ -66,9 +73,9 @@ var ContestPage = (function () {
             templateUrl: 'build/pages/contest/contest.html',
             directives: [contest_chart_1.ContestChartComponent]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
     ], ContestPage);
     return ContestPage;
-    var _a, _b;
+    var _a;
 })();
 exports.ContestPage = ContestPage;

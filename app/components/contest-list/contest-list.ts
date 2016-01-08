@@ -1,6 +1,6 @@
 import {Component, Input, Output, EventEmitter} from 'angular2/core';
 import {ContestChartComponent} from '../contest-chart/contest-chart';
-import {Server} from '../../providers/server';
+import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 
 @Component({
@@ -16,7 +16,7 @@ export class ContestListComponent {
 
   contests:Array<Object>;
   contestCharts:Array<Object>;
-  server:Server;
+  client:Client;
   events:Object = {
     "chartClick": (eventObj, dataObj) => {
       this.selectContest(eventObj.sender.args.dataSource.contest);
@@ -24,7 +24,7 @@ export class ContestListComponent {
   }
 
   constructor() {
-    this.server = Server.getInstance();
+    this.client = Client.getInstance();
   }
 
   selectContest(contest:Object) {
@@ -33,7 +33,7 @@ export class ContestListComponent {
 
   refresh() {
     var postData = {'tab': this.tab};
-    this.server.post('contests/list', postData).then((contests) => {
+    this.client.serverPost('contests/list', postData).then((contests) => {
       this.contests = contests;
       this.contestCharts = [];
       for(var i=0; i<contests.length; i++) {
@@ -47,7 +47,8 @@ export class ContestListComponent {
   }
 
   onTeamSelected(data) {
-    this.teamSelected.next(data);
+    //This is not a mistake - on chart lists - any click in any area should "select" the entire contest
+    this.contestSelected.next(data);
   }
 
 }

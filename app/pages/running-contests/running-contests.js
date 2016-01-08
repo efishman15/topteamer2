@@ -10,20 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var core_1 = require('angular2/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
-var server_1 = require('../../providers/server');
+var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var RunningContestsPage = (function () {
-    function RunningContestsPage(app) {
-        this.app = app;
-        this.nav = this.app.getComponent('nav');
-        this.server = server_1.Server.getInstance();
+    function RunningContestsPage() {
+        this.client = client_1.Client.getInstance();
     }
     RunningContestsPage.prototype.onPageDidEnter = function () {
-        this.app.setTitle(this.server.translate('RUNNING_CONTESTS'));
+        this.client.ionicApp.setTitle(this.client.translate('RUNNING_CONTESTS'));
         this.contestList.refresh();
     };
     RunningContestsPage.prototype.onContestSelected = function (data) {
-        contestsService.openContest(this.server, this.nav, data.contest._id);
+        contestsService.openContest(data.contest._id);
     };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 
@@ -34,9 +32,8 @@ var RunningContestsPage = (function () {
             templateUrl: 'build/pages/running-contests/running-contests.html',
             directives: [contest_list_1.ContestListComponent]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object])
+        __metadata('design:paramtypes', [])
     ], RunningContestsPage);
     return RunningContestsPage;
-    var _a;
 })();
 exports.RunningContestsPage = RunningContestsPage;

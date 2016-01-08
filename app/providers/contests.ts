@@ -1,5 +1,4 @@
-import {Server} from './server';
-import {NavController} from "ionic-framework/ionic";
+import {Client} from './client';
 import {ContestPage} from '../pages/contest/contest'
 
 //------------------------------------------------------
@@ -7,19 +6,19 @@ import {ContestPage} from '../pages/contest/contest'
 //------------------------------------------------------
 export let prepareContestChart = (contest, timeMode) => {
 
-  var server = Server.getInstance();
+  var client = Client.getInstance();
 
   var contestCaption;
   var contestSubCaption;
   var contestSubCaptionColor;
 
-  var contestChart = JSON.parse(JSON.stringify(server.settings.charts.contest));
+  var contestChart = JSON.parse(JSON.stringify(client.settings.charts.contest));
   contestChart.contest = contest;
 
   contestChart.data = [];
   var teamsOrder;
 
-  var direction = server.currentLanguage.direction;
+  var direction = client.currentLanguage.direction;
 
   if (direction == 'ltr') {
     teamsOrder = [0, 1];
@@ -32,37 +31,37 @@ export let prepareContestChart = (contest, timeMode) => {
 
   if (contest.status === 'finished') {
     //Contest Finished
-    contestCaption = server.translate('WHO_IS_SMARTER_QUESTION_CONTEST_FINISHED');
+    contestCaption = client.translate('WHO_IS_SMARTER_QUESTION_CONTEST_FINISHED');
 
     if (contest.teams[0].chartValue > contest.teams[1].chartValue) {
       contestSubCaption = contest.teams[0].name;
-      contestChart.chart.paletteColors = server.settings.charts.finishedPalette[teamsOrder[0]];
+      contestChart.chart.paletteColors = client.settings.charts.finishedPalette[teamsOrder[0]];
     }
     else if (contest.teams[0].chartValue < contest.teams[1].chartValue) {
       contestSubCaption = contest.teams[1].name;
-      contestChart.chart.paletteColors = server.settings.charts.finishedPalette[teamsOrder[1]];
+      contestChart.chart.paletteColors = client.settings.charts.finishedPalette[teamsOrder[1]];
     }
     else {
-      contestSubCaption = server.translate('TIE');
-      contestChart.chart.paletteColors = server.settings.charts.finishedPalette[2];
+      contestSubCaption = client.translate('TIE');
+      contestChart.chart.paletteColors = client.settings.charts.finishedPalette[2];
     }
 
-    contestSubCaptionColor = server.settings.charts.subCaption.finished.color;
+    contestSubCaptionColor = client.settings.charts.subCaption.finished.color;
   }
   else {
-    contestCaption = server.translate('WHO_IS_SMARTER');
-    contestSubCaption = server.translate('CONTEST_NAME',{
+    contestCaption = client.translate('WHO_IS_SMARTER');
+    contestSubCaption = client.translate('CONTEST_NAME',{
       team0: contest.teams[0].name,
       team1: contest.teams[1].name
     });
-    contestSubCaptionColor = server.settings.charts.subCaption.running.color;
+    contestSubCaptionColor = client.settings.charts.subCaption.running.color;
   }
 
-  var contestTimeWidth = server.canvasContext.measureText(contest.timePhrase.text).width;
-  var contestParticipantsString = server.translate('CONTEST_PARTICIPANTS', {participants: contest.participants + contest.manualParticipants});
-  var contestParticipantsWidth = server.canvasContext.measureText(contestParticipantsString).width;
+  var contestTimeWidth = client.canvasContext.measureText(contest.timePhrase.text).width;
+  var contestParticipantsString = client.translate('CONTEST_PARTICIPANTS', {participants: contest.participants + contest.manualParticipants});
+  var contestParticipantsWidth = client.canvasContext.measureText(contestParticipantsString).width;
 
-  var magicNumbers = server.settings.charts.contestAnnotations.annotationHorizontalMagicNumbers[direction];
+  var magicNumbers = client.settings.charts.contestAnnotations.annotationHorizontalMagicNumbers[direction];
 
   contestChart.annotations.groups[0].items[magicNumbers.time.id].text = contest.timePhrase.text;
   contestChart.annotations.groups[0].items[magicNumbers.time.id].x = magicNumbers.time.position + (contestTimeWidth / 2 + magicNumbers.time.spacing);
@@ -106,11 +105,12 @@ export let prepareContestChart = (contest, timeMode) => {
 
 };
 
-export let openContest = (server: Server, nav: NavController, contestId: string) => {
+export let openContest = (contestId: string) => {
 
   var postData = {'contestId': contestId};
-  server.post('contests/get', postData).then((contest) => {
-    nav.push(ContestPage, {'contestChart' : prepareContestChart(contest, "starts")});
+  var client = Client.getInstance();
+  client.serverPost('contests/get', postData).then((contest) => {
+    client.nav.push(ContestPage, {'contestChart' : prepareContestChart(contest, "starts")});
   });
 
 }
@@ -118,7 +118,7 @@ export let openContest = (server: Server, nav: NavController, contestId: string)
 //Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
 function setTimePhrase(contest, timeMode) {
 
-  var server = Server.getInstance();
+  var client = Client.getInstance();
 
   var now = (new Date()).getTime();
 
@@ -153,7 +153,7 @@ function setTimePhrase(contest, timeMode) {
       contestTimeUnits = 'MINUTES';
     }
 
-    contestTimeColor = server.settings.charts.contestAnnotations.time.running.color;
+    contestTimeColor = client.settings.charts.contestAnnotations.time.running.color;
 
     if (contest.status === 'running') {
       contestTimeTerm = 'CONTEST_STARTED';
@@ -179,18 +179,18 @@ function setTimePhrase(contest, timeMode) {
 
     if (contest.status === 'running') {
       contestTimeTerm = 'CONTEST_ENDS_IN';
-      contestTimeColor = server.settings.charts.contestAnnotations.time.running.color;
+      contestTimeColor = client.settings.charts.contestAnnotations.time.running.color;
     }
     else {
       //Contest Finished
       contestTimeTerm = 'CONTEST_ENDED';
-      contestTimeColor = server.settings.charts.contestAnnotations.time.finished.color;
+      contestTimeColor = client.settings.charts.contestAnnotations.time.finished.color;
     }
   }
 
-  var contestTimeString = server.translate(contestTimeTerm,{
+  var contestTimeString = client.translate(contestTimeTerm,{
     number: contestTimeNumber,
-    units: server.translate(contestTimeUnits)
+    units: client.translate(contestTimeUnits)
   });
 
   contest.timePhrase = {'text': contestTimeString, 'color': contestTimeColor};
