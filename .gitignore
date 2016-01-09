@@ -24,7 +24,8 @@ plugins/android.json
 plugins/ios.json
 www/build/
 $RECYCLE.BIN/
-server/logs/*
+server/logs/
+server/logs/server.log.0
 server/node_modules/
 .DS_Store
 Thumbs.db
