@@ -43,7 +43,7 @@ var ContestChartComponent = (function () {
     ContestChartComponent.prototype.ngOnInit = function () {
         var _this = this;
         FusionCharts.ready(function () {
-            var chart = new FusionCharts({
+            _this.chart = new FusionCharts({
                 type: "column2d",
                 renderAt: _this.id + '-container',
                 width: _this.width,
@@ -51,8 +51,12 @@ var ContestChartComponent = (function () {
                 dataFormat: 'json',
                 dataSource: _this.contestChart,
                 events: _this.events
-            }).render();
+            });
+            _this.chart.render();
         });
+    };
+    ContestChartComponent.prototype.refresh = function (contestChart) {
+        this.chart.setJSONData(contestChart);
     };
     __decorate([
         core_1.Input(), 

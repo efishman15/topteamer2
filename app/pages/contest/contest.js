@@ -8,6 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
+var core_1 = require('angular2/core');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
@@ -28,20 +29,22 @@ var ContestPage = (function () {
         //TODO: show participants
         alert('show participants, source: ' + source);
     };
-    ContestPage.prototype.joinContest = function (team, source) {
+    ContestPage.prototype.joinContest = function (team, source, action) {
         var _this = this;
+        if (action === void 0) { action = 'join'; }
         var postData = { 'contestId': this.contestChart.contest._id, 'teamId': team };
         this.client.serverPost('contests/join', postData).then(function (data) {
-            FlurryAgent.logEvent('contest/join', {
+            FlurryAgent.logEvent('contest/' + action, {
                 'contestId': _this.contestChart.contest._id,
                 'team': '' + team,
                 'sourceClick': source
             });
             _this.contestChart = contestsService.prepareContestChart(data.contest, 'starts');
+            _this.contestChartComponent.refresh(_this.contestChart);
         });
     };
     ContestPage.prototype.switchTeams = function (source) {
-        this.joinContest(1 - this.contestChart.contest.myTeam, source);
+        this.joinContest(1 - this.contestChart.contest.myTeam, source, 'switchTeams');
     };
     ContestPage.prototype.editContest = function () {
         //TODO: edit contest
@@ -68,6 +71,10 @@ var ContestPage = (function () {
             this.playContest('chart');
         }
     };
+    __decorate([
+        core_1.ViewChild(contest_chart_1.ContestChartComponent), 
+        __metadata('design:type', contest_chart_1.ContestChartComponent)
+    ], ContestPage.prototype, "contestChartComponent", void 0);
     ContestPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/contest/contest.html',

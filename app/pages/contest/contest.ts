@@ -14,6 +14,8 @@ export class ContestPage {
   client:Client;
   contestChart:Object = {};
 
+  @ViewChild(ContestChartComponent) contestChartComponent: ContestChartComponent;
+
   constructor(params:NavParams) {
     this.client = Client.getInstance();
     this.contestChart = params.data.contestChart;
@@ -33,24 +35,25 @@ export class ContestPage {
     alert('show participants, source: ' + source);
   }
 
-  joinContest(team, source) {
+  joinContest(team, source, action : string = 'join') {
 
     var postData = {'contestId' : this.contestChart.contest._id, 'teamId': team};
     this.client.serverPost('contests/join', postData).then( (data) => {
 
-      FlurryAgent.logEvent('contest/join', {
+      FlurryAgent.logEvent('contest/' + action, {
         'contestId': this.contestChart.contest._id,
         'team': '' + team,
         'sourceClick': source
       });
 
       this.contestChart = contestsService.prepareContestChart(data.contest, 'starts');
+      this.contestChartComponent.refresh(this.contestChart);
 
     });
   }
 
   switchTeams(source) {
-    this.joinContest(1 - this.contestChart.contest.myTeam, source);
+    this.joinContest(1 - this.contestChart.contest.myTeam, source, 'switchTeams');
   }
 
   editContest() {

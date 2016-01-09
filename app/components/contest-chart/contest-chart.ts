@@ -14,7 +14,8 @@ export class ContestChartComponent {
   @Input() contestChart:Object;
 
   chartTeamEventHandled:boolean;
-  client: Client;
+  client:Client;
+  chart:FusionChart;
 
   @Output() contestSelected = new EventEmitter();
   @Output() teamSelected = new EventEmitter();
@@ -50,7 +51,7 @@ export class ContestChartComponent {
 
   ngOnInit() {
     FusionCharts.ready(() => {
-      var chart = new FusionCharts({
+      this.chart = new FusionCharts({
         type: "column2d",
         renderAt: this.id + '-container',
         width: this.width,
@@ -58,8 +59,15 @@ export class ContestChartComponent {
         dataFormat: 'json',
         dataSource: this.contestChart,
         events: this.events
-      }).render();
+      });
+
+      this.chart.render();
+
     });
 
+  }
+
+  refresh(contestChart: Object) {
+    this.chart.setJSONData(contestChart);
   }
 }
