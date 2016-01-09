@@ -4,7 +4,6 @@
 *~
 *.sw[mnpcod]
 *.log
-*.log.*
 *.tmp
 *.tmp.*
 log.txt
@@ -25,7 +24,7 @@ plugins/android.json
 plugins/ios.json
 www/build/
 $RECYCLE.BIN/
-server/logs/
+/server/logs/
 server/node_modules/
 .DS_Store
 Thumbs.db
