@@ -75,8 +75,12 @@ export class Client {
     return this.serverGateway.get(path, timeout);
   }
 
-  serverPost(path, postData, timeout, blockUserInterface) {
+  serverPost(path, postData?, timeout?, blockUserInterface?) {
     return this.serverGateway.post(path, postData, timeout, blockUserInterface);
+  }
+
+  setPageTitle(key : string, params? : Object) {
+    this.ionicApp.setTitle(this.translate(key, params));
   }
 
   get ionicApp() : IonicApp {

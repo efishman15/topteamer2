@@ -17,7 +17,6 @@ var RecentlyFinishedContestsPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     RecentlyFinishedContestsPage.prototype.onPageDidEnter = function () {
-        this.client.ionicApp.setTitle(this.client.translate('RECENTLY_FINISHED_CONTESTS'));
         this.contestList.refresh();
     };
     RecentlyFinishedContestsPage.prototype.onContestSelected = function (data) {

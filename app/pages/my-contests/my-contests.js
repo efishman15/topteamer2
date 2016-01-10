@@ -17,13 +17,12 @@ var MyContestsPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     MyContestsPage.prototype.onPageWillEnter = function () {
-        this.client.ionicApp.setTitle(this.client.translate('MY_CONTESTS'));
+        this.client.setPageTitle('MY_CONTESTS');
         if (this.contestList) {
             this.contestList.refresh();
         }
     };
     MyContestsPage.prototype.onPageDidEnter = function () {
-        console.log('onPageDidEnter');
     };
     MyContestsPage.prototype.ngAfterViewInit = function () {
         this.contestList.refresh();

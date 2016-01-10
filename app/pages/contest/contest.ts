@@ -1,6 +1,8 @@
-import {IonicApp, Page, Component, NavParams} from 'ionic/ionic';
+import {Page, NavParams} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
+import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
+import {QuizPage} from '../../pages/quiz/quiz';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 
@@ -22,17 +24,15 @@ export class ContestPage {
   }
 
   onPageWillEnter() {
-    this.client.ionicApp.setTitle(this.client.translate('WHO_SMARTER_QUESTION'));
+    this.client.setPageTitle('WHO_SMARTER_QUESTION');
   }
 
   playContest(source) {
-    //TODO: play contest
-    alert('play contest, source: ' + source);
+    this.client.nav.push(QuizPage, {'contestId' : this.contestChart.contest._id, 'source' : source});
   }
 
   showParticipants(source) {
-    //TODO: show participants
-    alert('show participants, source: ' + source);
+    this.client.nav.push(ContestParticipantsPage, {'contest' : this.contestChart.contest, 'source' : source});
   }
 
   joinContest(team, source, action : string = 'join') {
@@ -61,9 +61,9 @@ export class ContestPage {
     alert('edit contest');
   }
 
-  share() {
+  share(source) {
     //TODO: share
-    alert('share');
+    alert('share, source=' + source);
   }
 
   like() {
@@ -73,7 +73,12 @@ export class ContestPage {
 
   onTeamSelected(data) {
     if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
-      this.switchTeams(data.source);
+      if (data.teamId !== this.contestChart.contest.myTeam) {
+        this.switchTeams(data.source);
+      }
+      else {
+        this.playContest(data.source);
+      }
     }
     else {
       this.joinContest(data.teamId, data.source);

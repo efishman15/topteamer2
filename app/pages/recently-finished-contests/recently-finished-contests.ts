@@ -19,7 +19,6 @@ export class RecentlyFinishedContestsPage {
   }
 
   onPageDidEnter() {
-    this.client.ionicApp.setTitle(this.client.translate('RECENTLY_FINISHED_CONTESTS'));
     this.contestList.refresh();
   }
 

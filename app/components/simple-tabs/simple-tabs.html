@@ -1,0 +1,5 @@
+<ion-row>
+  <ion-col *ngFor="#simpleTab of simpleTabs" (click)="selectTab(simpleTab)" [class.active]="simpleTab.active">
+      <a ng-class="'active' : simpleTab.active, 'passive' : !simpleTab.active" href="#">{{simpleTab.simpleTabTitle}}</a>
+  </ion-col>
+</ion-row>

@@ -1,5 +1,5 @@
 import {App, IonicApp, Platform, Config} from 'ionic/ionic';
-import {TabsPage} from './pages/tabs/tabs';
+import {MainTabsPage} from './pages/main-tabs/main-tabs';
 import {LoginPage} from './pages/login/login';
 import * as facebookService from './providers/facebook';
 import {Client} from './providers/client';
@@ -23,7 +23,7 @@ class topTeamerApp {
     // the menu only works after login
     // the login page disables the menu
     this.pages = [
-      {title: 'RunningContests', page: TabsPage, icon: 'calendar'},
+      {title: 'RunningContests', page: MainTabsPage, icon: 'calendar'},
       {title: 'Login', page: LoginPage, icon: 'log-in'},
     ];
 
@@ -58,6 +58,7 @@ class topTeamerApp {
     //TODO: Catch http 401 errors and re-login
     //TODO: Catch server popup messages and display a modal popup.
     //TODO: Flurry events
+    //TODO: Top bar with rank
 
     this.client.platform.ready().then(() => {
 
@@ -199,7 +200,7 @@ class topTeamerApp {
     facebookService.getLoginStatus().then((result) => {
       if (result.connected) {
         this.client.facebookServerConnect(result.response.authResponse).then(() => {
-          this.openPage(TabsPage, true, false);
+          this.openPage(MainTabsPage, true, false);
         })
       }
       else {

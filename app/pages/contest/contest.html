@@ -65,9 +65,13 @@
     </div>
   </div>
 
+  <button fab fab-bottom fab-left (click)="share('fab')">
+    <icon share></icon>
+  </button>
+
   <ion-toolbar>
     <div class="bar bar-button">
-      <a class="tab-button" (click)="share()">
+      <a class="tab-button" (click)="share('button')">
         {{client.translate('SHARE')}}
       </a>
       <a class="tab-button" (click)="like()">

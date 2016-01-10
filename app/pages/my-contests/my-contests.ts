@@ -20,14 +20,13 @@ export class MyContestsPage {
   }
 
   onPageWillEnter() {
-    this.client.ionicApp.setTitle(this.client.translate('MY_CONTESTS'));
+    this.client.setPageTitle('MY_CONTESTS');
     if (this.contestList) {
       this.contestList.refresh();
     }
   }
 
   onPageDidEnter() {
-    console.log('onPageDidEnter');
   }
 
   ngAfterViewInit() {

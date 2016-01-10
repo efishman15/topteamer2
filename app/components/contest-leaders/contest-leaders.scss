@@ -1,0 +1,36 @@
+.center {
+  text-align: center;
+}
+
+.col-90 {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 90%;
+  -moz-box-flex: 0;
+  -moz-flex: 0 0 90%;
+  -ms-flex: 0 0 90%;
+  flex: 0 0 90%;
+  max-width: 90%;
+}
+
+.col-100 {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 100%;
+  -moz-box-flex: 0;
+  -moz-flex: 0 0 100%;
+  -ms-flex: 0 0 100%;
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.contest-leader-background {
+  border-color: #28a54c;
+  background-color: #2a5a7c;
+  background: linear-gradient(top, #2a5a7c, #bcd9ef);
+  background: -ms-linear-gradient(top, #2a5a7c, #bcd9ef);
+  background: -webkit-gradient(linear, left top, left bottom, from(#2a5a7c), to(#bcd9ef));
+  background: -moz-linear-gradient(top, #2a5a7c, #bcd9ef);
+}

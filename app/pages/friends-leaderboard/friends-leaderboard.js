@@ -8,24 +8,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
-var my_contests_1 = require('../my-contests/my-contests');
-var running_contests_1 = require('../running-contests/running-contests');
-var recently_finished_contests_1 = require('../recently-finished-contests/recently-finished-contests');
+var core_1 = require('angular2/core');
+var contest_leaders_1 = require('../../components/contest-leaders/contest-leaders');
 var client_1 = require('../../providers/client');
-var TabsPage = (function () {
-    function TabsPage() {
-        // set the root pages for each tab
-        this.rootMyContestsPage = my_contests_1.MyContestsPage;
-        this.rootRunningContestsPage = running_contests_1.RunningContestsPage;
-        this.rootRecentlyFinishedContestsPage = recently_finished_contests_1.RecentlyFinishedContestsPage;
+var FriendsLeaderboardPage = (function () {
+    function FriendsLeaderboardPage() {
         this.client = client_1.Client.getInstance();
     }
-    TabsPage = __decorate([
+    FriendsLeaderboardPage.prototype.onPageDidEnter = function () {
+        //TODO: friendsPermissionJustGranted
+        this.contestLeadersComponent.showFriends();
+    };
+    __decorate([
+        core_1.ViewChild(contest_leaders_1.ContestLeadersComponent), 
+        __metadata('design:type', contest_leaders_1.ContestLeadersComponent)
+    ], FriendsLeaderboardPage.prototype, "contestLeadersComponent", void 0);
+    FriendsLeaderboardPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/tabs/tabs.html'
+            templateUrl: 'build/pages/friends-leaderboard/friends-leaderboard.html',
+            directives: [contest_leaders_1.ContestLeadersComponent]
         }), 
         __metadata('design:paramtypes', [])
-    ], TabsPage);
-    return TabsPage;
+    ], FriendsLeaderboardPage);
+    return FriendsLeaderboardPage;
 })();
-exports.TabsPage = TabsPage;
+exports.FriendsLeaderboardPage = FriendsLeaderboardPage;

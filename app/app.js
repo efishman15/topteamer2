@@ -8,7 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
-var tabs_1 = require('./pages/tabs/tabs');
+var main_tabs_1 = require('./pages/main-tabs/main-tabs');
 var login_1 = require('./pages/login/login');
 var facebookService = require('./providers/facebook');
 var client_1 = require('./providers/client');
@@ -20,7 +20,7 @@ var topTeamerApp = (function () {
         // the menu only works after login
         // the login page disables the menu
         this.pages = [
-            { title: 'RunningContests', page: tabs_1.TabsPage, icon: 'calendar' },
+            { title: 'RunningContests', page: main_tabs_1.MainTabsPage, icon: 'calendar' },
             { title: 'Login', page: login_1.LoginPage, icon: 'log-in' },
         ];
         client.init(ionicApp, platform).then(function () {
@@ -51,6 +51,7 @@ var topTeamerApp = (function () {
         //TODO: Catch http 401 errors and re-login
         //TODO: Catch server popup messages and display a modal popup.
         //TODO: Flurry events
+        //TODO: Top bar with rank
         var _this = this;
         this.client.platform.ready().then(function () {
             _this.declareStringFormat();
@@ -164,7 +165,7 @@ var topTeamerApp = (function () {
         facebookService.getLoginStatus().then(function (result) {
             if (result.connected) {
                 _this.client.facebookServerConnect(result.response.authResponse).then(function () {
-                    _this.openPage(tabs_1.TabsPage, true, false);
+                    _this.openPage(main_tabs_1.MainTabsPage, true, false);
                 });
             }
             else {

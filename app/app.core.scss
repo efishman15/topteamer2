@@ -11,12 +11,30 @@
 
 @import "components/contest-list/contest-list";
 
+@import "components/contest-leaders/contest-leaders";
+
+@import "components/simple-tabs/simple-tabs";
+
+@import "components/simple-tab/simple-tab";
+
+@import "pages/contest/contest";
+
+@import "pages/contest-participants/contest-participants";
+
+@import "pages/friends-leaderboard/friends-leaderboard";
+
+@import "pages/leaderboard-tabs/leadboard-tabs";
+
 @import "pages/login/login";
 
-@import "pages/tabs/tabs";
+@import "pages/main-tabs/main-tabs";
 
 @import "pages/my-contests/my-contests";
 
-@import "pages/running-contests/running-contests";
+@import "pages/quiz/quiz";
 
 @import "pages/recently-finished-contests/recently-finished-contests";
+
+@import "pages/running-contests/running-contests";
+
+@import "pages/weekly-leaderboard/weekly-leaderboard";

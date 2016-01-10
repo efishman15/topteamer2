@@ -8,7 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
-var tabs_1 = require('../tabs/tabs');
+var main_tabs_1 = require('../main-tabs/main-tabs');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
 var LoginPage = (function () {
@@ -20,7 +20,7 @@ var LoginPage = (function () {
         facebookService.login().then(function (response) {
             _this.client.nav.pop(LoginPage);
             _this.client.facebookServerConnect(response.authResponse).then(function () {
-                _this.client.nav.push(tabs_1.TabsPage);
+                _this.client.nav.push(main_tabs_1.MainTabsPage);
             });
         });
     };

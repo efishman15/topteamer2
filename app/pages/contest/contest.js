@@ -10,6 +10,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var core_1 = require('angular2/core');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
+var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
+var quiz_1 = require('../../pages/quiz/quiz');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestPage = (function () {
@@ -19,15 +21,13 @@ var ContestPage = (function () {
         this.contestChart = params.data.contestChart;
     }
     ContestPage.prototype.onPageWillEnter = function () {
-        this.client.ionicApp.setTitle(this.client.translate('WHO_SMARTER_QUESTION'));
+        this.client.setPageTitle('WHO_SMARTER_QUESTION');
     };
     ContestPage.prototype.playContest = function (source) {
-        //TODO: play contest
-        alert('play contest, source: ' + source);
+        this.client.nav.push(quiz_1.QuizPage, { 'contestId': this.contestChart.contest._id, 'source': source });
     };
     ContestPage.prototype.showParticipants = function (source) {
-        //TODO: show participants
-        alert('show participants, source: ' + source);
+        this.client.nav.push(contest_participants_1.ContestParticipantsPage, { 'contest': this.contestChart.contest, 'source': source });
     };
     ContestPage.prototype.joinContest = function (team, source, action) {
         var _this = this;
@@ -50,9 +50,9 @@ var ContestPage = (function () {
         //TODO: edit contest
         alert('edit contest');
     };
-    ContestPage.prototype.share = function () {
+    ContestPage.prototype.share = function (source) {
         //TODO: share
-        alert('share');
+        alert('share, source=' + source);
     };
     ContestPage.prototype.like = function () {
         //TODO: like
@@ -60,7 +60,12 @@ var ContestPage = (function () {
     };
     ContestPage.prototype.onTeamSelected = function (data) {
         if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
-            this.switchTeams(data.source);
+            if (data.teamId !== this.contestChart.contest.myTeam) {
+                this.switchTeams(data.source);
+            }
+            else {
+                this.playContest(data.source);
+            }
         }
         else {
             this.joinContest(data.teamId, data.source);

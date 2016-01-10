@@ -54,6 +54,9 @@ var Client = (function () {
     Client.prototype.serverPost = function (path, postData, timeout, blockUserInterface) {
         return this.serverGateway.post(path, postData, timeout, blockUserInterface);
     };
+    Client.prototype.setPageTitle = function (key, params) {
+        this.ionicApp.setTitle(this.translate(key, params));
+    };
     Object.defineProperty(Client.prototype, "ionicApp", {
         get: function () {
             return this._ionicApp;

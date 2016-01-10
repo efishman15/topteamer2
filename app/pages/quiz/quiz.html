@@ -1,0 +1,45 @@
+<ion-navbar *navbar>
+  <button menuToggle>
+    <icon menu></icon>
+  </button>
+  <ion-title>{{client.translate('QUIZ')}}</ion-title>
+</ion-navbar>
+
+<ion-content class="center">
+
+  <canvas id="quizCanvas" height="{{client.settings.quiz.canvas.height}}" class="quiz-canvas"
+          (click)="canvasClick($event)" style="height: {{client.settings.quiz.canvas.height}}px">
+  </canvas>
+
+  <div *ngIf="quizData" dir="{{quizData.currentQuestion.direction}}"
+       ng-class="{'animated' : quizData.currentQuestion.doAnimation,
+                        'fix-animation-bug' : quizData.currentQuestion.doAnimation,
+                        'bounceInLeft' : quizData.currentQuestion.doAnimation && client.currentLanguage.direction==='ltr',
+                        'bounceInRight' : quizData.currentQuestion.doAnimation && client.currentLanguage.direction==='rtl'}"
+       transition-end="questionTransitionEnd()">
+
+    <div class="question-text"
+         ng-class="{'pointer' : client.session.isAdmin}"
+         (click)="client.session.isAdmin && openQuestionModal()">
+      <div id="questionText">
+      </div>
+    </div>
+
+    <div class="list padding">
+      <button id="buttonAnswer{{i}}"
+              disabled="{{quizData.currentQuestion.answered && answer.correct==null && answer.answeredCorrectly==null}}"
+              *ngFor="#answer of quizData.currentQuestion.answers, #i=index"
+              class="item button button-full item-text-wrap quiz-answer"
+              ng-class="{'button' : !quizData.currentQuestion.answered,
+                         'positive' : !quizData.currentQuestion.answered,
+                            'balanced blink' : answer.answeredCorrectly == true || answer.correct == true,
+                            'danger blink' : answer.answeredCorrectly == false && answer.correct == null}"
+              (click)="!quizData.currentQuestion.answered && submitAnswer(i)"
+              animationend="buttonAnimationEnded">
+        <div id="answerText{{i}}">
+        </div>
+      </button>
+    </div>
+  </div>
+
+</ion-content>

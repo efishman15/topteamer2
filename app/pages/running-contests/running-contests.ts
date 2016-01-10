@@ -19,7 +19,7 @@ export class RunningContestsPage {
   }
 
   onPageDidEnter() {
-    this.client.ionicApp.setTitle(this.client.translate('RUNNING_CONTESTS'));
+    this.client.setPageTitle('RUNNING_CONTESTS');
     this.contestList.refresh();
   }
 

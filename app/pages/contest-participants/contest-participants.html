@@ -1,0 +1,20 @@
+<ion-navbar *navbar>
+  <button menuToggle>
+    <icon menu></icon>
+  </button>
+  <ion-title>{{client.translate('CONTEST_LEADERS')}}</ion-title>
+</ion-navbar>
+
+<ion-content class="center">
+
+  <simple-tabs>
+    <simple-tab simpleTabTitle="{{client.translate('CONTEST_LEADERS_GENERAL_SCORING')}}"
+                (selected)="showContestParticipants()"></simple-tab>
+    <simple-tab simpleTabTitle="{{contest.teams[0].name}}" (selected)="showTeamParticipants(0)"></simple-tab>
+    <simple-tab simpleTabTitle="{{contest.teams[1].name}}" (selected)="showTeamParticipants(1)"></simple-tab>
+  </simple-tabs>
+
+  <contest-leaders>
+
+  </contest-leaders>
+</ion-content>

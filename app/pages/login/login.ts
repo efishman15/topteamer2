@@ -1,5 +1,5 @@
 import {IonicApp, Page, NavController} from 'ionic/ionic';
-import {TabsPage} from '../tabs/tabs';
+import {MainTabsPage} from '../main-tabs/main-tabs';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
 
@@ -18,7 +18,7 @@ export class LoginPage {
     facebookService.login().then((response) => {
       this.client.nav.pop(LoginPage);
       this.client.facebookServerConnect(response.authResponse).then(() => {
-        this.client.nav.push(TabsPage);
+        this.client.nav.push(MainTabsPage);
       })
     });
   };
