@@ -1,4 +1,4 @@
-import {Page, NavParams} from 'ionic/ionic';
+import {Page, NavParams, Events} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
@@ -18,9 +18,13 @@ export class ContestPage {
 
   @ViewChild(ContestChartComponent) contestChartComponent: ContestChartComponent;
 
-  constructor(params:NavParams) {
+  constructor(params:NavParams, events: Events) {
     this.client = Client.getInstance();
     this.contestChart = params.data.contestChart;
+
+    events.subscribe('topTeamer:quizFinished', (results) => {
+      alert("quiz finished!, results: " + JSON.stringify(results));
+    });
   }
 
   onPageWillEnter() {

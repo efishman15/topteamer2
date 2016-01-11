@@ -12,33 +12,35 @@
   </canvas>
 
   <div *ngIf="quizData" dir="{{quizData.currentQuestion.direction}}"
-       ng-class="{'animated' : quizData.currentQuestion.doAnimation,
+       [transitioned]
+       ng-class="{'long-animated' : quizData.currentQuestion.doAnimation,
                         'fix-animation-bug' : quizData.currentQuestion.doAnimation,
                         'bounceInLeft' : quizData.currentQuestion.doAnimation && client.currentLanguage.direction==='ltr',
                         'bounceInRight' : quizData.currentQuestion.doAnimation && client.currentLanguage.direction==='rtl'}"
-       transition-end="questionTransitionEnd()">
+       (transitionEnd)="questionTransitionEnd($event)">
 
     <div class="question-text"
          ng-class="{'pointer' : client.session.isAdmin}"
-         (click)="client.session.isAdmin && openQuestionModal()">
-      <div id="questionText">
-      </div>
+         (click)="client.session.isAdmin && openQuestionModal()"
+         [innerHtml]="quizData.currentQuestion.text">
     </div>
 
     <div class="list padding">
-      <button id="buttonAnswer{{i}}"
-              disabled="{{quizData.currentQuestion.answered && answer.correct==null && answer.answeredCorrectly==null}}"
+      <button [animated]
               *ngFor="#answer of quizData.currentQuestion.answers, #i=index"
-              class="item button button-full item-text-wrap quiz-answer"
-              ng-class="{'button' : !quizData.currentQuestion.answered,
-                         'positive' : !quizData.currentQuestion.answered,
-                            'balanced blink' : answer.answeredCorrectly == true || answer.correct == true,
-                            'danger blink' : answer.answeredCorrectly == false && answer.correct == null}"
+              id="buttonAnswer{{i}}"
+              name="buttonAnswer{{i}}"
+              [disabled]="quizData.currentQuestion.answered && answer.correct==null && answer.answeredCorrectly==null"
+              class="button button-full item-text-wrap quiz-answer pointer"
+              [ngClass]="{'button-light' : quizData.currentQuestion.answered && answer.answeredCorrectly == null && answer.correct == null,
+                            'blink' : answer.answeredCorrectly == true || answer.correct == true || (answer.answeredCorrectly == false && answer.correct == null),
+                            'button-favorite' : answer.answeredCorrectly == true || answer.correct == true,
+                            'button-danger' : answer.answeredCorrectly == false && answer.correct == null}"
               (click)="!quizData.currentQuestion.answered && submitAnswer(i)"
-              animationend="buttonAnimationEnded">
-        <div id="answerText{{i}}">
-        </div>
+              (animationEnd)="buttonAnimationEnded($event)"
+              [innerHtml]="answer.text">
       </button>
+
     </div>
   </div>
 

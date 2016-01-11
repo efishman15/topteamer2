@@ -15,10 +15,13 @@ var quiz_1 = require('../../pages/quiz/quiz');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestPage = (function () {
-    function ContestPage(params) {
+    function ContestPage(params, events) {
         this.contestChart = {};
         this.client = client_1.Client.getInstance();
         this.contestChart = params.data.contestChart;
+        events.subscribe('topTeamer:quizFinished', function (results) {
+            alert("quiz finished!, results: " + JSON.stringify(results));
+        });
     }
     ContestPage.prototype.onPageWillEnter = function () {
         this.client.setPageTitle('WHO_SMARTER_QUESTION');
@@ -85,9 +88,9 @@ var ContestPage = (function () {
             templateUrl: 'build/pages/contest/contest.html',
             directives: [contest_chart_1.ContestChartComponent]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _b) || Object])
     ], ContestPage);
     return ContestPage;
-    var _a;
+    var _a, _b;
 })();
 exports.ContestPage = ContestPage;

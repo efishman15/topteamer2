@@ -12,8 +12,10 @@ var core_1 = require('angular2/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
+var inner_html_1 = require('../../components/inner-html/inner-html');
 var MyContestsPage = (function () {
     function MyContestsPage() {
+        this.str = '<strong>This is a strong text</strong>';
         this.client = client_1.Client.getInstance();
     }
     MyContestsPage.prototype.onPageWillEnter = function () {
@@ -37,7 +39,7 @@ var MyContestsPage = (function () {
     MyContestsPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/my-contests/my-contests.html',
-            directives: [contest_list_1.ContestListComponent]
+            directives: [contest_list_1.ContestListComponent, inner_html_1.InnerHtmlComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], MyContestsPage);
