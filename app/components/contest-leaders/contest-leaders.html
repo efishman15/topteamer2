@@ -1,17 +1,16 @@
-<ion-list class="list-inset" *ngFor="#leader of leaders">
-  <ion-row *ngIf="leader.outside">
-    <ion-col><strong>{{client.translate('MY_POSITION', {'position' : leader.rank}) }}</strong>
+<ion-list inset>
+  <ion-row *ngFor="#leader of leaders">
+    <ion-col width-10>
+      <h1 class="align-center">{{leader.rank}}</h1>
     </ion-col>
-  </ion-row>
-  <ion-row class="padding-left padding-right">
-    <ion-col *ngIf="!leader.outside" class="col-center">
-      <h1 class="center">{{leader.rank}}</h1>
+    <ion-col width-90>
+      <ion-item divider class="contest-leader-background">
+        <ion-avatar item-left>
+          <img src="{{leader.avatar}}">
+        </ion-avatar>
+        <h2 class="contest-leader-row1">{{leader.name}}</h2>
+        <p class="contest-leader-row2">{{leader.score}} {{ client.translate('SCORE') }}</p>
+      </ion-item>
     </ion-col>
-    <ion-item ng-class="{'col-90' : !leader.outside, 'col-100': leader.outside }"
-         class="item-divider full-width contest-leader-background item-avatar-{{client.currentLanguage.align}}">
-      <img ng-class="{'leader-avatar-in-leaderboard' : !leader.outside, 'leader-avatar-outside-leaderboard' : leader.outside}" src="{{leader.avatar}}">
-      <h2 class="contest-leader-row1">{{leader.name}}</h2>
-      <p class="contest-leader-row2">{{leader.score}} {{ client.translate('SCORE') }}</p>
-    </ion-item>
   </ion-row>
 </ion-list>

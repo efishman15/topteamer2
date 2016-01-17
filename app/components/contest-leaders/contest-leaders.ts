@@ -1,15 +1,16 @@
-import {Component, Input} from 'angular2/core';
 import {Client} from '../../providers/client';
+import {Component} from 'angular2/core';
+import {List, Item} from 'ionic/ionic';
 
 @Component({
   selector: 'contest-leaders',
-  templateUrl: 'build/components/contest-leaders/contest-leaders.html'
+  templateUrl: 'build/components/contest-leaders/contest-leaders.html',
+  directives: [List, Item]
 })
 
 export class ContestLeadersComponent {
 
   leaders:Array<Object>;
-
   client:Client;
 
   constructor() {

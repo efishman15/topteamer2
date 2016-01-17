@@ -5,16 +5,15 @@
   <ion-title>{{client.translate('WHO_IS_SMARTER_QUESTION')}}</ion-title>
 </ion-navbar>
 
-<ion-content class="center">
+<ion-content class="align-center">
 
-  <div>
-
-    <div
-      class="item contest-leader-background item-avatar-{{client.currentLanguage.align}}">
-      <img src="{{contestChart.contest.creator.avatar}}">
-      <h2 class="contest-leader-row1">{{client.translate('CREATED_BY',{name : contestChart.contest.creator.name})}}</h2>
+    <ion-item class="contest-leader-background">
+      <ion-avatar item-left>
+        <img src="{{contestChart.contest.creator.avatar}}">
+      </ion-avatar>
+      <h2 class="contest-leader-row1">{{ client.translate('CREATED_BY',{name : contestChart.contest.creator.name}) }}</h2>
       <p class="contest-leader-row2">{{contestChart.contest.timePhrase.text}}</p>
-    </div>
+    </ion-item>
 
     <div class="contest-chart-background">
 
@@ -52,38 +51,30 @@
              (click)="showParticipants('topLeaders')">{{client.translate('CONTEST_LEADERS_MORE')}}
         </div>
       </div>
-    </div>
+
   </div>
 
   <div *ngIf="animateResults" class="padding-left padding-right">
-    <div class="item item-divider center long-animated {{lastQuizResults.data.animation}}">
+    <ion-item divider class="align-center long-animated {{lastQuizResults.data.animation}}">
       <h2>{{client.translate(lastQuizResults.data.clientKey + '_TITLE')}}</h2>
       <h3>{{client.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
-      <i class="balanced pointer contest-animation-share-image android-share-alt"
-         style="{{client.settings.currentLanguage.oppositeAlign}}: 10px;"
-         (click)="share()"></i>
-    </div>
+      <ion-icon
+          name="android-share-alt"
+          class="pointer contest-animation-share-image"
+          style="{{client.settings.currentLanguage.oppositeAlign}}: 10px;"
+         (click)="share()">
+      </ion-icon>
+    </ion-item>
   </div>
 
   <button fab fab-bottom fab-left (click)="share('fab')">
     <icon share></icon>
   </button>
-
-  <ion-toolbar>
-    <div class="bar bar-button">
-      <a class="tab-button" (click)="share('button')">
-        {{client.translate('SHARE')}}
-      </a>
-      <a class="tab-button" (click)="like()">
-        {{client.translate('LIKE')}}
-      </a>
-      <a class="tab-button" (click)="switchTeams('button')" *ngIf="contestChart.contest.state==='play'">
-        {{client.translate('SWITCH_TEAMS')}}
-      </a>
-      <a class="tab-button" (click)="editContest()">
-        {{client.translate('EDIT_CONTEST')}}
-      </a>
-    </div>
-  </ion-toolbar>
+  <ion-buttons>
+      <button secondary class="bar-button" (click)="share('button')">{{client.translate('SHARE')}}</button>
+      <button secondary class="bar-button" (click)="like()">{{client.translate('LIKE')}}</button>
+      <button *ngIf="contestChart.contest.state==='play'" secondary class="bar-button" (click)="switchTeams('button')">{{client.translate('SWITCH_TEAMS')}}</button>
+      <button *ngIf="contestChart.contest.owner" secondary class="bar-button" (click)="editContest()">{{client.translate('EDIT_CONTEST')}}</button>
+  </ion-buttons>
 
 </ion-content>

@@ -1,20 +1,3 @@
-.contest-leader-background {
-  border-color: #28a54c;
-  background-color: #2a5a7c;
-  background: linear-gradient(top, #2a5a7c, #bcd9ef);
-  background: -ms-linear-gradient(top, #2a5a7c, #bcd9ef);
-  background: -webkit-gradient(linear, left top, left bottom, from(#2a5a7c), to(#bcd9ef));
-  background: -moz-linear-gradient(top, #2a5a7c, #bcd9ef);
-}
-
-.contest-leader-row1 {
-  color: #e0e3e5 !important;
-}
-
-.contest-leader-row2 {
-  color: #383838 !important;
-}
-
 .contest-chart-background {
   border-color: #28a54c;
   background-color: #ffe29b;
@@ -55,4 +38,11 @@
   position: absolute;
   top : 6px;
   font-size: 45px;
+}
+
+.long-animated {
+  -webkit-animation-duration: 3s;
+  animation-duration: 3s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
 }

@@ -5,7 +5,7 @@
   <ion-title>{{client.translate('QUIZ')}}</ion-title>
 </ion-navbar>
 
-<ion-content class="center">
+<ion-content class="align-center">
 
   <canvas id="quizCanvas" height="{{client.settings.quiz.canvas.height}}" class="quiz-canvas"
           (click)="canvasClick($event)" style="height: {{client.settings.quiz.canvas.height}}px">
@@ -13,19 +13,18 @@
 
   <div *ngIf="quizData" dir="{{quizData.currentQuestion.direction}}"
        [transitioned]
-       ng-class="{'long-animated' : quizData.currentQuestion.doAnimation,
-                        'fix-animation-bug' : quizData.currentQuestion.doAnimation,
+       [ngClass]="{'animated' : quizData.currentQuestion.doAnimation,
                         'bounceInLeft' : quizData.currentQuestion.doAnimation && client.currentLanguage.direction==='ltr',
                         'bounceInRight' : quizData.currentQuestion.doAnimation && client.currentLanguage.direction==='rtl'}"
        (transitionEnd)="questionTransitionEnd($event)">
 
     <div class="question-text"
-         ng-class="{'pointer' : client.session.isAdmin}"
+         [ngClass]="{'pointer' : client.session.isAdmin}"
          (click)="client.session.isAdmin && openQuestionModal()"
          [innerHtml]="quizData.currentQuestion.text">
     </div>
 
-    <div class="list padding">
+    <ion-list class="padding">
       <button [animated]
               *ngFor="#answer of quizData.currentQuestion.answers, #i=index"
               id="buttonAnswer{{i}}"
@@ -41,7 +40,7 @@
               [innerHtml]="answer.text">
       </button>
 
-    </div>
+    </ion-list>
   </div>
 
 </ion-content>

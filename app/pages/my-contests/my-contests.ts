@@ -4,19 +4,16 @@ import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Client} from '../../providers/client';
 import {ContestPage} from '../contest/contest'
 import * as contestsService from '../../providers/contests';
-import {InnerHtmlComponent} from '../../components/inner-html/inner-html'
 
 @Page({
   templateUrl: 'build/pages/my-contests/my-contests.html',
-  directives: [ContestListComponent,InnerHtmlComponent]
+  directives: [ContestListComponent]
 })
 
 export class MyContestsPage {
 
   @ViewChild(ContestListComponent) contestList: ContestListComponent;
   client: Client;
-
-  str: string = '<strong>This is a strong text</strong>';
 
   constructor() {
     this.client = Client.getInstance();
