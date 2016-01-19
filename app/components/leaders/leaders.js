@@ -10,11 +10,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var client_1 = require('../../providers/client');
 var core_1 = require('angular2/core');
 var ionic_1 = require('ionic/ionic');
-var ContestLeadersComponent = (function () {
-    function ContestLeadersComponent() {
+var LeadersComponent = (function () {
+    function LeadersComponent() {
         this.client = client_1.Client.getInstance();
     }
-    ContestLeadersComponent.prototype.showFriends = function (friendsPermissionJustGranted) {
+    LeadersComponent.prototype.showFriends = function (friendsPermissionJustGranted) {
         var _this = this;
         var postData = {};
         if (friendsPermissionJustGranted) {
@@ -24,14 +24,14 @@ var ContestLeadersComponent = (function () {
             _this.leaders = leaders;
         });
     };
-    ContestLeadersComponent.prototype.showWeekly = function () {
+    LeadersComponent.prototype.showWeekly = function () {
         var _this = this;
         this.client.serverPost('leaderboard/weekly').then(function (leaders) {
             _this.leaders = leaders;
         });
     };
     //If teamId is not passed - general contest leaderboard is shown
-    ContestLeadersComponent.prototype.showContestParticipants = function (contestId, teamId) {
+    LeadersComponent.prototype.showContestParticipants = function (contestId, teamId) {
         var _this = this;
         var postData = { 'contestId': contestId };
         if (teamId === 0 || teamId === 1) {
@@ -41,14 +41,14 @@ var ContestLeadersComponent = (function () {
             _this.leaders = leaders;
         });
     };
-    ContestLeadersComponent = __decorate([
+    LeadersComponent = __decorate([
         core_1.Component({
-            selector: 'contest-leaders',
-            templateUrl: 'build/components/contest-leaders/contest-leaders.html',
+            selector: 'leaders',
+            templateUrl: 'build/components/leaders/leaders.html',
             directives: [ionic_1.List, ionic_1.Item]
         }), 
         __metadata('design:paramtypes', [])
-    ], ContestLeadersComponent);
-    return ContestLeadersComponent;
+    ], LeadersComponent);
+    return LeadersComponent;
 })();
-exports.ContestLeadersComponent = ContestLeadersComponent;
+exports.LeadersComponent = LeadersComponent;

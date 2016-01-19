@@ -12,19 +12,41 @@ var core_1 = require('angular2/core');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
 var quiz_1 = require('../../pages/quiz/quiz');
+var facebook_post_1 = require('../../pages/facebook-post/facebook-post');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
+var SoundService = require('../../providers/sound');
 var ContestPage = (function () {
-    function ContestPage(params, events) {
+    function ContestPage(params, events, modal) {
+        var _this = this;
         this.contestChart = {};
+        this.lastQuizResults = null;
+        this.animateLastResults = false;
+        this.modal = modal;
         this.client = client_1.Client.getInstance();
         this.contestChart = params.data.contestChart;
-        events.subscribe('topTeamer:quizFinished', function (results) {
-            alert("quiz finished!, results: " + JSON.stringify(results));
+        events.subscribe('topTeamer:quizFinished', function (eventData) {
+            //Event data comes as an array of data objects - we expect only one (last quiz results)
+            _this.lastQuizResults = eventData[0];
+            //Exit from the quiz
+            _this.client.nav.pop();
+            if (_this.lastQuizResults.data.facebookPost) {
+                _this.animateLastResults = false;
+                _this.modal.open(facebook_post_1.FacebookPostPage, { 'quizResults': _this.lastQuizResults }, { 'handle': 'facebookPost' });
+            }
+            else {
+                //Exit from the quiz
+                _this.client.nav.pop();
+                _this.animateLastResults = true;
+            }
+            setTimeout(function () {
+                SoundService.play(_this.lastQuizResults.data.sound);
+            }, 500);
         });
     }
-    ContestPage.prototype.onPageWillEnter = function () {
-        this.client.setPageTitle('WHO_SMARTER_QUESTION');
+    ContestPage.prototype.onPageWillLeave = function () {
+        this.animateLastResults = false;
+        this.lastQuizResults = null;
     };
     ContestPage.prototype.playContest = function (source) {
         this.client.nav.push(quiz_1.QuizPage, { 'contestId': this.contestChart.contest._id, 'source': source });
@@ -86,11 +108,11 @@ var ContestPage = (function () {
     ContestPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/contest/contest.html',
-            directives: [contest_chart_1.ContestChartComponent]
+            directives: [contest_chart_1.ContestChartComponent, ionic_1.Item]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _b) || Object, (typeof (_c = typeof ionic_1.Modal !== 'undefined' && ionic_1.Modal) === 'function' && _c) || Object])
     ], ContestPage);
     return ContestPage;
-    var _a, _b;
+    var _a, _b, _c;
 })();
 exports.ContestPage = ContestPage;

@@ -1,0 +1,25 @@
+<ion-navbar *navbar>
+  <button menuToggle>
+    <icon menu></icon>
+  </button>
+  <ion-title>{{client.translate('LEADERBOARDS')}}</ion-title>
+</ion-navbar>
+
+<ion-content class="align-center">
+
+  <simple-tabs>
+    <simple-tab simpleTabTitle="{{client.translate('RECENTLY_FINISHED_CONTESTS')}}"
+                (selected)="showRecentlyFinishedContests()"></simple-tab>
+    <simple-tab simpleTabTitle="{{client.translate('FRIENDS')}}" (selected)="showFriendsLeaderboard()"></simple-tab>
+    <simple-tab simpleTabTitle="{{client.translate('WEEKLY')}}" (selected)="showWeeklyLeaderboard()"></simple-tab>
+  </simple-tabs>
+
+  <contest-list [hidden]="mode !== 'contests'" tab="recentlyFinished"
+                (contestSelected)="onContestSelected($event)">
+  </contest-list>
+
+  <leaders [hidden]="mode !== 'leaders'">
+
+  </leaders>
+
+</ion-content>

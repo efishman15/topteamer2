@@ -8,7 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
-var contest_leaders_1 = require('../../components/contest-leaders/contest-leaders');
+var leaders_1 = require('../../components/leaders/leaders');
 var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var core_1 = require('angular2/core');
@@ -20,27 +20,26 @@ var ContestParticipantsPage = (function () {
         this.contest = params.data.contest;
         this.source = params.data.source;
         this.client = client_1.Client.getInstance();
-        this.client.setPageTitle('CONTEST_LEADERS');
     }
     ContestParticipantsPage.prototype.onPageDidEnter = function () {
         this.showContestParticipants();
     };
     ContestParticipantsPage.prototype.showContestParticipants = function () {
         FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/all');
-        this.contestLeadersComponent.showContestParticipants(this.contest._id);
+        this.leadersComponent.showContestParticipants(this.contest._id);
     };
     ContestParticipantsPage.prototype.showTeamParticipants = function (teamId) {
         FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/team' + teamId);
-        this.contestLeadersComponent.showContestParticipants(this.contest._id, teamId);
+        this.leadersComponent.showContestParticipants(this.contest._id, teamId);
     };
     __decorate([
-        core_1.ViewChild(contest_leaders_1.ContestLeadersComponent), 
-        __metadata('design:type', contest_leaders_1.ContestLeadersComponent)
-    ], ContestParticipantsPage.prototype, "contestLeadersComponent", void 0);
+        core_1.ViewChild(leaders_1.LeadersComponent), 
+        __metadata('design:type', leaders_1.LeadersComponent)
+    ], ContestParticipantsPage.prototype, "leadersComponent", void 0);
     ContestParticipantsPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/contest-participants/contest-participants.html',
-            directives: [simple_tabs_1.SimpleTabsComponent, simple_tab_1.SimpleTabComponent, contest_leaders_1.ContestLeadersComponent]
+            directives: [simple_tabs_1.SimpleTabsComponent, simple_tab_1.SimpleTabComponent, leaders_1.LeadersComponent]
         }), 
         __metadata('design:paramtypes', [ionic_2.NavParams])
     ], ContestParticipantsPage);

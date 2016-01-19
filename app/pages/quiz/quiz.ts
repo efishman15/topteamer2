@@ -157,7 +157,6 @@ export class QuizPage {
         });
 
       this.events.publish('topTeamer:quizFinished', this.quizData.results)
-      this.client.nav.pop();
 
     }
     else {

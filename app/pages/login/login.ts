@@ -1,4 +1,4 @@
-import {IonicApp, Page, NavController} from 'ionic/ionic';
+import {Page} from 'ionic/ionic';
 import {MainTabsPage} from '../main-tabs/main-tabs';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
@@ -12,6 +12,10 @@ export class LoginPage {
 
   constructor() {
     this.client = Client.getInstance();
+  }
+
+  onPageLoaded() {
+    this.client.setPageTitle('WHO_IS_SMARTER_QUESTION');
   }
 
   login() {

@@ -1,7 +1,7 @@
 import {Page} from 'ionic/ionic';
 import {MyContestsPage} from '../my-contests/my-contests';
 import {RunningContestsPage} from '../running-contests/running-contests';
-import {LeaderboardTabsPage} from '../leaderboard-tabs/leadboard-tabs';
+import {LeaderboardsPage} from '../leaderboards/leaderboards';
 import {Client} from '../../providers/client';
 
 @Page({
@@ -13,13 +13,13 @@ export class MainTabsPage {
 
   private rootMyContestsPage;
   private rootRunningContestsPage;
-  private rootLeaderboardTabs;
+  private rootLeaderboardsPage;
 
   constructor() {
     // set the root pages for each tab
     this.rootMyContestsPage = MyContestsPage;
     this.rootRunningContestsPage = RunningContestsPage;
-    this.rootLeaderboardTabs = LeaderboardTabsPage;
+    this.rootLeaderboardsPage = LeaderboardsPage;
 
     this.client = Client.getInstance();
   }

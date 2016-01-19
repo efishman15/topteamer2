@@ -118,7 +118,6 @@ var QuizPage = (function () {
                 'message': this.quizData.results.data.message
             });
             this.events.publish('topTeamer:quizFinished', this.quizData.results);
-            this.client.nav.pop();
         }
         else {
             this.nextQuestion();

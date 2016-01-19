@@ -10,14 +10,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var my_contests_1 = require('../my-contests/my-contests');
 var running_contests_1 = require('../running-contests/running-contests');
-var leadboard_tabs_1 = require('../leaderboard-tabs/leadboard-tabs');
+var leaderboards_1 = require('../leaderboards/leaderboards');
 var client_1 = require('../../providers/client');
 var MainTabsPage = (function () {
     function MainTabsPage() {
         // set the root pages for each tab
         this.rootMyContestsPage = my_contests_1.MyContestsPage;
         this.rootRunningContestsPage = running_contests_1.RunningContestsPage;
-        this.rootLeaderboardTabs = leadboard_tabs_1.LeaderboardTabsPage;
+        this.rootLeaderboardsPage = leaderboards_1.LeaderboardsPage;
         this.client = client_1.Client.getInstance();
     }
     MainTabsPage = __decorate([

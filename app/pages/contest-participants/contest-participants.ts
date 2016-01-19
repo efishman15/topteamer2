@@ -1,5 +1,5 @@
 import {Page} from 'ionic/ionic';
-import {ContestLeadersComponent} from '../../components/contest-leaders/contest-leaders';
+import {LeadersComponent} from '../../components/leaders/leaders';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ViewChild} from 'angular2/core';
@@ -8,13 +8,13 @@ import {NavParams} from "ionic-framework/ionic";
 
 @Page({
   templateUrl: 'build/pages/contest-participants/contest-participants.html',
-  directives: [SimpleTabsComponent, SimpleTabComponent,ContestLeadersComponent]
+  directives: [SimpleTabsComponent, SimpleTabComponent,LeadersComponent]
 })
 export class ContestParticipantsPage {
 
   client:Client;
 
-  @ViewChild(ContestLeadersComponent) contestLeadersComponent : ContestLeadersComponent;
+  @ViewChild(LeadersComponent) leadersComponent : LeadersComponent;
 
   contest:Object;
   source:string;
@@ -25,7 +25,6 @@ export class ContestParticipantsPage {
     this.source = params.data.source;
 
     this.client = Client.getInstance();
-    this.client.setPageTitle('CONTEST_LEADERS');
   }
 
   onPageDidEnter() {
@@ -34,11 +33,11 @@ export class ContestParticipantsPage {
 
   showContestParticipants() {
     FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/all');
-    this.contestLeadersComponent.showContestParticipants(this.contest._id)
+    this.leadersComponent.showContestParticipants(this.contest._id)
   }
 
   showTeamParticipants(teamId) {
     FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/team' + teamId);
-    this.contestLeadersComponent.showContestParticipants(this.contest._id, teamId);
+    this.leadersComponent.showContestParticipants(this.contest._id, teamId);
   }
 }

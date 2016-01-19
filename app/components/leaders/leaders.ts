@@ -3,12 +3,12 @@ import {Component} from 'angular2/core';
 import {List, Item} from 'ionic/ionic';
 
 @Component({
-  selector: 'contest-leaders',
-  templateUrl: 'build/components/contest-leaders/contest-leaders.html',
+  selector: 'leaders',
+  templateUrl: 'build/components/leaders/leaders.html',
   directives: [List, Item]
 })
 
-export class ContestLeadersComponent {
+export class LeadersComponent {
 
   leaders:Array<Object>;
   client:Client;

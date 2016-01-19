@@ -1,48 +1,77 @@
-import {Page, NavParams, Events} from 'ionic/ionic';
+import {Page, NavParams, Events, Item, Modal} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
+import {FacebookPostPage} from '../../pages/facebook-post/facebook-post';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
+import * as SoundService from '../../providers/sound';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [ContestChartComponent]
+  directives: [ContestChartComponent, Item]
 })
 
 export class ContestPage {
 
   client:Client;
+  modal: Modal;
   contestChart:Object = {};
+  lastQuizResults:Object = null;
+  animateLastResults:Boolean = false;
 
-  @ViewChild(ContestChartComponent) contestChartComponent: ContestChartComponent;
+  @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
 
-  constructor(params:NavParams, events: Events) {
+  constructor(params:NavParams, events:Events, modal: Modal) {
+
+    this.modal = modal;
     this.client = Client.getInstance();
     this.contestChart = params.data.contestChart;
 
-    events.subscribe('topTeamer:quizFinished', (results) => {
-      alert("quiz finished!, results: " + JSON.stringify(results));
+    events.subscribe('topTeamer:quizFinished', (eventData) => {
+      //Event data comes as an array of data objects - we expect only one (last quiz results)
+
+      this.lastQuizResults = eventData[0];
+
+      //Exit from the quiz
+      this.client.nav.pop();
+
+      if (this.lastQuizResults.data.facebookPost) {
+        this.animateLastResults = false;
+        this.modal.open(FacebookPostPage, {'quizResults' : this.lastQuizResults}, {'handle' : 'facebookPost'});
+      }
+      else {
+        //Exit from the quiz
+        this.client.nav.pop();
+        this.animateLastResults = true;
+      }
+
+      setTimeout(() => {
+        SoundService.play(this.lastQuizResults.data.sound);
+      }, 500);
+
     });
+
   }
 
-  onPageWillEnter() {
-    this.client.setPageTitle('WHO_SMARTER_QUESTION');
+  onPageWillLeave() {
+    this.animateLastResults = false;
+    this.lastQuizResults = null;
   }
 
   playContest(source) {
-    this.client.nav.push(QuizPage, {'contestId' : this.contestChart.contest._id, 'source' : source});
+    this.client.nav.push(QuizPage, {'contestId': this.contestChart.contest._id, 'source': source});
   }
 
   showParticipants(source) {
-    this.client.nav.push(ContestParticipantsPage, {'contest' : this.contestChart.contest, 'source' : source});
+    this.client.nav.push(ContestParticipantsPage, {'contest': this.contestChart.contest, 'source': source});
   }
 
-  joinContest(team, source, action : string = 'join') {
+  joinContest(team, source, action:string = 'join') {
 
-    var postData = {'contestId' : this.contestChart.contest._id, 'teamId': team};
-    this.client.serverPost('contests/join', postData).then( (data) => {
+    var postData = {'contestId': this.contestChart.contest._id, 'teamId': team};
+    this.client.serverPost('contests/join', postData).then((data) => {
 
       FlurryAgent.logEvent('contest/' + action, {
         'contestId': this.contestChart.contest._id,

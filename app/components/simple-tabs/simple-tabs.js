@@ -27,6 +27,11 @@ var SimpleTabsComponent = (function () {
         }
         this.simpleTabs.push(simpleTab);
     };
+    SimpleTabsComponent.prototype.switchToTab = function (tabId) {
+        if (tabId >= 0 && tabId < this.simpleTabs.length) {
+            this.selectTab(this.simpleTabs[tabId]);
+        }
+    };
     SimpleTabsComponent = __decorate([
         core_1.Component({
             selector: 'simple-tabs',

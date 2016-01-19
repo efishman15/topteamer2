@@ -17,7 +17,6 @@ var MyContestsPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     MyContestsPage.prototype.onPageWillEnter = function () {
-        this.client.setPageTitle('MY_CONTESTS');
         if (this.contestList) {
             this.contestList.refresh();
         }

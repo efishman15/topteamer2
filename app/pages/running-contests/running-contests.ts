@@ -19,7 +19,6 @@ export class RunningContestsPage {
   }
 
   onPageDidEnter() {
-    this.client.setPageTitle('RUNNING_CONTESTS');
     this.contestList.refresh();
   }
 

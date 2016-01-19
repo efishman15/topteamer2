@@ -11,7 +11,7 @@
 
 @import "components/contest-list/contest-list";
 
-@import "components/contest-leaders/contest-leaders";
+@import "components/leaders/leaders";
 
 @import "components/simple-tabs/simple-tabs";
 
@@ -21,9 +21,9 @@
 
 @import "pages/contest-participants/contest-participants";
 
-@import "pages/friends-leaderboard/friends-leaderboard";
+@import "pages/facebook-post/facebook-post";
 
-@import "pages/leaderboard-tabs/leadboard-tabs";
+@import "pages/leaderboards/leaderboards";
 
 @import "pages/login/login";
 
@@ -33,8 +33,4 @@
 
 @import "pages/quiz/quiz";
 
-@import "pages/recently-finished-contests/recently-finished-contests";
-
 @import "pages/running-contests/running-contests";
-
-@import "pages/weekly-leaderboard/weekly-leaderboard";

@@ -8,36 +8,32 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
-var main_tabs_1 = require('../main-tabs/main-tabs');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
-var LoginPage = (function () {
-    function LoginPage() {
+var FacebookPostPage = (function () {
+    function FacebookPostPage(params, events) {
         this.client = client_1.Client.getInstance();
+        this.quizResults = params.data.quizResults;
+        this.events = events;
     }
-    LoginPage.prototype.onPageLoaded = function () {
-        this.client.setPageTitle('WHO_IS_SMARTER_QUESTION');
-    };
-    LoginPage.prototype.login = function () {
+    FacebookPostPage.prototype.post = function () {
         var _this = this;
-        facebookService.login().then(function (response) {
-            _this.client.nav.pop(LoginPage);
-            _this.client.facebookServerConnect(response.authResponse).then(function () {
-                _this.client.nav.push(main_tabs_1.MainTabsPage);
-            });
+        facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
+            _this.close();
+        }, function (error) {
+            FlurryAgent.myLogError("FacebookPostError", "Error posting: " + error);
         });
     };
-    ;
-    LoginPage.prototype.changeLanguage = function (language) {
-        this.client.user.settings.language = language;
-        localStorage.setItem('language', language);
+    FacebookPostPage.prototype.goBack = function () {
+        this.close();
     };
-    LoginPage = __decorate([
+    FacebookPostPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/login/login.html'
+            templateUrl: 'build/pages/facebook-post/facebook-post.html'
         }), 
-        __metadata('design:paramtypes', [])
-    ], LoginPage);
-    return LoginPage;
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _b) || Object])
+    ], FacebookPostPage);
+    return FacebookPostPage;
+    var _a, _b;
 })();
-exports.LoginPage = LoginPage;
+exports.FacebookPostPage = FacebookPostPage;

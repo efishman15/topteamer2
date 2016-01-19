@@ -8,7 +8,7 @@
 <ion-content class="align-center">
 
   <canvas id="quizCanvas" height="{{client.settings.quiz.canvas.height}}" class="quiz-canvas"
-          (click)="canvasClick($event)" style="height: {{client.settings.quiz.canvas.height}}px">
+          (click)="canvasClick($event)" [ngStyle]="{'height': client.settings.quiz.canvas.height + 'px'}">
   </canvas>
 
   <div *ngIf="quizData" dir="{{quizData.currentQuestion.direction}}"

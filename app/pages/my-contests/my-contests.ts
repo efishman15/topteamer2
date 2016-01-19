@@ -20,7 +20,6 @@ export class MyContestsPage {
   }
 
   onPageWillEnter() {
-    this.client.setPageTitle('MY_CONTESTS');
     if (this.contestList) {
       this.contestList.refresh();
     }

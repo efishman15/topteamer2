@@ -17,7 +17,6 @@ var RunningContestsPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     RunningContestsPage.prototype.onPageDidEnter = function () {
-        this.client.setPageTitle('RUNNING_CONTESTS');
         this.contestList.refresh();
     };
     RunningContestsPage.prototype.onContestSelected = function (data) {
