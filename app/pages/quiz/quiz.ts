@@ -17,13 +17,57 @@ export class QuizPage {
   quizData:Object;
   questionHistory:Array<Object> = [];
   correctButtonName:string;
-  events: Events;
+  events:Events;
 
-  constructor(params:NavParams, events: Events) {
+  //Canvas vars
+  quizCanvas:any;
+  quizContext:any;
+  currentQuestionCircle:any;
+  questionChart:Object;
+  imgCorrectSrc:String = 'images/correct.png';
+  imgErrorSrc:String = 'images/error.png';
+  imgQuestionInfoSrc:String = 'images/info_question.png';
+
+
+  //Hash map - each item's key is the img.src and the value is an object like this:
+  // loaded: true/false
+  // drawRequests: array of drawRequest objects that each contain:
+  //img, x, y, width, height
+  drawImageQueue = {};
+
+  constructor(params:NavParams, events:Events) {
     this.client = Client.getInstance();
     this.contestId = params.data.contestId;
     this.source = params.data.source;
     this.events = events;
+
+    this.quizCanvas = document.getElementById('quizCanvas');
+    this.quizContext = this.quizCanvas.getContext('2d');
+    this.quizContext.font = this.client.settings.quiz.canvas.font;
+
+    this.initDrawImageQueue(this.imgCorrectSrc);
+    this.initDrawImageQueue(this.imgErrorSrc);
+    this.initDrawImageQueue(this.imgQuestionInfoSrc);
+
+    events.subscribe('topTeamer:questionStatsClosed', (eventData) => {
+      //Event data comes as an array of data objects - we expect only one (result)
+      switch (result) {
+
+        case 'hint':
+          this.questionHistory[this.quizData.currentQuestionIndex].hintUsed = true;
+          this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.hintCost;
+          this.drawQuizScores();
+          window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaHint, "_system", "location=yes");
+          break;
+
+        case 'answer':
+          this.questionHistory[this.quizData.currentQuestionIndex].answerUsed = true;
+          this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.answerCost;
+          this.drawQuizScores();
+          window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaAnswer, "_system", "location=yes");
+          break;
+      }
+    });
   }
 
   onPageDidEnter() {
@@ -43,8 +87,10 @@ export class QuizPage {
       }
 
       for (var i = 0; i < data.quiz.totalQuestions; i++) {
-        this.questionHistory.push({"score": this.client.settings.quiz.questions.score[i]});
+        this.questionHistory.push({'score': this.client.settings.quiz.questions.score[i]});
       }
+
+      this.drawQuizProgress();
 
     });
   }
@@ -98,8 +144,8 @@ export class QuizPage {
         SoundService.play('audio/click_ok');
       }
       else {
-        FlurryAgent.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + "/answered/incorrect");
-        SoundService.play("audio/click_wrong");
+        FlurryAgent.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
+        SoundService.play('audio/click_wrong');
         correctAnswerId = data.question.correctAnswerId;
         this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
         setTimeout(() => {
@@ -107,7 +153,7 @@ export class QuizPage {
         }, 3000)
       }
 
-      this.correctButtonName = "buttonAnswer" + correctAnswerId;
+      this.correctButtonName = 'buttonAnswer' + correctAnswerId;
 
     });
   }
@@ -120,9 +166,9 @@ export class QuizPage {
       this.quizData.currentQuestion.answered = false;
       this.quizData.currentQuestion.doAnimation = true; //Animation end will trigger quiz proceed
 
-      //TODO: drawQuizProgress();
+      this.drawQuizProgress();
 
-      FlurryAgent.logEvent("quiz/gotQuestion" + (this.quizData.currentQuestionIndex + 1));
+      FlurryAgent.logEvent('quiz/gotQuestion' + (this.quizData.currentQuestionIndex + 1));
     });
   }
 
@@ -132,7 +178,7 @@ export class QuizPage {
     }
   }
 
-  buttonAnimationEnded(event: Event) {
+  buttonAnimationEnded(event:Event) {
 
     if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
       //TODO: XpService.addXp($scope.quiz.xpProgress, $scope.quizProceed);
@@ -146,7 +192,7 @@ export class QuizPage {
   quizProceed() {
     if (this.quizData.finished) {
 
-      //TODO: drawQuizProgress();
+      this.drawQuizProgress();
       this.client.session.score += this.quizData.results.data.score;
 
       FlurryAgent.logEvent('quiz/finished',
@@ -156,11 +202,257 @@ export class QuizPage {
           'message': this.quizData.results.data.message
         });
 
-      this.events.publish('topTeamer:quizFinished', this.quizData.results)
+      //Give enough time to draw the circle progress of the last question
+      setTimeout(() => {
+        this.events.publish('topTeamer:quizFinished', this.quizData.results)
+      },1000);
 
     }
     else {
       this.nextQuestion();
     }
   }
+
+  canvasClick(event) {
+
+    if (this.currentQuestionCircle &&
+      event.offsetX <= this.currentQuestionCircle.right &&
+      event.offsetX >= this.currentQuestionCircle.left &&
+      event.offsetY >= this.currentQuestionCircle.top &&
+      event.offsetY <= this.currentQuestionCircle.bottom) {
+
+      if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio == 0) {
+        this.questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
+
+        this.questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
+        this.questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+
+        this.questionChart.data = [];
+        this.questionChart.data.push({
+          'label': this.client.translate('ANSWERED_CORRECT'),
+          'value': this.quizData.currentQuestion.correctRatio
+        });
+        this.questionChart.data.push({
+          'label': this.client.translate('ANSWERED_INCORRECT'),
+          'value': (1 - this.quizData.currentQuestion.correctRatio)
+        });
+      }
+
+      //TODO: open question stats modal/popup
+    }
+  }
+
+  processDrawImageRequests(imgSrc) {
+
+    this.drawImageQueue[imgSrc].loaded = true;
+    while (this.drawImageQueue[imgSrc].drawRequests.length > 0) {
+      var drawRequest = this.drawImageQueue[imgSrc].drawRequests.pop();
+      this.quizContext.drawImage(this.drawImageQueue[imgSrc].img, drawRequest.x, drawRequest.y, drawRequest.width, drawRequest.height);
+    }
+  }
+
+  initDrawImageQueue(src) {
+
+    var img = document.createElement('img');
+    this.drawImageQueue[src] = {'img': img, 'loaded': false, 'drawRequests': []};
+
+    img.onload = () => {
+      this.processDrawImageRequests(src);
+    }
+    img.src = src;
+  }
+
+  drawImageAsync(imgSrc, x, y, width, height) {
+
+    //If image loaded - draw right away
+    if (this.drawImageQueue[imgSrc].loaded) {
+      this.quizContext.drawImage(this.drawImageQueue[imgSrc].img, x, y, width, height);
+      return;
+    }
+
+    var drawRequest = {
+      'x': x,
+      'y': y,
+      'width': width,
+      'height': height
+    }
+
+    //Add request to queue
+    this.drawImageQueue[imgSrc].drawRequests.push(drawRequest);
+  }
+
+  drawQuizProgress() {
+
+    this.quizCanvas.width = this.quizCanvas.clientWidth;
+
+    this.quizContext.beginPath();
+    this.quizContext.moveTo(0, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
+    this.quizContext.lineTo(this.quizCanvas.width, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
+    this.quizContext.lineWidth = this.client.settings.quiz.canvas.lineWidth;
+
+    // set line color
+    this.quizContext.strokeStyle = this.client.settings.quiz.canvas.inactiveColor;
+    this.quizContext.stroke();
+    this.quizContext.fill();
+    this.quizContext.closePath();
+
+    var currentX;
+    if (this.client.currentLanguage.direction === 'ltr') {
+      currentX = this.client.settings.quiz.canvas.radius;
+    }
+    else {
+      currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+    }
+
+    this.currentQuestionCircle = null;
+    var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.radius * 2) / (this.quizData.totalQuestions - 1);
+
+    for (var i = 0; i < this.quizData.totalQuestions; i++) {
+
+      if (i === this.quizData.currentQuestionIndex) {
+
+        //Question has no statistics about success ratio
+        this.quizContext.beginPath();
+        this.quizContext.fillStyle = this.client.settings.quiz.canvas.activeColor;
+        this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius, 0, Math.PI * 2, false);
+        this.quizContext.fill();
+        this.quizContext.closePath();
+
+        this.currentQuestionCircle = {
+          'top': this.client.settings.quiz.canvas.topOffset,
+          'left': currentX - this.client.settings.quiz.canvas.radius,
+          'bottom': this.client.settings.quiz.canvas.topOffset + 2 * this.client.settings.quiz.canvas.radius,
+          'right': currentX + this.client.settings.quiz.canvas.radius
+        };
+
+        //Current question has statistics about success ratio
+        if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio == 0) {
+
+          //Draw the correct ratio
+          if (this.quizData.currentQuestion.correctRatio > 0) {
+            this.quizContext.beginPath();
+            this.quizContext.moveTo(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
+            this.quizContext.fillStyle = this.client.settings.quiz.canvas.correctRatioColor;
+            this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.pieChartRadius, 0, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, true);
+            this.quizContext.fill();
+            this.quizContext.closePath();
+          }
+
+          //Draw the incorrect ratio
+          if (this.quizData.currentQuestion.correctRatio < 1) {
+            this.quizContext.beginPath();
+            this.quizContext.moveTo(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
+            this.quizContext.fillStyle = this.client.settings.quiz.canvas.incorrectRatioColor;
+            this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.pieChartRadius, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, Math.PI * 2, true);
+            this.quizContext.fill();
+            this.quizContext.closePath();
+          }
+        }
+        else {
+          //Question has no stats - draw an info icon inside to make user press
+          this.drawImageAsync(this.imgQuestionInfoSrc, currentX - this.client.settings.quiz.canvas.pieChartRadius, this.client.settings.quiz.canvas.topOffset + this.client.settings.quiz.canvas.radius - this.client.settings.quiz.canvas.pieChartRadius, this.client.settings.quiz.canvas.pieChartRadius * 2, this.client.settings.quiz.canvas.pieChartRadius * 2);
+        }
+      }
+      else {
+        this.quizContext.beginPath();
+        this.quizContext.fillStyle = this.client.settings.quiz.canvas.inactiveColor;
+        this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius, 0, Math.PI * 2, false);
+        this.quizContext.fill();
+        this.quizContext.closePath();
+      }
+
+      //Draw correct/incorrect for answered
+      if (this.questionHistory[i].answer != null) {
+        if (this.questionHistory[i].answer) {
+          this.drawImageAsync(this.imgCorrectSrc, currentX - this.client.settings.quiz.canvas.radius, this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius * 2, this.client.settings.quiz.canvas.radius * 2);
+        }
+        else {
+          this.drawImageAsync(this.imgErrorSrc, currentX - this.client.settings.quiz.canvas.radius, this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius * 2, this.client.settings.quiz.canvas.radius * 2);
+        }
+      }
+
+      if (this.client.currentLanguage.direction === 'ltr') {
+        if (i < this.quizData.totalQuestions - 1) {
+          currentX += circleOffsets + this.client.settings.quiz.canvas.radius * 2;
+        }
+        else {
+          currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+        }
+      }
+      else {
+        if (i < this.quizData.totalQuestions - 1) {
+          currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.radius * 2);
+        }
+        else {
+          currentX = this.client.settings.quiz.canvas.radius;
+        }
+      }
+    }
+
+    this.drawQuizScores();
+
+  };
+
+  clearQuizScores() {
+    this.quizContext.beginPath();
+    this.quizContext.clearRect(0, 0, this.quizCanvas.width, this.client.settings.quiz.canvas.scores.top);
+    this.quizContext.closePath();
+  }
+
+  drawQuizScores() {
+
+    this.clearQuizScores();
+
+    var currentX;
+    if (this.client.currentLanguage.direction === 'ltr') {
+      currentX = this.client.settings.quiz.canvas.radius;
+    }
+    else {
+      currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+    }
+
+    var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.radius * 2) / (this.quizData.totalQuestions - 1);
+    for (var i = 0; i < this.quizData.totalQuestions; i++) {
+
+      var questionScore;
+      if (!this.quizData.reviewMode) {
+        questionScore = '' + this.questionHistory[i].score;
+      }
+      else {
+        questionScore = '';
+      }
+
+      //Draw question score
+      var textWidth = this.quizContext.measureText(questionScore).width;
+      var scoreColor = this.client.settings.quiz.canvas.inactiveColor;
+
+      if (this.questionHistory[i].answer && !this.questionHistory[i].answerUsed) {
+        scoreColor = this.client.settings.quiz.canvas.correctRatioColor;
+      }
+
+      //Draw the score at the top of the circle
+      this.quizContext.beginPath();
+      this.quizContext.fillStyle = scoreColor;
+      this.quizContext.fillText(questionScore, currentX + textWidth / 2, this.client.settings.quiz.canvas.scores.top);
+      this.quizContext.closePath();
+
+      if (this.client.currentLanguage.direction === 'ltr') {
+        if (i < this.quizData.totalQuestions - 1) {
+          currentX += circleOffsets + this.client.settings.quiz.canvas.radius * 2;
+        }
+        else {
+          currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+        }
+      }
+      else {
+        if (i < this.quizData.totalQuestions - 1) {
+          currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.radius * 2);
+        }
+        else {
+          currentX = this.client.settings.quiz.canvas.radius;
+        }
+      }
+    }
+  };
+
 }

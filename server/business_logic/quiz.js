@@ -143,7 +143,7 @@ module.exports.start = function (req, res, next) {
 
             //Number of questions (either entered by user or X random questions from the system
             if (data.contest.content.category.id !== "user") {
-                quiz.clientData.totalQuestions = 1; //generalUtils.settings.client.quiz.questions.score.length;
+                quiz.clientData.totalQuestions = generalUtils.settings.client.quiz.questions.score.length;
                 quiz.serverData.previousQuestions = [];
             }
             else {
