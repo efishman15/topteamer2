@@ -1,0 +1,20 @@
+<ion-navbar *navbar>
+  <button menuToggle>
+    <icon menu></icon>
+  </button>
+  <ion-title>{{client.translate('LIKE')}}</ion-title>
+</ion-navbar>
+
+<ion-content class="align-center">
+
+  <h4 *ngIf="!contest">{{client.translate('CLICK_LIKE')}}</h4>
+  <div *ngIf="contest">
+    <h4>{{client.translate('CLICK_LIKE_WITH_CONTEST')}}</h4>
+    <h3 class="padding">{{contest.name}}</h3>
+  </div>
+
+  <h4>
+    <a target="_new" href="{{client.settings.general.facebookFanPage}}">{{client.translate('FACEBOOK_GAME_PAGE')}}</a>
+  </h4>
+
+</ion-content>

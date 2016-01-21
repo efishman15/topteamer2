@@ -1,4 +1,4 @@
-import {Page,NavParams,Events} from 'ionic/ionic';
+import {Page,NavParams} from 'ionic/ionic';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
 
@@ -9,12 +9,10 @@ export class FacebookPostPage {
 
   client:Client;
   quizResults:Object;
-  events: Events;
 
-  constructor(params:NavParams, events: Events) {
+  constructor(params:NavParams) {
     this.client = Client.getInstance();
     this.quizResults = params.data.quizResults;
-    this.events = events;
   }
 
   post() {
@@ -23,10 +21,6 @@ export class FacebookPostPage {
     }, (error) => {
       FlurryAgent.myLogError("FacebookPostError", "Error posting: " + error);
     })
-  }
-
-  goBack() {
-    this.close();
   }
 
 }

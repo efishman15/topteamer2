@@ -1,8 +1,9 @@
-import {Page, NavParams,Events} from 'ionic/ionic';
+import {Page, NavParams,Events,Modal} from 'ionic/ionic';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener'
 import {TransitionListener} from '../../directives/transition-listener/transition-listener'
+import {QuestionStatsPage} from '../../pages/question-stats/question-stats'
 import {Client} from '../../providers/client';
-import * as SoundService from '../../providers/sound';
+import * as soundService from '../../providers/sound';
 
 @Page({
   templateUrl: 'build/pages/quiz/quiz.html',
@@ -12,6 +13,7 @@ import * as SoundService from '../../providers/sound';
 export class QuizPage {
 
   client:Client;
+  modal: Modal;
   contestId:string;
   source:string;
   quizData:Object;
@@ -35,8 +37,9 @@ export class QuizPage {
   //img, x, y, width, height
   drawImageQueue = {};
 
-  constructor(params:NavParams, events:Events) {
+  constructor(params:NavParams, events:Events, modal: Modal) {
     this.client = Client.getInstance();
+    this.modal = modal;
     this.contestId = params.data.contestId;
     this.source = params.data.source;
     this.events = events;
@@ -50,21 +53,24 @@ export class QuizPage {
     this.initDrawImageQueue(this.imgQuestionInfoSrc);
 
     events.subscribe('topTeamer:questionStatsClosed', (eventData) => {
+
       //Event data comes as an array of data objects - we expect only one (result)
-      switch (result) {
+      var action = eventData[0];
+
+      switch (action) {
 
         case 'hint':
           this.questionHistory[this.quizData.currentQuestionIndex].hintUsed = true;
           this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.hintCost;
           this.drawQuizScores();
-          window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaHint, "_system", "location=yes");
+          window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
           break;
 
         case 'answer':
           this.questionHistory[this.quizData.currentQuestionIndex].answerUsed = true;
           this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.answerCost;
           this.drawQuizScores();
-          window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaAnswer, "_system", "location=yes");
+          window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
           break;
       }
     });
@@ -141,11 +147,11 @@ export class QuizPage {
         correctAnswerId = answerId;
         this.quizData.currentQuestion.answers[answerId].answeredCorrectly = true;
 
-        SoundService.play('audio/click_ok');
+        soundService.play('audio/click_ok');
       }
       else {
         FlurryAgent.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
-        SoundService.play('audio/click_wrong');
+        soundService.play('audio/click_wrong');
         correctAnswerId = data.question.correctAnswerId;
         this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
         setTimeout(() => {
@@ -222,23 +228,28 @@ export class QuizPage {
       event.offsetY <= this.currentQuestionCircle.bottom) {
 
       if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio == 0) {
-        this.questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
 
-        this.questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
-        this.questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+        var questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
 
-        this.questionChart.data = [];
-        this.questionChart.data.push({
+        questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
+
+        questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+
+        questionChart.data = [];
+        questionChart.data.push({
           'label': this.client.translate('ANSWERED_CORRECT'),
           'value': this.quizData.currentQuestion.correctRatio
         });
-        this.questionChart.data.push({
+        questionChart.data.push({
           'label': this.client.translate('ANSWERED_INCORRECT'),
           'value': (1 - this.quizData.currentQuestion.correctRatio)
         });
-      }
 
-      //TODO: open question stats modal/popup
+        this.modal.open(QuestionStatsPage, {
+          'question': this.quizData.currentQuestion,
+          'chartDataSource': questionChart
+        }, {'handle': 'questionStats'});
+      }
     }
   }
 

@@ -13,9 +13,11 @@ var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
 var quiz_1 = require('../../pages/quiz/quiz');
 var facebook_post_1 = require('../../pages/facebook-post/facebook-post');
+var like_1 = require('../../pages/like/like');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
-var SoundService = require('../../providers/sound');
+var shareService = require('../../providers/share');
+var soundService = require('../../providers/sound');
 var ContestPage = (function () {
     function ContestPage(params, events, modal) {
         var _this = this;
@@ -40,7 +42,7 @@ var ContestPage = (function () {
                 _this.animateLastResults = true;
             }
             setTimeout(function () {
-                SoundService.play(_this.lastQuizResults.data.sound);
+                soundService.play(_this.lastQuizResults.data.sound);
             }, 500);
         });
     }
@@ -76,12 +78,10 @@ var ContestPage = (function () {
         alert('edit contest');
     };
     ContestPage.prototype.share = function (source) {
-        //TODO: share
-        alert('share, source=' + source);
+        shareService.share(contest);
     };
     ContestPage.prototype.like = function () {
-        //TODO: like
-        alert('like');
+        this.client.nav.push(like_1.LikePage, { 'contest': this.contestChart.contest });
     };
     ContestPage.prototype.onTeamSelected = function (data) {
         if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {

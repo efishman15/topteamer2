@@ -25,14 +25,19 @@
     "app/pages/contest-participants/contest-participants.ts",
     "app/pages/facebook-post/facebook-post.ts",
     "app/pages/leaderboards/leaderboards.ts",
+    "app/pages/like/like.ts",
     "app/pages/login/login.ts",
     "app/pages/main-tabs/main-tabs.ts",
     "app/pages/my-contests/my-contests.ts",
+    "app/pages/question-stats/question-stats.ts",
     "app/pages/quiz/quiz.ts",
     "app/pages/running-contests/running-contests.ts",
+    "app/pages/share/share.ts",
     "app/providers/client.ts",
     "app/providers/contests.ts",
-    "app/providers/facebook.ts"
+    "app/providers/facebook.ts",
+    "app/providers/share.ts",
+    "app/providers/sound.ts"
   ],
   "exclude": [
     "node_modules"

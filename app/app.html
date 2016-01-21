@@ -1,18 +1,18 @@
 
 <!-- left menu -->
-<ion-menu [content]="content">
+<ion-menu [content]="content" dir="">
 
-  <ion-toolbar>
-    <ion-title>Account</ion-title>
+  <ion-toolbar *ngIf="client.loaded">
+    <ion-title>{{client.translate('TOOLS')}}</ion-title>
   </ion-toolbar>
 
   <ion-content>
 
-    <ion-list>
+    <ion-list *ngIf="client.loaded">
 
-      <button ion-item *ngFor="#p of pages" (click)="openPage(p, false, true)">
-        <icon item-left [name]="p.icon"></icon>
-        {{p.title}}
+      <button ion-item (click)="share()">
+        <icon name="share-alt"></icon>
+        {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
       </button>
 
     </ion-list>

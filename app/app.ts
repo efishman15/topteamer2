@@ -2,8 +2,9 @@ import {App, IonicApp, Platform, Config} from 'ionic/ionic';
 import {MainTabsPage} from './pages/main-tabs/main-tabs';
 import {LoginPage} from './pages/login/login';
 import * as facebookService from './providers/facebook';
+import * as shareService from './providers/share';
 import {Client} from './providers/client';
-import {NavController,Menu} from "ionic-framework/ionic";
+import {NavController,Menu} from 'ionic-framework/ionic';
 
 @App({
   templateUrl: 'app.html',
@@ -12,20 +13,11 @@ import {NavController,Menu} from "ionic-framework/ionic";
 })
 class topTeamerApp {
 
-  pages:Array<Object>;
   client:Client;
 
   constructor(ionicApp:IonicApp, platform:Platform, client:Client) {
 
     this.client = client;
-
-    // create an list of pages that can be navigated to from the menu
-    // the menu only works after login
-    // the login page disables the menu
-    this.pages = [
-      {title: 'RunningContests', page: MainTabsPage, icon: 'calendar'},
-      {title: 'Login', page: LoginPage, icon: 'log-in'},
-    ];
 
     client.init(ionicApp, platform).then(() => {
       this.initApp();
@@ -81,7 +73,7 @@ class topTeamerApp {
         StatusBar.styleDefault();
       }
 
-      console.log("platform ready");
+      console.log('platform ready');
     });
   };
 
@@ -90,11 +82,11 @@ class topTeamerApp {
     //Resize app for web
     var containerWidth = window.innerWidth;
 
-    var myApp = document.getElementById("myApp");
+    var myApp = document.getElementById('myApp');
     if (myApp) {
       if (containerWidth > this.client.settings.general.webCanvasWidth) {
-        myApp.style.width = this.client.settings.general.webCanvasWidth + "px";
-        myApp.style.marginLeft = (containerWidth - this.client.settings.general.webCanvasWidth) / 2 + "px";
+        myApp.style.width = this.client.settings.general.webCanvasWidth + 'px';
+        myApp.style.marginLeft = (containerWidth - this.client.settings.general.webCanvasWidth) / 2 + 'px';
       }
     }
 
@@ -116,10 +108,9 @@ class topTeamerApp {
       }
       js = d.createElement(s);
       js.id = id;
-      js.src = "//connect.facebook.net/en_US/sdk.js";
+      js.src = '//connect.facebook.net/en_US/sdk.js';
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
-
   }
 
   initMobile() {
@@ -134,14 +125,14 @@ class topTeamerApp {
     window.open = cordova.InAppBrowser.open;
 
     //Load branch mobile script
-    loadJsFile("lib/branch/moblie.min.js");
+    loadJsFile('lib/branch/moblie.min.js');
 
     //Init android billing
-    if (this.platform.is('android') && typeof inappbilling !== "undefined") {
+    if (this.platform.is('android') && typeof inappbilling !== 'undefined') {
       inappbilling.init((resultInit) => {
         },
         (errorInit) => {
-          FlurryAgent.myLogError("InAppBilling", errorInit);
+          FlurryAgent.myLogError('InAppBilling', errorInit);
         }
         ,
         {showLog: true}, []
@@ -150,7 +141,7 @@ class topTeamerApp {
 
     cordova.getAppVersion((version) => {
       client.user.clientInfo.appVersion = version;
-      FlurryAgent.setAppVersion("" + version);
+      FlurryAgent.setAppVersion('' + version);
 
       this.initFacebook();
     });
@@ -160,7 +151,7 @@ class topTeamerApp {
   initFlurry() {
 
     //FlurryAgent.setDebugLogEnabled(true);
-    FlurryAgent.startSession("NT66P8Q5BR5HHVN2C527");
+    FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
 
     FlurryAgent.myLogError = (errorType, message) => {
       console.log(message);
@@ -172,7 +163,7 @@ class topTeamerApp {
     window.myHandleBranch = (err, data) => {
       try {
         if (err) {
-          FlurryAgent.myLogError("BranchIoError", "Error received during branch init: " + err);
+          FlurryAgent.myLogError('BranchIoError', 'Error received during branch init: ' + err);
           return;
         }
 
@@ -183,11 +174,11 @@ class topTeamerApp {
         }
       }
       catch (e) {
-        FlurryAgent.myLogError("BranchIoError", "Error parsing data during branch init, data= " + data + ", parsedData=" + parsedData + ", error: " + e);
+        FlurryAgent.myLogError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + parsedData + ', error: ' + e);
       }
 
       window.initBranch = () => {
-        branch.init("key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE", (err, data) => {
+        branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', (err, data) => {
           if (window.myHandleBranch) {
             window.myHandleBranch(err, data);
           }
@@ -233,23 +224,23 @@ class topTeamerApp {
           for (var property in obj)
             if (obj.hasOwnProperty(property))
             //replace all instances case-insensitive
-              str = str.replace(new RegExp(escapeRegExp("{{" + property + "}}"), 'gi'), String(obj[property]));
+              str = str.replace(new RegExp(escapeRegExp('{{' + property + '}}'), 'gi'), String(obj[property]));
         }
 
         function escapeRegExp(string) {
-          return string.replace(/([.*+?^=!:${{}}()|\[\]\/\\])/g, "\\$1");
+          return string.replace(/([.*+?^=!:${{}}()|\[\]\/\\])/g, '\\$1');
         }
 
         function replaceByArray(arrayLike) {
           for (var i = 0, len = arrayLike.length; i < len; i++)
-            str = str.replace(new RegExp(escapeRegExp("{{" + i + "}}"), 'gi'), String(arrayLike[i]));
+            str = str.replace(new RegExp(escapeRegExp('{{' + i + '}}'), 'gi'), String(arrayLike[i]));
         }
 
         if (!arguments.length || arguments[0] === null || arguments[0] === undefined)
           return str;
         else if (arguments.length == 1 && Array.isArray(arguments[0]))
           replaceByArray(arguments[0]);
-        else if (arguments.length == 1 && typeof arguments[0] === "object")
+        else if (arguments.length == 1 && typeof arguments[0] === 'object')
           replaceByObjectProperies(arguments[0]);
         else
           replaceByArray(arguments);
@@ -257,5 +248,10 @@ class topTeamerApp {
         return str;
       };
     }
+  }
+
+  share() {
+    this.client.menu.close();
+    shareService.share();
   }
 }

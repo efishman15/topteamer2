@@ -13,6 +13,7 @@ require('rxjs/add/operator/map');
 require('rxjs/add/operator/timeout');
 var Client = (function () {
     function Client(http) {
+        this._loaded = false;
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
         }
@@ -37,9 +38,11 @@ var Client = (function () {
                 _this._menu = ionicApp.getComponent('leftMenu');
                 _this._menu.side = _this.currentLanguage.align;
                 _this._menu.id = _this.currentLanguage.align + "Menu";
+                _this._menu.getElementRef().nativeElement.attributes['dir'] = _this.currentLanguage.direction;
                 var canvas = document.createElement("canvas");
                 _this._canvasContext = canvas.getContext("2d");
                 _this._canvasContext.font = _this.serverGateway.settings.charts.contestAnnotations.annotationsFont;
+                _this._loaded = true;
                 Client.instance = _this;
                 resolve();
             }, function (err) { return reject(err); });
@@ -57,6 +60,13 @@ var Client = (function () {
     Client.prototype.setPageTitle = function (key, params) {
         this.ionicApp.setTitle(this.translate(key, params));
     };
+    Object.defineProperty(Client.prototype, "loaded", {
+        get: function () {
+            return this._loaded;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Client.prototype, "ionicApp", {
         get: function () {
             return this._ionicApp;

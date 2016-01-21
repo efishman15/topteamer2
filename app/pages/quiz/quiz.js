@@ -10,10 +10,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
+var question_stats_1 = require('../../pages/question-stats/question-stats');
 var client_1 = require('../../providers/client');
-var SoundService = require('../../providers/sound');
+var soundService = require('../../providers/sound');
 var QuizPage = (function () {
-    function QuizPage(params, events) {
+    function QuizPage(params, events, modal) {
         var _this = this;
         this.questionHistory = [];
         this.imgCorrectSrc = 'images/correct.png';
@@ -25,6 +26,7 @@ var QuizPage = (function () {
         //img, x, y, width, height
         this.drawImageQueue = {};
         this.client = client_1.Client.getInstance();
+        this.modal = modal;
         this.contestId = params.data.contestId;
         this.source = params.data.source;
         this.events = events;
@@ -36,18 +38,19 @@ var QuizPage = (function () {
         this.initDrawImageQueue(this.imgQuestionInfoSrc);
         events.subscribe('topTeamer:questionStatsClosed', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (result)
-            switch (result) {
+            var action = eventData[0];
+            switch (action) {
                 case 'hint':
                     _this.questionHistory[_this.quizData.currentQuestionIndex].hintUsed = true;
                     _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.hintCost;
                     _this.drawQuizScores();
-                    window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaHint, "_system", "location=yes");
+                    window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
                     break;
                 case 'answer':
                     _this.questionHistory[_this.quizData.currentQuestionIndex].answerUsed = true;
                     _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.answerCost;
                     _this.drawQuizScores();
-                    window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaAnswer, "_system", "location=yes");
+                    window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
                     break;
             }
         });
@@ -104,11 +107,11 @@ var QuizPage = (function () {
                 FlurryAgent.logEvent('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/correct');
                 correctAnswerId = answerId;
                 _this.quizData.currentQuestion.answers[answerId].answeredCorrectly = true;
-                SoundService.play('audio/click_ok');
+                soundService.play('audio/click_ok');
             }
             else {
                 FlurryAgent.logEvent('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
-                SoundService.play('audio/click_wrong');
+                soundService.play('audio/click_wrong');
                 correctAnswerId = data.question.correctAnswerId;
                 _this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
                 setTimeout(function () {
@@ -167,18 +170,22 @@ var QuizPage = (function () {
             event.offsetY >= this.currentQuestionCircle.top &&
             event.offsetY <= this.currentQuestionCircle.bottom) {
             if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio == 0) {
-                this.questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
-                this.questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
-                this.questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
-                this.questionChart.data = [];
-                this.questionChart.data.push({
+                var questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
+                questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
+                questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+                questionChart.data = [];
+                questionChart.data.push({
                     'label': this.client.translate('ANSWERED_CORRECT'),
                     'value': this.quizData.currentQuestion.correctRatio
                 });
-                this.questionChart.data.push({
+                questionChart.data.push({
                     'label': this.client.translate('ANSWERED_INCORRECT'),
                     'value': (1 - this.quizData.currentQuestion.correctRatio)
                 });
+                this.modal.open(question_stats_1.QuestionStatsPage, {
+                    'question': this.quizData.currentQuestion,
+                    'chartDataSource': questionChart
+                }, { 'handle': 'questionStats' });
             }
         }
     };
@@ -367,9 +374,9 @@ var QuizPage = (function () {
             templateUrl: 'build/pages/quiz/quiz.html',
             directives: [animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _b) || Object, (typeof (_c = typeof ionic_1.Modal !== 'undefined' && ionic_1.Modal) === 'function' && _c) || Object])
     ], QuizPage);
     return QuizPage;
-    var _a, _b;
+    var _a, _b, _c;
 })();
 exports.QuizPage = QuizPage;

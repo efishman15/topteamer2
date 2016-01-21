@@ -4,9 +4,11 @@ import {ContestChartComponent} from '../../components/contest-chart/contest-char
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
 import {FacebookPostPage} from '../../pages/facebook-post/facebook-post';
+import {LikePage} from '../../pages/like/like';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
-import * as SoundService from '../../providers/sound';
+import * as shareService from '../../providers/share';
+import * as soundService from '../../providers/sound';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
@@ -48,7 +50,7 @@ export class ContestPage {
       }
 
       setTimeout(() => {
-        SoundService.play(this.lastQuizResults.data.sound);
+        soundService.play(this.lastQuizResults.data.sound);
       }, 500);
 
     });
@@ -95,13 +97,12 @@ export class ContestPage {
   }
 
   share(source) {
-    //TODO: share
-    alert('share, source=' + source);
+
+    shareService.share(contest);
   }
 
   like() {
-    //TODO: like
-    alert('like');
+    this.client.nav.push(LikePage, {'contest': this.contestChart.contest});
   }
 
   onTeamSelected(data) {

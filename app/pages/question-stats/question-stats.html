@@ -1,0 +1,39 @@
+<ion-toolbar>
+
+  <ion-buttons>
+    <button (click)="close()">
+      <icon close-circle></icon>
+    </button>
+  </ion-buttons>
+
+  <ion-title>
+    {{client.translate('QUESTION_STATS_TITLE')}}
+  </ion-title>
+
+</ion-toolbar>
+
+<ion-content class="align-center" dir="{{client.currentLanguage.direction}}">
+
+  <div class="padding center" dir="{{question.direction}}">
+    <h5 class="center question-text" [innerHtml]="question.text"></h5>
+  </div>
+
+  <div class="align-center padding" *ngIf="chartDataSource" id="questionChart">
+  </div>
+
+  <ion-buttons>
+    <button secondary *ngIf="question.wikipediaHint"
+            class="padding button button-small"
+            (click)="dismiss('hint')">
+      {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
+    </button>
+    <button secondary *ngIf="question.wikipediaAnswer"
+            class="padding button button-small"
+            (click)="dismiss('answer')">
+      {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
+    </button>
+  </ion-buttons>
+
+
+</ion-content>
+

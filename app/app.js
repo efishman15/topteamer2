@@ -11,18 +11,12 @@ var ionic_1 = require('ionic/ionic');
 var main_tabs_1 = require('./pages/main-tabs/main-tabs');
 var login_1 = require('./pages/login/login');
 var facebookService = require('./providers/facebook');
+var shareService = require('./providers/share');
 var client_1 = require('./providers/client');
 var topTeamerApp = (function () {
     function topTeamerApp(ionicApp, platform, client) {
         var _this = this;
         this.client = client;
-        // create an list of pages that can be navigated to from the menu
-        // the menu only works after login
-        // the login page disables the menu
-        this.pages = [
-            { title: 'RunningContests', page: main_tabs_1.MainTabsPage, icon: 'calendar' },
-            { title: 'Login', page: login_1.LoginPage, icon: 'log-in' },
-        ];
         client.init(ionicApp, platform).then(function () {
             _this.initApp();
         });
@@ -68,7 +62,7 @@ var topTeamerApp = (function () {
                 // org.apache.cordova.statusbar required
                 StatusBar.styleDefault();
             }
-            console.log("platform ready");
+            console.log('platform ready');
         });
     };
     ;
@@ -76,11 +70,11 @@ var topTeamerApp = (function () {
         var _this = this;
         //Resize app for web
         var containerWidth = window.innerWidth;
-        var myApp = document.getElementById("myApp");
+        var myApp = document.getElementById('myApp');
         if (myApp) {
             if (containerWidth > this.client.settings.general.webCanvasWidth) {
-                myApp.style.width = this.client.settings.general.webCanvasWidth + "px";
-                myApp.style.marginLeft = (containerWidth - this.client.settings.general.webCanvasWidth) / 2 + "px";
+                myApp.style.width = this.client.settings.general.webCanvasWidth + 'px';
+                myApp.style.marginLeft = (containerWidth - this.client.settings.general.webCanvasWidth) / 2 + 'px';
             }
         }
         //init facebook javascript sdk
@@ -99,7 +93,7 @@ var topTeamerApp = (function () {
             }
             js = d.createElement(s);
             js.id = id;
-            js.src = "//connect.facebook.net/en_US/sdk.js";
+            js.src = '//connect.facebook.net/en_US/sdk.js';
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
     };
@@ -113,23 +107,23 @@ var topTeamerApp = (function () {
         //Hook into window.open
         window.open = cordova.InAppBrowser.open;
         //Load branch mobile script
-        loadJsFile("lib/branch/moblie.min.js");
+        loadJsFile('lib/branch/moblie.min.js');
         //Init android billing
-        if (this.platform.is('android') && typeof inappbilling !== "undefined") {
+        if (this.platform.is('android') && typeof inappbilling !== 'undefined') {
             inappbilling.init(function (resultInit) {
             }, function (errorInit) {
-                FlurryAgent.myLogError("InAppBilling", errorInit);
+                FlurryAgent.myLogError('InAppBilling', errorInit);
             }, { showLog: true }, []);
         }
         cordova.getAppVersion(function (version) {
             client.user.clientInfo.appVersion = version;
-            FlurryAgent.setAppVersion("" + version);
+            FlurryAgent.setAppVersion('' + version);
             _this.initFacebook();
         });
     };
     topTeamerApp.prototype.initFlurry = function () {
         //FlurryAgent.setDebugLogEnabled(true);
-        FlurryAgent.startSession("NT66P8Q5BR5HHVN2C527");
+        FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
         FlurryAgent.myLogError = function (errorType, message) {
             console.log(message);
             FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
@@ -139,7 +133,7 @@ var topTeamerApp = (function () {
         window.myHandleBranch = function (err, data) {
             try {
                 if (err) {
-                    FlurryAgent.myLogError("BranchIoError", "Error received during branch init: " + err);
+                    FlurryAgent.myLogError('BranchIoError', 'Error received during branch init: ' + err);
                     return;
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
@@ -149,10 +143,10 @@ var topTeamerApp = (function () {
                 }
             }
             catch (e) {
-                FlurryAgent.myLogError("BranchIoError", "Error parsing data during branch init, data= " + data + ", parsedData=" + parsedData + ", error: " + e);
+                FlurryAgent.myLogError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + parsedData + ', error: ' + e);
             }
             window.initBranch = function () {
-                branch.init("key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE", function (err, data) {
+                branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
                     if (window.myHandleBranch) {
                         window.myHandleBranch(err, data);
                     }
@@ -193,26 +187,30 @@ var topTeamerApp = (function () {
                     for (var property in obj)
                         if (obj.hasOwnProperty(property))
                             //replace all instances case-insensitive
-                            str = str.replace(new RegExp(escapeRegExp("{{" + property + "}}"), 'gi'), String(obj[property]));
+                            str = str.replace(new RegExp(escapeRegExp('{{' + property + '}}'), 'gi'), String(obj[property]));
                 }
                 function escapeRegExp(string) {
-                    return string.replace(/([.*+?^=!:${{}}()|\[\]\/\\])/g, "\\$1");
+                    return string.replace(/([.*+?^=!:${{}}()|\[\]\/\\])/g, '\\$1');
                 }
                 function replaceByArray(arrayLike) {
                     for (var i = 0, len = arrayLike.length; i < len; i++)
-                        str = str.replace(new RegExp(escapeRegExp("{{" + i + "}}"), 'gi'), String(arrayLike[i]));
+                        str = str.replace(new RegExp(escapeRegExp('{{' + i + '}}'), 'gi'), String(arrayLike[i]));
                 }
                 if (!arguments.length || arguments[0] === null || arguments[0] === undefined)
                     return str;
                 else if (arguments.length == 1 && Array.isArray(arguments[0]))
                     replaceByArray(arguments[0]);
-                else if (arguments.length == 1 && typeof arguments[0] === "object")
+                else if (arguments.length == 1 && typeof arguments[0] === 'object')
                     replaceByObjectProperies(arguments[0]);
                 else
                     replaceByArray(arguments);
                 return str;
             };
         }
+    };
+    topTeamerApp.prototype.share = function () {
+        this.client.menu.close();
+        shareService.share();
     };
     topTeamerApp = __decorate([
         ionic_1.App({

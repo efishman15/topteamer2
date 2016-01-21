@@ -9,27 +9,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
-var facebookService = require('../../providers/facebook');
-var FacebookPostPage = (function () {
-    function FacebookPostPage(params) {
+var ShareService = require('../../providers/share');
+var SharePage = (function () {
+    function SharePage(params) {
         this.client = client_1.Client.getInstance();
-        this.quizResults = params.data.quizResults;
+        if (params && params.data) {
+            this.contest = params.data.contest;
+        }
+        this.shareVariables = ShareService.getVariables(this.contest);
     }
-    FacebookPostPage.prototype.post = function () {
-        var _this = this;
-        facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
-            _this.close();
-        }, function (error) {
-            FlurryAgent.myLogError("FacebookPostError", "Error posting: " + error);
-        });
-    };
-    FacebookPostPage = __decorate([
+    SharePage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/facebook-post/facebook-post.html'
+            templateUrl: 'build/pages/share/share.html'
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
-    ], FacebookPostPage);
-    return FacebookPostPage;
+    ], SharePage);
+    return SharePage;
     var _a;
 })();
-exports.FacebookPostPage = FacebookPostPage;
+exports.SharePage = SharePage;

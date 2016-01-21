@@ -1,3 +1,17 @@
+<ion-toolbar>
+
+  <ion-buttons>
+    <button (click)="close()">
+      <icon close-circle></icon>
+    </button>
+  </ion-buttons>
+
+  <ion-title>
+    {{client.translate('FACEBOOK_POST_TITLE')}}
+  </ion-title>
+
+</ion-toolbar>
+
 <ion-content class="align-center" dir="{{client.currentLanguage.direction}}">
 
   <img *ngIf="quizResults.data.facebookPost.dialogImage"
@@ -17,7 +31,7 @@
     <button class="button padding button-bar button-facebook" (click)="post()">{{client.translate('SHARE')}}
     </button>
     <button class="button padding button-bar button-clear"
-            (click)="goBack()">{{client.translate('NOT_NOW')}}
+            (click)="close()">{{client.translate('NOT_NOW')}}
     </button>
   </div>
 
