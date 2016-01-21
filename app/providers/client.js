@@ -38,7 +38,6 @@ var Client = (function () {
                 _this._menu = ionicApp.getComponent('leftMenu');
                 _this._menu.side = _this.currentLanguage.align;
                 _this._menu.id = _this.currentLanguage.align + "Menu";
-                _this._menu.getElementRef().nativeElement.attributes['dir'] = _this.currentLanguage.direction;
                 var canvas = document.createElement("canvas");
                 _this._canvasContext = canvas.getContext("2d");
                 _this._canvasContext.font = _this.serverGateway.settings.charts.contestAnnotations.annotationsFont;

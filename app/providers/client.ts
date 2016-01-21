@@ -55,7 +55,6 @@ export class Client {
         this._menu = ionicApp.getComponent('leftMenu');
         this._menu.side = this.currentLanguage.align;
         this._menu.id = this.currentLanguage.align + "Menu";
-        this._menu.getElementRef().nativeElement.attributes['dir'] = this.currentLanguage.direction;
 
         var canvas = document.createElement("canvas");
         this._canvasContext = canvas.getContext("2d");

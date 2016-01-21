@@ -25,23 +25,6 @@ class topTeamerApp {
 
   }
 
-  openPage(page, isRoot, isFromMenu) {
-    if (isRoot) {
-      this.client.nav.setRoot(page).then(() => {
-        if (isFromMenu) {
-          this.client.menu.close();
-        }
-      });
-    }
-    else {
-      this.nav.push(page.component).then(() => {
-        if (isFromMenu) {
-          this.menu.close();
-        }
-      })
-    }
-  }
-
   initApp() {
 
     //TODO: Global Exception handler - to write to flurry
@@ -191,11 +174,11 @@ class topTeamerApp {
     facebookService.getLoginStatus().then((result) => {
       if (result.connected) {
         this.client.facebookServerConnect(result.response.authResponse).then(() => {
-          this.openPage(MainTabsPage, true, false);
+          this.client.nav.push(MainTabsPage);
         })
       }
       else {
-        this.openPage(LoginPage, true, false)
+        this.client.nav.push(LoginPage);
       }
     });
   }

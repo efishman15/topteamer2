@@ -21,23 +21,6 @@ var topTeamerApp = (function () {
             _this.initApp();
         });
     }
-    topTeamerApp.prototype.openPage = function (page, isRoot, isFromMenu) {
-        var _this = this;
-        if (isRoot) {
-            this.client.nav.setRoot(page).then(function () {
-                if (isFromMenu) {
-                    _this.client.menu.close();
-                }
-            });
-        }
-        else {
-            this.nav.push(page.component).then(function () {
-                if (isFromMenu) {
-                    _this.menu.close();
-                }
-            });
-        }
-    };
     topTeamerApp.prototype.initApp = function () {
         //TODO: Global Exception handler - to write to flurry
         //TODO: Global page change detection to report to flurry about page navigations
@@ -159,11 +142,11 @@ var topTeamerApp = (function () {
         facebookService.getLoginStatus().then(function (result) {
             if (result.connected) {
                 _this.client.facebookServerConnect(result.response.authResponse).then(function () {
-                    _this.openPage(main_tabs_1.MainTabsPage, true, false);
+                    _this.client.nav.push(main_tabs_1.MainTabsPage);
                 });
             }
             else {
-                _this.openPage(login_1.LoginPage, true, false);
+                _this.client.nav.push(login_1.LoginPage);
             }
         });
     };

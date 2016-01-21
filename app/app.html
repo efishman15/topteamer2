@@ -1,6 +1,6 @@
 
 <!-- left menu -->
-<ion-menu [content]="content" dir="">
+<ion-menu [content]="content">
 
   <ion-toolbar *ngIf="client.loaded">
     <ion-title>{{client.translate('TOOLS')}}</ion-title>
@@ -8,7 +8,7 @@
 
   <ion-content>
 
-    <ion-list *ngIf="client.loaded">
+    <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
 
       <button ion-item (click)="share()">
         <icon name="share-alt"></icon>
