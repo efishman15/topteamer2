@@ -1,4 +1,4 @@
-import {Page, NavParams, Events, Item, Modal} from 'ionic/ionic';
+import {Page, NavParams} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
@@ -6,32 +6,29 @@ import {QuizPage} from '../../pages/quiz/quiz';
 import {FacebookPostPage} from '../../pages/facebook-post/facebook-post';
 import {LikePage} from '../../pages/like/like';
 import {Client} from '../../providers/client';
-import * as contestsService from '../../providers/contests';
 import * as shareService from '../../providers/share';
 import * as soundService from '../../providers/sound';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [ContestChartComponent, Item]
+  directives: [ContestChartComponent]
 })
 
 export class ContestPage {
 
   client:Client;
-  modal: Modal;
   contestChart:Object = {};
   lastQuizResults:Object = null;
   animateLastResults:Boolean = false;
 
   @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
 
-  constructor(params:NavParams, events:Events, modal: Modal) {
+  constructor(params:NavParams) {
 
-    this.modal = modal;
     this.client = Client.getInstance();
     this.contestChart = params.data.contestChart;
 
-    events.subscribe('topTeamer:quizFinished', (eventData) => {
+    this.client.events.subscribe('topTeamer:quizFinished', (eventData) => {
       //Event data comes as an array of data objects - we expect only one (last quiz results)
 
       this.lastQuizResults = eventData[0];
@@ -41,7 +38,7 @@ export class ContestPage {
 
       if (this.lastQuizResults.data.facebookPost) {
         this.animateLastResults = false;
-        this.modal.open(FacebookPostPage, {'quizResults' : this.lastQuizResults}, {'handle' : 'facebookPost'});
+        this.client.modal.open(FacebookPostPage, {'quizResults' : this.lastQuizResults}, {'handle' : 'facebookPost'});
       }
       else {
         //Exit from the quiz

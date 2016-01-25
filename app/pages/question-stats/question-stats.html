@@ -14,21 +14,21 @@
 
 <ion-content class="align-center" dir="{{client.currentLanguage.direction}}">
 
-  <div class="padding center" dir="{{question.direction}}">
+  <div padding class="align-center" dir="{{question.direction}}">
     <h5 class="center question-text" [innerHtml]="question.text"></h5>
   </div>
 
-  <div class="align-center padding" *ngIf="chartDataSource" id="questionChart">
+  <div padding class="align-center" *ngIf="chartDataSource" id="questionChart">
   </div>
 
   <ion-buttons>
-    <button secondary *ngIf="question.wikipediaHint"
-            class="padding button button-small"
+    <button padding secondary *ngIf="question.wikipediaHint"
+            class="button button-small"
             (click)="dismiss('hint')">
       {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
     </button>
-    <button secondary *ngIf="question.wikipediaAnswer"
-            class="padding button button-small"
+    <button padding secondary *ngIf="question.wikipediaAnswer"
+            class="button button-small"
             (click)="dismiss('answer')">
       {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
     </button>

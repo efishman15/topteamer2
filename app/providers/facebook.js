@@ -119,3 +119,16 @@ exports.post = function (story) { return new Promise(function (resolve, reject) 
         }
     }
 }); };
+//------------------------------------------------------
+//-- buy
+//------------------------------------------------------
+exports.buy = function (purchaseDialogData) { return new Promise(function (resolve, reject) {
+    try {
+        FB.ui(purchaseDialogData, function (response) {
+            resolve(response);
+        });
+    }
+    catch (error) {
+        reject(error);
+    }
+}); };

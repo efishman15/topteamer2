@@ -9,37 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
-var QuestionStatsPage = (function () {
-    function QuestionStatsPage(params) {
+var PurchaseSuccessPage = (function () {
+    function PurchaseSuccessPage(params) {
         this.client = client_1.Client.getInstance();
-        this.question = params.data.question;
-        this.chartDataSource = params.data.chartDataSource;
+        this.params = params;
     }
-    QuestionStatsPage.prototype.onPageWillEnter = function () {
-        var _this = this;
-        FusionCharts.ready(function () {
-            var chart = new FusionCharts({
-                type: "pie2d",
-                renderAt: 'questionChart',
-                width: _this.client.settings.charts.size.width,
-                height: _this.client.settings.charts.size.height,
-                dataFormat: 'json',
-                dataSource: _this.chartDataSource
-            });
-            chart.render();
-        });
+    PurchaseSuccessPage.prototype.onPageWillEnter = function () {
+        this.unlockText = this.client.translate(client.session.features[this.params.data.featurePurchased].unlockText);
     };
-    QuestionStatsPage.prototype.dismiss = function (action) {
-        this.close();
-        this.client.events.publish('topTeamer:questionStatsClosed', action);
+    PurchaseSuccessPage.prototype.proceed = function () {
+        this.client.nav.pop();
+        if (!this.client.nav.canGoBack()) {
+        }
     };
-    QuestionStatsPage = __decorate([
+    PurchaseSuccessPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/question-stats/question-stats.html'
+            templateUrl: 'build/pages/purchase-sucess/purchase-success.html'
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
-    ], QuestionStatsPage);
-    return QuestionStatsPage;
+    ], PurchaseSuccessPage);
+    return PurchaseSuccessPage;
     var _a;
 })();
-exports.QuestionStatsPage = QuestionStatsPage;
+exports.PurchaseSuccessPage = PurchaseSuccessPage;

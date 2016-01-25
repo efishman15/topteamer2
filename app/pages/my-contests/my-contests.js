@@ -13,9 +13,16 @@ var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var date_picker_1 = require('../../components/date-picker/date-picker');
+var item_selection_1 = require('../../components/item-selection/item-selection');
 var MyContestsPage = (function () {
     function MyContestsPage() {
         this.client = client_1.Client.getInstance();
+        this.currentLanguage = "en";
+        this.languages = [
+            { 'value': 'en', 'displayValue': 'English' },
+            { 'value': 'es', 'displayValue': 'Spanish' },
+            { 'value': 'he', 'displayValue': 'Hebrew' },
+        ];
     }
     MyContestsPage.prototype.onPageWillEnter = function () {
         if (this.contestList) {
@@ -40,7 +47,7 @@ var MyContestsPage = (function () {
     MyContestsPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/my-contests/my-contests.html',
-            directives: [contest_list_1.ContestListComponent, date_picker_1.DatePickerComponent]
+            directives: [contest_list_1.ContestListComponent, date_picker_1.DatePickerComponent, item_selection_1.ItemSelectionComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], MyContestsPage);

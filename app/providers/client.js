@@ -25,11 +25,14 @@ var Client = (function () {
         }
         return Client.instance;
     };
-    Client.prototype.init = function (ionicApp, platform) {
+    Client.prototype.init = function (ionicApp, platform, modal, popup, events) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._ionicApp = ionicApp;
             _this._platform = platform;
+            _this._modal = modal;
+            _this._popup = popup;
+            _this._events = events;
             _this.serverGateway.getSettings().then(function (data) {
                 var dir = document.createAttribute("dir");
                 dir.value = _this.currentLanguage.direction;
@@ -80,6 +83,27 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Client.prototype, "modal", {
+        get: function () {
+            return this._modal;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Client.prototype, "popup", {
+        get: function () {
+            return this._popup;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Client.prototype, "events", {
+        get: function () {
+            return this._events;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Client.prototype, "nav", {
         get: function () {
             return this._nav;
@@ -90,6 +114,13 @@ var Client = (function () {
     Object.defineProperty(Client.prototype, "menu", {
         get: function () {
             return this._menu;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Client.prototype, "endPoint", {
+        get: function () {
+            return this.serverGateway.endPoint;
         },
         enumerable: true,
         configurable: true
@@ -192,7 +223,7 @@ var ServerGateway = (function () {
             if (!timeout) {
                 timeout = 10000;
             }
-            _this.http.post(_this.endPoint + path, JSON.stringify(postData), { headers: headers })
+            _this.http.post(_this._endPoint + path, JSON.stringify(postData), { headers: headers })
                 .timeout(timeout)
                 .map(function (res) { return res.json(); })
                 .subscribe(function (res) { return resolve(res); }, function (err) {
@@ -212,7 +243,7 @@ var ServerGateway = (function () {
             var clientInfo = {};
             if (!window.cordova) {
                 //this._endPoint = 'http://www.topteamer.com/'
-                _this.endPoint = window.location.protocol + '//' + window.location.host + '/';
+                _this._endPoint = window.location.protocol + '//' + window.location.host + '/';
                 clientInfo.mobile = false;
                 if (window.self !== window.top) {
                     clientInfo.platform = 'facebook';
@@ -222,7 +253,7 @@ var ServerGateway = (function () {
                 }
             }
             else {
-                _this.endPoint = 'http://www.topteamer.com/';
+                _this._endPoint = 'http://www.topteamer.com/';
                 clientInfo.mobile = true;
                 if (_this.platform.is('android')) {
                     clientInfo.platform = 'android';
@@ -322,6 +353,13 @@ var ServerGateway = (function () {
         });
     };
     ;
+    Object.defineProperty(ServerGateway.prototype, "endPoint", {
+        get: function () {
+            return this._endPoint;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(ServerGateway.prototype, "settings", {
         get: function () {
             return this._settings;

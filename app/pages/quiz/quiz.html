@@ -24,7 +24,7 @@
          [innerHtml]="quizData.currentQuestion.text">
     </div>
 
-    <ion-list class="padding">
+    <ion-list padding>
       <button [animated]
               *ngFor="#answer of quizData.currentQuestion.answers, #i=index"
               id="buttonAnswer{{i}}"

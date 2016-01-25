@@ -25,7 +25,7 @@
                    (teamSelected)="onTeamSelected($event)">
     </contest-chart>
 
-    <div class="padding-top">
+    <div padding-top>
       <div *ngIf="contestChart.contest.state==='play'">
         <button danger class="button button-small no-wrap-text"
                 (click)="playContest('button')">{{client.translate('PLAY_CONTEST')}}
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div class="padding-top">
+    <div padding-top>
       <div class="pointer contest-footer-text float-{{client.currentLanguage.align}}"
            (click)="showParticipants('leader')">
         {{client.translate('CONTEST_LEADER')}}: {{contestChart.contest.leader.name}}
@@ -58,7 +58,7 @@
   </div>
 
   <div *ngIf="animateLastResults"
-       class="padding-left padding-right align-center long-animated {{lastQuizResults.data.animation}}">
+       padding-left padding-right class="align-center long-animated {{lastQuizResults.data.animation}}">
     <h2>{{client.translate(lastQuizResults.data.clientKey + '_TITLE')}}</h2>
     <h3>{{client.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
   </div>

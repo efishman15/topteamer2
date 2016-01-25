@@ -11,6 +11,8 @@
 
 @import "components/contest-list/contest-list";
 
+@import "components/item-selection/item-selection";
+
 @import "components/date-picker/date-picker";
 
 @import "components/leaders/leaders";
@@ -22,6 +24,8 @@
 @import "pages/contest/contest";
 
 @import "pages/contest-participants/contest-participants";
+
+@import "pages/contest-type/contest-type";
 
 @import "pages/facebook-post/facebook-post";
 
@@ -40,6 +44,8 @@
 @import "pages/quiz/quiz";
 
 @import "pages/running-contests/running-contests";
+
+@import "pages/set-contest/set-contest";
 
 @import "pages/share/share";
 

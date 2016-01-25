@@ -20,7 +20,7 @@ var DatePickerComponent = (function () {
         //Setting the input date for the date picker
         if (!this.currentDate) {
             this.currentDate = new Date();
-            this.clearTime(this.currentDate);
+            this.currentDate.clearTime();
         }
         this.displayedYear = this.currentDate.getFullYear();
         this.displayedMonth = this.currentDate.getMonth();
@@ -28,12 +28,12 @@ var DatePickerComponent = (function () {
         this.weekDays = this.client.translate('DATE_PICKER_WEEK_DAYS');
         if (this.minDate) {
             var minDate = new Date(this.minDate);
-            this.clearTime(minDate);
+            minDate.clearTime();
             this.minEpochLocal = minDate.getTime();
         }
         if (this.maxDate) {
             var maxDate = new Date(this.maxDate);
-            this.clearTime(maxDate);
+            maxDate.clearTime();
             this.maxEpochLocal = maxDate.getTime();
         }
         this.rows = [];
@@ -91,7 +91,7 @@ var DatePickerComponent = (function () {
         this.calendar = [];
         var currentEpoch = this.currentDate.getTime();
         var today = new Date();
-        this.clearTime(today);
+        today.clearTime();
         var todayEpoch = today.getTime();
         for (var i = 0; i < totalDays; i++) {
             var cellDate = new Date(firstDayOfTheCalendar.getFullYear(), firstDayOfTheCalendar.getMonth(), firstDayOfTheCalendar.getDate() + i, 0, 0, 0);
@@ -123,16 +123,6 @@ var DatePickerComponent = (function () {
             this.hideCalendar = true;
         }
     };
-    DatePickerComponent.prototype.clearTime = function (date) {
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setSeconds(0);
-        date.setMilliseconds(0);
-    };
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', Object)
-    ], DatePickerComponent.prototype, "options", void 0);
     __decorate([
         core_1.Input(), 
         __metadata('design:type', Date)

@@ -1,4 +1,4 @@
-import {Page, NavParams,Events,Modal} from 'ionic/ionic';
+import {Page, NavParams} from 'ionic/ionic';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener'
 import {TransitionListener} from '../../directives/transition-listener/transition-listener'
 import {QuestionStatsPage} from '../../pages/question-stats/question-stats'
@@ -13,13 +13,11 @@ import * as soundService from '../../providers/sound';
 export class QuizPage {
 
   client:Client;
-  modal: Modal;
   contestId:string;
   source:string;
   quizData:Object;
   questionHistory:Array<Object> = [];
   correctButtonName:string;
-  events:Events;
 
   //Canvas vars
   quizCanvas:any;
@@ -37,12 +35,10 @@ export class QuizPage {
   //img, x, y, width, height
   drawImageQueue = {};
 
-  constructor(params:NavParams, events:Events, modal: Modal) {
+  constructor(params:NavParams) {
     this.client = Client.getInstance();
-    this.modal = modal;
     this.contestId = params.data.contestId;
     this.source = params.data.source;
-    this.events = events;
 
     this.quizCanvas = document.getElementById('quizCanvas');
     this.quizContext = this.quizCanvas.getContext('2d');
@@ -52,7 +48,7 @@ export class QuizPage {
     this.initDrawImageQueue(this.imgErrorSrc);
     this.initDrawImageQueue(this.imgQuestionInfoSrc);
 
-    events.subscribe('topTeamer:questionStatsClosed', (eventData) => {
+    this.client.events.subscribe('topTeamer:questionStatsClosed', (eventData) => {
 
       //Event data comes as an array of data objects - we expect only one (result)
       var action = eventData[0];
@@ -210,7 +206,7 @@ export class QuizPage {
 
       //Give enough time to draw the circle progress of the last question
       setTimeout(() => {
-        this.events.publish('topTeamer:quizFinished', this.quizData.results)
+        this.client.events.publish('topTeamer:quizFinished', this.quizData.results)
       },1000);
 
     }
@@ -245,7 +241,7 @@ export class QuizPage {
           'value': (1 - this.quizData.currentQuestion.correctRatio)
         });
 
-        this.modal.open(QuestionStatsPage, {
+        this.client.modal.open(QuestionStatsPage, {
           'question': this.quizData.currentQuestion,
           'chartDataSource': questionChart
         }, {'handle': 'questionStats'});

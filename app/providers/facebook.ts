@@ -133,3 +133,17 @@ export let post = (story) => new Promise((resolve, reject) => {
     }
   }
 });
+
+//------------------------------------------------------
+//-- buy
+//------------------------------------------------------
+export let buy = (purchaseDialogData) => new Promise((resolve, reject) => {
+
+    try {
+      FB.ui(purchaseDialogData, (response) => {
+        resolve(response);
+      });
+    } catch (error) {
+      reject(error);
+    }
+});

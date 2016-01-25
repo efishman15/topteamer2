@@ -1,4 +1,4 @@
-import {Page,NavParams,Events} from 'ionic/ionic';
+import {Page,NavParams} from 'ionic/ionic';
 import {Client} from '../../providers/client';
 
 @Page({
@@ -9,13 +9,11 @@ export class QuestionStatsPage {
   client:Client;
   question:Object;
   chartDataSource:Object;
-  events: Events;
 
-  constructor(params:NavParams, events: Events) {
+  constructor(params:NavParams) {
     this.client = Client.getInstance();
     this.question = params.data.question;
     this.chartDataSource = params.data.chartDataSource;
-    this.events = events;
   }
 
   onPageWillEnter() {
@@ -36,6 +34,6 @@ export class QuestionStatsPage {
 
   dismiss(action) {
     this.close();
-    this.events.publish('topTeamer:questionStatsClosed', action)
+    this.client.events.publish('topTeamer:questionStatsClosed', action)
   }
 }

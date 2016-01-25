@@ -14,7 +14,7 @@ var question_stats_1 = require('../../pages/question-stats/question-stats');
 var client_1 = require('../../providers/client');
 var soundService = require('../../providers/sound');
 var QuizPage = (function () {
-    function QuizPage(params, events, modal) {
+    function QuizPage(params) {
         var _this = this;
         this.questionHistory = [];
         this.imgCorrectSrc = 'images/correct.png';
@@ -26,17 +26,15 @@ var QuizPage = (function () {
         //img, x, y, width, height
         this.drawImageQueue = {};
         this.client = client_1.Client.getInstance();
-        this.modal = modal;
         this.contestId = params.data.contestId;
         this.source = params.data.source;
-        this.events = events;
         this.quizCanvas = document.getElementById('quizCanvas');
         this.quizContext = this.quizCanvas.getContext('2d');
         this.quizContext.font = this.client.settings.quiz.canvas.font;
         this.initDrawImageQueue(this.imgCorrectSrc);
         this.initDrawImageQueue(this.imgErrorSrc);
         this.initDrawImageQueue(this.imgQuestionInfoSrc);
-        events.subscribe('topTeamer:questionStatsClosed', function (eventData) {
+        this.client.events.subscribe('topTeamer:questionStatsClosed', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (result)
             var action = eventData[0];
             switch (action) {
@@ -156,7 +154,7 @@ var QuizPage = (function () {
             });
             //Give enough time to draw the circle progress of the last question
             setTimeout(function () {
-                _this.events.publish('topTeamer:quizFinished', _this.quizData.results);
+                _this.client.events.publish('topTeamer:quizFinished', _this.quizData.results);
             }, 1000);
         }
         else {
@@ -182,7 +180,7 @@ var QuizPage = (function () {
                     'label': this.client.translate('ANSWERED_INCORRECT'),
                     'value': (1 - this.quizData.currentQuestion.correctRatio)
                 });
-                this.modal.open(question_stats_1.QuestionStatsPage, {
+                this.client.modal.open(question_stats_1.QuestionStatsPage, {
                     'question': this.quizData.currentQuestion,
                     'chartDataSource': questionChart
                 }, { 'handle': 'questionStats' });
@@ -374,9 +372,9 @@ var QuizPage = (function () {
             templateUrl: 'build/pages/quiz/quiz.html',
             directives: [animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _b) || Object, (typeof (_c = typeof ionic_1.Modal !== 'undefined' && ionic_1.Modal) === 'function' && _c) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
     ], QuizPage);
     return QuizPage;
-    var _a, _b, _c;
+    var _a;
 })();
 exports.QuizPage = QuizPage;

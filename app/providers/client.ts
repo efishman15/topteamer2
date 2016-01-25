@@ -2,7 +2,7 @@ import {Injectable} from 'angular2/core';
 import {Http, Response, Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
-import {IonicApp,Platform, NavController, Menu} from 'ionic-framework/ionic';
+import {IonicApp,Platform, NavController, Menu, Modal, Popup, Events} from 'ionic/ionic';
 
 @Injectable()
 export class Client {
@@ -14,6 +14,9 @@ export class Client {
 
   _ionicApp:IonicApp;
   _platform:Platform;
+  _modal: Modal;
+  _popup: Popup;
+  _events: Events;
   _nav:NavController;
   _menu: Menu;
   _loaded:Boolean = false;
@@ -38,12 +41,15 @@ export class Client {
     return Client.instance;
   }
 
-  init(ionicApp:IonicApp, platform:Platform) {
+  init(ionicApp:IonicApp, platform:Platform, modal: Modal, popup: Popup, events: Events) {
 
     return new Promise((resolve, reject) => {
 
       this._ionicApp = ionicApp;
       this._platform = platform;
+      this._modal = modal;
+      this._popup = popup;
+      this._events = events;
 
       this.serverGateway.getSettings().then((data) => {
 
@@ -90,11 +96,23 @@ export class Client {
   }
 
   get ionicApp() : IonicApp {
-    return this._ionicApp
+    return this._ionicApp;
   }
 
   get platform() : Platform {
-    return this._platform
+    return this._platform;
+  }
+
+  get modal() : Modal {
+    return this._modal;
+  }
+
+  get popup() : Popup {
+    return this._popup;
+  }
+
+  get events() : Events {
+    return this._events;
   }
 
   get nav():NavController{
@@ -103,6 +121,10 @@ export class Client {
 
   get menu():Menu{
     return this._menu;
+  }
+
+  get endPoint():String {
+    return this.serverGateway.endPoint;
   }
 
   get settings():Object {
@@ -147,7 +169,7 @@ export class ServerGateway {
   http:Http;
   _session:Object;
   _settings: Object;
-  endPoint:string;
+  _endPoint:string;
   _user: Object;
 
   constructor(http:Http) {
@@ -197,7 +219,7 @@ export class ServerGateway {
         timeout = 10000;
       }
 
-      this.http.post(this.endPoint + path, JSON.stringify(postData), {headers: headers})
+      this.http.post(this._endPoint + path, JSON.stringify(postData), {headers: headers})
         .timeout(timeout)
         .map((res:Response) => res.json())
         .subscribe(
@@ -222,7 +244,7 @@ export class ServerGateway {
 
       if (!window.cordova) {
         //this._endPoint = 'http://www.topteamer.com/'
-        this.endPoint = window.location.protocol + '//' + window.location.host + '/';
+        this._endPoint = window.location.protocol + '//' + window.location.host + '/';
         clientInfo.mobile = false;
         if (window.self !== window.top) {
           clientInfo.platform = 'facebook';
@@ -232,7 +254,7 @@ export class ServerGateway {
         }
       }
       else {
-        this.endPoint = 'http://www.topteamer.com/'
+        this._endPoint = 'http://www.topteamer.com/'
         clientInfo.mobile = true;
         if (this.platform.is('android')) {
           clientInfo.platform = 'android';
@@ -363,6 +385,10 @@ export class ServerGateway {
 
     })
   };
+
+  get endPoint():String {
+    return this._endPoint;
+  }
 
   get settings():Object {
     return this._settings;

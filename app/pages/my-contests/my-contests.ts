@@ -5,10 +5,11 @@ import {Client} from '../../providers/client';
 import {ContestPage} from '../contest/contest'
 import * as contestsService from '../../providers/contests';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
+import {ItemSelectionComponent} from '../../components/item-selection/item-selection';
 
 @Page({
   templateUrl: 'build/pages/my-contests/my-contests.html',
-  directives: [ContestListComponent, DatePickerComponent]
+  directives: [ContestListComponent, DatePickerComponent,ItemSelectionComponent]
 })
 
 export class MyContestsPage {
@@ -16,8 +17,18 @@ export class MyContestsPage {
   @ViewChild(ContestListComponent) contestList: ContestListComponent;
   client: Client;
 
+  currentLanguage:string;
+  languages:Array<Object>;
+
   constructor() {
     this.client = Client.getInstance();
+
+    this.currentLanguage = "en";
+    this.languages = [
+      {'value' : 'en', 'displayValue': 'English'},
+      {'value' : 'es', 'displayValue': 'Spanish'},
+      {'value' : 'he', 'displayValue': 'Hebrew'},
+    ]
   }
 
   onPageWillEnter() {

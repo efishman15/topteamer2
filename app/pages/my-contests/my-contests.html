@@ -7,6 +7,10 @@
 
 <ion-content>
 
+  <item-selection [value]="currentLanguage" [items]="languages" width="180" title="{{client.translate('CHOOSE_LANGUAGE')}}">
+
+  </item-selection>
+
   <contest-list tab="mine"
                 (contestSelected)="onContestSelected($event)">
   </contest-list>

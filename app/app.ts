@@ -1,10 +1,10 @@
-import {App, IonicApp, Platform, Config} from 'ionic/ionic';
+import {App, IonicApp, Platform, Config, Events, Modal, Popup, NavController,Menu} from 'ionic/ionic';
 import {MainTabsPage} from './pages/main-tabs/main-tabs';
 import {LoginPage} from './pages/login/login';
 import * as facebookService from './providers/facebook';
 import * as shareService from './providers/share';
 import {Client} from './providers/client';
-import {NavController,Menu} from 'ionic-framework/ionic';
+import {ContestTypePage} from './pages/contest-type/contest-type';
 
 @App({
   templateUrl: 'app.html',
@@ -15,12 +15,19 @@ class topTeamerApp {
 
   client:Client;
 
-  constructor(ionicApp:IonicApp, platform:Platform, client:Client) {
+  constructor(ionicApp:IonicApp, platform:Platform, client:Client, modal:Modal, events:Events, popup:Popup) {
 
     this.client = client;
 
-    client.init(ionicApp, platform).then(() => {
+    client.init(ionicApp, platform, modal, popup, events).then(() => {
+
       this.initApp();
+
+      client.events.subscribe('topTeamer:contestTypeSelected', (eventData) => {
+        var content = eventData[0];
+        console.log("contest=" + JSON.stringify(content));
+      });
+
     });
 
   }
@@ -34,11 +41,13 @@ class topTeamerApp {
     //TODO: Catch server popup messages and display a modal popup.
     //TODO: Flurry events
     //TODO: Top bar with rank
+    //TODO: Hardware back button
 
     this.client.platform.ready().then(() => {
 
       this.declareStringFormat();
       this.declareRequestAnimationFrame();
+      this.declareClearTime();
 
       this.initFlurry();
 
@@ -231,6 +240,22 @@ class topTeamerApp {
         return str;
       };
     }
+  }
+
+  declareClearTime() {
+    if (!Date.prototype.clearTime) {
+      Date.prototype.clearTime = function () {
+        this.setHours(0);
+        this.setMinutes(0);
+        this.setSeconds(0);
+        this.setMilliseconds(0);
+      }
+    }
+  }
+
+  newContest() {
+    this.client.menu.close();
+    this.modal.open(ContestTypePage);
   }
 
   share() {

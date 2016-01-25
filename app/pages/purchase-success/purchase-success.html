@@ -1,0 +1,20 @@
+<ion-navbar *navbar>
+  <button menuToggle>
+    <icon menu></icon>
+  </button>
+  <ion-title>{{client.translate('PAYMENT_THANKYOU')}}</ion-title>
+</ion-navbar>
+
+<ion-content>
+
+  <div padding class="align-center">
+
+    <div padding class="align-center">
+      <h2>{{unlockText}}</h2>
+    </div>
+
+    <button padding class="button button-primary" (click)="proceed()">{{client.translate('OK')}}
+    </button>
+
+  </div>
+</ion-content>

@@ -105,6 +105,9 @@ export let prepareContestChart = (contest, timeMode) => {
 
 };
 
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
 export let openContest = (contestId: string) => {
 
   var postData = {'contestId': contestId};
@@ -112,10 +115,21 @@ export let openContest = (contestId: string) => {
   client.serverPost('contests/get', postData).then((contest) => {
     client.nav.push(ContestPage, {'contestChart' : prepareContestChart(contest, "starts")});
   });
+};
 
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+export let removeContest = (contestId: string) => {
+  var postData = {'contestId': contestId};
+  var client = Client.getInstance();
+  return client.serverPost('contests/remove', postData);
 }
 
-//Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
+//------------------------------------------------------
+//-- setTimePhrase
+//-- Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
+//------------------------------------------------------
 function setTimePhrase(contest, timeMode) {
 
   var client = Client.getInstance();

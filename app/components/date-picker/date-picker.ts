@@ -10,7 +10,6 @@ import {Icon} from 'ionic/ionic';
 
 export class DatePickerComponent {
 
-  @Input() options:Object;
   @Input() currentDate:Date;
   @Input() minDate:string;
   @Input() maxDate:string;
@@ -40,7 +39,7 @@ export class DatePickerComponent {
     //Setting the input date for the date picker
     if (!this.currentDate) {
       this.currentDate = new Date();
-      this.clearTime(this.currentDate);
+      this.currentDate.clearTime();
     }
 
     this.displayedYear = this.currentDate.getFullYear();
@@ -51,12 +50,12 @@ export class DatePickerComponent {
 
     if (this.minDate) {
       var minDate = new Date(this.minDate);
-      this.clearTime(minDate);
+      minDate.clearTime();
       this.minEpochLocal = minDate.getTime();
     }
     if (this.maxDate) {
       var maxDate = new Date(this.maxDate);
-      this.clearTime(maxDate);
+      maxDate.clearTime();
       this.maxEpochLocal = maxDate.getTime();
     }
 
@@ -120,7 +119,7 @@ export class DatePickerComponent {
 
     var currentEpoch = this.currentDate.getTime();
     var today = new Date();
-    this.clearTime(today);
+    today.clearTime();
     var todayEpoch = today.getTime();
 
     for (var i = 0; i < totalDays; i++) {
@@ -155,13 +154,5 @@ export class DatePickerComponent {
       this.dateSelected.next(cell);
       this.hideCalendar = true;
     }
-  }
-
-  clearTime(date: Date) {
-    date.setHours(0);
-    date.setMinutes(0);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-
   }
 }

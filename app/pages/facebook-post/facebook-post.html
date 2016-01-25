@@ -24,13 +24,13 @@
     <h5>{{client.translate(quizResults.data.clientKey + '_MESSAGE', quizResults.data.clientValues) }}</h5>
   </div>
 
-  <div class="padding">
+  <div padding>
   </div>
 
-  <div class="button-bar padding">
-    <button class="button padding button-bar button-facebook" (click)="post()">{{client.translate('SHARE')}}
+  <div padding class="button-bar">
+    <button padding class="button button-bar button-facebook" (click)="post()">{{client.translate('SHARE')}}
     </button>
-    <button class="button padding button-bar button-clear"
+    <button padding class="button button-bar button-clear"
             (click)="close()">{{client.translate('NOT_NOW')}}
     </button>
   </div>

@@ -84,6 +84,9 @@ exports.prepareContestChart = function (contest, timeMode) {
     contestChart.chart.subCaptionFontColor = contestSubCaptionColor;
     return contestChart;
 };
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
 exports.openContest = function (contestId) {
     var postData = { 'contestId': contestId };
     var client = client_1.Client.getInstance();
@@ -91,7 +94,18 @@ exports.openContest = function (contestId) {
         client.nav.push(contest_1.ContestPage, { 'contestChart': exports.prepareContestChart(contest, "starts") });
     });
 };
-//Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+exports.removeContest = function (contestId) {
+    var postData = { 'contestId': contestId };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/remove', postData);
+};
+//------------------------------------------------------
+//-- setTimePhrase
+//-- Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
+//------------------------------------------------------
 function setTimePhrase(contest, timeMode) {
     var client = client_1.Client.getInstance();
     var now = (new Date()).getTime();

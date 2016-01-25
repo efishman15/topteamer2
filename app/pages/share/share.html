@@ -7,34 +7,34 @@
 
 <ion-content class="align-center">
 
-  <div class="padding align-center">
-    <h3 class="padding" *ngIf="contest">{{contest.name}}</h3>
-    <h3 class="padding" *ngIf="!contest">{{client.translate('WHO_IS_SMARTER_QUESTION')}}</h3>
+  <div padding class="align-center">
+    <h3 padding *ngIf="contest">{{contest.name}}</h3>
+    <h3 padding *ngIf="!contest">{{client.translate('WHO_IS_SMARTER_QUESTION')}}</h3>
     <h5>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h5>
 
     <ion-list>
-      <div class="padding">
-        <a class="padding" href="https://www.facebook.com/sharer.php?u={{shareVariables.shareUrl}}?ref=shareFacebook"
+      <div padding>
+        <a padding href="https://www.facebook.com/sharer.php?u={{shareVariables.shareUrl}}?ref=shareFacebook"
            target="_blank"><img src="images/social/facebook.png" width="45" height="45"></a>
-        <a class="padding" href="https://plus.google.com/share?url={{shareVariables.shareUrl}}?ref=shareGoogle"
+        <a padding href="https://plus.google.com/share?url={{shareVariables.shareUrl}}?ref=shareGoogle"
            target="_blank"><img src="images/social/googleplus.png" width="45" height="45"></a>
-        <a class="padding"
+        <a padding
            href="https://twitter.com/share?url={{shareVariables.shareUrl}}?ref=shareTwitter&text={{shareVariables.shareSubject}}&via={{client.settings.share.twitterAccount}}"
            target="_blank"><img src="images/social/twitter.png" width="45" height="45"></a>
-        <a class="padding" href="mailto:?subject={{shareVariables.shareSubject}}&body={{shareVariables.shareBodyEmail}}"
+        <a padding href="mailto:?subject={{shareVariables.shareSubject}}&body={{shareVariables.shareBodyEmail}}"
            target="_blank"><img src="images/social/email.png" width="45" height="45"></a>
       </div>
-      <div class="padding">
-        <a class="padding"
+      <div padding>
+        <a padding
            href="https://www.linkedin.com/shareArticle?mini=true&url={{shareVariables.shareUrl}}?ref=shareLinkedIn"
            target="_blank"><img src="images/social/linkedin.png" width="45" height="45"></a>
-        <a class="padding"
+        <a padding
            href="https://www.stumbleupon.com/submit?url={{shareVariables.shareUrl}}&title={{shareVariables.shareSubject}}"
            target="_blank"><img src="images/social/stumbleupon.png" width="45" height="45"
         ></a>
-        <a class="padding" href="https://www.digg.com/submit?url={{shareVariables.shareUrl}}" target="_blank"><img
+        <a padding href="https://www.digg.com/submit?url={{shareVariables.shareUrl}}" target="_blank"><img
           src="images/social/digg.png" width="45" height="45"></a>
-        <a class="padding"
+        <a padding
            href="https://www.reddit.com/submit?url={{shareVariables.shareUrl}}&title={{shareVariables.shareSubject}}"
            target="_blank"><img src="images/social/reddit.png" width="45" height="45"></a>
       </div>
