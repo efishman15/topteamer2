@@ -1,0 +1,166 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var core_1 = require('angular2/core');
+var client_1 = require('../../providers/client');
+var ionic_1 = require('ionic/ionic');
+var DatePickerComponent = (function () {
+    function DatePickerComponent() {
+        this.dateSelected = new core_1.EventEmitter();
+        this.client = client_1.Client.getInstance();
+    }
+    DatePickerComponent.prototype.ngOnInit = function () {
+        this.hideCalendar = true;
+        //Setting the input date for the date picker
+        if (!this.currentDate) {
+            this.currentDate = new Date();
+            this.clearTime(this.currentDate);
+        }
+        this.displayedYear = this.currentDate.getFullYear();
+        this.displayedMonth = this.currentDate.getMonth();
+        this.monthsList = this.client.translate('DATE_PICKER_MONTH_NAMES');
+        this.weekDays = this.client.translate('DATE_PICKER_WEEK_DAYS');
+        if (this.minDate) {
+            var minDate = new Date(this.minDate);
+            this.clearTime(minDate);
+            this.minEpochLocal = minDate.getTime();
+        }
+        if (this.maxDate) {
+            var maxDate = new Date(this.maxDate);
+            this.clearTime(maxDate);
+            this.maxEpochLocal = maxDate.getTime();
+        }
+        this.rows = [];
+        this.cols = [];
+        this.rows.length = 6;
+        this.cols.length = 7;
+    };
+    ;
+    DatePickerComponent.prototype.toggleCalendar = function () {
+        this.hideCalendar = !this.hideCalendar;
+        if (!this.hideCalendar) {
+            this.displayedYear = this.currentDate.getFullYear();
+            this.displayedMonth = this.currentDate.getMonth();
+            this.refreshMonth();
+        }
+    };
+    DatePickerComponent.prototype.prevMonth = function () {
+        if (this.displayedMonth === 0) {
+            this.displayedYear--;
+            this.displayedMonth = 11;
+        }
+        else {
+            this.displayedMonth--;
+        }
+        this.refreshMonth();
+    };
+    ;
+    DatePickerComponent.prototype.nextMonth = function () {
+        if (this.displayedMonth === 11) {
+            this.displayedYear++;
+            this.displayedMonth = 0;
+        }
+        else {
+            this.displayedMonth++;
+        }
+        this.refreshMonth();
+    };
+    ;
+    DatePickerComponent.prototype.prevYear = function () {
+        this.displayedYear--;
+        this.refreshMonth();
+    };
+    ;
+    DatePickerComponent.prototype.nextYear = function () {
+        this.displayedYear++;
+        this.refreshMonth();
+    };
+    ;
+    DatePickerComponent.prototype.refreshMonth = function () {
+        var firstDateOfTheMonth = new Date(this.displayedYear, this.displayedMonth, 1);
+        var lastDateOfTheMonth = new Date(this.displayedYear, this.displayedMonth + 1, 0);
+        var daysOffsetStart = firstDateOfTheMonth.getDay();
+        var firstDayOfTheCalendar = new Date(firstDateOfTheMonth.getFullYear(), firstDateOfTheMonth.getMonth(), firstDateOfTheMonth.getDate() - daysOffsetStart);
+        var totalDays = this.rows.length * this.cols.length;
+        this.calendar = [];
+        var currentEpoch = this.currentDate.getTime();
+        var today = new Date();
+        this.clearTime(today);
+        var todayEpoch = today.getTime();
+        for (var i = 0; i < totalDays; i++) {
+            var cellDate = new Date(firstDayOfTheCalendar.getFullYear(), firstDayOfTheCalendar.getMonth(), firstDayOfTheCalendar.getDate() + i, 0, 0, 0);
+            var epochLocal = cellDate.getTime();
+            this.calendar.push({
+                dateObject: cellDate,
+                date: cellDate.getDate(),
+                month: cellDate.getMonth(),
+                year: cellDate.getFullYear(),
+                day: cellDate.getDay(),
+                dateString: cellDate.toString(),
+                epochLocal: epochLocal,
+                epochUTC: (cellDate.getTime() + (cellDate.getTimezoneOffset() * 60 * 1000)),
+                inMonth: (epochLocal >= firstDateOfTheMonth.getTime() && epochLocal <= lastDateOfTheMonth.getTime()),
+                disabled: ((this.minEpochLocal && epochLocal < this.minEpochLocal) || (this.maxEpochLocal || epochLocal > this.maxEpochLocal)),
+                selected: (epochLocal === currentEpoch),
+                today: (epochLocal === todayEpoch)
+            });
+        }
+    };
+    DatePickerComponent.prototype.getCell = function (row, col) {
+        return this.calendar[(row * this.cols.length) + col];
+    };
+    DatePickerComponent.prototype.pickDate = function (row, col) {
+        var cell = this.getCell(row, col);
+        if (!cell.disabled) {
+            this.currentDate = cell.dateObject;
+            this.dateSelected.next(cell);
+            this.hideCalendar = true;
+        }
+    };
+    DatePickerComponent.prototype.clearTime = function (date) {
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+        date.setMilliseconds(0);
+    };
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', Object)
+    ], DatePickerComponent.prototype, "options", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', Date)
+    ], DatePickerComponent.prototype, "currentDate", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', String)
+    ], DatePickerComponent.prototype, "minDate", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', String)
+    ], DatePickerComponent.prototype, "maxDate", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', String)
+    ], DatePickerComponent.prototype, "currentDateClass", void 0);
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], DatePickerComponent.prototype, "dateSelected", void 0);
+    DatePickerComponent = __decorate([
+        core_1.Component({
+            selector: 'date-picker',
+            templateUrl: 'build/components/date-picker/date-picker.html',
+            directives: [ionic_1.Icon]
+        }), 
+        __metadata('design:paramtypes', [])
+    ], DatePickerComponent);
+    return DatePickerComponent;
+})();
+exports.DatePickerComponent = DatePickerComponent;

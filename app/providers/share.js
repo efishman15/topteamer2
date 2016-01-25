@@ -57,7 +57,7 @@ exports.share = function (contest) {
         _this.mobileShare(contest);
     }
     else {
-        client.nav.push(share_1.SharePage);
+        client.nav.push(share_1.SharePage, { 'contest': contest });
     }
     //TODO: flurry + source
 };

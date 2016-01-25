@@ -12,6 +12,7 @@ var core_1 = require('angular2/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
+var date_picker_1 = require('../../components/date-picker/date-picker');
 var MyContestsPage = (function () {
     function MyContestsPage() {
         this.client = client_1.Client.getInstance();
@@ -29,6 +30,9 @@ var MyContestsPage = (function () {
     MyContestsPage.prototype.onContestSelected = function (data) {
         contestsService.openContest(data.contest._id);
     };
+    MyContestsPage.prototype.dateSelected = function (theDate) {
+        console.log("date selected: " + theDate);
+    };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 
         __metadata('design:type', contest_list_1.ContestListComponent)
@@ -36,7 +40,7 @@ var MyContestsPage = (function () {
     MyContestsPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/my-contests/my-contests.html',
-            directives: [contest_list_1.ContestListComponent]
+            directives: [contest_list_1.ContestListComponent, date_picker_1.DatePickerComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], MyContestsPage);

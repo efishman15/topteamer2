@@ -63,6 +63,8 @@
     <h3>{{client.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
   </div>
 
+  <my-date-picker dir="ltr" [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event)" [selDate]="selectedDate"></my-date-picker>
+
   <button fab fab-bottom fab-left (click)="share('fab')">
     <icon share></icon>
   </button>

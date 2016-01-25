@@ -57,6 +57,10 @@ export class ContestPage {
 
   }
 
+  onDateChanged(event) {
+    console.log('onDateChanged(): ', event.date, ' - formatted: ', event.formatted, ' - epoc timestamp: ', event.epoc);
+  }
+
   onPageWillLeave() {
     this.animateLastResults = false;
     this.lastQuizResults = null;
@@ -98,7 +102,7 @@ export class ContestPage {
 
   share(source) {
 
-    shareService.share(contest);
+    shareService.share(this.contestChart.contest);
   }
 
   like() {

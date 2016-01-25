@@ -1,0 +1,5 @@
+{"name":"whoSmarterServer","hostname":"EddyHomePC","pid":10072,"level":50,"dbError":{"name":"MongoError","message":"connect ECONNREFUSED 127.0.0.1:27017"},"msg":"Error connecting to the database","time":"2015-12-02T11:30:22.063Z","v":0}
+{"name":"whoSmarterServer","hostname":"EddyHomePC","pid":5504,"level":30,"msg":"server up!","time":"2015-12-02T16:40:30.123Z","v":0}
+{"name":"whoSmarterServer","hostname":"EddyHomePC","pid":7620,"level":30,"msg":"server up!","time":"2015-12-02T17:08:25.623Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":8596,"level":30,"msg":"server up!","time":"2015-12-04T12:40:33.212Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":8676,"level":30,"msg":"server up!","time":"2015-12-04T13:40:42.643Z","v":0}

@@ -4,10 +4,11 @@ import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Client} from '../../providers/client';
 import {ContestPage} from '../contest/contest'
 import * as contestsService from '../../providers/contests';
+import {DatePickerComponent} from '../../components/date-picker/date-picker';
 
 @Page({
   templateUrl: 'build/pages/my-contests/my-contests.html',
-  directives: [ContestListComponent]
+  directives: [ContestListComponent, DatePickerComponent]
 })
 
 export class MyContestsPage {
@@ -36,4 +37,7 @@ export class MyContestsPage {
     contestsService.openContest(data.contest._id);
   }
 
+  dateSelected(theDate) {
+    console.log("date selected: " + theDate);
+  }
 }

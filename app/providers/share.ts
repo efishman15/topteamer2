@@ -75,7 +75,7 @@ export let share = (contest) => {
     this.mobileShare(contest);
   }
   else {
-    client.nav.push(SharePage);
+    client.nav.push(SharePage, {'contest' : contest});
   }
 
   //TODO: flurry + source

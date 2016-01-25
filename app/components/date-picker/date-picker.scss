@@ -1,0 +1,51 @@
+.calendar {
+  width: 270px;
+}
+
+.calendar-current-date {
+  width: 270px;
+}
+
+.calendar-popup {
+  border: solid 2px #8699A4;
+}
+
+.calendar-month-year {
+  width: 120px;
+}
+
+.calendar-week-days {
+  background-color: #51a7e8;
+  font-weight: bold;
+}
+
+.date-today {
+  border: solid 1px black;
+  cursor: pointer;
+}
+
+.calendar-cell {
+  padding: 5px;
+}
+
+.no-padding {
+  padding: 0;
+}
+
+.date-in-month {
+  cursor: pointer;
+}
+
+.date-outside-month {
+  color: #a1a1a1;
+  cursor: pointer;
+}
+
+.date-selected {
+  background-color: #e93a3a;
+  cursor: pointer;
+}
+
+.date-disabled {
+  text-decoration: line-through;
+}

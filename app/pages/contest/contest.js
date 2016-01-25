@@ -46,6 +46,9 @@ var ContestPage = (function () {
             }, 500);
         });
     }
+    ContestPage.prototype.onDateChanged = function (event) {
+        console.log('onDateChanged(): ', event.date, ' - formatted: ', event.formatted, ' - epoc timestamp: ', event.epoc);
+    };
     ContestPage.prototype.onPageWillLeave = function () {
         this.animateLastResults = false;
         this.lastQuizResults = null;
@@ -78,7 +81,7 @@ var ContestPage = (function () {
         alert('edit contest');
     };
     ContestPage.prototype.share = function (source) {
-        shareService.share(contest);
+        shareService.share(this.contestChart.contest);
     };
     ContestPage.prototype.like = function () {
         this.client.nav.push(like_1.LikePage, { 'contest': this.contestChart.contest });
