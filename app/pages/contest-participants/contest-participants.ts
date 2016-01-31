@@ -1,10 +1,9 @@
-import {Page} from 'ionic/ionic';
+import {Page,NavParams} from 'ionic/ionic';
 import {LeadersComponent} from '../../components/leaders/leaders';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ViewChild} from 'angular2/core';
 import {Client} from '../../providers/client';
-import {NavParams} from "ionic-framework/ionic";
 
 @Page({
   templateUrl: 'build/pages/contest-participants/contest-participants.html',

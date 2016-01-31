@@ -25,13 +25,11 @@ var Client = (function () {
         }
         return Client.instance;
     };
-    Client.prototype.init = function (ionicApp, platform, modal, popup, events) {
+    Client.prototype.init = function (ionicApp, platform, events) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._ionicApp = ionicApp;
             _this._platform = platform;
-            _this._modal = modal;
-            _this._popup = popup;
             _this._events = events;
             _this.serverGateway.getSettings().then(function (data) {
                 var dir = document.createAttribute("dir");
@@ -79,20 +77,6 @@ var Client = (function () {
     Object.defineProperty(Client.prototype, "platform", {
         get: function () {
             return this._platform;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "modal", {
-        get: function () {
-            return this._modal;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "popup", {
-        get: function () {
-            return this._popup;
         },
         enumerable: true,
         configurable: true

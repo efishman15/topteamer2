@@ -1,20 +1,14 @@
 <ion-navbar *navbar>
   <button menuToggle>
-    <icon menu></icon>
+    <ion-icon name="menu"></ion-icon>
   </button>
   <ion-title>{{client.translate('MY_CONTESTS')}}</ion-title>
 </ion-navbar>
 
 <ion-content>
 
-  <item-selection [value]="currentLanguage" [items]="languages" width="180" title="{{client.translate('CHOOSE_LANGUAGE')}}">
-
-  </item-selection>
-
   <contest-list tab="mine"
                 (contestSelected)="onContestSelected($event)">
   </contest-list>
 
-
 </ion-content>
-

@@ -10,19 +10,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
 var ContestTypePage = (function () {
-    function ContestTypePage() {
+    function ContestTypePage(viewController) {
         this.client = client_1.Client.getInstance();
+        this.viewController = viewController;
     }
-    ContestTypePage.prototype.selectContestContent = function (contest) {
-        this.close();
-        this.client.events.publish('topTeamer:contestTypeSelected', contest);
+    ContestTypePage.prototype.selectContestContent = function (content) {
+        this.viewController.dismiss(content);
     };
     ContestTypePage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/contest-type/contest-type.html'
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.ViewController !== 'undefined' && ionic_1.ViewController) === 'function' && _a) || Object])
     ], ContestTypePage);
     return ContestTypePage;
+    var _a;
 })();
 exports.ContestTypePage = ContestTypePage;

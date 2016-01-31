@@ -1,9 +1,10 @@
-import {Page, NavParams} from 'ionic/ionic';
+import {Page, NavParams,Modal} from "ionic-framework/ionic";
 import {AnimationListener} from '../../directives/animation-listener/animation-listener'
 import {TransitionListener} from '../../directives/transition-listener/transition-listener'
 import {QuestionStatsPage} from '../../pages/question-stats/question-stats'
 import {Client} from '../../providers/client';
 import * as soundService from '../../providers/sound';
+import * as alertService from '../../providers/alert';
 
 @Page({
   templateUrl: 'build/pages/quiz/quiz.html',
@@ -85,7 +86,7 @@ export class QuizPage {
 
       if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
         //TODO: show alert about review mode
-        //PopupService.alert($translate.instant($scope.quiz.reviewMode.reason));
+        alertService.alert($scope.quiz.reviewMode.reason);
       }
 
       for (var i = 0; i < data.quiz.totalQuestions; i++) {
@@ -241,10 +242,12 @@ export class QuizPage {
           'value': (1 - this.quizData.currentQuestion.correctRatio)
         });
 
-        this.client.modal.open(QuestionStatsPage, {
+        var modal = Modal.create(QuestionStatsPage, {
           'question': this.quizData.currentQuestion,
           'chartDataSource': questionChart
-        }, {'handle': 'questionStats'});
+        });
+
+        this.client.nav.present(modal);
       }
     }
   }

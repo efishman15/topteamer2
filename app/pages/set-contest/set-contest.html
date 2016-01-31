@@ -1,13 +1,14 @@
 <ion-navbar *navbar>
   <button menuToggle>
-    <icon menu></icon>
+    <ion-icon name="menu"></ion-icon>
   </button>
-  <ion-title>{{getTitle())}}</ion-title>
+  <ion-title>{{getTitle()}}</ion-title>
 </ion-navbar>
 
 <ion-content>
 
-  <h4 class="align-center">{{ client.translate('WHO_IS_SMARTER' + ' - ' + contestLocalCopy.content.category.title}}</h4>
+  <h4 class="align-center">{{ client.translate('WHO_IS_SMARTER') + ' - ' +
+    contestLocalCopy.content.category.title}}</h4>
 
   <div padding *ngIf="client.session.features.newContest.locked">
     <span class="feature-locked-text">{{client.translate('FEATURE_LOCKED_NEW_CONTEST', {rank : client.session.features.newContest.unlockRank}) }}</span>
@@ -30,31 +31,35 @@
 
     <ion-row>
       <ion-col width-40>
-        <ion-input>
-          <input type="text"
-                 *ngControl="team0"
-                 *ngModel="contestLocalCopy.teams[0].name"
-                 placeholder="{{client.translate('TEAM0)}}"
-                 [disabled]="client.session.features.newContest.locked">
-          <div [hidden]="team0.valid" class="alert alert-danger">
-            {{client.translate('FIELD_REQUIRED'}}
-          </div>
-        </ion-input>
+        <ion-item>
+          <ion-input>
+            <input type="text"
+                   *ngControl="team0"
+                   *ngModel="contestLocalCopy.teams[0].name"
+                   placeholder="{{client.translate('TEAM0')}}"
+                   [disabled]="client.session.features.newContest.locked">
+            <div [hidden]="team0.valid" class="alert alert-danger">
+              {{client.translate('FIELD_REQUIRED')}}
+            </div>
+          </ion-input>
+        </ion-item>
       </ion-col>
       <ion-col width-10 class="align-center contest-or-between-teams">
         <h5>{{client.translate('OR')}}</h5>
       </ion-col>
       <ion-col width-40>
-        <ion-input>
-          <input type="text"
-                 *ngControl="team1"
-                 *ngModel="contestLocalCopy.teams[1].name"
-                 placeholder="{{client.translate('TEAM1)}}"
-                 [disabled]="client.session.features.newContest.locked">
-          <div [hidden]="team1.valid" class="alert alert-danger">
-            {{client.translate('FIELD_REQUIRED'}}
-          </div>
-        </ion-input>
+        <ion-item>
+          <ion-input>
+            <input type="text"
+                   *ngControl="team1"
+                   *ngModel="contestLocalCopy.teams[1].name"
+                   placeholder="{{client.translate('TEAM1')}}"
+                   [disabled]="client.session.features.newContest.locked">
+            <div [hidden]="team1.valid" class="alert alert-danger">
+              {{client.translate('FIELD_REQUIRED')}}
+            </div>
+          </ion-input>
+        </ion-item>
       </ion-col>
     </ion-row>
 
@@ -112,9 +117,9 @@
               {{question.text}}
             </div>
             <div class="float-{{$root.settings.languages[$root.user.settings.language].oppositeAlign}}">
-              <i title="{{'REMOVE_QUESTION' | translate}}" class="pointer icon ion-close-circled"
-                 ng-click="removeQuestion($index)">
-              </i>
+              <ion-icon title="{{'REMOVE_QUESTION' | translate}}" name="close-circled" class="pointer"
+                        (click)="removeQuestion($index)">
+              </ion-icon>
             </div>
           </div>
         </div>

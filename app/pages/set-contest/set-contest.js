@@ -8,12 +8,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
-var core_1 = require('angular2/core');
 var common_1 = require('angular2/common');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
-var popupService = require('../../providers/popup');
+var alertService = require('../../providers/alert');
 var SetContestPage = (function () {
     function SetContestPage(params, formBuilder) {
         this.client = client_1.Client.getInstance();
@@ -177,7 +176,7 @@ var SetContestPage = (function () {
                     }
                     else if (result.data.status === 'initiated') {
                         //Payment might come later from server
-                        popupService.alert({ 'type': "SERVER_ERROR_PURCHASE_IN_PROGRESS" });
+                        alertService.alert({ 'type': "SERVER_ERROR_PURCHASE_IN_PROGRESS" });
                     }
                     else {
                         //Probably user canceled
@@ -218,7 +217,7 @@ var SetContestPage = (function () {
     };
     SetContestPage.prototype.removeContest = function () {
         var _this = this;
-        popupService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.contestLocalCopy.name }).then(function () {
+        alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.contestLocalCopy.name }).then(function () {
             contestsService.removeContest(_this.contestLocalCopy._id).then(function (data) {
                 _this.client.nav.pop();
                 _this.client.events.publish('topTeamer-contestRemoved', data);
@@ -310,9 +309,9 @@ var SetContestPage = (function () {
         ionic_1.Page({
             templateUrl: 'build/pages/set-contest/set-contest.html'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof core_1.FormBuilder !== 'undefined' && core_1.FormBuilder) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, common_1.FormBuilder])
     ], SetContestPage);
     return SetContestPage;
-    var _a, _b;
+    var _a;
 })();
 exports.SetContestPage = SetContestPage;

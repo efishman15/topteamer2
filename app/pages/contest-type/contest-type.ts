@@ -1,4 +1,4 @@
-import {Page, Component} from 'ionic/ionic';
+import {Page, Component,ViewController} from 'ionic/ionic';
 import {Client} from '../../providers/client';
 
 @Page({
@@ -7,14 +7,15 @@ import {Client} from '../../providers/client';
 export class ContestTypePage {
 
   client:Client;
+  viewController: ViewController;
 
-  constructor() {
+  constructor(viewController: ViewController) {
     this.client = Client.getInstance();
+    this.viewController = viewController;
   }
 
-  selectContestContent(contest) {
-    this.close();
-    this.client.events.publish('topTeamer:contestTypeSelected', contest);
+  selectContestContent(content) {
+    this.viewController.dismiss(content);
   }
 
 }

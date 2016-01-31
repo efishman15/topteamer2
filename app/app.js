@@ -14,16 +14,13 @@ var facebookService = require('./providers/facebook');
 var shareService = require('./providers/share');
 var client_1 = require('./providers/client');
 var contest_type_1 = require('./pages/contest-type/contest-type');
+var set_contest_1 = require('./pages/set-contest/set-contest');
 var topTeamerApp = (function () {
-    function topTeamerApp(ionicApp, platform, client, modal, events, popup) {
+    function topTeamerApp(ionicApp, platform, client, events) {
         var _this = this;
         this.client = client;
-        client.init(ionicApp, platform, modal, popup, events).then(function () {
+        client.init(ionicApp, platform, events).then(function () {
             _this.initApp();
-            client.events.subscribe('topTeamer:contestTypeSelected', function (eventData) {
-                var content = eventData[0];
-                console.log("contest=" + JSON.stringify(content));
-            });
         });
     }
     topTeamerApp.prototype.initApp = function () {
@@ -209,8 +206,13 @@ var topTeamerApp = (function () {
         }
     };
     topTeamerApp.prototype.newContest = function () {
+        var _this = this;
         this.client.menu.close();
-        this.modal.open(contest_type_1.ContestTypePage);
+        var modal = ionic_1.Modal.create(contest_type_1.ContestTypePage);
+        modal.onDismiss(function (content) {
+            _this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'new', 'conent': content });
+        });
+        this.client.nav.present(modal);
     };
     topTeamerApp.prototype.share = function () {
         this.client.menu.close();
@@ -222,8 +224,8 @@ var topTeamerApp = (function () {
             moduleId: 'build/app.html',
             providers: [client_1.Client]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Platform !== 'undefined' && ionic_1.Platform) === 'function' && _b) || Object, client_1.Client, (typeof (_c = typeof ionic_1.Modal !== 'undefined' && ionic_1.Modal) === 'function' && _c) || Object, (typeof (_d = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _d) || Object, (typeof (_e = typeof ionic_1.Popup !== 'undefined' && ionic_1.Popup) === 'function' && _e) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Platform !== 'undefined' && ionic_1.Platform) === 'function' && _b) || Object, client_1.Client, (typeof (_c = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _c) || Object])
     ], topTeamerApp);
     return topTeamerApp;
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c;
 })();

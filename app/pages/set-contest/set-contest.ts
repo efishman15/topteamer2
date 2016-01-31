@@ -1,10 +1,10 @@
 import {Page, NavParams} from 'ionic/ionic';
-import {ViewChild, Form, FormBuilder} from 'angular2/core';
+import {ViewChild} from 'angular2/core';
 import {Form, FormBuilder, Control, ControlGroup, Validators } from 'angular2/common';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
-import * as popupService from '../../providers/popup';
+import * as alertService from '../../providers/alert';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html'
@@ -225,7 +225,7 @@ export class SetContestPage {
             }
             else if (result.data.status === 'initiated') {
               //Payment might come later from server
-              popupService.alert({'type': "SERVER_ERROR_PURCHASE_IN_PROGRESS"});
+              alertService.alert({'type': "SERVER_ERROR_PURCHASE_IN_PROGRESS"});
             }
             else {
               //Probably user canceled
@@ -272,7 +272,7 @@ export class SetContestPage {
 
   removeContest() {
 
-    popupService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.contestLocalCopy.name}).then(() => {
+    alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.contestLocalCopy.name}).then(() => {
       contestsService.removeContest(this.contestLocalCopy._id).then((data) => {
         this.client.nav.pop();
         this.client.events.publish('topTeamer-contestRemoved', data);

@@ -2,7 +2,7 @@ import {Injectable} from 'angular2/core';
 import {Http, Response, Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
-import {IonicApp,Platform, NavController, Menu, Modal, Popup, Events} from 'ionic/ionic';
+import {IonicApp,Platform, NavController, Menu, Alert, Events} from 'ionic/ionic';
 
 @Injectable()
 export class Client {
@@ -14,8 +14,6 @@ export class Client {
 
   _ionicApp:IonicApp;
   _platform:Platform;
-  _modal: Modal;
-  _popup: Popup;
   _events: Events;
   _nav:NavController;
   _menu: Menu;
@@ -41,14 +39,12 @@ export class Client {
     return Client.instance;
   }
 
-  init(ionicApp:IonicApp, platform:Platform, modal: Modal, popup: Popup, events: Events) {
+  init(ionicApp:IonicApp, platform:Platform, events: Events) {
 
     return new Promise((resolve, reject) => {
 
       this._ionicApp = ionicApp;
       this._platform = platform;
-      this._modal = modal;
-      this._popup = popup;
       this._events = events;
 
       this.serverGateway.getSettings().then((data) => {
@@ -101,14 +97,6 @@ export class Client {
 
   get platform() : Platform {
     return this._platform;
-  }
-
-  get modal() : Modal {
-    return this._modal;
-  }
-
-  get popup() : Popup {
-    return this._popup;
   }
 
   get events() : Events {

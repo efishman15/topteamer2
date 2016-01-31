@@ -1,4 +1,4 @@
-import {Page, NavParams} from 'ionic/ionic';
+import {Page, NavParams,Modal} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
@@ -38,7 +38,8 @@ export class ContestPage {
 
       if (this.lastQuizResults.data.facebookPost) {
         this.animateLastResults = false;
-        this.client.modal.open(FacebookPostPage, {'quizResults' : this.lastQuizResults}, {'handle' : 'facebookPost'});
+        var modal = Modal.create(FacebookPostPage, {'quizResults' : this.lastQuizResults});
+        this.client.nav.present(modal);
       }
       else {
         //Exit from the quiz

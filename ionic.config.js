@@ -2,17 +2,20 @@ module.exports = {
   proxies: null,
 
   paths: {
-    html : {
+    html: {
       src: ['app/**/*.html'],
       dest: "www/build"
     },
     sass: {
       src: ['app/app.+(ios|md).scss'],
       dest: 'www/build/css',
-      include: ['node_modules/ionic-framework']
+      include: [
+        'node_modules/ionic-framework',
+        'node_modules/ionicons/dist/scss'
+      ]
     },
     fonts: {
-      src: ['node_modules/ionic-framework/fonts/**/*.ttf'],
+      src: ['node_modules/ionic-framework/fonts/**/*.+(ttf|woff|woff2)'],
       dest: "www/build/fonts"
     },
     watch: {
@@ -44,7 +47,7 @@ module.exports = {
   // The format is 'before' or 'after' + commandName (uppercased)
   // ex: beforeServe, afterRun, beforePrepare, etc.
   hooks: {
-    beforeServe: function(argv) {
+    beforeServe: function (argv) {
       //console.log('beforeServe');
     }
   }

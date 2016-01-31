@@ -11,11 +11,11 @@
     <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
 
       <button ion-item (click)="newContest()">
-        <icon name="add"></icon>
+        <ion-icon name="add"></ion-icon>
         {{client.translate('NEW_CONTEST')}}
       </button>
       <button ion-item (click)="share()">
-        <icon name="share-alt"></icon>
+        <ion-icon name="share-alt"></ion-icon>
         {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
       </button>
 
@@ -24,10 +24,5 @@
 
 </ion-menu>
 
-
 <!-- main navigation -->
 <ion-nav id="nav" [root]="root" #content swipe-back-enabled="false"></ion-nav>
-
-
-<!-- where popups/actionsheets/modals are added -->
-<ion-overlay></ion-overlay>

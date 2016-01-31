@@ -1,10 +1,11 @@
-import {App, IonicApp, Platform, Config, Events, Modal, Popup, NavController,Menu} from 'ionic/ionic';
+import {App, IonicApp, Platform, Config, Events, Modal, Alert, NavController,Menu} from 'ionic/ionic';
 import {MainTabsPage} from './pages/main-tabs/main-tabs';
 import {LoginPage} from './pages/login/login';
 import * as facebookService from './providers/facebook';
 import * as shareService from './providers/share';
 import {Client} from './providers/client';
 import {ContestTypePage} from './pages/contest-type/contest-type';
+import {SetContestPage} from './pages/set-contest/set-contest';
 
 @App({
   templateUrl: 'app.html',
@@ -15,19 +16,12 @@ class topTeamerApp {
 
   client:Client;
 
-  constructor(ionicApp:IonicApp, platform:Platform, client:Client, modal:Modal, events:Events, popup:Popup) {
+  constructor(ionicApp:IonicApp, platform:Platform, client:Client, events:Events) {
 
     this.client = client;
 
-    client.init(ionicApp, platform, modal, popup, events).then(() => {
-
+    client.init(ionicApp, platform, events).then(() => {
       this.initApp();
-
-      client.events.subscribe('topTeamer:contestTypeSelected', (eventData) => {
-        var content = eventData[0];
-        console.log("contest=" + JSON.stringify(content));
-      });
-
     });
 
   }
@@ -255,7 +249,11 @@ class topTeamerApp {
 
   newContest() {
     this.client.menu.close();
-    this.modal.open(ContestTypePage);
+    var modal = Modal.create(ContestTypePage);
+    modal.onDismiss( (content) => {
+      this.client.nav.push(SetContestPage, {'mode' : 'new', 'conent' : content});
+    });
+    this.client.nav.present(modal);
   }
 
   share() {

@@ -32,7 +32,8 @@ var ContestPage = (function () {
             _this.client.nav.pop();
             if (_this.lastQuizResults.data.facebookPost) {
                 _this.animateLastResults = false;
-                _this.client.modal.open(facebook_post_1.FacebookPostPage, { 'quizResults': _this.lastQuizResults }, { 'handle': 'facebookPost' });
+                var modal = ionic_1.Modal.create(facebook_post_1.FacebookPostPage, { 'quizResults': _this.lastQuizResults });
+                _this.client.nav.present(modal);
             }
             else {
                 //Exit from the quiz

@@ -13,7 +13,6 @@ var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var core_1 = require('angular2/core');
 var client_1 = require('../../providers/client');
-var ionic_2 = require("ionic-framework/ionic");
 var ContestParticipantsPage = (function () {
     function ContestParticipantsPage(params) {
         // set the root pages for each tab
@@ -41,8 +40,9 @@ var ContestParticipantsPage = (function () {
             templateUrl: 'build/pages/contest-participants/contest-participants.html',
             directives: [simple_tabs_1.SimpleTabsComponent, simple_tab_1.SimpleTabComponent, leaders_1.LeadersComponent]
         }), 
-        __metadata('design:paramtypes', [ionic_2.NavParams])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
     ], ContestParticipantsPage);
     return ContestParticipantsPage;
+    var _a;
 })();
 exports.ContestParticipantsPage = ContestParticipantsPage;

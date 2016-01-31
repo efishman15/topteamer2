@@ -1,6 +1,6 @@
 <ion-navbar *navbar>
   <button menuToggle>
-    <icon menu></icon>
+    <ion-icon name="menu"></ion-icon>
   </button>
   <ion-title>{{client.translate('WHO_IS_SMARTER_QUESTION')}}</ion-title>
 </ion-navbar>
@@ -66,7 +66,7 @@
   <my-date-picker dir="ltr" [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event)" [selDate]="selectedDate"></my-date-picker>
 
   <button fab fab-bottom fab-left (click)="share('fab')">
-    <icon share></icon>
+    <ion-icon name="share"></ion-icon>
   </button>
   <ion-buttons>
     <button secondary class="bar-button" (click)="share('button')">{{client.translate('SHARE')}}</button>

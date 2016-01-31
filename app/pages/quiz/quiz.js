@@ -7,12 +7,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_1 = require("ionic-framework/ionic");
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
 var question_stats_1 = require('../../pages/question-stats/question-stats');
 var client_1 = require('../../providers/client');
 var soundService = require('../../providers/sound');
+var alertService = require('../../providers/alert');
 var QuizPage = (function () {
     function QuizPage(params) {
         var _this = this;
@@ -64,6 +65,8 @@ var QuizPage = (function () {
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
+                //TODO: show alert about review mode
+                alertService.alert($scope.quiz.reviewMode.reason);
             }
             for (var i = 0; i < data.quiz.totalQuestions; i++) {
                 _this.questionHistory.push({ 'score': _this.client.settings.quiz.questions.score[i] });
@@ -180,10 +183,11 @@ var QuizPage = (function () {
                     'label': this.client.translate('ANSWERED_INCORRECT'),
                     'value': (1 - this.quizData.currentQuestion.correctRatio)
                 });
-                this.client.modal.open(question_stats_1.QuestionStatsPage, {
+                var modal = ionic_1.Modal.create(question_stats_1.QuestionStatsPage, {
                     'question': this.quizData.currentQuestion,
                     'chartDataSource': questionChart
-                }, { 'handle': 'questionStats' });
+                });
+                this.client.nav.present(modal);
             }
         }
     };
@@ -372,9 +376,8 @@ var QuizPage = (function () {
             templateUrl: 'build/pages/quiz/quiz.html',
             directives: [animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
+        __metadata('design:paramtypes', [ionic_1.NavParams])
     ], QuizPage);
     return QuizPage;
-    var _a;
 })();
 exports.QuizPage = QuizPage;
