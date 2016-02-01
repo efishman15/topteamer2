@@ -23,7 +23,7 @@ export class SimpleTabsComponent {
     }
 
     //Bubble the event outside
-    simpleTab.selected.next();
+    simpleTab.selected.emit();
   }
 
   addTab(simpleTab: SimpleTabComponent) {

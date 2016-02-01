@@ -1,3 +1,7 @@
+.invalid-input {
+  color: #ff0000;
+}
+
 .feature-locked-text {
   font-size: 14px;
   color: red;
@@ -5,4 +9,13 @@
 
 .contest-or-between-teams {
   padding-top: 4px;
+}
+
+.set-contest-label {
+  font-size: 16px;
+  color: #808080;
+}
+
+.calendar-button {
+  font-size: 16px;
 }

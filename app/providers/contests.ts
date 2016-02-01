@@ -127,6 +127,20 @@ export let removeContest = (contestId: string) => {
 }
 
 //------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+export let setContest = (contest: Object, mode: string, nameChanged: boolean) => {
+  var postData = {'contest': contest, 'mode': mode};
+  if (nameChanged) {
+    postData.nameChanged = nameChanged;
+  }
+
+  var client = Client.getInstance();
+  return client.serverPost('contests/set', postData);
+}
+
+
+//------------------------------------------------------
 //-- setTimePhrase
 //-- Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
 //------------------------------------------------------

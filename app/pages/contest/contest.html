@@ -5,7 +5,7 @@
   <ion-title>{{client.translate('WHO_IS_SMARTER_QUESTION')}}</ion-title>
 </ion-navbar>
 
-<ion-content class="align-center">
+<ion-content>
 
   <ion-item class="contest-leader-background">
     <ion-avatar item-left>
@@ -25,7 +25,7 @@
                    (teamSelected)="onTeamSelected($event)">
     </contest-chart>
 
-    <div padding-top>
+    <div padding-top text-center>
       <div *ngIf="contestChart.contest.state==='play'">
         <button danger class="button button-small no-wrap-text"
                 (click)="playContest('button')">{{client.translate('PLAY_CONTEST')}}
@@ -58,7 +58,7 @@
   </div>
 
   <div *ngIf="animateLastResults"
-       padding-left padding-right class="align-center long-animated {{lastQuizResults.data.animation}}">
+       padding-left padding-right text-center class="long-animated {{lastQuizResults.data.animation}}">
     <h2>{{client.translate(lastQuizResults.data.clientKey + '_TITLE')}}</h2>
     <h3>{{client.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
   </div>
@@ -69,14 +69,16 @@
     <ion-icon name="share"></ion-icon>
   </button>
   <ion-buttons>
-    <button secondary class="bar-button" (click)="share('button')">{{client.translate('SHARE')}}</button>
-    <button secondary class="bar-button" (click)="like()">{{client.translate('LIKE')}}</button>
-    <button *ngIf="contestChart.contest.state==='play'" secondary class="bar-button" (click)="switchTeams('button')">
-      {{client.translate('SWITCH_TEAMS')}}
-    </button>
-    <button *ngIf="contestChart.contest.owner" secondary class="bar-button" (click)="editContest()">
-      {{client.translate('EDIT_CONTEST')}}
-    </button>
+    <div text-center>
+      <button secondary class="bar-button" (click)="share('button')">{{client.translate('SHARE')}}</button>
+      <button secondary class="bar-button" (click)="like()">{{client.translate('LIKE')}}</button>
+      <button *ngIf="contestChart.contest.state==='play'" secondary class="bar-button" (click)="switchTeams('button')">
+        {{client.translate('SWITCH_TEAMS')}}
+      </button>
+      <button *ngIf="contestChart.contest.owner" secondary class="bar-button" (click)="editContest()">
+        {{client.translate('EDIT_CONTEST')}}
+      </button>
+    </div>
   </ion-buttons>
 
 </ion-content>

@@ -28,7 +28,7 @@ export class ContestListComponent {
   }
 
   selectContest(contest:Object) {
-    this.select.next(contest);
+    this.contestSelected.emit(contest);
   }
 
   refresh() {
@@ -43,12 +43,12 @@ export class ContestListComponent {
   }
 
   onContestSelected(data) {
-    this.contestSelected.next(data);
+    this.contestSelected.emit(data);
   }
 
   onTeamSelected(data) {
     //This is not a mistake - on chart lists - any click in any area should "select" the entire contest
-    this.contestSelected.next(data);
+    this.contestSelected.emit(data);
   }
 
 }

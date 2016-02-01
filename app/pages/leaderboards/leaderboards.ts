@@ -31,7 +31,6 @@ export class LeaderboardsPage {
   showRecentlyFinishedContests() {
     this.mode = 'contests';
     this.contestList.refresh();
-    console.log("showRecentlyFinishedContests");
   }
 
   showFriendsLeaderboard() {

@@ -14,10 +14,10 @@ var TransitionListener = (function () {
         this.transitionEnd = new core_1.EventEmitter();
     }
     TransitionListener.prototype.transitionStarted = function ($event) {
-        this.transitionStart.next($event);
+        this.transitionStart.emit($event);
     };
     TransitionListener.prototype.transitionEnded = function ($event) {
-        this.transitionEnd.next($event);
+        this.transitionEnd.emit($event);
     };
     __decorate([
         core_1.Input(), 

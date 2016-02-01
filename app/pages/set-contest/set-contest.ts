@@ -1,13 +1,14 @@
 import {Page, NavParams} from 'ionic/ionic';
-import {ViewChild} from 'angular2/core';
-import {Form, FormBuilder, Control, ControlGroup, Validators } from 'angular2/common';
+import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
+import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
 
 @Page({
-  templateUrl: 'build/pages/set-contest/set-contest.html'
+  templateUrl: 'build/pages/set-contest/set-contest.html',
+  directives: [FORM_DIRECTIVES, DatePickerComponent]
 })
 
 export class SetContestPage {
@@ -16,54 +17,44 @@ export class SetContestPage {
   params:NavParams;
 
   minContestStart:Date;
+  maxContestStart:Date;
   minContestEnd:Date;
+  maxContestEnd:Date;
   startDate:Date;
   endDate:Date;
   showRemoveContest:Boolean;
   contestLocalCopy:Object;
   showStartDate:Boolean;
-  hideAdminInfo:Boolean;
+  showAdminInfo:Boolean;
   buyInProgress:Boolean;
+  endOptionKeys:Array<string>;
 
-  form:ControlGroup;
+  contestForm:ControlGroup;
+  team0:Control;
+  team1:Control;
+  contestNameChanged:boolean;
 
   constructor(params:NavParams, formBuilder:FormBuilder) {
 
     this.client = Client.getInstance();
     this.params = params;
 
-    this.form = formBuilder.group({
-      nonMatchingTeams: formBuilder.group({
-        team0: ['', Validators.required],
-        team1: ['', Validators.required]
-      }, {validator: this.nonMatchingTeams})
-    });
+    this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
 
+    this.team0 = new Control('', Validators.required);
+    this.team1 = new Control('', Validators.required);
+
+    this.contestForm = formBuilder.group({
+      team0: this.team0,
+      team1: this.team1
+    }, {validator: this.matchingTeamsValidator});
 
     //Start date is today, end date is by default within 24 hours
     this.startDate = new Date();
     this.startDate.clearTime();
     this.endDate = new Date(this.startDate.getTime() + 1 * 24 * 60 * 60 * 1000);
 
-    if (this.client.session.isAdmin) {
-      //Only Admins are allowed to set past dates
-      this.minContestStart = this.startDate;
-      this.minContestEnd = this.startDate;
-    }
-    else {
-      var pastDate = new Date(1970, 0, 1, 0, 0, 0);
-      this.minContestStart = pastDate;
-      this.minContestEnd = pastDate;
-    }
-
     this.showRemoveContest = false;
-
-    this.client.events.subscribe('topTeamer:someEvent...', (eventData) => {
-    });
-
-  }
-
-  onPageWillEnter() {
 
     if (this.params.data.mode === 'edit') {
       this.contestLocalCopy = JSON.parse(JSON.stringify(this.params.data.contest));
@@ -92,8 +83,9 @@ export class SetContestPage {
         'participants': 0,
         'manualParticipants': 0,
         'manualRating': 0,
-        'teams': [{"name": null, "score": 0}, {"name": null, "score": 0}]
+        'teams': [{'name': null, 'score': 0}, {'name': null, 'score': 0}]
       };
+      this.showStartDate = true;
     }
 
     this.client.session.features.newContest.purchaseData.retrieved = false;
@@ -117,7 +109,7 @@ export class SetContestPage {
             this.client.session.features.newContest.purchaseData.retrieved = true;
 
             //-------------------------------------------------------------------------------------------------------------
-            //Retrieve unconsumed items - and checking if user has an unconsumed "new contest unlock key"
+            //Retrieve unconsumed items - and checking if user has an unconsumed 'new contest unlock key'
             //-------------------------------------------------------------------------------------------------------------
             inappbilling.getPurchases((unconsumedItems) => {
                 if (unconsumedItems && unconsumedItems.length > 0) {
@@ -130,13 +122,13 @@ export class SetContestPage {
                 }
               },
               (error) => {
-                FlurryAgent.myLogError("AndroidBillingError", "Error retrieving unconsumed items: " + error);
+                FlurryAgent.myLogError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
               });
 
           },
           function (msg) {
-            FlurryAgent.myLogError("AndroidBillingError", "Error getting product details: " + msg);
-          }, $rootScope.session.features.newContest.purchaseData.productId);
+            FlurryAgent.myLogError('AndroidBillingError', 'Error getting product details: ' + msg);
+          }, this.client.session.features.newContest.purchaseData.productId);
       }
     }
     else {
@@ -144,7 +136,9 @@ export class SetContestPage {
     }
 
     this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
-    this.hideAdminInfo = true;
+    this.showAdminInfo = false;
+
+    this.setDateLimits();
 
   }
 
@@ -156,7 +150,7 @@ export class SetContestPage {
   }
 
   getTitle() {
-    switch (params.data.mode) {
+    switch (this.params.data.mode) {
       case 'add':
         return this.client.translate('NEW_CONTEST');
 
@@ -225,7 +219,7 @@ export class SetContestPage {
             }
             else if (result.data.status === 'initiated') {
               //Payment might come later from server
-              alertService.alert({'type': "SERVER_ERROR_PURCHASE_IN_PROGRESS"});
+              alertService.alert({'type': 'SERVER_ERROR_PURCHASE_IN_PROGRESS'});
             }
             else {
               //Probably user canceled
@@ -250,10 +244,8 @@ export class SetContestPage {
 
   toggleAdminInfo() {
     if (this.contestLocalCopy.teams[0].name && this.contestLocalCopy.teams[1].name) {
-      this.hideAdminInfo = !this.hideAdminInfo;
+      this.showAdminInfo = !this.showAdminInfo;
     }
-
-
   };
 
   getArrowDirection(stateClosed) {
@@ -284,17 +276,9 @@ export class SetContestPage {
 
     if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
       if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
-        if (!$scope.contestForm.userQuestions.$error) {
-          $scope.contestForm.userQuestions.$error = {};
-        }
-        if ($rootScope.settings.newContest.privateQuestions.min === 1) {
-          $scope.contestForm.userQuestions.$error["minimumQuestionsSingle"] = true;
-        }
-        else {
-          $scope.contestForm.userQuestions.$error["minimumQuestionsPlural"] = true;
-        }
-        $scope.contestForm.userQuestions.$invalid = true;
-
+        //TODO - min questions check
+        //minimumQuestionsSingle
+        //minimumQuestionsPlural
         return;
       }
     }
@@ -304,69 +288,71 @@ export class SetContestPage {
       this.contestLocalCopy.manualParticipants += this.contestLocalCopy.totalParticipants - (this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants)
     }
 
-    delete this.contestLocalCopy["totalParticipants"];
+    delete this.contestLocalCopy['totalParticipants'];
 
-    delete this.contestLocalCopy["status"];
+    delete this.contestLocalCopy['status'];
 
     //Server stores in epoch - client uses real DATE objects
     //Convert back to epoch before storing to server
     this.contestLocalCopy.startDate = this.contestLocalCopy.startDate.getTime();
     this.contestLocalCopy.endDate = this.contestLocalCopy.endDate.getTime();
 
-    if ($stateParams.mode === "add" || ($stateParams.mode === "edit" && JSON.stringify($stateParams.contest) != JSON.stringify(this.contestLocalCopy))) {
+    if (this.params.data.mode === 'add' || (this.params.data.mode === 'edit' && JSON.stringify(this.params.data.contest) != JSON.stringify(this.contestLocalCopy))) {
 
-      this.contestLocalCopy.name = $translate.instant("FULL_CONTEST_NAME", {
-        "team0": this.contestLocalCopy.teams[0].name,
-        "team1": this.contestLocalCopy.teams[1].name
+      this.contestLocalCopy.name = this.client.translate('FULL_CONTEST_NAME', {
+        'team0': this.contestLocalCopy.teams[0].name,
+        'team1': this.contestLocalCopy.teams[1].name
       });
 
-      if ($stateParams.mode === "edit" && this.contestLocalCopy.name !== $stateParams.contest.name) {
-        this.contestLocalCopy.nameChanged = true;
+      if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {
+        this.contestNameChanged = true;
       }
 
-      ContestsService.setContest(this.contestLocalCopy, $stateParams.mode, function (contest) {
+      contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then((contest) => {
 
         this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
         this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.endDate);
 
         //Report to Flurry
         var contestParams = {
-          "team0": this.contestLocalCopy.teams[0].name,
-          "team1": this.contestLocalCopy.teams[1].name,
-          "duration": this.contestLocalCopy.endOption,
-          "questionsSource": this.contestLocalCopy.questionsSource
+          'team0': this.contestLocalCopy.teams[0].name,
+          'team1': this.contestLocalCopy.teams[1].name,
+          'duration': this.contestLocalCopy.endOption,
+          'questionsSource': this.contestLocalCopy.questionsSource
         };
 
-        $rootScope.goBack();
-
-        if ($stateParams.mode === "add") {
-          FlurryAgent.logEvent("contest/created", contestParams);
-          $rootScope.$broadcast("topTeamer-contestCreated", contest);
+        if (this.params.data.mode === 'add') {
+          FlurryAgent.logEvent('contest/created', contestParams);
+          setTimeout(() => {
+            this.client.events.publish('topTeamer:contestCreated', this.quizData.results)
+          }, 1000);
         }
         else {
-          FlurryAgent.logEvent("contest/updated", contestParams);
-          $rootScope.$broadcast("topTeamer-contestUpdated", contest);
+          FlurryAgent.logEvent('contest/updated', contestParams);
+          setTimeout(() => {
+            this.client.events.publish('topTeamer:contestUpdated', this.quizData.results)
+          }, 1000);
         }
 
-      }, function (status, error) {
+        this.client.nav.pop();
+
+      }, (error) => {
         this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
         this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.endDate);
       });
     }
     else {
-      $rootScope.goBack();
+      this.client.nav.pop();
     }
-
   }
 
-  nonMatchingTeams(group:ControlGroup) {
-
+  matchingTeamsValidator(group:ControlGroup) {
     let val;
     let valid = true;
 
     for (name in group.controls) {
       if (val === undefined) {
-        val = group.controls[name].value
+        val = group.controls[name].value;
       }
       else {
         if (val === group.controls[name].value) {
@@ -380,7 +366,41 @@ export class SetContestPage {
       return null;
     }
 
-    return {nonMatchingTeams: true};
+    return {matchingTeams: true};
+  }
+
+  startDateSelected(dateSelection) {
+    if (dateSelection.dateObject > this.contestLocalCopy.endDate) {
+      return false;
+    }
+    this.contestLocalCopy.startDate = dateSelection.dateObject;
+    return true;
+  }
+
+  endDateSelected(dateSelection) {
+    if (dateSelection.dateObject < this.contestLocalCopy.startDate) {
+      return false;
+    }
+    this.contestLocalCopy.endDate = dateSelection.dateObject;
+    return true;
+  }
+
+  setDateLimits() {
+    if (!this.client.session.isAdmin) {
+      this.minContestStart = this.startDate;
+      this.minContestEnd = this.startDate;
+      this.maxContestEnd = this.getMaxEndDate();
+    }
+    else {
+      var pastDate = new Date(1970, 0, 1, 0, 0, 0);
+      this.minContestStart = pastDate;
+      this.minContestEnd = pastDate;
+      this.maxContestEnd = new Date(2100, 0, 1, 0, 0, 0);
+    }
+  }
+
+  getMaxEndDate() {
+    //Set the maximum end date according to the last end option in the list
+    return new Date(this.contestLocalCopy.startDate.getTime() + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length-1]].msecMultiplier);
   }
 }
-

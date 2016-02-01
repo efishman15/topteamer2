@@ -26,7 +26,7 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.teamSelected.next({'teamId': teamId, 'source': 'bar', 'contest': this.contestChart.contest});
+      this.teamSelected.emit({'teamId': teamId, 'source': 'bar', 'contest': this.contestChart.contest});
       this.chartTeamEventHandled = true;
     },
     "dataLabelClick": (eventObj, dataObj) => {
@@ -34,12 +34,12 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.teamSelected.next({'teamId': teamId, 'source': 'label', 'contest': this.contestChart.contest});
+      this.teamSelected.emit({'teamId': teamId, 'source': 'label', 'contest': this.contestChart.contest});
       this.chartTeamEventHandled = true;
     },
     "chartClick": (eventObj, dataObj) => {
       if (!this.chartTeamEventHandled) {
-        this.contestSelected.next({'contest': this.contestChart.contest})
+        this.contestSelected.emit({'contest': this.contestChart.contest})
       }
       this.chartTeamEventHandled = false;
     }

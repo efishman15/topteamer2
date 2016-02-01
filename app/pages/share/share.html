@@ -5,9 +5,9 @@
   <ion-title>{{client.translate('SHARE_WITH_FRIENDS_TITLE')}}</ion-title>
 </ion-navbar>
 
-<ion-content class="align-center">
+<ion-content>
 
-  <div padding class="align-center">
+  <div padding text-center>
     <h3 padding *ngIf="contest">{{contest.name}}</h3>
     <h3 padding *ngIf="!contest">{{client.translate('WHO_IS_SMARTER_QUESTION')}}</h3>
     <h5>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h5>

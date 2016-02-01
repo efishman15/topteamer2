@@ -5,15 +5,15 @@
   <ion-title>{{client.translate('LIKE')}}</ion-title>
 </ion-navbar>
 
-<ion-content class="align-center">
+<ion-content>
 
-  <h4 *ngIf="!contest">{{client.translate('CLICK_LIKE')}}</h4>
-  <div *ngIf="contest">
+  <h4 text-center *ngIf="!contest">{{client.translate('CLICK_LIKE')}}</h4>
+  <div text-center *ngIf="contest">
     <h4>{{client.translate('CLICK_LIKE_WITH_CONTEST')}}</h4>
     <h3 padding>{{contest.name}}</h3>
   </div>
 
-  <h4>
+  <h4 text-center>
     <a target="_new" href="{{client.settings.general.facebookFanPage}}">{{client.translate('FACEBOOK_GAME_PAGE')}}</a>
   </h4>
 

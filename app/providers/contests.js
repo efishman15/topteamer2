@@ -103,6 +103,17 @@ exports.removeContest = function (contestId) {
     return client.serverPost('contests/remove', postData);
 };
 //------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+exports.setContest = function (contest, mode, nameChanged) {
+    var postData = { 'contest': contest, 'mode': mode };
+    if (nameChanged) {
+        postData.nameChanged = nameChanged;
+    }
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/set', postData);
+};
+//------------------------------------------------------
 //-- setTimePhrase
 //-- Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
 //------------------------------------------------------

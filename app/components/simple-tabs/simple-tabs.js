@@ -19,7 +19,7 @@ var SimpleTabsComponent = (function () {
             simpleTabs.forEach(function (simpleTab) { return simpleTab.active = false; });
         }
         //Bubble the event outside
-        simpleTab.selected.next();
+        simpleTab.selected.emit();
     };
     SimpleTabsComponent.prototype.addTab = function (simpleTab) {
         if (this.simpleTabs.length === 0) {

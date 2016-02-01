@@ -26,20 +26,12 @@ var DatePickerComponent = (function () {
         this.displayedMonth = this.currentDate.getMonth();
         this.monthsList = this.client.translate('DATE_PICKER_MONTH_NAMES');
         this.weekDays = this.client.translate('DATE_PICKER_WEEK_DAYS');
-        if (this.minDate) {
-            var minDate = new Date(this.minDate);
-            minDate.clearTime();
-            this.minEpochLocal = minDate.getTime();
-        }
-        if (this.maxDate) {
-            var maxDate = new Date(this.maxDate);
-            maxDate.clearTime();
-            this.maxEpochLocal = maxDate.getTime();
-        }
         this.rows = [];
         this.cols = [];
         this.rows.length = 6;
         this.cols.length = 7;
+        this.setDateLimits();
+        this.formatSelectedDate();
     };
     ;
     DatePickerComponent.prototype.toggleCalendar = function () {
@@ -106,7 +98,7 @@ var DatePickerComponent = (function () {
                 epochLocal: epochLocal,
                 epochUTC: (cellDate.getTime() + (cellDate.getTimezoneOffset() * 60 * 1000)),
                 inMonth: (epochLocal >= firstDateOfTheMonth.getTime() && epochLocal <= lastDateOfTheMonth.getTime()),
-                disabled: ((this.minEpochLocal && epochLocal < this.minEpochLocal) || (this.maxEpochLocal || epochLocal > this.maxEpochLocal)),
+                disabled: ((this.minEpochLocal && epochLocal < this.minEpochLocal) || (this.maxEpochLocal && epochLocal > this.maxEpochLocal)),
                 selected: (epochLocal === currentEpoch),
                 today: (epochLocal === todayEpoch)
             });
@@ -119,8 +111,24 @@ var DatePickerComponent = (function () {
         var cell = this.getCell(row, col);
         if (!cell.disabled) {
             this.currentDate = cell.dateObject;
-            this.dateSelected.next(cell);
+            this.formatSelectedDate();
             this.hideCalendar = true;
+            this.dateSelected.emit(cell);
+        }
+    };
+    DatePickerComponent.prototype.formatSelectedDate = function () {
+        this.currentDateFormatted = this.currentDate.toLocaleDateString(this.client.currentLanguage.locale, this.client.currentLanguage.localeDateOptions);
+    };
+    DatePickerComponent.prototype.setDateLimits = function () {
+        if (this.minDate) {
+            var minDate = new Date(this.minDate);
+            minDate.clearTime();
+            this.minEpochLocal = minDate.getTime();
+        }
+        if (this.maxDate) {
+            var maxDate = new Date(this.maxDate);
+            maxDate.clearTime();
+            this.maxEpochLocal = maxDate.getTime();
         }
     };
     __decorate([
@@ -129,11 +137,11 @@ var DatePickerComponent = (function () {
     ], DatePickerComponent.prototype, "currentDate", void 0);
     __decorate([
         core_1.Input(), 
-        __metadata('design:type', String)
+        __metadata('design:type', Date)
     ], DatePickerComponent.prototype, "minDate", void 0);
     __decorate([
         core_1.Input(), 
-        __metadata('design:type', String)
+        __metadata('design:type', Date)
     ], DatePickerComponent.prototype, "maxDate", void 0);
     __decorate([
         core_1.Input(), 

@@ -7,8 +7,9 @@
 
 <ion-content>
 
-  <h4 class="align-center">{{ client.translate('WHO_IS_SMARTER') + ' - ' +
-    contestLocalCopy.content.category.title}}</h4>
+  <h4 text-center>
+    {{client.translate('WHO_IS_SMARTER')}} - {{contestLocalCopy.content.category.title}}
+  </h4>
 
   <div padding *ngIf="client.session.features.newContest.locked">
     <span class="feature-locked-text">{{client.translate('FEATURE_LOCKED_NEW_CONTEST', {rank : client.session.features.newContest.unlockRank}) }}</span>
@@ -31,206 +32,77 @@
 
     <ion-row>
       <ion-col width-40>
-        <ion-item>
-          <ion-input>
-            <input type="text"
-                   *ngControl="team0"
-                   *ngModel="contestLocalCopy.teams[0].name"
-                   placeholder="{{client.translate('TEAM0')}}"
-                   [disabled]="client.session.features.newContest.locked">
-            <div [hidden]="team0.valid" class="alert alert-danger">
-              {{client.translate('FIELD_REQUIRED')}}
-            </div>
-          </ion-input>
-        </ion-item>
+        <ion-input>
+          <input type="text"
+                 ngControl="team0"
+                 [(ngModel)]="contestLocalCopy.teams[0].name"
+                 placeholder="{{client.translate('TEAM0')}}"
+                 [disabled]="client.session.features.newContest.locked">
+        </ion-input>
       </ion-col>
-      <ion-col width-10 class="align-center contest-or-between-teams">
-        <h5>{{client.translate('OR')}}</h5>
+      <ion-col width-20 class="contest-or-between-teams">
+        <h5 text-center>{{client.translate('OR')}}</h5>
       </ion-col>
       <ion-col width-40>
-        <ion-item>
-          <ion-input>
-            <input type="text"
-                   *ngControl="team1"
-                   *ngModel="contestLocalCopy.teams[1].name"
-                   placeholder="{{client.translate('TEAM1')}}"
-                   [disabled]="client.session.features.newContest.locked">
-            <div [hidden]="team1.valid" class="alert alert-danger">
-              {{client.translate('FIELD_REQUIRED')}}
-            </div>
-          </ion-input>
-        </ion-item>
+        <ion-input>
+          <input type="text"
+                 ngControl="team1"
+                 [(ngModel)]="contestLocalCopy.teams[1].name"
+                 placeholder="{{client.translate('TEAM1')}}"
+                 [disabled]="client.session.features.newContest.locked">
+        </ion-input>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col width-40>
+        <div text-center *ngIf="team0.dirty && team0.errors && team0.errors.required" class="invalid-input">
+          {{client.translate('FIELD_REQUIRED')}}
+        </div>
+      </ion-col>
+      <ion-col>
+        <div text-center *ngIf="contestForm.dirty && contestForm.errors && contestForm.errors.matchingTeams"
+             class="invalid-input">
+          {{client.translate('SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES_MESSAGE')}}
+        </div>
+      </ion-col>
+      <ion-col width-40>
+        <div text-center *ngIf="team1.dirty && team1.errors && team1.errors.required" class="invalid-input">
+          {{client.translate('FIELD_REQUIRED')}}
+        </div>
       </ion-col>
     </ion-row>
 
-    <div padding (click)="openContestEndsInPopover($event)" ng-if="mode==='add'">
-      <span translate="ENDS_IN"></span>
-                    <span class="pointer padding">
-                    <strong>{{ $root.settings.newContest.endOptions[contestLocalCopy.endOption].units |
-                      translate:{number :
-                      $root.settings.newContest.endOptions[contestLocalCopy.endOption].number} }} {{
-                      getArrowDirection(true) }}
-                    </strong>
-                    </span>
+    <ion-select no-lines [(ngModel)]="contestLocalCopy.endOption" okText="{{client.translate('OK')}}"
+                cancelText="{{client.translate('CANCEL')}}">
+      <ion-label>{{client.translate('ENDS_IN')}}</ion-label>
+      <ion-option *ngFor="#endOptionKey of endOptionKeys"
+                  value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
+                  checked="{{contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value}}">
+        {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number: client.settings.newContest.endOptions[endOptionKey].number}) }}
+      </ion-option>
+    </ion-select>
+
+    <div padding *ngIf="params.data.mode==='add'">
+        <span class="set-contest-label">{{client.translate('CONTEST_END')}}</span>
+        <date-picker [currentDate]="contestLocalCopy.endDate" [(minDate)]="minContestEnd" [(maxDate)]="maxContestEnd" currentDateClass="calendar-button"
+                     (dateSelected)="endDateSelected($event)">
+        </date-picker>
     </div>
 
-    <div class="padding" ng-if="mode==='edit'">
-      <span>{{'CONTEST_END' | translate}}</span>
-      <ionic-datepicker input-obj="contestEndDatePicker" dir="ltr">
-        <button class="button button-block button-positive">{{contestLocalCopy.endDate |
-          date:'dd-MM-yyyy'}}
-        </button>
-      </ionic-datepicker>
-    </div>
-
-    <div class="item item-divider set-contest-user-questions-area"
-         ng-if="contestLocalCopy.content.source === 'trivia' && contestLocalCopy.content.category.id === 'user'">
-      <div class="row full-width">
-        <button
-          class="set-contest-question-buttons medium-horizontal-margin icon-{{$root.settings.languages[$root.user.settings.language].align}} ion-plus-round button button-small button-assertive"
-          translate="ADD"
-          ng-click="openQuestionModal('add')">
-        </button>
-
-                        <span class="col set-contest-user-questions-title padding-right padding-left">
-                            {{'MY_CONTEST_QUESTIONS' | translate : {count : (contestLocalCopy.questions ? contestLocalCopy.questions.visibleCount : 0)} }}
-                        </span>
-
-        <button
-          class="set-contest-question-buttons icon-{{$root.settings.languages[$root.user.settings.language].align}} ion-search button button-small button-assertive"
-          translate="SEARCH"
-          ng-click="openSearchQuestionsModal()">
-        </button>
-      </div>
-
-      <input type="hidden" name="userQuestions" ng-model="contestLocalCopy.questions">
-
-      <div class="set-contest-user-questions-list small-horizontal-margin"
-           ng-if="contestLocalCopy.questions && contestLocalCopy.questions.visibleCount > 0">
-        <div class="list">
-          <div class="item pointer item-icon-{{$root.settings.languages[$root.user.settings.language].oppositeAlign}}"
-               ng-repeat="question in contestLocalCopy.questions.list track by $index"
-               ng-if="!question.deleted"
-               item="question">
-            <div title="{{'EDIT_QUESTION' | translate}}" class="pointer "
-                 ng-click="openQuestionModal('edit', question)">
-              {{question.text}}
-            </div>
-            <div class="float-{{$root.settings.languages[$root.user.settings.language].oppositeAlign}}">
-              <ion-icon title="{{'REMOVE_QUESTION' | translate}}" name="close-circled" class="pointer"
-                        (click)="removeQuestion($index)">
-              </ion-icon>
-            </div>
-          </div>
+    <div padding class="set-contest-label" *ngIf="client.session.isAdmin">
+      <span class="pointer" (click)="toggleAdminInfo()">{{client.translate('CONTEST_ADMIN_INFO')}} {{getArrowDirection(!showAdminInfo)}}</span>
+      <div *ngIf="showAdminInfo && contestForm.valid">
+        <div padding *ngIf="showStartDate">
+          <span>{{client.translate('CONTEST_START')}}</span>
+          <date-picker [currentDate]="contestLocalCopy.startDate" [(minDate)]="minContestStart" currentDateClass="calendar-button"
+                       (dateSelected)="startDateSelected($event)">
+          </date-picker>
         </div>
       </div>
-
-    </div>
-    <div class="error-container last-error-container form-errors padding"
-         ng-if="contestLocalCopy.content.source === 'trivia' && contestLocalCopy.content.category.id === 'user' && contestForm.userQuestions.$error && contestForm.$submitted"
-         ng-messages="contestForm.userQuestions.$error"
-         ng-messages-include="templates/setContest-error-list.html">
     </div>
 
-    <div class="padding center" ng-if="contestLocalCopy.content.source !== 'trivia'">
-      <button ng-if="!contestLocalCopy.content.game"
-              class="button-outline set-contest-select-game-button"
-              ng-click="openChooseGameModal()">{{'SELECT_GAME' | translate}}
-      </button>
-      <image class="pointer" ng-if="contestLocalCopy.content.game"
-             class="set-contest-select-game-image"
-             ng-src="{{contestLocalCopy.content.game.thumbnailUrl}}"
-             ng-click="openChooseGameModal()"
-             title="{{'SELECT_GAME' | translate}}">
-      </image>
-      <input type="hidden" name="game" ng-model="contestLocalCopy.content.game" gameRequired>
+    <div padding>
+      <button (click)="contestForm.valid && setContest()" block>{{client.translate('OK')}}</button>
     </div>
-    <div class="center error-container last-error-container form-errors"
-         ng-if="contestLocalCopy.content.source !== 'trivia' && !contestLocalCopy.content.category.game && contestForm.game.$error && contestForm.$submitted"
-         ng-messages="contestForm.game.$error"
-         ng-messages-include="templates/setContest-error-list.html">
-    </div>
-
-    <div class="padding" ng-hide="!$root.session.isAdmin">
-      <span class="pointer" ng-click="toggleAdminInfo()">{{'CONTEST_ADMIN_INFO' | translate}} {{getArrowDirection(!showAdminInfo)}}</span>
-
-      <div ng-hide="!showAdminInfo && contestForm.team0 && contestForm.team1">
-        <div class="padding" ng-if="showStartDate===true">
-          <span>{{'CONTEST_START' | translate}}</span>
-          <ionic-datepicker input-obj="contestStartDatePicker" dir="ltr">
-            <button class="button button-block button-positive">{{contestLocalCopy.startDate |
-              date:'dd-MM-yyyy'}}
-            </button>
-          </ionic-datepicker>
-        </div>
-        <div class="row">
-          <div class="padding contest-team">
-            <span class="padding">{{'TEAM_SCORE' | translate:{team : contestLocalCopy.teams[0].name} }}</span>
-            <label class="item item-input"
-                   ng-class="{ 'has-error' : contestForm.score0.$invalid && contestForm.score0.$touched, 'valid-lr' : contestForm.score0.$valid}"
-                   ng-messages-include="templates/setContest-error-list.html">
-              <input type="number" placeholder="{{ 'SCORE' | translate }}" name="score0"
-                     ng-model="contestLocalCopy.teams[0].score"
-                     ng-minlength="1" min="0" ng-maxlength="15" required>
-            </label>
-
-            <div class="error-container last-error-container form-errors"
-                 ng-show="contestForm.score0.$error && contestForm.$submitted"
-                 ng-messages="contestForm.score0.$error"
-                 ng-messages-include="templates/setContest-error-list.html">
-            </div>
-          </div>
-          <div class="center col-10 padding-vertical">
-          </div>
-          <div class="padding contest-team">
-            <span class="padding">{{'TEAM_SCORE' | translate:{team : contestLocalCopy.teams[1].name} }}</span>
-            <label class="item item-input"
-                   ng-class="{ 'has-error' : contestForm.score1.$invalid && contestForm.score1.$touched, 'valid-lr' : contestForm.score1.$valid}"
-                   ng-messages-include="templates/setContest-error-list.html">
-              <input type="number" placeholder="{{ 'SCORE' | translate }}" name="score1"
-                     ng-model="contestLocalCopy.teams[1].score"
-                     ng-minlength="1" min="0" ng-maxlength="10" required>
-            </label>
-
-            <div class="error-container last-error-container form-errors"
-                 ng-show="contestForm.score1.$error && contestForm.$submitted"
-                 ng-messages="contestForm.score1.$error"
-                 ng-messages-include="templates/setContest-error-list.html">
-            </div>
-          </div>
-        </div>
-        <div class="padding">
-          <span>{{'RATING' | translate}}: {{contestLocalCopy.manualRating}}</span>
-
-          <div class="padding range">
-            0
-            <input type="range" name="manualRating" min="0" max="100"
-                   ng-model="contestLocalCopy.manualRating" value="{{contestLocalCopy.manualRating}}">
-            100
-          </div>
-        </div>
-        <div class="padding">
-          <span>{{'PARTICIPANTS' | translate}}: {{contestLocalCopy.totalParticipants}}</span>
-
-          <div class="padding range">
-            <input type="range" name="manualParticipants" min="{{contestLocalCopy.participants}}"
-                   max="10000" ng-model="contestLocalCopy.totalParticipants"
-                   value="{{contestLocalCopy.totalParticipants}}">
-          </div>
-        </div>
-        <button class="padding button button-small button-assertive" ng-click="removeContest()"
-                ng-if="showRemoveContest">{{ 'REMOVE_CONTEST' | translate}}
-        </button>
-
-      </div>
-    </div>
-
-    <div class="button-bar padding set-contest-ok-button">
-      <button class="button padding button-bar button-calm" translate="OK"
-              ng-click="contestForm.$valid && setContest()"
-              analytics-on="click" analytics-event="contest/set">
-      </button>
-    </div>
-
   </form>
 </ion-content>

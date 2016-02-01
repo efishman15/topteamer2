@@ -12,13 +12,13 @@
 
 </ion-toolbar>
 
-<ion-content class="align-center" dir="{{client.currentLanguage.direction}}">
+<ion-content dir="{{client.currentLanguage.direction}}">
 
-  <div padding class="align-center" dir="{{question.direction}}">
+  <div padding text-center dir="{{question.direction}}">
     <h5 class="center question-text" [innerHtml]="question.text"></h5>
   </div>
 
-  <div padding class="align-center" *ngIf="chartDataSource" id="questionChart">
+  <div padding text-center *ngIf="chartDataSource" id="questionChart">
   </div>
 
   <ion-buttons>

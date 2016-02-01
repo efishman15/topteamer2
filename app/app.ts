@@ -251,7 +251,7 @@ class topTeamerApp {
     this.client.menu.close();
     var modal = Modal.create(ContestTypePage);
     modal.onDismiss( (content) => {
-      this.client.nav.push(SetContestPage, {'mode' : 'new', 'conent' : content});
+      this.client.nav.push(SetContestPage, {'mode' : 'add', 'content' : content});
     });
     this.client.nav.present(modal);
   }

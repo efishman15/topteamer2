@@ -210,7 +210,7 @@ var topTeamerApp = (function () {
         this.client.menu.close();
         var modal = ionic_1.Modal.create(contest_type_1.ContestTypePage);
         modal.onDismiss(function (content) {
-            _this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'new', 'conent': content });
+            _this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'add', 'content': content });
         });
         this.client.nav.present(modal);
     };

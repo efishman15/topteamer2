@@ -22,10 +22,10 @@ export class AnimationListener {
   }
 
   animationStarted($event: Event): void {
-    this.animationStart.next($event);
+    this.animationStart.emit($event);
   }
 
   animationEnded($event: Event): void {
-    this.animationEnd.next($event);
+    this.animationEnd.emit($event);
   }
 }

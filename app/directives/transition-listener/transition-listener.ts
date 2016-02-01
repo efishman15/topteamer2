@@ -28,10 +28,10 @@ export class TransitionListener {
   }
 
   transitionStarted($event: Event): void {
-    this.transitionStart.next($event);
+    this.transitionStart.emit($event);
   }
 
   transitionEnded($event: Event): void {
-    this.transitionEnd.next($event);
+    this.transitionEnd.emit($event);
   }
 }

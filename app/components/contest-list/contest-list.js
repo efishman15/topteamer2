@@ -24,7 +24,7 @@ var ContestListComponent = (function () {
         this.client = client_1.Client.getInstance();
     }
     ContestListComponent.prototype.selectContest = function (contest) {
-        this.select.next(contest);
+        this.contestSelected.emit(contest);
     };
     ContestListComponent.prototype.refresh = function () {
         var _this = this;
@@ -38,11 +38,11 @@ var ContestListComponent = (function () {
         });
     };
     ContestListComponent.prototype.onContestSelected = function (data) {
-        this.contestSelected.next(data);
+        this.contestSelected.emit(data);
     };
     ContestListComponent.prototype.onTeamSelected = function (data) {
         //This is not a mistake - on chart lists - any click in any area should "select" the entire contest
-        this.contestSelected.next(data);
+        this.contestSelected.emit(data);
     };
     __decorate([
         core_1.Input(), 

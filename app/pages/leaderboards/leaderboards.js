@@ -26,7 +26,6 @@ var LeaderboardsPage = (function () {
     LeaderboardsPage.prototype.showRecentlyFinishedContests = function () {
         this.mode = 'contests';
         this.contestList.refresh();
-        console.log("showRecentlyFinishedContests");
     };
     LeaderboardsPage.prototype.showFriendsLeaderboard = function () {
         //TODO: friendsPermissionJustGranted

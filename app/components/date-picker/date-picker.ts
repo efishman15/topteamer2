@@ -11,8 +11,8 @@ import {Icon} from 'ionic/ionic';
 export class DatePickerComponent {
 
   @Input() currentDate:Date;
-  @Input() minDate:string;
-  @Input() maxDate:string;
+  @Input() minDate:Date;
+  @Input() maxDate:Date;
   @Input() currentDateClass:String;
   @Output() dateSelected = new EventEmitter();
 
@@ -28,6 +28,7 @@ export class DatePickerComponent {
   cols:Array<any>;
   minEpochLocal:any;
   maxEpochLocal:any;
+  currentDateFormatted: string;
 
   constructor() {
     this.client = Client.getInstance();
@@ -48,21 +49,14 @@ export class DatePickerComponent {
     this.monthsList = this.client.translate('DATE_PICKER_MONTH_NAMES');
     this.weekDays = this.client.translate('DATE_PICKER_WEEK_DAYS');
 
-    if (this.minDate) {
-      var minDate = new Date(this.minDate);
-      minDate.clearTime();
-      this.minEpochLocal = minDate.getTime();
-    }
-    if (this.maxDate) {
-      var maxDate = new Date(this.maxDate);
-      maxDate.clearTime();
-      this.maxEpochLocal = maxDate.getTime();
-    }
-
     this.rows = [];
     this.cols = [];
     this.rows.length = 6;
     this.cols.length = 7;
+
+    this.setDateLimits();
+
+    this.formatSelectedDate();
 
   };
 
@@ -136,7 +130,7 @@ export class DatePickerComponent {
         epochLocal: epochLocal,
         epochUTC: (cellDate.getTime() + (cellDate.getTimezoneOffset() * 60 * 1000)),
         inMonth: (epochLocal >= firstDateOfTheMonth.getTime() && epochLocal <= lastDateOfTheMonth.getTime()),
-        disabled: ( (this.minEpochLocal && epochLocal < this.minEpochLocal) || (this.maxEpochLocal || epochLocal > this.maxEpochLocal) ),
+        disabled: ( (this.minEpochLocal && epochLocal < this.minEpochLocal) || (this.maxEpochLocal && epochLocal > this.maxEpochLocal) ),
         selected: (epochLocal === currentEpoch),
         today: (epochLocal === todayEpoch)
       });
@@ -151,8 +145,27 @@ export class DatePickerComponent {
     var cell = this.getCell(row, col);
     if (!cell.disabled) {
       this.currentDate = cell.dateObject;
-      this.dateSelected.next(cell);
+      this.formatSelectedDate();
       this.hideCalendar = true;
+      this.dateSelected.emit(cell);
+    }
+  }
+
+  formatSelectedDate() {
+    this.currentDateFormatted = this.currentDate.toLocaleDateString(this.client.currentLanguage.locale,this.client.currentLanguage.localeDateOptions);
+  }
+
+  setDateLimits() {
+    if (this.minDate) {
+      var minDate = new Date(this.minDate);
+      minDate.clearTime();
+      this.minEpochLocal = minDate.getTime();
+    }
+
+    if (this.maxDate) {
+      var maxDate = new Date(this.maxDate);
+      maxDate.clearTime();
+      this.maxEpochLocal = maxDate.getTime();
     }
   }
 }

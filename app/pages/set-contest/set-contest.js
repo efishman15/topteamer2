@@ -9,40 +9,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var common_1 = require('angular2/common');
+var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
 var alertService = require('../../providers/alert');
 var SetContestPage = (function () {
     function SetContestPage(params, formBuilder) {
+        var _this = this;
         this.client = client_1.Client.getInstance();
         this.params = params;
-        this.form = formBuilder.group({
-            nonMatchingTeams: formBuilder.group({
-                team0: ['', common_1.Validators.required],
-                team1: ['', common_1.Validators.required]
-            }, { validator: this.nonMatchingTeams })
-        });
+        this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
+        this.team0 = new common_1.Control('', common_1.Validators.required);
+        this.team1 = new common_1.Control('', common_1.Validators.required);
+        this.contestForm = formBuilder.group({
+            team0: this.team0,
+            team1: this.team1
+        }, { validator: this.matchingTeamsValidator });
         //Start date is today, end date is by default within 24 hours
         this.startDate = new Date();
         this.startDate.clearTime();
         this.endDate = new Date(this.startDate.getTime() + 1 * 24 * 60 * 60 * 1000);
-        if (this.client.session.isAdmin) {
-            //Only Admins are allowed to set past dates
-            this.minContestStart = this.startDate;
-            this.minContestEnd = this.startDate;
-        }
-        else {
-            var pastDate = new Date(1970, 0, 1, 0, 0, 0);
-            this.minContestStart = pastDate;
-            this.minContestEnd = pastDate;
-        }
         this.showRemoveContest = false;
-        this.client.events.subscribe('topTeamer:someEvent...', function (eventData) {
-        });
-    }
-    SetContestPage.prototype.onPageWillEnter = function () {
-        var _this = this;
         if (this.params.data.mode === 'edit') {
             this.contestLocalCopy = JSON.parse(JSON.stringify(this.params.data.contest));
             //Server stores in epoch - client uses real DATE objects
@@ -68,8 +56,9 @@ var SetContestPage = (function () {
                 'participants': 0,
                 'manualParticipants': 0,
                 'manualRating': 0,
-                'teams': [{ "name": null, "score": 0 }, { "name": null, "score": 0 }]
+                'teams': [{ 'name': null, 'score': 0 }, { 'name': null, 'score': 0 }]
             };
+            this.showStartDate = true;
         }
         this.client.session.features.newContest.purchaseData.retrieved = false;
         this.showRemoveContest = (this.params.data.mode === 'edit' && this.client.session.isAdmin);
@@ -88,7 +77,7 @@ var SetContestPage = (function () {
                     _this.client.session.features.newContest.purchaseData.currency = products[0].price_currency_code;
                     _this.client.session.features.newContest.purchaseData.retrieved = true;
                     //-------------------------------------------------------------------------------------------------------------
-                    //Retrieve unconsumed items - and checking if user has an unconsumed "new contest unlock key"
+                    //Retrieve unconsumed items - and checking if user has an unconsumed 'new contest unlock key'
                     //-------------------------------------------------------------------------------------------------------------
                     inappbilling.getPurchases(function (unconsumedItems) {
                         if (unconsumedItems && unconsumedItems.length > 0) {
@@ -100,19 +89,20 @@ var SetContestPage = (function () {
                             }
                         }
                     }, function (error) {
-                        FlurryAgent.myLogError("AndroidBillingError", "Error retrieving unconsumed items: " + error);
+                        FlurryAgent.myLogError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
                     });
                 }, function (msg) {
-                    FlurryAgent.myLogError("AndroidBillingError", "Error getting product details: " + msg);
-                }, $rootScope.session.features.newContest.purchaseData.productId);
+                    FlurryAgent.myLogError('AndroidBillingError', 'Error getting product details: ' + msg);
+                }, this.client.session.features.newContest.purchaseData.productId);
             }
         }
         else {
             this.client.session.features.newContest.purchaseData.retrieved = true;
         }
         this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
-        this.hideAdminInfo = true;
-    };
+        this.showAdminInfo = false;
+        this.setDateLimits();
+    }
     SetContestPage.prototype.retrieveUserQuestions = function () {
         var _this = this;
         var postData = { 'userQuestions': this.contestLocalCopy.userQuestions };
@@ -121,7 +111,7 @@ var SetContestPage = (function () {
         });
     };
     SetContestPage.prototype.getTitle = function () {
-        switch (params.data.mode) {
+        switch (this.params.data.mode) {
             case 'add':
                 return this.client.translate('NEW_CONTEST');
             case 'edit':
@@ -176,7 +166,7 @@ var SetContestPage = (function () {
                     }
                     else if (result.data.status === 'initiated') {
                         //Payment might come later from server
-                        alertService.alert({ 'type': "SERVER_ERROR_PURCHASE_IN_PROGRESS" });
+                        alertService.alert({ 'type': 'SERVER_ERROR_PURCHASE_IN_PROGRESS' });
                     }
                     else {
                         //Probably user canceled
@@ -198,7 +188,7 @@ var SetContestPage = (function () {
     ;
     SetContestPage.prototype.toggleAdminInfo = function () {
         if (this.contestLocalCopy.teams[0].name && this.contestLocalCopy.teams[1].name) {
-            this.hideAdminInfo = !this.hideAdminInfo;
+            this.showAdminInfo = !this.showAdminInfo;
         }
     };
     ;
@@ -225,18 +215,12 @@ var SetContestPage = (function () {
         });
     };
     SetContestPage.prototype.setContest = function () {
+        var _this = this;
         if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
             if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
-                if (!$scope.contestForm.userQuestions.$error) {
-                    $scope.contestForm.userQuestions.$error = {};
-                }
-                if ($rootScope.settings.newContest.privateQuestions.min === 1) {
-                    $scope.contestForm.userQuestions.$error["minimumQuestionsSingle"] = true;
-                }
-                else {
-                    $scope.contestForm.userQuestions.$error["minimumQuestionsPlural"] = true;
-                }
-                $scope.contestForm.userQuestions.$invalid = true;
+                //TODO - min questions check
+                //minimumQuestionsSingle
+                //minimumQuestionsPlural
                 return;
             }
         }
@@ -244,49 +228,53 @@ var SetContestPage = (function () {
         if (this.contestLocalCopy.totalParticipants > this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants) {
             this.contestLocalCopy.manualParticipants += this.contestLocalCopy.totalParticipants - (this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants);
         }
-        delete this.contestLocalCopy["totalParticipants"];
-        delete this.contestLocalCopy["status"];
+        delete this.contestLocalCopy['totalParticipants'];
+        delete this.contestLocalCopy['status'];
         //Server stores in epoch - client uses real DATE objects
         //Convert back to epoch before storing to server
         this.contestLocalCopy.startDate = this.contestLocalCopy.startDate.getTime();
         this.contestLocalCopy.endDate = this.contestLocalCopy.endDate.getTime();
-        if ($stateParams.mode === "add" || ($stateParams.mode === "edit" && JSON.stringify($stateParams.contest) != JSON.stringify(this.contestLocalCopy))) {
-            this.contestLocalCopy.name = $translate.instant("FULL_CONTEST_NAME", {
-                "team0": this.contestLocalCopy.teams[0].name,
-                "team1": this.contestLocalCopy.teams[1].name
+        if (this.params.data.mode === 'add' || (this.params.data.mode === 'edit' && JSON.stringify(this.params.data.contest) != JSON.stringify(this.contestLocalCopy))) {
+            this.contestLocalCopy.name = this.client.translate('FULL_CONTEST_NAME', {
+                'team0': this.contestLocalCopy.teams[0].name,
+                'team1': this.contestLocalCopy.teams[1].name
             });
-            if ($stateParams.mode === "edit" && this.contestLocalCopy.name !== $stateParams.contest.name) {
-                this.contestLocalCopy.nameChanged = true;
+            if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {
+                this.contestNameChanged = true;
             }
-            ContestsService.setContest(this.contestLocalCopy, $stateParams.mode, function (contest) {
-                this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
-                this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.endDate);
+            contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then(function (contest) {
+                _this.contestLocalCopy.startDate = new Date(_this.contestLocalCopy.startDate);
+                _this.contestLocalCopy.endDate = new Date(_this.contestLocalCopy.endDate);
                 //Report to Flurry
                 var contestParams = {
-                    "team0": this.contestLocalCopy.teams[0].name,
-                    "team1": this.contestLocalCopy.teams[1].name,
-                    "duration": this.contestLocalCopy.endOption,
-                    "questionsSource": this.contestLocalCopy.questionsSource
+                    'team0': _this.contestLocalCopy.teams[0].name,
+                    'team1': _this.contestLocalCopy.teams[1].name,
+                    'duration': _this.contestLocalCopy.endOption,
+                    'questionsSource': _this.contestLocalCopy.questionsSource
                 };
-                $rootScope.goBack();
-                if ($stateParams.mode === "add") {
-                    FlurryAgent.logEvent("contest/created", contestParams);
-                    $rootScope.$broadcast("topTeamer-contestCreated", contest);
+                if (_this.params.data.mode === 'add') {
+                    FlurryAgent.logEvent('contest/created', contestParams);
+                    setTimeout(function () {
+                        _this.client.events.publish('topTeamer:contestCreated', _this.quizData.results);
+                    }, 1000);
                 }
                 else {
-                    FlurryAgent.logEvent("contest/updated", contestParams);
-                    $rootScope.$broadcast("topTeamer-contestUpdated", contest);
+                    FlurryAgent.logEvent('contest/updated', contestParams);
+                    setTimeout(function () {
+                        _this.client.events.publish('topTeamer:contestUpdated', _this.quizData.results);
+                    }, 1000);
                 }
-            }, function (status, error) {
-                this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
-                this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.endDate);
+                _this.client.nav.pop();
+            }, function (error) {
+                _this.contestLocalCopy.startDate = new Date(_this.contestLocalCopy.startDate);
+                _this.contestLocalCopy.endDate = new Date(_this.contestLocalCopy.endDate);
             });
         }
         else {
-            $rootScope.goBack();
+            this.client.nav.pop();
         }
     };
-    SetContestPage.prototype.nonMatchingTeams = function (group) {
+    SetContestPage.prototype.matchingTeamsValidator = function (group) {
         var val;
         var valid = true;
         for (name in group.controls) {
@@ -303,11 +291,43 @@ var SetContestPage = (function () {
         if (valid) {
             return null;
         }
-        return { nonMatchingTeams: true };
+        return { matchingTeams: true };
+    };
+    SetContestPage.prototype.startDateSelected = function (dateSelection) {
+        if (dateSelection.dateObject > this.contestLocalCopy.endDate) {
+            return false;
+        }
+        this.contestLocalCopy.startDate = dateSelection.dateObject;
+        return true;
+    };
+    SetContestPage.prototype.endDateSelected = function (dateSelection) {
+        if (dateSelection.dateObject < this.contestLocalCopy.startDate) {
+            return false;
+        }
+        this.contestLocalCopy.endDate = dateSelection.dateObject;
+        return true;
+    };
+    SetContestPage.prototype.setDateLimits = function () {
+        if (!this.client.session.isAdmin) {
+            this.minContestStart = this.startDate;
+            this.minContestEnd = this.startDate;
+            this.maxContestEnd = this.getMaxEndDate();
+        }
+        else {
+            var pastDate = new Date(1970, 0, 1, 0, 0, 0);
+            this.minContestStart = pastDate;
+            this.minContestEnd = pastDate;
+            this.maxContestEnd = new Date(2100, 0, 1, 0, 0, 0);
+        }
+    };
+    SetContestPage.prototype.getMaxEndDate = function () {
+        //Set the maximum end date according to the last end option in the list
+        return new Date(this.contestLocalCopy.startDate.getTime() + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier);
     };
     SetContestPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/set-contest/set-contest.html'
+            templateUrl: 'build/pages/set-contest/set-contest.html',
+            directives: [common_1.FORM_DIRECTIVES, date_picker_1.DatePickerComponent]
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, common_1.FormBuilder])
     ], SetContestPage);

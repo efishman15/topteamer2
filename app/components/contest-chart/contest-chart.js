@@ -20,7 +20,7 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected.next({ 'teamId': teamId, 'source': 'bar', 'contest': _this.contestChart.contest });
+                _this.teamSelected.emit({ 'teamId': teamId, 'source': 'bar', 'contest': _this.contestChart.contest });
                 _this.chartTeamEventHandled = true;
             },
             "dataLabelClick": function (eventObj, dataObj) {
@@ -28,12 +28,12 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected.next({ 'teamId': teamId, 'source': 'label', 'contest': _this.contestChart.contest });
+                _this.teamSelected.emit({ 'teamId': teamId, 'source': 'label', 'contest': _this.contestChart.contest });
                 _this.chartTeamEventHandled = true;
             },
             "chartClick": function (eventObj, dataObj) {
                 if (!_this.chartTeamEventHandled) {
-                    _this.contestSelected.next({ 'contest': _this.contestChart.contest });
+                    _this.contestSelected.emit({ 'contest': _this.contestChart.contest });
                 }
                 _this.chartTeamEventHandled = false;
             }

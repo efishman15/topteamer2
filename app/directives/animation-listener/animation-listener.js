@@ -14,10 +14,10 @@ var AnimationListener = (function () {
         this.animationEnd = new core_1.EventEmitter();
     }
     AnimationListener.prototype.animationStarted = function ($event) {
-        this.animationStart.next($event);
+        this.animationStart.emit($event);
     };
     AnimationListener.prototype.animationEnded = function ($event) {
-        this.animationEnd.next($event);
+        this.animationEnd.emit($event);
     };
     __decorate([
         core_1.Input(), 

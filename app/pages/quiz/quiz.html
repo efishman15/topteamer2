@@ -5,7 +5,7 @@
   <ion-title>{{client.translate('QUIZ')}}</ion-title>
 </ion-navbar>
 
-<ion-content class="align-center">
+<ion-content>
 
   <canvas id="quizCanvas" height="{{client.settings.quiz.canvas.height}}" class="quiz-canvas"
           (click)="canvasClick($event)" [ngStyle]="{'height': client.settings.quiz.canvas.height + 'px'}">
