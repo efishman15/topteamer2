@@ -10,36 +10,38 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
 var QuestionStatsPage = (function () {
-    function QuestionStatsPage(params) {
+    function QuestionStatsPage(params, viewController) {
         this.client = client_1.Client.getInstance();
         this.question = params.data.question;
         this.chartDataSource = params.data.chartDataSource;
+        this.viewController = viewController;
     }
     QuestionStatsPage.prototype.onPageWillEnter = function () {
         var _this = this;
-        FusionCharts.ready(function () {
-            var chart = new FusionCharts({
-                type: "pie2d",
-                renderAt: 'questionChart',
-                width: _this.client.settings.charts.size.width,
-                height: _this.client.settings.charts.size.height,
-                dataFormat: 'json',
-                dataSource: _this.chartDataSource
+        if (this.chartDataSource) {
+            FusionCharts.ready(function () {
+                var chart = new FusionCharts({
+                    type: "pie2d",
+                    renderAt: 'questionChart',
+                    width: _this.client.settings.charts.size.width,
+                    height: _this.client.settings.charts.size.height,
+                    dataFormat: 'json',
+                    dataSource: _this.chartDataSource
+                });
+                chart.render();
             });
-            chart.render();
-        });
+        }
     };
     QuestionStatsPage.prototype.dismiss = function (action) {
-        this.close();
-        this.client.events.publish('topTeamer:questionStatsClosed', action);
+        this.viewController.dismiss(action);
     };
     QuestionStatsPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/question-stats/question-stats.html'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.ViewController !== 'undefined' && ionic_1.ViewController) === 'function' && _b) || Object])
     ], QuestionStatsPage);
     return QuestionStatsPage;
-    var _a;
+    var _a, _b;
 })();
 exports.QuestionStatsPage = QuestionStatsPage;

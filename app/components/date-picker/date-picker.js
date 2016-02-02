@@ -128,7 +128,8 @@ var DatePickerComponent = (function () {
         if (this.maxDate) {
             var maxDate = new Date(this.maxDate);
             maxDate.clearTime();
-            this.maxEpochLocal = maxDate.getTime();
+            //Another 24 hours to count all the hours in the max date including up to midnight (23:59:59.999)
+            this.maxEpochLocal = maxDate.getTime() + 24 * 60 * 60 * 1000;
         }
     };
     __decorate([

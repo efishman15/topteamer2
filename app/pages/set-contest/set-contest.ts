@@ -1,7 +1,8 @@
-import {Page, NavParams} from 'ionic/ionic';
+import {Page, NavParams, Item, Input, Select, Label} from 'ionic/ionic';
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
+import {ContestPage} from '../../pages/contest/contest';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
@@ -308,6 +309,7 @@ export class SetContestPage {
         this.contestNameChanged = true;
       }
 
+      console.log('contest=' + JSON.stringify(this.contestLocalCopy));
       contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then((contest) => {
 
         this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
@@ -324,13 +326,13 @@ export class SetContestPage {
         if (this.params.data.mode === 'add') {
           FlurryAgent.logEvent('contest/created', contestParams);
           setTimeout(() => {
-            this.client.events.publish('topTeamer:contestCreated', this.quizData.results)
+            this.client.nav.push(ContestPage, {'contest': contest})
           }, 1000);
         }
         else {
           FlurryAgent.logEvent('contest/updated', contestParams);
           setTimeout(() => {
-            this.client.events.publish('topTeamer:contestUpdated', this.quizData.results)
+            this.client.events.publish('topTeamer:contestUpdated', contest)
           }, 1000);
         }
 
@@ -369,6 +371,7 @@ export class SetContestPage {
     return {matchingTeams: true};
   }
 
+  //TODO: validate startDate<endDate
   startDateSelected(dateSelection) {
     if (dateSelection.dateObject > this.contestLocalCopy.endDate) {
       return false;

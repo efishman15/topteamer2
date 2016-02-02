@@ -1,5 +1,7 @@
-<ion-row>
-  <ion-col *ngFor="#simpleTab of simpleTabs" (click)="selectTab(simpleTab)" [class.active]="simpleTab.active">
+<div text-center>
+  <ion-row>
+    <ion-col *ngFor="#simpleTab of simpleTabs" (click)="selectTab(simpleTab)" [class.active]="simpleTab.active">
       <a [ngClass]="{'active-tab' : simpleTab.active, 'passive-tab' : !simpleTab.active}" href="#">{{simpleTab.simpleTabTitle}}</a>
-  </ion-col>
-</ion-row>
+    </ion-col>
+  </ion-row>
+</div>

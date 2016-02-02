@@ -32,25 +32,27 @@
 
     <ion-row>
       <ion-col width-40>
-        <ion-input>
-          <input type="text"
-                 ngControl="team0"
-                 [(ngModel)]="contestLocalCopy.teams[0].name"
-                 placeholder="{{client.translate('TEAM0')}}"
-                 [disabled]="client.session.features.newContest.locked">
-        </ion-input>
+        <ion-item no-lines>
+          <ion-input type="text"
+                   ngControl="team0"
+                   [(ngModel)]="contestLocalCopy.teams[0].name"
+                   placeholder="{{client.translate('TEAM0')}}"
+                   [disabled]="client.session.features.newContest.locked">
+          </ion-input>
+        </ion-item>
       </ion-col>
       <ion-col width-20 class="contest-or-between-teams">
         <h5 text-center>{{client.translate('OR')}}</h5>
       </ion-col>
       <ion-col width-40>
-        <ion-input>
-          <input type="text"
-                 ngControl="team1"
-                 [(ngModel)]="contestLocalCopy.teams[1].name"
-                 placeholder="{{client.translate('TEAM1')}}"
-                 [disabled]="client.session.features.newContest.locked">
-        </ion-input>
+        <ion-item no-lines>
+          <ion-input type="text"
+                   ngControl="team1"
+                   [(ngModel)]="contestLocalCopy.teams[1].name"
+                   placeholder="{{client.translate('TEAM1')}}"
+                   [disabled]="client.session.features.newContest.locked">
+          </ion-input>
+        </ion-item>
       </ion-col>
     </ion-row>
     <ion-row>
@@ -72,32 +74,82 @@
       </ion-col>
     </ion-row>
 
-    <ion-select no-lines [(ngModel)]="contestLocalCopy.endOption" okText="{{client.translate('OK')}}"
-                cancelText="{{client.translate('CANCEL')}}">
-      <ion-label>{{client.translate('ENDS_IN')}}</ion-label>
-      <ion-option *ngFor="#endOptionKey of endOptionKeys"
-                  value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
-                  checked="{{contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value}}">
-        {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number: client.settings.newContest.endOptions[endOptionKey].number}) }}
-      </ion-option>
-    </ion-select>
-
-    <div padding *ngIf="params.data.mode==='add'">
-        <span class="set-contest-label">{{client.translate('CONTEST_END')}}</span>
-        <date-picker [currentDate]="contestLocalCopy.endDate" [(minDate)]="minContestEnd" [(maxDate)]="maxContestEnd" currentDateClass="calendar-button"
-                     (dateSelected)="endDateSelected($event)">
-        </date-picker>
+    <div *ngIf="params.data.mode==='add'">
+      <ion-item no-lines>
+        <ion-label>{{client.translate('ENDS_IN')}}</ion-label>
+        <ion-select multiple="false" no-lines [(ngModel)]="contestLocalCopy.endOption" okText="{{client.translate('OK')}}"
+                    cancelText="{{client.translate('CANCEL')}}">
+          <ion-option *ngFor="#endOptionKey of endOptionKeys"
+                      value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
+                      checked="{{contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value}}">
+            {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number: client.settings.newContest.endOptions[endOptionKey].number}) }}
+          </ion-option>
+        </ion-select>
+      </ion-item>
+    </div>
+    <div padding *ngIf="params.data.mode==='edit'">
+      <span class="set-contest-label">{{client.translate('CONTEST_END')}}</span>
+      <date-picker [(currentDate)]="contestLocalCopy.endDate" [(minDate)]="minContestEnd" [(maxDate)]="maxContestEnd"
+                   currentDateClass="calendar-button"
+                   (dateSelected)="endDateSelected($event)">
+      </date-picker>
     </div>
 
     <div padding class="set-contest-label" *ngIf="client.session.isAdmin">
       <span class="pointer" (click)="toggleAdminInfo()">{{client.translate('CONTEST_ADMIN_INFO')}} {{getArrowDirection(!showAdminInfo)}}</span>
       <div *ngIf="showAdminInfo && contestForm.valid">
+
         <div padding *ngIf="showStartDate">
           <span>{{client.translate('CONTEST_START')}}</span>
-          <date-picker [currentDate]="contestLocalCopy.startDate" [(minDate)]="minContestStart" currentDateClass="calendar-button"
+          <date-picker [(currentDate)]="contestLocalCopy.startDate" [(minDate)]="minContestStart"
+                       currentDateClass="calendar-button"
                        (dateSelected)="startDateSelected($event)">
           </date-picker>
         </div>
+
+        <ion-row>
+          <ion-col width-40>
+            <ion-item no-lines>
+              <ion-label stacked>{{client.translate('TEAM_SCORE',{team: contestLocalCopy.teams[0].name} ) }}</ion-label>
+              <ion-input type="number"
+                       [(ngModel)]="contestLocalCopy.teams[0].score"
+                       min="1"
+                       max="1000000000000">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col width-20>
+          </ion-col>
+          <ion-col width-40>
+            <ion-item no-lines>
+              <ion-label stacked>{{client.translate('TEAM_SCORE',{team: contestLocalCopy.teams[1].name} ) }}</ion-label>
+              <ion-input input type="number"
+                       [(ngModel)]="contestLocalCopy.teams[1].score"
+                       min="1"
+                       max="1000000000000">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+
+        <div padding-left padding-right>
+          <ion-item no-lines>
+            <ion-label stacked>{{client.translate('RATING')}} (0-100): {{contestLocalCopy.manualRating}}</ion-label>
+          </ion-item>
+          <input class="set-contest-range-input" type="range" min="0" max="100" [(ngModel)]="contestLocalCopy.manualRating" value="{{contestLocalCopy.manualRating}}">
+        </div>
+
+        <div padding-left padding-right>
+          <ion-item no-lines>
+            <ion-label stacked>{{client.translate('PARTICIPANTS')}}: {{contestLocalCopy.totalParticipants}}</ion-label>
+          </ion-item>
+          <input class="set-contest-range-input" type="range" min="{{contestLocalCopy.participants}}" max="10000" [(ngModel)]="contestLocalCopy.totalParticipants" value="{{contestLocalCopy.totalParticipants}}">
+        </div>
+
+        <button padding danger class="button-small" (click)="removeContest()"
+                *ngIf="showRemoveContest">{{client.translate('REMOVE_CONTEST')}}
+        </button>
+
       </div>
     </div>
 

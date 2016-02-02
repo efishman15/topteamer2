@@ -1,7 +1,7 @@
 <ion-toolbar>
 
   <ion-buttons>
-    <button (click)="close()">
+    <button (click)="dismiss(null)">
       <ion-icon name="close-circle"></ion-icon>
     </button>
   </ion-buttons>
@@ -12,7 +12,7 @@
 
 </ion-toolbar>
 
-<ion-content dir="{{client.currentLanguage.direction}}">
+<ion-content>
 
   <div padding text-center dir="{{question.direction}}">
     <h5 class="center question-text" [innerHtml]="question.text"></h5>
@@ -21,19 +21,21 @@
   <div padding text-center *ngIf="chartDataSource" id="questionChart">
   </div>
 
-  <ion-buttons>
-    <button padding secondary *ngIf="question.wikipediaHint"
-            class="button button-small"
-            (click)="dismiss('hint')">
-      {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
-    </button>
-    <button padding secondary *ngIf="question.wikipediaAnswer"
-            class="button button-small"
-            (click)="dismiss('answer')">
-      {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
-    </button>
-  </ion-buttons>
+  <div text-center>
 
+    <ion-buttons>
+      <button padding secondary *ngIf="question.wikipediaHint"
+              class="button button-small"
+              (click)="dismiss('hint')">
+        {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
+      </button>
+      <button padding secondary *ngIf="question.wikipediaAnswer"
+              class="button button-small"
+              (click)="dismiss('answer')">
+        {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
+      </button>
+    </ion-buttons>
+  </div>
 
 </ion-content>
 

@@ -1,4 +1,4 @@
-import {Page,NavParams} from 'ionic/ionic';
+import {Page,NavParams,ViewController} from 'ionic/ionic';
 import {Client} from '../../providers/client';
 
 @Page({
@@ -9,31 +9,34 @@ export class QuestionStatsPage {
   client:Client;
   question:Object;
   chartDataSource:Object;
+  viewController:ViewController;
 
-  constructor(params:NavParams) {
+  constructor(params:NavParams, viewController: ViewController) {
     this.client = Client.getInstance();
     this.question = params.data.question;
     this.chartDataSource = params.data.chartDataSource;
+    this.viewController = viewController;
   }
 
   onPageWillEnter() {
-    FusionCharts.ready(() => {
-      var chart = new FusionCharts({
-        type: "pie2d",
-        renderAt: 'questionChart',
-        width: this.client.settings.charts.size.width,
-        height: this.client.settings.charts.size.height,
-        dataFormat: 'json',
-        dataSource: this.chartDataSource
+    if (this.chartDataSource) {
+      FusionCharts.ready(() => {
+        var chart = new FusionCharts({
+          type: "pie2d",
+          renderAt: 'questionChart',
+          width: this.client.settings.charts.size.width,
+          height: this.client.settings.charts.size.height,
+          dataFormat: 'json',
+          dataSource: this.chartDataSource
+        });
+
+        chart.render();
+
       });
-
-      chart.render();
-
-    });
+    }
   }
 
   dismiss(action) {
-    this.close();
-    this.client.events.publish('topTeamer:questionStatsClosed', action)
+    this.viewController.dismiss(action);
   }
 }

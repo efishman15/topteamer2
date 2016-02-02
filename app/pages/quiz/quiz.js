@@ -16,7 +16,6 @@ var soundService = require('../../providers/sound');
 var alertService = require('../../providers/alert');
 var QuizPage = (function () {
     function QuizPage(params) {
-        var _this = this;
         this.questionHistory = [];
         this.imgCorrectSrc = 'images/correct.png';
         this.imgErrorSrc = 'images/error.png';
@@ -27,34 +26,17 @@ var QuizPage = (function () {
         //img, x, y, width, height
         this.drawImageQueue = {};
         this.client = client_1.Client.getInstance();
-        this.contestId = params.data.contestId;
-        this.source = params.data.source;
+        this.params = params;
+    }
+    QuizPage.prototype.ngOnInit = function () {
+        this.contestId = this.params.data.contestId;
+        this.source = this.params.data.source;
         this.quizCanvas = document.getElementById('quizCanvas');
         this.quizContext = this.quizCanvas.getContext('2d');
         this.quizContext.font = this.client.settings.quiz.canvas.font;
         this.initDrawImageQueue(this.imgCorrectSrc);
         this.initDrawImageQueue(this.imgErrorSrc);
         this.initDrawImageQueue(this.imgQuestionInfoSrc);
-        this.client.events.subscribe('topTeamer:questionStatsClosed', function (eventData) {
-            //Event data comes as an array of data objects - we expect only one (result)
-            var action = eventData[0];
-            switch (action) {
-                case 'hint':
-                    _this.questionHistory[_this.quizData.currentQuestionIndex].hintUsed = true;
-                    _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.hintCost;
-                    _this.drawQuizScores();
-                    window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
-                    break;
-                case 'answer':
-                    _this.questionHistory[_this.quizData.currentQuestionIndex].answerUsed = true;
-                    _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.answerCost;
-                    _this.drawQuizScores();
-                    window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
-                    break;
-            }
-        });
-    }
-    QuizPage.prototype.onPageDidEnter = function () {
         this.startQuiz();
     };
     QuizPage.prototype.startQuiz = function () {
@@ -65,8 +47,7 @@ var QuizPage = (function () {
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
-                //TODO: show alert about review mode
-                alertService.alert($scope.quiz.reviewMode.reason);
+                alertService.alert(_this.quizData.reviewMode.reason);
             }
             for (var i = 0; i < data.quiz.totalQuestions; i++) {
                 _this.questionHistory.push({ 'score': _this.client.settings.quiz.questions.score[i] });
@@ -165,27 +146,51 @@ var QuizPage = (function () {
         }
     };
     QuizPage.prototype.canvasClick = function (event) {
+        var _this = this;
         if (this.currentQuestionCircle &&
             event.offsetX <= this.currentQuestionCircle.right &&
             event.offsetX >= this.currentQuestionCircle.left &&
             event.offsetY >= this.currentQuestionCircle.top &&
             event.offsetY <= this.currentQuestionCircle.bottom) {
-            if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio == 0) {
-                var questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
-                questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
-                questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
-                questionChart.data = [];
-                questionChart.data.push({
-                    'label': this.client.translate('ANSWERED_CORRECT'),
-                    'value': this.quizData.currentQuestion.correctRatio
-                });
-                questionChart.data.push({
-                    'label': this.client.translate('ANSWERED_INCORRECT'),
-                    'value': (1 - this.quizData.currentQuestion.correctRatio)
-                });
+            if (this.quizData.currentQuestion.correctRatio ||
+                this.quizData.currentQuestion.correctRatio === 0 ||
+                this.quizData.currentQuestion.wikipediaHint ||
+                this.quizData.currentQuestion.wikipediaAnswer) {
+                var questionChart;
+                if (this.quizData.currentQuestion.correctRatio ||
+                    this.quizData.currentQuestion.correctRatio === 0) {
+                    questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
+                    questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
+                    questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+                    questionChart.data = [];
+                    questionChart.data.push({
+                        'label': this.client.translate('ANSWERED_CORRECT'),
+                        'value': this.quizData.currentQuestion.correctRatio
+                    });
+                    questionChart.data.push({
+                        'label': this.client.translate('ANSWERED_INCORRECT'),
+                        'value': (1 - this.quizData.currentQuestion.correctRatio)
+                    });
+                }
                 var modal = ionic_1.Modal.create(question_stats_1.QuestionStatsPage, {
                     'question': this.quizData.currentQuestion,
                     'chartDataSource': questionChart
+                });
+                modal.onDismiss(function (action) {
+                    switch (action) {
+                        case 'hint':
+                            _this.questionHistory[_this.quizData.currentQuestionIndex].hintUsed = true;
+                            _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.hintCost;
+                            _this.drawQuizScores();
+                            window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
+                            break;
+                        case 'answer':
+                            _this.questionHistory[_this.quizData.currentQuestionIndex].answerUsed = true;
+                            _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.answerCost;
+                            _this.drawQuizScores();
+                            window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
+                            break;
+                    }
                 });
                 this.client.nav.present(modal);
             }

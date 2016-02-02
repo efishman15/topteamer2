@@ -3,9 +3,11 @@ import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
+import {SetContestPage} from '../../pages/set-contest/set-contest';
 import {FacebookPostPage} from '../../pages/facebook-post/facebook-post';
 import {LikePage} from '../../pages/like/like';
 import {Client} from '../../providers/client';
+import * as contestsService from '../../providers/contests';
 import * as shareService from '../../providers/share';
 import * as soundService from '../../providers/sound';
 
@@ -26,7 +28,14 @@ export class ContestPage {
   constructor(params:NavParams) {
 
     this.client = Client.getInstance();
-    this.contestChart = params.data.contestChart;
+
+    if (params.data.contestChart) {
+      this.contestChart = params.data.contestChart;
+    }
+    else {
+      //Just created this contest - no chart
+      this.refreshContest(params.data.contest);
+    }
 
     this.client.events.subscribe('topTeamer:quizFinished', (eventData) => {
       //Event data comes as an array of data objects - we expect only one (last quiz results)
@@ -53,6 +62,13 @@ export class ContestPage {
 
     });
 
+    this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
+      //Event data comes as an array of data objects - we expect only one (contest)
+      var contest = eventData[0];
+
+      this.refreshContest(contest);
+
+    });
   }
 
   onDateChanged(event) {
@@ -83,10 +99,14 @@ export class ContestPage {
         'sourceClick': source
       });
 
-      this.contestChart = contestsService.prepareContestChart(data.contest, 'starts');
-      this.contestChartComponent.refresh(this.contestChart);
+      this.refreshContest(data.contest);
 
     });
+  }
+
+  refreshContest(contest) {
+    this.contestChart = contestsService.prepareContestChart(contest, 'starts');
+    this.contestChartComponent.refresh(this.contestChart);
   }
 
   switchTeams(source) {
@@ -94,8 +114,7 @@ export class ContestPage {
   }
 
   editContest() {
-    //TODO: edit contest
-    alert('edit contest');
+    this.client.nav.push(SetContestPage, {'mode' : 'edit', 'contest' : this.contestChart.contest});
   }
 
   share(source) {

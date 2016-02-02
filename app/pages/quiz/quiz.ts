@@ -14,6 +14,7 @@ import * as alertService from '../../providers/alert';
 export class QuizPage {
 
   client:Client;
+  params:NavParams;
   contestId:string;
   source:string;
   quizData:Object;
@@ -38,8 +39,12 @@ export class QuizPage {
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
-    this.contestId = params.data.contestId;
-    this.source = params.data.source;
+    this.params = params;
+  }
+
+  ngOnInit() {
+    this.contestId = this.params.data.contestId;
+    this.source = this.params.data.source;
 
     this.quizCanvas = document.getElementById('quizCanvas');
     this.quizContext = this.quizCanvas.getContext('2d');
@@ -49,31 +54,6 @@ export class QuizPage {
     this.initDrawImageQueue(this.imgErrorSrc);
     this.initDrawImageQueue(this.imgQuestionInfoSrc);
 
-    this.client.events.subscribe('topTeamer:questionStatsClosed', (eventData) => {
-
-      //Event data comes as an array of data objects - we expect only one (result)
-      var action = eventData[0];
-
-      switch (action) {
-
-        case 'hint':
-          this.questionHistory[this.quizData.currentQuestionIndex].hintUsed = true;
-          this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.hintCost;
-          this.drawQuizScores();
-          window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
-          break;
-
-        case 'answer':
-          this.questionHistory[this.quizData.currentQuestionIndex].answerUsed = true;
-          this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.answerCost;
-          this.drawQuizScores();
-          window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
-          break;
-      }
-    });
-  }
-
-  onPageDidEnter() {
     this.startQuiz();
   }
 
@@ -85,8 +65,7 @@ export class QuizPage {
       this.quizData.currentQuestion.answered = false;
 
       if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
-        //TODO: show alert about review mode
-        alertService.alert($scope.quiz.reviewMode.reason);
+        alertService.alert(this.quizData.reviewMode.reason);
       }
 
       for (var i = 0; i < data.quiz.totalQuestions; i++) {
@@ -208,7 +187,7 @@ export class QuizPage {
       //Give enough time to draw the circle progress of the last question
       setTimeout(() => {
         this.client.events.publish('topTeamer:quizFinished', this.quizData.results)
-      },1000);
+      }, 1000);
 
     }
     else {
@@ -224,27 +203,54 @@ export class QuizPage {
       event.offsetY >= this.currentQuestionCircle.top &&
       event.offsetY <= this.currentQuestionCircle.bottom) {
 
-      if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio == 0) {
+      if (this.quizData.currentQuestion.correctRatio ||
+        this.quizData.currentQuestion.correctRatio === 0 ||
+        this.quizData.currentQuestion.wikipediaHint ||
+        this.quizData.currentQuestion.wikipediaAnswer) {
 
-        var questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
+        var questionChart;
 
-        questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
+        if (this.quizData.currentQuestion.correctRatio ||
+          this.quizData.currentQuestion.correctRatio === 0) {
 
-        questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+          questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
 
-        questionChart.data = [];
-        questionChart.data.push({
-          'label': this.client.translate('ANSWERED_CORRECT'),
-          'value': this.quizData.currentQuestion.correctRatio
-        });
-        questionChart.data.push({
-          'label': this.client.translate('ANSWERED_INCORRECT'),
-          'value': (1 - this.quizData.currentQuestion.correctRatio)
-        });
+          questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
+
+          questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+
+          questionChart.data = [];
+          questionChart.data.push({
+            'label': this.client.translate('ANSWERED_CORRECT'),
+            'value': this.quizData.currentQuestion.correctRatio
+          });
+          questionChart.data.push({
+            'label': this.client.translate('ANSWERED_INCORRECT'),
+            'value': (1 - this.quizData.currentQuestion.correctRatio)
+          });
+        }
 
         var modal = Modal.create(QuestionStatsPage, {
           'question': this.quizData.currentQuestion,
           'chartDataSource': questionChart
+        });
+
+        modal.onDismiss( (action) => {
+          switch (action) {
+            case 'hint':
+              this.questionHistory[this.quizData.currentQuestionIndex].hintUsed = true;
+              this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.hintCost;
+              this.drawQuizScores();
+              window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
+              break;
+
+            case 'answer':
+              this.questionHistory[this.quizData.currentQuestionIndex].answerUsed = true;
+              this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.answerCost;
+              this.drawQuizScores();
+              window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
+              break;
+          }
         });
 
         this.client.nav.present(modal);
@@ -401,7 +407,8 @@ export class QuizPage {
 
     this.drawQuizScores();
 
-  };
+  }
+  ;
 
   clearQuizScores() {
     this.quizContext.beginPath();
@@ -463,6 +470,7 @@ export class QuizPage {
         }
       }
     }
-  };
+  }
+  ;
 
 }

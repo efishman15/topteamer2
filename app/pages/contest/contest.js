@@ -12,9 +12,11 @@ var core_1 = require('angular2/core');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
 var quiz_1 = require('../../pages/quiz/quiz');
+var set_contest_1 = require('../../pages/set-contest/set-contest');
 var facebook_post_1 = require('../../pages/facebook-post/facebook-post');
 var like_1 = require('../../pages/like/like');
 var client_1 = require('../../providers/client');
+var contestsService = require('../../providers/contests');
 var shareService = require('../../providers/share');
 var soundService = require('../../providers/sound');
 var ContestPage = (function () {
@@ -24,7 +26,13 @@ var ContestPage = (function () {
         this.lastQuizResults = null;
         this.animateLastResults = false;
         this.client = client_1.Client.getInstance();
-        this.contestChart = params.data.contestChart;
+        if (params.data.contestChart) {
+            this.contestChart = params.data.contestChart;
+        }
+        else {
+            //Just created this contest - no chart
+            this.refreshContest(params.data.contest);
+        }
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
@@ -43,6 +51,11 @@ var ContestPage = (function () {
             setTimeout(function () {
                 soundService.play(_this.lastQuizResults.data.sound);
             }, 500);
+        });
+        this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
+            //Event data comes as an array of data objects - we expect only one (contest)
+            var contest = eventData[0];
+            _this.refreshContest(contest);
         });
     }
     ContestPage.prototype.onDateChanged = function (event) {
@@ -68,16 +81,18 @@ var ContestPage = (function () {
                 'team': '' + team,
                 'sourceClick': source
             });
-            _this.contestChart = contestsService.prepareContestChart(data.contest, 'starts');
-            _this.contestChartComponent.refresh(_this.contestChart);
+            _this.refreshContest(data.contest);
         });
+    };
+    ContestPage.prototype.refreshContest = function (contest) {
+        this.contestChart = contestsService.prepareContestChart(contest, 'starts');
+        this.contestChartComponent.refresh(this.contestChart);
     };
     ContestPage.prototype.switchTeams = function (source) {
         this.joinContest(1 - this.contestChart.contest.myTeam, source, 'switchTeams');
     };
     ContestPage.prototype.editContest = function () {
-        //TODO: edit contest
-        alert('edit contest');
+        this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'edit', 'contest': this.contestChart.contest });
     };
     ContestPage.prototype.share = function (source) {
         shareService.share(this.contestChart.contest);

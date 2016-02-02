@@ -11,6 +11,7 @@ var ionic_1 = require('ionic/ionic');
 var common_1 = require('angular2/common');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
+var contest_1 = require('../../pages/contest/contest');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
 var alertService = require('../../providers/alert');
@@ -242,6 +243,7 @@ var SetContestPage = (function () {
             if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {
                 this.contestNameChanged = true;
             }
+            console.log('contest=' + JSON.stringify(this.contestLocalCopy));
             contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then(function (contest) {
                 _this.contestLocalCopy.startDate = new Date(_this.contestLocalCopy.startDate);
                 _this.contestLocalCopy.endDate = new Date(_this.contestLocalCopy.endDate);
@@ -255,13 +257,13 @@ var SetContestPage = (function () {
                 if (_this.params.data.mode === 'add') {
                     FlurryAgent.logEvent('contest/created', contestParams);
                     setTimeout(function () {
-                        _this.client.events.publish('topTeamer:contestCreated', _this.quizData.results);
+                        _this.client.nav.push(contest_1.ContestPage, { 'contest': contest });
                     }, 1000);
                 }
                 else {
                     FlurryAgent.logEvent('contest/updated', contestParams);
                     setTimeout(function () {
-                        _this.client.events.publish('topTeamer:contestUpdated', _this.quizData.results);
+                        _this.client.events.publish('topTeamer:contestUpdated', contest);
                     }, 1000);
                 }
                 _this.client.nav.pop();
@@ -293,6 +295,7 @@ var SetContestPage = (function () {
         }
         return { matchingTeams: true };
     };
+    //TODO: validate startDate<endDate
     SetContestPage.prototype.startDateSelected = function (dateSelection) {
         if (dateSelection.dateObject > this.contestLocalCopy.endDate) {
             return false;
