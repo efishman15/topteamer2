@@ -310,7 +310,7 @@ module.exports.dynamicPricing = function (req, res, next) {
 
     async.waterfall(operations, function (err, data) {
         if (!err) {
-            res.send(200, data.clientResponse);
+            res.json(data.clientResponse);
         }
         else {
             res.send(err.httpStatus, err);

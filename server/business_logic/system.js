@@ -68,7 +68,7 @@ module.exports.restart = function (req, res, next) {
             return;
         }
 
-        res.send(200, "OK");
+        res.json(generalUtils.okResponse);
         res.end();
 
         logger.server.info({"user" : data.session.name}, "Restarting server per admins request");

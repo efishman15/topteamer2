@@ -16,10 +16,29 @@ export class RunningContestsPage {
 
   constructor() {
     this.client = Client.getInstance();
+
+    console.log('RunningContestsPage:constructor')
+
+    this.client.events.subscribe('topTeamer:contestCreated', (eventData) => {
+      if (this.client.nav.isActive(RunningContestsPage)) {
+        console.log('contest created - refreshing list');
+        this.contestList.refresh();
+      }
+    });
+
+    this.client.events.subscribe('topTeamer:contestRemoved', () => {
+      if (this.client.nav.isActive(RunningContestsPage)) {
+        console.log('contest removed - refreshing list');
+        this.contestList.refresh();
+      }
+    });
+
   }
 
-  onPageDidEnter() {
-    this.contestList.refresh();
+  onPageWillEnter() {
+    if (this.contestList) {
+      this.contestList.refresh();
+    }
   }
 
   onContestSelected(data) {

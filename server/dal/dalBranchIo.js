@@ -31,10 +31,12 @@ function createContestLinks(data, callback) {
         "json": true
     };
 
-    console.log("postData=" + JSON.stringify(postData));
+    httpUtils.post(options, function (err, branchData) {
 
-    httpUtils.post(options, function (branchData) {
-
+      if (err) {
+        callback(err);
+        return;
+      }
 
       //Contest link (primary)
         if (branchData[0].error) {

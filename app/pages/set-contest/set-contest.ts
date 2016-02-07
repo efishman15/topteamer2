@@ -6,6 +6,7 @@ import {ContestPage} from '../../pages/contest/contest';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
+import * as shareService from '../../providers/share';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html',
@@ -266,10 +267,10 @@ export class SetContestPage {
   removeContest() {
 
     alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.contestLocalCopy.name}).then(() => {
-      contestsService.removeContest(this.contestLocalCopy._id).then((data) => {
-        this.client.nav.pop();
-        this.client.events.publish('topTeamer-contestRemoved', data);
-      })
+      contestsService.removeContest(this.contestLocalCopy._id).then(() => {
+        this.client.events.publish('topTeamer-contestRemoved');
+        this.client.nav.popToRoot();
+      });
     });
   }
 
@@ -309,7 +310,6 @@ export class SetContestPage {
         this.contestNameChanged = true;
       }
 
-      console.log('contest=' + JSON.stringify(this.contestLocalCopy));
       contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then((contest) => {
 
         this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
@@ -325,18 +325,23 @@ export class SetContestPage {
 
         if (this.params.data.mode === 'add') {
           FlurryAgent.logEvent('contest/created', contestParams);
-          setTimeout(() => {
-            this.client.nav.push(ContestPage, {'contest': contest})
-          }, 1000);
+          this.client.events.publish('topTeamer:contestCreated', contest);
+          var options = {'animate': false};
+          this.client.nav.pop(options).then(() => {
+            if (!this.client.user.clientInfo.mobile) {
+              //For web - no animation - the share screen will be on top with its animation
+              options = undefined;
+            }
+            this.client.nav.push(ContestPage, {'contest': contest}, options).then(() => {
+              shareService.share(contest);
+            });
+          });
         }
         else {
           FlurryAgent.logEvent('contest/updated', contestParams);
-          setTimeout(() => {
-            this.client.events.publish('topTeamer:contestUpdated', contest)
-          }, 1000);
+          this.client.events.publish('topTeamer:contestUpdated', contest);
+          this.client.nav.pop();
         }
-
-        this.client.nav.pop();
 
       }, (error) => {
         this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
@@ -404,6 +409,6 @@ export class SetContestPage {
 
   getMaxEndDate() {
     //Set the maximum end date according to the last end option in the list
-    return new Date(this.contestLocalCopy.startDate.getTime() + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length-1]].msecMultiplier);
+    return new Date(this.contestLocalCopy.startDate.getTime() + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier);
   }
 }

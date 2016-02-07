@@ -22,6 +22,10 @@ var ContestListComponent = (function () {
             }
         };
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
+            console.log('contest updated - refreshing list');
+            _this.refresh();
+        });
     }
     ContestListComponent.prototype.selectContest = function (contest) {
         this.contestSelected.emit(contest);

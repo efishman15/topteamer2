@@ -16,10 +16,10 @@ var client_1 = require('./providers/client');
 var contest_type_1 = require('./pages/contest-type/contest-type');
 var set_contest_1 = require('./pages/set-contest/set-contest');
 var topTeamerApp = (function () {
-    function topTeamerApp(ionicApp, platform, client, events) {
+    function topTeamerApp(ionicApp, platform, client, events, menuController) {
         var _this = this;
         this.client = client;
-        client.init(ionicApp, platform, events).then(function () {
+        client.init(ionicApp, platform, menuController, events).then(function () {
             _this.initApp();
         });
     }
@@ -228,8 +228,8 @@ var topTeamerApp = (function () {
             moduleId: 'build/app.html',
             providers: [client_1.Client]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Platform !== 'undefined' && ionic_1.Platform) === 'function' && _b) || Object, client_1.Client, (typeof (_c = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _c) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Platform !== 'undefined' && ionic_1.Platform) === 'function' && _b) || Object, client_1.Client, (typeof (_c = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _c) || Object, (typeof (_d = typeof ionic_1.MenuController !== 'undefined' && ionic_1.MenuController) === 'function' && _d) || Object])
     ], topTeamerApp);
     return topTeamerApp;
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
 })();

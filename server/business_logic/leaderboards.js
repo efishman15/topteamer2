@@ -1,13 +1,13 @@
 var path = require("path");
-var exceptions = require(path.resolve(__dirname,"../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname,"../utils/general"));
+var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
+var generalUtils = require(path.resolve(__dirname, "../utils/general"));
 var Leaderboard = require("agoragames-leaderboard");
-var logger = require(path.resolve(__dirname,"../utils/logger"));
+var logger = require(path.resolve(__dirname, "../utils/logger"));
 var async = require("async");
-var sessionUtils = require(path.resolve(__dirname,"./session"));
-var dalLeaderboards = require(path.resolve(__dirname,"../dal/dalLeaderboards"));
-var dalFacebook = require(path.resolve(__dirname,"../dal/dalFacebook"));
-var dalDb = require(path.resolve(__dirname,"../dal/dalDb"));
+var sessionUtils = require(path.resolve(__dirname, "./session"));
+var dalLeaderboards = require(path.resolve(__dirname, "../dal/dalLeaderboards"));
+var dalFacebook = require(path.resolve(__dirname, "../dal/dalFacebook"));
+var dalDb = require(path.resolve(__dirname, "../dal/dalDb"));
 
 //--------------------------------------------------------------------------
 // private functions
@@ -20,24 +20,24 @@ var dalDb = require(path.resolve(__dirname,"../dal/dalDb"));
 //--------------------------------------------------------------------------
 function getLeaders(data, callback) {
 
-    var operations = [
+  var operations = [
 
-        //getSession
-        function (callback) {
-            sessionUtils.getSession(data, callback);
-        },
+    //getSession
+    function (callback) {
+      sessionUtils.getSession(data, callback);
+    },
 
-        dalLeaderboards.getLeaders
-    ];
+    dalLeaderboards.getLeaders
+  ];
 
-    async.waterfall(operations, function (err, data) {
-        if (!err) {
-            callback(null, data);
-        }
-        else {
-            callback(err, data);
-        }
-    });
+  async.waterfall(operations, function (err, data) {
+    if (!err) {
+      callback(null, data);
+    }
+    else {
+      callback(err, data);
+    }
+  });
 }
 
 //--------------------------------------------------------------------------
@@ -47,35 +47,35 @@ function getLeaders(data, callback) {
 //--------------------------------------------------------------------------
 module.exports.getContestLeaders = function (req, res, next) {
 
-    var token = req.headers.authorization;
-    var data = req.body;
-    data.token = token;
+  var token = req.headers.authorization;
+  var data = req.body;
+  data.token = token;
 
-    if (!data.contestId) {
-        exceptions.ServerResponseException(res, "contestId not supplied", null, "warn", 424);
-        return;
-    }
+  if (!data.contestId) {
+    exceptions.ServerResponseException(res, "contestId not supplied", null, "warn", 424);
+    return;
+  }
 
-    if (data.teamId != null && data.teamId !== 0 && data.teamId !== 1) {
-        exceptions.ServerResponseException(res, "invalid teamId supplied", {"teamId": data.teamId}, "warn", 424);
-        return;
-    }
+  if (data.teamId != null && data.teamId !== 0 && data.teamId !== 1) {
+    exceptions.ServerResponseException(res, "invalid teamId supplied", {"teamId": data.teamId}, "warn", 424);
+    return;
+  }
 
-    if (data.teamId === 0 || data.teamId === 1) {
-        data.leaderboard = dalLeaderboards.getTeamLeaderboard(data.contestId, data.teamId);
+  if (data.teamId === 0 || data.teamId === 1) {
+    data.leaderboard = dalLeaderboards.getTeamLeaderboard(data.contestId, data.teamId);
+  }
+  else {
+    data.leaderboard = dalLeaderboards.getContestLeaderboard(data.contestId);
+  }
+
+  getLeaders(data, function (err, data) {
+    if (!err) {
+      res.json(data.clientResponse);
     }
     else {
-        data.leaderboard = dalLeaderboards.getContestLeaderboard(data.contestId);
+      res.send(err.httpStatus, err);
     }
-
-    getLeaders(data, function (err, data) {
-        if (!err) {
-            res.send(200, data.clientResponse);
-        }
-        else {
-            res.send(err.httpStatus, err);
-        }
-    });
+  });
 };
 
 //--------------------------------------------------------------------------
@@ -85,19 +85,19 @@ module.exports.getContestLeaders = function (req, res, next) {
 //--------------------------------------------------------------------------
 module.exports.getWeeklyLeaders = function (req, res, next) {
 
-    var token = req.headers.authorization;
-    var data = {"token": token};
+  var token = req.headers.authorization;
+  var data = {"token": token};
 
-    data.leaderboard = dalLeaderboards.getWeeklyLeaderboard();
+  data.leaderboard = dalLeaderboards.getWeeklyLeaderboard();
 
-    getLeaders(data, function (err, data) {
-        if (!err) {
-            res.send(200, data.clientResponse);
-        }
-        else {
-            res.send(err.httpStatus, err);
-        }
-    });
+  getLeaders(data, function (err, data) {
+    if (!err) {
+      res.json(data.clientResponse);
+    }
+    else {
+      res.send(err.httpStatus, err);
+    }
+  });
 };
 
 //--------------------------------------------------------------------------
@@ -107,80 +107,80 @@ module.exports.getWeeklyLeaders = function (req, res, next) {
 //--------------------------------------------------------------------------
 module.exports.getFriends = function (req, res, next) {
 
-    var token = req.headers.authorization;
-    var data = req.body;
-    data.token = token;
+  var token = req.headers.authorization;
+  var data = req.body;
+  data.token = token;
 
-    var operations = [
+  var operations = [
 
-        //getSession
-        function (callback) {
-            sessionUtils.getSession(data, callback);
-        },
+    //getSession
+    function (callback) {
+      sessionUtils.getSession(data, callback);
+    },
 
-        //If no permission for friends - 2 cases:
-        //1. User "just granted" the permission - give another try to facebook to validate that and retrieve user friends
-        //2. User did not just grant - return with an error message to the client to ask for the permission
-        function (data, callback) {
-            if (data.session.friends.noPermission) {
-                if (!data.friendsPermissionJustGranted) {
-                    callback(new exceptions.ServerMessageException("SERVER_ERROR_MISSING_FRIENDS_PERMISSION"));
-                    return;
-                }
-                else {
-                    //User just granted - try to retrieve user friends again from facebook
-                    data.user = {"thirdParty": {"accessToken": data.session.facebookAccessToken}};
-                    dalFacebook.getUserFriends(data, callback);
-                }
-            }
-            else {
-                callback(null, data);
-            }
-
-        },
-
-        //If no permission and permission was just granted - store the session with the friends just retrived
-        function (data, callback) {
-            if (data.session.friends.noPermission && data.friendsPermissionJustGranted) {
-
-                data.session.friends = data.user.thirdParty.friends;
-
-                //Still no luck - user gave no permission
-                if (data.session.friends.noPermission) {
-                    callback(new exceptions.ServerMessageException("SERVER_ERROR_MISSING_FRIENDS_PERMISSION"));
-                    return;
-                }
-                else {
-                    dalDb.storeSession(data, callback);
-                }
-            }
-            else {
-                callback(null, data);
-            }
-        },
-
-        //If permission was just granted - store it in the user's profile as well
-        function (data, callback) {
-            if (data.friendsPermissionJustGranted) {
-                data.setData = {"friends": data.session.friends};
-                data.closeConnection = true;
-                dalDb.setUser(data, callback);
-            }
-            else {
-                dalDb.closeDb(data);
-                callback(null, data);
-            }
-        },
-
-        dalLeaderboards.getFriends
-    ];
-
-    async.waterfall(operations, function (err, data) {
-        if (!err) {
-            res.send(200, data.clientResponse)
+    //If no permission for friends - 2 cases:
+    //1. User "just granted" the permission - give another try to facebook to validate that and retrieve user friends
+    //2. User did not just grant - return with an error message to the client to ask for the permission
+    function (data, callback) {
+      if (data.session.friends.noPermission) {
+        if (!data.friendsPermissionJustGranted) {
+          callback(new exceptions.ServerMessageException("SERVER_ERROR_MISSING_FRIENDS_PERMISSION"));
+          return;
         }
         else {
-            res.send(err.httpStatus, err);
+          //User just granted - try to retrieve user friends again from facebook
+          data.user = {"thirdParty": {"accessToken": data.session.facebookAccessToken}};
+          dalFacebook.getUserFriends(data, callback);
         }
-    })
+      }
+      else {
+        callback(null, data);
+      }
+
+    },
+
+    //If no permission and permission was just granted - store the session with the friends just retrived
+    function (data, callback) {
+      if (data.session.friends.noPermission && data.friendsPermissionJustGranted) {
+
+        data.session.friends = data.user.thirdParty.friends;
+
+        //Still no luck - user gave no permission
+        if (data.session.friends.noPermission) {
+          callback(new exceptions.ServerMessageException("SERVER_ERROR_MISSING_FRIENDS_PERMISSION"));
+          return;
+        }
+        else {
+          dalDb.storeSession(data, callback);
+        }
+      }
+      else {
+        callback(null, data);
+      }
+    },
+
+    //If permission was just granted - store it in the user's profile as well
+    function (data, callback) {
+      if (data.friendsPermissionJustGranted) {
+        data.setData = {"friends": data.session.friends};
+        data.closeConnection = true;
+        dalDb.setUser(data, callback);
+      }
+      else {
+        dalDb.closeDb(data);
+        callback(null, data);
+      }
+    },
+
+    dalLeaderboards.getFriends
+  ];
+
+  async.waterfall(operations, function (err, data) {
+    if (!err) {
+      res.json(data.clientResponse);
+    }
+    else {
+      res.send(err.httpStatus, err);
+    }
+  })
 };

@@ -1,0 +1,8 @@
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12056,"level":30,"msg":"server up!","time":"2016-01-21T16:50:28.966Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12952,"level":30,"msg":"server up!","time":"2016-01-21T18:30:47.167Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":11488,"level":30,"msg":"server up!","time":"2016-01-21T18:31:28.827Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":11488,"level":50,"count":0,"questionCriteria":{"$and":[{"_id":{"$nin":["55cb3f8648023f0bdc07bf92"]}},{"topicId":{"$in":[5,270]}},{"$or":[{"$and":[{"correctRatio":{"$gte":0.75}},{"correctRatio":{"$lt":0.95}}]}]},{"minAge":{"$lte":21}}]},"dbError":null,"msg":"Error retrieving number of questions from the database","time":"2016-01-21T18:31:45.303Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":11488,"level":50,"count":0,"questionCriteria":{"$and":[{"_id":{"$nin":["55cb3f7548023f0bdc07bdba"]}},{"topicId":{"$in":[5,270]}},{"$or":[{"$and":[{"correctRatio":{"$gte":0.75}},{"correctRatio":{"$lt":0.95}}]}]},{"minAge":{"$lte":21}}]},"dbError":null,"msg":"Error retrieving number of questions from the database","time":"2016-01-21T18:32:04.188Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":14536,"level":30,"msg":"server up!","time":"2016-01-21T18:32:42.393Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10964,"level":30,"msg":"server up!","time":"2016-01-21T18:35:10.147Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":11144,"level":30,"msg":"server up!","time":"2016-01-21T18:45:36.527Z","v":0}

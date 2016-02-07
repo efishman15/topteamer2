@@ -14,14 +14,26 @@ var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var MyContestsPage = (function () {
     function MyContestsPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:contestCreated', function (eventData) {
+            if (_this.client.nav.isActive(MyContestsPage)) {
+                console.log('contest created - refreshing list');
+                _this.contestList.refresh();
+            }
+        });
+        this.client.events.subscribe('topTeamer:contestRemoved', function () {
+            if (_this.client.nav.isActive(MyContestsPage)) {
+                console.log('contest removed - refreshing list');
+                _this.contestList.refresh();
+            }
+        });
     }
     MyContestsPage.prototype.onPageWillEnter = function () {
+        console.log('MyContestsPage:onPageWillEnter');
         if (this.contestList) {
             this.contestList.refresh();
         }
-    };
-    MyContestsPage.prototype.onPageDidEnter = function () {
     };
     MyContestsPage.prototype.ngAfterViewInit = function () {
         this.contestList.refresh();

@@ -151,4 +151,5 @@ dalDb.loadSettings(null, function (err, data) {
 
   logger.console.info(null, 'server up!');
   logger.server.info(null, 'server up!');
+
 })

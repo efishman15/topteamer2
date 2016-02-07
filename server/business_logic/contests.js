@@ -715,7 +715,7 @@ module.exports.removeContest = function (req, res, next) {
 
     async.waterfall(operations, function (err, data) {
         if (!err) {
-            res.json(data.contest)
+            res.json(generalUtils.okResponse);
         }
         else {
             res.send(err.httpStatus, err);

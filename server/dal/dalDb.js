@@ -1030,7 +1030,7 @@ function setContest(data, callback) {
 //
 // data:
 // -----
-// input: DbHelper, session, contest
+// input: DbHelper, session, contestId
 // output: <NA>
 //------------------------------------------------------------------------------------------------
 module.exports.removeContest = removeContest;
@@ -1043,7 +1043,7 @@ function removeContest(data, callback) {
         }
         , {w: 1, single: true},
         function (err, numberOfRemovedDocs) {
-            if (err || numberOfRemovedDocs.ok == 0) {
+            if (err || numberOfRemovedDocs.ok === 0) {
 
                 //Contest does not exist - stop the call chain
                 closeDb(data);

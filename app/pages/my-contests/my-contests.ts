@@ -16,15 +16,27 @@ export class MyContestsPage {
 
   constructor() {
     this.client = Client.getInstance();
+
+    this.client.events.subscribe('topTeamer:contestCreated', (eventData) => {
+      if (this.client.nav.isActive(MyContestsPage)) {
+        console.log('contest created - refreshing list');
+        this.contestList.refresh();
+      }
+    });
+
+    this.client.events.subscribe('topTeamer:contestRemoved', () => {
+      if (this.client.nav.isActive(MyContestsPage)) {
+        console.log('contest removed - refreshing list');
+        this.contestList.refresh();
+      }
+    });
   }
 
   onPageWillEnter() {
+    console.log('MyContestsPage:onPageWillEnter')
     if (this.contestList) {
       this.contestList.refresh();
     }
-  }
-
-  onPageDidEnter() {
   }
 
   ngAfterViewInit() {

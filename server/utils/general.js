@@ -5,6 +5,8 @@ var util = require("util");
 var logger = require(path.resolve(__dirname, "./logger"));
 var async = require("async");
 
+var okResposnse = {'status' : 0};
+
 var settings;
 module.exports.injectSettings = function (dbSettings) {
 
@@ -212,7 +214,7 @@ module.exports.getSettings = function (req, res, next) {
 
   async.waterfall(operations, function (err, data) {
     if (!err) {
-      res.send(200, data.clientResponse);
+      res.json(data.clientResponse);
     }
     else {
       res.send(err.httpStatus, err);
@@ -364,3 +366,10 @@ module.exports.getYearWeek = function () {
   var week = Math.ceil((((d - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
   return "" + thisYear + "" + week;
 };
+
+//-------------------------------------------------------------------------------------------------------
+// returns okResponse sent to the client
+//-------------------------------------------------------------------------------------------------------
+module.exports.okResponse = function() {
+  return okResposnse;
+}

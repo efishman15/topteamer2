@@ -15,6 +15,7 @@ var contest_1 = require('../../pages/contest/contest');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
 var alertService = require('../../providers/alert');
+var shareService = require('../../providers/share');
 var SetContestPage = (function () {
     function SetContestPage(params, formBuilder) {
         var _this = this;
@@ -209,9 +210,9 @@ var SetContestPage = (function () {
     SetContestPage.prototype.removeContest = function () {
         var _this = this;
         alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.contestLocalCopy.name }).then(function () {
-            contestsService.removeContest(_this.contestLocalCopy._id).then(function (data) {
-                _this.client.nav.pop();
-                _this.client.events.publish('topTeamer-contestRemoved', data);
+            contestsService.removeContest(_this.contestLocalCopy._id).then(function () {
+                _this.client.events.publish('topTeamer-contestRemoved');
+                _this.client.nav.popToRoot();
             });
         });
     };
@@ -243,7 +244,6 @@ var SetContestPage = (function () {
             if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {
                 this.contestNameChanged = true;
             }
-            console.log('contest=' + JSON.stringify(this.contestLocalCopy));
             contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then(function (contest) {
                 _this.contestLocalCopy.startDate = new Date(_this.contestLocalCopy.startDate);
                 _this.contestLocalCopy.endDate = new Date(_this.contestLocalCopy.endDate);
@@ -256,17 +256,23 @@ var SetContestPage = (function () {
                 };
                 if (_this.params.data.mode === 'add') {
                     FlurryAgent.logEvent('contest/created', contestParams);
-                    setTimeout(function () {
-                        _this.client.nav.push(contest_1.ContestPage, { 'contest': contest });
-                    }, 1000);
+                    _this.client.events.publish('topTeamer:contestCreated', contest);
+                    var options = { 'animate': false };
+                    _this.client.nav.pop(options).then(function () {
+                        if (!_this.client.user.clientInfo.mobile) {
+                            //For web - no animation - the share screen will be on top with its animation
+                            options = undefined;
+                        }
+                        _this.client.nav.push(contest_1.ContestPage, { 'contest': contest }, options).then(function () {
+                            shareService.share(contest);
+                        });
+                    });
                 }
                 else {
                     FlurryAgent.logEvent('contest/updated', contestParams);
-                    setTimeout(function () {
-                        _this.client.events.publish('topTeamer:contestUpdated', contest);
-                    }, 1000);
+                    _this.client.events.publish('topTeamer:contestUpdated', contest);
+                    _this.client.nav.pop();
                 }
-                _this.client.nav.pop();
             }, function (error) {
                 _this.contestLocalCopy.startDate = new Date(_this.contestLocalCopy.startDate);
                 _this.contestLocalCopy.endDate = new Date(_this.contestLocalCopy.endDate);

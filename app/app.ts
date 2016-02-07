@@ -1,4 +1,4 @@
-import {App, IonicApp, Platform, Config, Events, Modal, Alert, NavController,Menu} from 'ionic/ionic';
+import {App, IonicApp, Platform, Config, Events, Modal, Alert, NavController, MenuController} from 'ionic/ionic';
 import {MainTabsPage} from './pages/main-tabs/main-tabs';
 import {LoginPage} from './pages/login/login';
 import * as facebookService from './providers/facebook';
@@ -16,11 +16,11 @@ class topTeamerApp {
 
   client:Client;
 
-  constructor(ionicApp:IonicApp, platform:Platform, client:Client, events:Events) {
+  constructor(ionicApp:IonicApp, platform:Platform, client:Client, events:Events, menuController: MenuController) {
 
     this.client = client;
 
-    client.init(ionicApp, platform, events).then(() => {
+    client.init(ionicApp, platform, menuController, events).then(() => {
       this.initApp();
     });
 

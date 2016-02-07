@@ -14,10 +14,26 @@ var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var RunningContestsPage = (function () {
     function RunningContestsPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        console.log('RunningContestsPage:constructor');
+        this.client.events.subscribe('topTeamer:contestCreated', function (eventData) {
+            if (_this.client.nav.isActive(RunningContestsPage)) {
+                console.log('contest created - refreshing list');
+                _this.contestList.refresh();
+            }
+        });
+        this.client.events.subscribe('topTeamer:contestRemoved', function () {
+            if (_this.client.nav.isActive(RunningContestsPage)) {
+                console.log('contest removed - refreshing list');
+                _this.contestList.refresh();
+            }
+        });
     }
-    RunningContestsPage.prototype.onPageDidEnter = function () {
-        this.contestList.refresh();
+    RunningContestsPage.prototype.onPageWillEnter = function () {
+        if (this.contestList) {
+            this.contestList.refresh();
+        }
     };
     RunningContestsPage.prototype.onContestSelected = function (data) {
         contestsService.openContest(data.contest._id);

@@ -50,24 +50,35 @@ export class ContestChartComponent {
   }
 
   ngOnInit() {
-    FusionCharts.ready(() => {
-      this.chart = new FusionCharts({
-        type: "column2d",
-        renderAt: this.id + '-container',
-        width: this.width,
-        height: this.height,
-        dataFormat: 'json',
-        dataSource: this.contestChart,
-        events: this.events
+    this.initChart();
+  }
+
+  initChart() {
+    if (!this.chart) {
+      FusionCharts.ready(() => {
+        this.chart = new FusionCharts({
+          type: 'column2d',
+          renderAt: this.id + '-container',
+          width: this.width,
+          height: this.height,
+          dataFormat: 'json',
+          dataSource: this.contestChart,
+          events: this.events
+        });
+
+        this.chart.render();
+
       });
-
-      this.chart.render();
-
-    });
-
+    }
   }
 
   refresh(contestChart: Object) {
-    this.chart.setJSONData(contestChart);
+    if (this.chart) {
+      this.chart.setJSONData(contestChart);
+    }
+    else {
+      this.contestChart = contestChart;
+      this.initChart();
+    }
   }
 }

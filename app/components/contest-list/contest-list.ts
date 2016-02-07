@@ -25,6 +25,11 @@ export class ContestListComponent {
 
   constructor() {
     this.client = Client.getInstance();
+
+    this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
+      console.log('contest updated - refreshing list');
+      this.refresh();
+    });
   }
 
   selectContest(contest:Object) {

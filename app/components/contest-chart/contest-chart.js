@@ -41,22 +41,33 @@ var ContestChartComponent = (function () {
         this.client = client_1.Client.getInstance();
     }
     ContestChartComponent.prototype.ngOnInit = function () {
+        this.initChart();
+    };
+    ContestChartComponent.prototype.initChart = function () {
         var _this = this;
-        FusionCharts.ready(function () {
-            _this.chart = new FusionCharts({
-                type: "column2d",
-                renderAt: _this.id + '-container',
-                width: _this.width,
-                height: _this.height,
-                dataFormat: 'json',
-                dataSource: _this.contestChart,
-                events: _this.events
+        if (!this.chart) {
+            FusionCharts.ready(function () {
+                _this.chart = new FusionCharts({
+                    type: 'column2d',
+                    renderAt: _this.id + '-container',
+                    width: _this.width,
+                    height: _this.height,
+                    dataFormat: 'json',
+                    dataSource: _this.contestChart,
+                    events: _this.events
+                });
+                _this.chart.render();
             });
-            _this.chart.render();
-        });
+        }
     };
     ContestChartComponent.prototype.refresh = function (contestChart) {
-        this.chart.setJSONData(contestChart);
+        if (this.chart) {
+            this.chart.setJSONData(contestChart);
+        }
+        else {
+            this.contestChart = contestChart;
+            this.initChart();
+        }
     };
     __decorate([
         core_1.Input(), 

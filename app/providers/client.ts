@@ -2,7 +2,7 @@ import {Injectable} from 'angular2/core';
 import {Http, Response, Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
-import {IonicApp,Platform, NavController, Menu, Alert, Events} from 'ionic/ionic';
+import {IonicApp,Platform, NavController, Menu, MenuController, Alert, Events} from 'ionic/ionic';
 
 @Injectable()
 export class Client {
@@ -39,12 +39,13 @@ export class Client {
     return Client.instance;
   }
 
-  init(ionicApp:IonicApp, platform:Platform, events: Events) {
+  init(ionicApp:IonicApp, platform:Platform, menuController: MenuController, events: Events) {
 
     return new Promise((resolve, reject) => {
 
       this._ionicApp = ionicApp;
       this._platform = platform;
+      this._menu = menuController.get('left');
       this._events = events;
 
       this.serverGateway.getSettings().then((data) => {
@@ -54,7 +55,6 @@ export class Client {
         this._nav = ionicApp.getComponent('nav');
         this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
 
-        this._menu = ionicApp.getComponent('leftMenu');
         this._menu.side = this.currentLanguage.align;
         this._menu.id = this.currentLanguage.align + "Menu";
 
@@ -212,7 +212,7 @@ export class ServerGateway {
         .map((res:Response) => res.json())
         .subscribe(
           (res:Object) => resolve(res),
-          err => {
+          (err:Object) => {
             if (reject) {
               reject(err);
             }

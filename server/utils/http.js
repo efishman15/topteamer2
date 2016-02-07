@@ -47,7 +47,7 @@ function api(options, method, callback) {
     }
 
     apiRequest(options, function (err, resp, body) {
-        if (err) {
+      if (err) {
             callback(new exceptions.ServerException("Error during request from api", {
                 "options": options,
                 "error": err

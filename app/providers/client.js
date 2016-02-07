@@ -25,18 +25,18 @@ var Client = (function () {
         }
         return Client.instance;
     };
-    Client.prototype.init = function (ionicApp, platform, events) {
+    Client.prototype.init = function (ionicApp, platform, menuController, events) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._ionicApp = ionicApp;
             _this._platform = platform;
+            _this._menu = menuController.get('left');
             _this._events = events;
             _this.serverGateway.getSettings().then(function (data) {
                 var dir = document.createAttribute("dir");
                 dir.value = _this.currentLanguage.direction;
                 _this._nav = ionicApp.getComponent('nav');
                 _this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
-                _this._menu = ionicApp.getComponent('leftMenu');
                 _this._menu.side = _this.currentLanguage.align;
                 _this._menu.id = _this.currentLanguage.align + "Menu";
                 var canvas = document.createElement("canvas");

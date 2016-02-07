@@ -26,12 +26,13 @@ var ContestPage = (function () {
         this.lastQuizResults = null;
         this.animateLastResults = false;
         this.client = client_1.Client.getInstance();
-        if (params.data.contestChart) {
-            this.contestChart = params.data.contestChart;
+        this.params = params;
+        if (this.params.data.contestChart) {
+            this.contestChart = this.params.data.contestChart;
         }
         else {
             //Just created this contest - no chart
-            this.refreshContest(params.data.contest);
+            this.contestChart = contestsService.prepareContestChart(this.params.data.contest, 'starts');
         }
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (last quiz results)

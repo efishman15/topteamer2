@@ -1,8 +1,8 @@
 var path = require("path");
 var async = require("async");
-var dalDb = require(path.resolve(__dirname,"../dal/dalDb"));
-var exceptions = require(path.resolve(__dirname,"../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname,"../utils/general"));
+var dalDb = require(path.resolve(__dirname, "../dal/dalDb"));
+var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
+var generalUtils = require(path.resolve(__dirname, "../utils/general"));
 
 //----------------------------------------------------
 // private functions
@@ -12,28 +12,28 @@ var generalUtils = require(path.resolve(__dirname,"../utils/general"));
 // adjustMobileClosestCost
 //----------------------------------------------------
 function adjustMobileClosestCost(session, feature) {
-    for (var i = 0; i < session.thirdParty.paymentMobilePricepoints.pricepoints.length; i++) {
+  for (var i = 0; i < session.thirdParty.paymentMobilePricepoints.pricepoints.length; i++) {
 
-        //Out default cost is in USD
-        //Find closest price (from top) - or stop at the last pricepoint
-        if (i === session.thirdParty.paymentMobilePricepoints.pricepoints.length - 1 ||
-            session.thirdParty.paymentMobilePricepoints.pricepoints[i].payer_amount >= feature.purchaseData.cost * session.thirdParty.currency.usd_exchange_inverse) {
+    //Out default cost is in USD
+    //Find closest price (from top) - or stop at the last pricepoint
+    if (i === session.thirdParty.paymentMobilePricepoints.pricepoints.length - 1 ||
+      session.thirdParty.paymentMobilePricepoints.pricepoints[i].payer_amount >= feature.purchaseData.cost * session.thirdParty.currency.usd_exchange_inverse) {
 
-            feature.purchaseData.cost = session.thirdParty.paymentMobilePricepoints.pricepoints[i].payer_amount;
-            feature.purchaseData.currency = session.thirdParty.paymentMobilePricepoints.user_currency;
+      feature.purchaseData.cost = session.thirdParty.paymentMobilePricepoints.pricepoints[i].payer_amount;
+      feature.purchaseData.currency = session.thirdParty.paymentMobilePricepoints.user_currency;
 
-            feature.purchaseData.mobilePricepointId = session.thirdParty.paymentMobilePricepoints.pricepoints[i].pricepoint_id;
+      feature.purchaseData.mobilePricepointId = session.thirdParty.paymentMobilePricepoints.pricepoints[i].pricepoint_id;
 
-            var currencySymbol = generalUtils.settings.server.payments.currencies[feature.purchaseData.currency];
-            if (!currencySymbol) {
-                currencySymbol = feature.purchaseData.currency;
-            }
-            feature.purchaseData.currencySymbol = currencySymbol;
+      var currencySymbol = generalUtils.settings.server.payments.currencies[feature.purchaseData.currency];
+      if (!currencySymbol) {
+        currencySymbol = feature.purchaseData.currency;
+      }
+      feature.purchaseData.currencySymbol = currencySymbol;
 
-            feature.purchaseData.formattedCost = currencySymbol + feature.purchaseData.cost;
-            break;
-        }
+      feature.purchaseData.formattedCost = currencySymbol + feature.purchaseData.cost;
+      break;
     }
+  }
 }
 
 //----------------------------------------------------
@@ -47,25 +47,25 @@ function adjustMobileClosestCost(session, feature) {
 //----------------------------------------------------
 module.exports.getSession = function (data, callback) {
 
-    var operations = [
+  var operations = [
 
-        //Connect to the database (so connection will stay open until we decide to close it)
-        dalDb.connect,
+    //Connect to the database (so connection will stay open until we decide to close it)
+    dalDb.connect,
 
-        function (connectData, callback) {
-            data.DbHelper = connectData.DbHelper;
-            dalDb.retrieveSession(data, callback);
-        }
-    ];
+    function (connectData, callback) {
+      data.DbHelper = connectData.DbHelper;
+      dalDb.retrieveSession(data, callback);
+    }
+  ];
 
-    async.waterfall(operations, function (err, data) {
-        if (!err) {
-            callback(null, data);
-        }
-        else {
-            callback(err);
-        }
-    });
+  async.waterfall(operations, function (err, data) {
+    if (!err) {
+      callback(null, data);
+    }
+    else {
+      callback(err);
+    }
+  });
 };
 
 //----------------------------------------------------
@@ -79,25 +79,25 @@ module.exports.getSession = function (data, callback) {
 //----------------------------------------------------
 module.exports.getAdminSession = function (data, callback) {
 
-    var operations = [
+  var operations = [
 
-        //Connect to the database (so connection will stay open until we decide to close it)
-        dalDb.connect,
+    //Connect to the database (so connection will stay open until we decide to close it)
+    dalDb.connect,
 
-        function (connectData, callback) {
-            data.DbHelper = connectData.DbHelper;
-            dalDb.retrieveAdminSession(data, callback);
-        }
-    ];
+    function (connectData, callback) {
+      data.DbHelper = connectData.DbHelper;
+      dalDb.retrieveAdminSession(data, callback);
+    }
+  ];
 
-    async.waterfall(operations, function (err, data) {
-        if (!err) {
-            callback(null, data);
-        }
-        else {
-            callback(err);
-        }
-    });
+  async.waterfall(operations, function (err, data) {
+    if (!err) {
+      callback(null, data);
+    }
+    else {
+      callback(err);
+    }
+  });
 };
 
 
@@ -108,43 +108,43 @@ module.exports.getAdminSession = function (data, callback) {
 //----------------------------------------------------
 module.exports.saveSettings = function (req, res, next) {
 
-    var data = req.body;
-    var token = req.headers.authorization;
+  var data = req.body;
+  var token = req.headers.authorization;
 
-    var operations = [
+  var operations = [
 
-        //Connect to the database
-        dalDb.connect,
+    //Connect to the database
+    dalDb.connect,
 
-        //Retrieve the session
-        function (connectData, callback) {
-            data.DbHelper = connectData.DbHelper;
-            data.token = token;
-            dalDb.retrieveSession(data, callback);
-        },
+    //Retrieve the session
+    function (connectData, callback) {
+      data.DbHelper = connectData.DbHelper;
+      data.token = token;
+      dalDb.retrieveSession(data, callback);
+    },
 
-        //Store the session back
-        function (data, callback) {
-            data.session.settings = data.settings;
-            dalDb.storeSession(data, callback);
-        },
+    //Store the session back
+    function (data, callback) {
+      data.session.settings = data.settings;
+      dalDb.storeSession(data, callback);
+    },
 
-        //Save the settings to the user object
-        function (data, callback) {
-            data.setData = {"settings": data.session.settings};
-            data.closeConnection = true;
-            dalDb.setUser(data, callback);
-        }
-    ];
+    //Save the settings to the user object
+    function (data, callback) {
+      data.setData = {"settings": data.session.settings};
+      data.closeConnection = true;
+      dalDb.setUser(data, callback);
+    }
+  ];
 
-    async.waterfall(operations, function (err) {
-        if (!err) {
-            res.send(200, "OK");
-        }
-        else {
-            res.send(err.httpStatus, err);
-        }
-    });
+  async.waterfall(operations, function (err) {
+    if (!err) {
+      res.json(generalUtils.okResponse);
+    }
+    else {
+      res.send(err.httpStatus, err);
+    }
+  });
 };
 
 //----------------------------------------------------
@@ -152,42 +152,42 @@ module.exports.saveSettings = function (req, res, next) {
 //----------------------------------------------------
 module.exports.toggleSound = function (req, res, next) {
 
-    var token = req.headers.authorization;
+  var token = req.headers.authorization;
 
-    var operations = [
+  var operations = [
 
-        //Connect to the database
-        dalDb.connect,
+    //Connect to the database
+    dalDb.connect,
 
-        //Retrieve the session
-        function (data, callback) {
-            data.token = token;
-            dalDb.retrieveSession(data, callback);
-        },
+    //Retrieve the session
+    function (data, callback) {
+      data.token = token;
+      dalDb.retrieveSession(data, callback);
+    },
 
-        //Store the session back
-        function (data, callback) {
-            data.session.settings.sound = !data.session.settings.sound
-            dalDb.storeSession(data, callback);
-        },
+    //Store the session back
+    function (data, callback) {
+      data.session.settings.sound = !data.session.settings.sound
+      dalDb.storeSession(data, callback);
+    },
 
-        //Save the settings to the user object
-        function (data, callback) {
-            data.setData = {"settings.sound": data.session.settings.sound};
-            data.closeConnection = true;
-            dalDb.setUser(data, callback);
-        }
+    //Save the settings to the user object
+    function (data, callback) {
+      data.setData = {"settings.sound": data.session.settings.sound};
+      data.closeConnection = true;
+      dalDb.setUser(data, callback);
+    }
 
-    ];
+  ];
 
-    async.waterfall(operations, function (err) {
-        if (!err) {
-            res.send(200, "OK");
-        }
-        else {
-            res.send(err.httpStatus, err);
-        }
-    });
+  async.waterfall(operations, function (err) {
+    if (!err) {
+      res.json(generalUtils.okResponse);
+    }
+    else {
+      res.send(err.httpStatus, err);
+    }
+  });
 };
 
 //----------------------------------------------------
@@ -197,44 +197,44 @@ module.exports.toggleSound = function (req, res, next) {
 //----------------------------------------------------
 module.exports.setGcmRegistration = function (req, res, next) {
 
-    var data = req.body;
+  var data = req.body;
 
-    if (!data.registrationId) {
-        exceptions.ServerResponseException(res, "registrationId not supplied", null, "warn", 424);
-        return;
+  if (!data.registrationId) {
+    exceptions.ServerResponseException(res, "registrationId not supplied", null, "warn", 424);
+    return;
+  }
+
+  var token = req.headers.authorization;
+
+
+  var operations = [
+
+    //Connect to the database
+    dalDb.connect,
+
+    //Retrieve the session
+    function (connectData, callback) {
+      data.DbHelper = connectData.DbHelper;
+      data.token = token;
+      dalDb.retrieveSession(data, callback);
+    },
+
+    //Save the settings to the user object
+    function (data, callback) {
+      data.setData = {"gcmRegistrationId": data.registrationId};
+      data.closeConnection = true;
+      dalDb.setUser(data, callback);
     }
+  ];
 
-    var token = req.headers.authorization;
-
-
-    var operations = [
-
-        //Connect to the database
-        dalDb.connect,
-
-        //Retrieve the session
-        function (connectData, callback) {
-            data.DbHelper = connectData.DbHelper;
-            data.token = token;
-            dalDb.retrieveSession(data, callback);
-        },
-
-        //Save the settings to the user object
-        function (data, callback) {
-            data.setData = {"gcmRegistrationId": data.registrationId};
-            data.closeConnection = true;
-            dalDb.setUser(data, callback);
-        }
-    ];
-
-    async.waterfall(operations, function (err) {
-        if (!err) {
-            res.send(200, "OK");
-        }
-        else {
-            res.send(err.httpStatus, err);
-        }
-    });
+  async.waterfall(operations, function (err) {
+    if (!err) {
+      res.json(generalUtils.okResponse);
+    }
+    else {
+      res.send(err.httpStatus, err);
+    }
+  });
 };
 
 
@@ -250,39 +250,39 @@ module.exports.setGcmRegistration = function (req, res, next) {
 //---------------------------------------------------------------------------------
 module.exports.computeFeatures = function (userOrSession) {
 
-    var features = {};
-    for (var property in generalUtils.settings.server.features) {
-        if (generalUtils.settings.server.features.hasOwnProperty(property)) {
-            features[property] = {};
-            var serverFeature = generalUtils.settings.server.features[property];
-            features[property].name = serverFeature.name;
-            features[property].lockText = serverFeature.lockText;
-            features[property].unlockText = serverFeature.unlockText;
-            features[property].unlockRank = serverFeature.unlockRank;
-            features[property].purchaseData = JSON.parse(JSON.stringify(generalUtils.settings.server.payments.purchaseProducts[serverFeature.purchaseProductId]));
+  var features = {};
+  for (var property in generalUtils.settings.server.features) {
+    if (generalUtils.settings.server.features.hasOwnProperty(property)) {
+      features[property] = {};
+      var serverFeature = generalUtils.settings.server.features[property];
+      features[property].name = serverFeature.name;
+      features[property].lockText = serverFeature.lockText;
+      features[property].unlockText = serverFeature.unlockText;
+      features[property].unlockRank = serverFeature.unlockRank;
+      features[property].purchaseData = JSON.parse(JSON.stringify(generalUtils.settings.server.payments.purchaseProducts[serverFeature.purchaseProductId]));
 
-            var currencySymbol = generalUtils.settings.server.payments.currencies[features[property].purchaseData.currency];
-            if (!currencySymbol) {
-                currencySymbol = features[property].purchaseData.currency;
-            }
+      var currencySymbol = generalUtils.settings.server.payments.currencies[features[property].purchaseData.currency];
+      if (!currencySymbol) {
+        currencySymbol = features[property].purchaseData.currency;
+      }
 
-            features[property].purchaseData.formattedCost = currencySymbol + features[property].purchaseData.cost;
+      features[property].purchaseData.formattedCost = currencySymbol + features[property].purchaseData.cost;
 
-            if (!features[property].purchaseData.mobilePricepointId && userOrSession.thirdParty && userOrSession.thirdParty.paymentMobilePricepoints && !features[property].mobilePricepointId) {
-                adjustMobileClosestCost(userOrSession,features[property]);
-            }
+      if (!features[property].purchaseData.mobilePricepointId && userOrSession.thirdParty && userOrSession.thirdParty.paymentMobilePricepoints && !features[property].mobilePricepointId) {
+        adjustMobileClosestCost(userOrSession, features[property]);
+      }
 
-            switch (property) {
-                case "newContest":
-                    features[property].locked = !(userOrSession.isAdmin) &&
-                        userOrSession.rank < serverFeature.unlockRank &&
-                        (!userOrSession.assets || !userOrSession.assets[property])
-                    break;
-                case "challengeFriendContest":
-                    features[property].locked = true;
-            }
-        }
+      switch (property) {
+        case "newContest":
+          features[property].locked = !(userOrSession.isAdmin) &&
+            userOrSession.rank < serverFeature.unlockRank &&
+            (!userOrSession.assets || !userOrSession.assets[property])
+          break;
+        case "challengeFriendContest":
+          features[property].locked = true;
+      }
     }
+  }
 
-    return features;
+  return features;
 }

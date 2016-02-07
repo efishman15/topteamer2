@@ -19,6 +19,7 @@ import * as soundService from '../../providers/sound';
 export class ContestPage {
 
   client:Client;
+  params:NavParams;
   contestChart:Object = {};
   lastQuizResults:Object = null;
   animateLastResults:Boolean = false;
@@ -28,13 +29,14 @@ export class ContestPage {
   constructor(params:NavParams) {
 
     this.client = Client.getInstance();
+    this.params = params;
 
-    if (params.data.contestChart) {
-      this.contestChart = params.data.contestChart;
+    if (this.params.data.contestChart) {
+      this.contestChart = this.params.data.contestChart;
     }
     else {
       //Just created this contest - no chart
-      this.refreshContest(params.data.contest);
+      this.contestChart = contestsService.prepareContestChart(this.params.data.contest, 'starts');
     }
 
     this.client.events.subscribe('topTeamer:quizFinished', (eventData) => {
@@ -118,7 +120,6 @@ export class ContestPage {
   }
 
   share(source) {
-
     shareService.share(this.contestChart.contest);
   }
 

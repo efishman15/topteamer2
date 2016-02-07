@@ -38,32 +38,30 @@ export let alert = (error) => {
 //------------------------------------------------------
 //-- confirm
 //------------------------------------------------------
-export let confirm = (title, message, params) => {
+export let confirm = (title, message, params) => new Promise((resolve, reject) => {
 
-  return new Promise((resolve, reject) => {
+  var client = Client.getInstance();
 
-    var client = Client.getInstance();
-
-    var alert = Alert.create({
-      title: client.translate(title, params),
-      message: client.translate(message, params),
-      cssClass: client.currentLanguage.direction,
-      buttons: [
-        {
-          text: client.translage('OK'),
-          handler: resolve
-        },
-        {
-          text: client.translage('CANCEL'),
-          handler: reject
-        }
-      ]
-    });
-
-    client.nav.present(alert);
-
+  var alert = Alert.create({
+    title: client.translate(title, params),
+    message: client.translate(message, params),
+    cssClass: client.currentLanguage.direction,
+    buttons: [
+      {
+        text: client.translate('OK'),
+        handler: resolve
+      },
+      {
+        text: client.translate('CANCEL'),
+        handler: reject
+      }
+    ]
   });
-}
+
+  client.nav.present(alert);
+
+});
+
 
 //------------------------------------------------------
 //-- confirmExitApp
