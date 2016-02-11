@@ -62,7 +62,7 @@ export class SetContestPage {
       this.contestLocalCopy = JSON.parse(JSON.stringify(this.params.data.contest));
       //Server stores in epoch - client uses real DATE objects
       this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
-      this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.startDate);
+      this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.endDate);
 
       if (this.contestLocalCopy.participants > 0) {
         this.showStartDate = false;
@@ -160,7 +160,7 @@ export class SetContestPage {
         return this.client.translate('EDIT_CONTEST');
 
       default:
-        return this.client.translate('WHO_IS_SMARTER');
+        return this.client.translate('GAME_NAME');
     }
   }
 
@@ -253,14 +253,14 @@ export class SetContestPage {
   getArrowDirection(stateClosed) {
     if (stateClosed) {
       if (this.client.currentLanguage.direction === 'ltr') {
-        return "►";
+        return '►';
       }
       else {
-        return "◄";
+        return '◄';
       }
     }
     else {
-      return "▼";
+      return '▼';
     }
   }
 
@@ -268,8 +268,8 @@ export class SetContestPage {
 
     alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.contestLocalCopy.name}).then(() => {
       contestsService.removeContest(this.contestLocalCopy._id).then(() => {
-        this.client.events.publish('topTeamer-contestRemoved');
-        this.client.nav.popToRoot();
+        this.client.events.publish('topTeamer:contestRemoved');
+        this.client.nav.popToRoot({animate: false});
       });
     });
   }
@@ -301,9 +301,10 @@ export class SetContestPage {
 
     if (this.params.data.mode === 'add' || (this.params.data.mode === 'edit' && JSON.stringify(this.params.data.contest) != JSON.stringify(this.contestLocalCopy))) {
 
-      this.contestLocalCopy.name = this.client.translate('FULL_CONTEST_NAME', {
+      this.contestLocalCopy.name = this.client.translate('CONTEST_NAME', {
         'team0': this.contestLocalCopy.teams[0].name,
-        'team1': this.contestLocalCopy.teams[1].name
+        'team1': this.contestLocalCopy.teams[1].name,
+        'category': this.client.translate(this.contestLocalCopy.content.category.name)
       });
 
       if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {
@@ -326,7 +327,7 @@ export class SetContestPage {
         if (this.params.data.mode === 'add') {
           FlurryAgent.logEvent('contest/created', contestParams);
           this.client.events.publish('topTeamer:contestCreated', contest);
-          var options = {'animate': false};
+          var options = {animate: false};
           this.client.nav.pop(options).then(() => {
             if (!this.client.user.clientInfo.mobile) {
               //For web - no animation - the share screen will be on top with its animation

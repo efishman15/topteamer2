@@ -34,9 +34,9 @@ var topTeamerApp = (function () {
         //TODO: Hardware back button
         var _this = this;
         this.client.platform.ready().then(function () {
-            _this.declareStringFormat();
+            _this.expandStringPrototype();
             _this.declareRequestAnimationFrame();
-            _this.declareClearTime();
+            _this.expandDatePrototype();
             _this.initFlurry();
             if (!window.cordova) {
                 _this.initWeb();
@@ -165,7 +165,7 @@ var topTeamerApp = (function () {
                 };
         })();
     };
-    topTeamerApp.prototype.declareStringFormat = function () {
+    topTeamerApp.prototype.expandStringPrototype = function () {
         if (!String.prototype.format) {
             String.prototype.format = function () {
                 var args = arguments;
@@ -194,8 +194,14 @@ var topTeamerApp = (function () {
                 return str;
             };
         }
+        if (!String.prototype.replaceAll) {
+            String.prototype.replaceAll = function (search, replacement) {
+                var target = this;
+                return target.replace(new RegExp(search, 'g'), replacement);
+            };
+        }
     };
-    topTeamerApp.prototype.declareClearTime = function () {
+    topTeamerApp.prototype.expandDatePrototype = function () {
         if (!Date.prototype.clearTime) {
             Date.prototype.clearTime = function () {
                 this.setHours(0);
@@ -207,7 +213,6 @@ var topTeamerApp = (function () {
     };
     topTeamerApp.prototype.newContest = function () {
         var _this = this;
-        this.client.menu.close();
         var modal = ionic_1.Modal.create(contest_type_1.ContestTypePage);
         modal.onDismiss(function (content) {
             if (content) {
@@ -219,7 +224,6 @@ var topTeamerApp = (function () {
         this.client.nav.present(modal);
     };
     topTeamerApp.prototype.share = function () {
-        this.client.menu.close();
         shareService.share();
     };
     topTeamerApp = __decorate([

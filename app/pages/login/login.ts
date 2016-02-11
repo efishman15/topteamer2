@@ -15,7 +15,7 @@ export class LoginPage {
   }
 
   onPageLoaded() {
-    this.client.setPageTitle('WHO_IS_SMARTER_QUESTION');
+    this.client.setPageTitle('GAME_NAME');
   }
 
   login() {

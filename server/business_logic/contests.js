@@ -1,12 +1,12 @@
-var path = require("path");
-var async = require("async");
-var dalDb = require(path.resolve(__dirname, "../dal/dalDb"));
-var dalBranchIo = require(path.resolve(__dirname, "../dal/dalBranchIo"));
-var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
-var mathjs = require("mathjs");
-var commonBusinessLogic = require(path.resolve(__dirname, "./common"));
-var generalUtils = require(path.resolve(__dirname, "../utils/general"));
-var ObjectId = require("mongodb").ObjectID;
+var path = require('path');
+var async = require('async');
+var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
+var dalBranchIo = require(path.resolve(__dirname, '../dal/dalBranchIo'));
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var mathjs = require('mathjs');
+var commonBusinessLogic = require(path.resolve(__dirname, './common'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var ObjectId = require('mongodb').ObjectID;
 
 //---------------------------------------------------------------------
 // private functions
@@ -20,8 +20,8 @@ function setUserQuestions(questionIndex, data, callback) {
         return;
     }
 
-    if (data.mode === "add" &&
-        data.contest.questions.list[questionIndex]._id !== "new" &&
+    if (data.mode === 'add' &&
+        data.contest.questions.list[questionIndex]._id !== 'new' &&
         data.contest.questions.list[questionIndex].deleted
     ) {
         //Proceed to next question - when adding a new contest, and a physical question
@@ -31,7 +31,7 @@ function setUserQuestions(questionIndex, data, callback) {
         return;
     }
 
-    if (data.contest.questions.list[questionIndex]._id === "new") {
+    if (data.contest.questions.list[questionIndex]._id === 'new') {
 
         //Add question text
         data.newQuestion = {};
@@ -40,7 +40,7 @@ function setUserQuestions(questionIndex, data, callback) {
         //Add Answers
         data.newQuestion.answers = [];
         for (var j = 0; j < data.contest.questions.list[questionIndex].answers.length; j++) {
-            var answer = {"text": data.contest.questions.list[questionIndex].answers[j]};
+            var answer = {'text': data.contest.questions.list[questionIndex].answers[j]};
             if (j === 0) {
                 answer.correct = true;
             }
@@ -50,7 +50,7 @@ function setUserQuestions(questionIndex, data, callback) {
         dalDb.insertQuestion(data, function (err, result) {
 
             if (err) {
-                callback(new exceptions.ServerException("Error adding a new user question", data));
+                callback(new exceptions.ServerException('Error adding a new user question', data));
                 return;
             }
 
@@ -71,12 +71,12 @@ function setUserQuestions(questionIndex, data, callback) {
             //Question text or answers text has been modified
             data.setData.text = data.contest.questions.list[questionIndex].text;
             for (j = 0; j < data.contest.questions.list[questionIndex].answers.length; j++) {
-                data.setData["answers." + j + ".text"] = data.contest.questions.list[questionIndex].answers[j];
+                data.setData['answers.' + j + '.text'] = data.contest.questions.list[questionIndex].answers[j];
             }
 
             dalDb.setQuestion(data, function(err, result) {
                 if (err) {
-                    callback(new exceptions.ServerException("Error updating question", data));
+                    callback(new exceptions.ServerException('Error updating question', data));
                     return;
                 }
                 setUserQuestions(questionIndex + 1, data, callback);
@@ -119,28 +119,28 @@ function validateContestData(data, callback) {
 
     //Empty contest
     if (!data.contest) {
-        callback(new exceptions.ServerException("Contest not supplied"));
+        callback(new exceptions.ServerException('Contest not supplied'));
         return;
     }
 
     //Adding new contest is locked
-    if (data.mode === "add" && data.session.features.newContest.locked) {
-        callback(new exceptions.ServerException("Attempt to create a new contest without having an eligible rank or feature asset", {
-            "session": data.session,
-            "contest": data.contest
+    if (data.mode === 'add' && data.session.features.newContest.locked) {
+        callback(new exceptions.ServerException('Attempt to create a new contest without having an eligible rank or feature asset', {
+            'session': data.session,
+            'contest': data.contest
         }));
         return;
     }
 
     //Required fields
     if (!data.contest.startDate || !data.contest.endDate || !data.contest.teams || !data.contest.content) {
-        callback(new exceptions.ServerException("One of the required fields not supplied: startDate, endDate, teams, content"));
+        callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, content'));
         return;
     }
 
     //End date must be AFTER start date
     if (data.contest.startDate > data.contest.endDate) {
-        callback(new exceptions.ServerException("Contest end date must be later than contest start date"));
+        callback(new exceptions.ServerException('Contest end date must be later than contest start date'));
         return;
     }
 
@@ -149,77 +149,77 @@ function validateContestData(data, callback) {
 
     //Cannot edit an ended contest
     if (data.contest.endDate < now && !data.session.isAdmin) {
-        callback(new exceptions.ServerException("You cannot edit a contest that has already been finished", data));
+        callback(new exceptions.ServerException('You cannot edit a contest that has already been finished', data));
     }
 
     //Only 2 teams are allowed
     if (data.contest.teams.length !== 2) {
-        callback(new exceptions.ServerException("Number of teams must be 2"));
+        callback(new exceptions.ServerException('Number of teams must be 2'));
         return;
     }
 
     //One or more of the team names is missing
     if (!data.contest.teams[0].name || !data.contest.teams[1].name) {
-        callback(new exceptions.ServerException("One or more of the team names are missing"));
+        callback(new exceptions.ServerException('One or more of the team names are missing'));
         return;
     }
 
     //Teams must have different names
     if (data.contest.teams[0].name.trim() === data.contest.teams[1].name.trim()) {
-        callback(new exceptions.ServerMessageException("SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES"));
+        callback(new exceptions.ServerMessageException('SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES'));
         return;
     }
 
     //Only admins can set team scores
     if ((data.contest.teams[0].score || data.contest.teams[1].score) && (!data.session.isAdmin)) {
-        callback(new exceptions.ServerException("Only admins are allowed to set team scores"));
+        callback(new exceptions.ServerException('Only admins are allowed to set team scores'));
         return;
     }
 
     //Contest _id must be supplied in edit mode
-    if (data.mode === "edit" && !data.contest._id) {
-        callback(new exceptions.ServerException("Contest _id not supplied in edit mode"));
+    if (data.mode === 'edit' && !data.contest._id) {
+        callback(new exceptions.ServerException('Contest _id not supplied in edit mode'));
         return;
     }
 
     //Illegal content source
-    if (!data.contest.content.source || (data.contest.content.source !== "trivia" && data.contest.content.source !== "hostedGame")) {
-        callback(new exceptions.ServerException("content source must be 'trivia' or 'hostedGame'", {"content": data.contest.content}));
+    if (!data.contest.content.source || (data.contest.content.source !== 'trivia' && data.contest.content.source !== 'hosted')) {
+        callback(new exceptions.ServerException('content source must be "trivia" or "hosted"', {'content': data.contest.content}));
         return;
     }
 
-    //Illegal content category id for trivia
-    if (data.contest.content.source === "trivia" &&
+    //Illegal content category id for TRIVIA
+    if (data.contest.content.source === 'trivia' &&
         (!data.contest.content.category ||
         !data.contest.content.category.id ||
         (data.contest.content.category.id !== 'system' && data.contest.content.category.id !== 'user'))) {
-        callback(new exceptions.ServerException("contest.content.category.id must be 'system' or 'user'", {"content": data.contest.content}));
+        callback(new exceptions.ServerException('contest.content.category.id must be "system" or "user"', {'content': data.contest.content}));
         return;
     }
 
     //User questions validations
-    if (data.contest.content.source === "trivia" && data.contest.content.category.id === "user") {
+    if (data.contest.content.source === 'trivia' && data.contest.content.category.id === 'user') {
 
         //Minimum check
         if (!data.contest.questions || data.contest.questions.visibleCount < generalUtils.settings.client.newContest.privateQuestions.min) {
             if (generalUtils.settings.client.newContest.privateQuestions.min === 1) {
-                callback(new exceptions.ServerMessageException("SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE", {"minimum": generalUtils.settings.client.newContest.privateQuestions.min}));
+                callback(new exceptions.ServerMessageException('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE', {'minimum': generalUtils.settings.client.newContest.privateQuestions.min}));
             }
             else {
-                callback(new exceptions.ServerMessageException("SERVER_ERROR_MINIMUM_USER_QUESTIONS_PLURAL", {"minimum": generalUtils.settings.client.newContest.privateQuestions.min}));
+                callback(new exceptions.ServerMessageException('SERVER_ERROR_MINIMUM_USER_QUESTIONS_PLURAL', {'minimum': generalUtils.settings.client.newContest.privateQuestions.min}));
             }
             return;
         }
 
         //Maximum check
         if (data.contest.questions && data.contest.questions.visibleCount > generalUtils.settings.client.newContest.privateQuestions.max) {
-            callback(new exceptions.ServerMessageException("SERVER_ERROR_MAXIMUM_USER_QUESTIONS", {"maximum": generalUtils.settings.client.newContest.privateQuestions.max}));
+            callback(new exceptions.ServerMessageException('SERVER_ERROR_MAXIMUM_USER_QUESTIONS', {'maximum': generalUtils.settings.client.newContest.privateQuestions.max}));
             return;
         }
 
         //Question list not supplied
         if (!data.contest.questions.list || !data.contest.questions.list.length) {
-            callback(new exceptions.ServerException("questions.list must contain the array of questions"));
+            callback(new exceptions.ServerException('questions.list must contain the array of questions'));
             return;
         }
 
@@ -228,20 +228,20 @@ function validateContestData(data, callback) {
 
             //Question must contain text
             if (!data.contest.questions.list[i].text) {
-                callback(new exceptions.ServerException("Question must contain text"));
+                callback(new exceptions.ServerException('Question must contain text'));
                 return;
             }
 
             //Question must contain answers
             if (!data.contest.questions.list[i].answers || !data.contest.questions.list[i].answers.length || data.contest.questions.list[i].answers.length !== 4) {
-                callback(new exceptions.ServerException("Question must contain 4 answers"));
+                callback(new exceptions.ServerException('Question must contain 4 answers'));
                 return;
             }
 
             //Count duplicate questions
             if (!data.contest.questions.list[i].deleted) {
                 if (questionHash[data.contest.questions.list[i].text.trim()]) {
-                    callback(new exceptions.ServerMessageException("SERVER_ERROR_QUESTION_ALREADY_EXISTS", {"question": data.contest.questions.list[i]}));
+                    callback(new exceptions.ServerMessageException('SERVER_ERROR_QUESTION_ALREADY_EXISTS', {'question': data.contest.questions.list[i]}));
                 }
                 questionHash[data.contest.questions.list[i].text.trim()] = true;
             }
@@ -250,7 +250,7 @@ function validateContestData(data, callback) {
             var answersHash = {};
             for (var j = 0; j < data.contest.questions.list[i].answers[j]; j++) {
                 if (answersHash[data.contest.questions.list[i].answers[j].trim()]) {
-                    callback(new exceptions.ServerMessageException("SERVER_ERROR_ENTER_DIFFERENT_ANSWERS", {"question": data.contest.questions.list[i]}));
+                    callback(new exceptions.ServerMessageException('SERVER_ERROR_ENTER_DIFFERENT_ANSWERS', {'question': data.contest.questions.list[i]}));
                     return;
                 }
                 answersHash[data.contest.questions.list[i].answers[j].trim()] = true;
@@ -258,7 +258,7 @@ function validateContestData(data, callback) {
         }
     }
 
-    if (data.mode == "add") {
+    if (data.mode == 'add') {
 
         var cleanContest = {};
         cleanContest.startDate = data.contest.startDate;
@@ -272,10 +272,10 @@ function validateContestData(data, callback) {
         cleanContest.language = data.session.settings.language;
         cleanContest.score = 0; //The total score gained for this contest
 
-        cleanContest.creator = {"id" : data.session.userId, "avatar" : data.session.avatar, "name" : data.session.name, "date" : now};
+        cleanContest.creator = {'id' : data.session.userId, 'avatar' : data.session.avatar, 'name' : data.session.name, 'date' : now};
 
         cleanContest.content = data.contest.content;
-        if (cleanContest.content.source === "trivia" && cleanContest.content.category.id === "user") {
+        if (cleanContest.content.source === 'trivia' && cleanContest.content.category.id === 'user') {
             cleanContest.questions = data.contest.questions;
         }
 
@@ -286,7 +286,7 @@ function validateContestData(data, callback) {
             cleanContest.teams[1].score = 0;
         }
 
-        //Now the data.contest object is "clean" and contains only fields that passed validation
+        //Now the data.contest object is 'clean' and contains only fields that passed validation
         data.contest = cleanContest;
     }
 
@@ -302,7 +302,7 @@ function validateContestData(data, callback) {
         }
     }
     else {
-        if (data.mode == "add") {
+        if (data.mode == 'add') {
             data.contest.manualParticipants = 0;
         }
     }
@@ -314,7 +314,7 @@ function validateContestData(data, callback) {
         }
     }
     else {
-        if (data.mode == "add") {
+        if (data.mode == 'add') {
             data.contest.manualRating = 0;
         }
     }
@@ -329,14 +329,14 @@ function updateContest(data, callback) {
     data.setData = {};
 
     //Non admin fields
-    data.setData["name"] = data.contest.name;
-    data.setData["teams.0.name"] = data.contest.teams[0].name;
-    data.setData["teams.1.name"] = data.contest.teams[1].name;
+    data.setData['name'] = data.contest.name;
+    data.setData['teams.0.name'] = data.contest.teams[0].name;
+    data.setData['teams.1.name'] = data.contest.teams[1].name;
     data.setData.endDate = data.contest.endDate;
 
     //If team names are changing - a new link is created in branch.io with the new contest teams /name
     if (data.contest.link) {
-        data.setData["link"] = data.contest.link;
+        data.setData['link'] = data.contest.link;
     }
 
     data.setData.content = data.contest.content;
@@ -347,16 +347,16 @@ function updateContest(data, callback) {
     //Admin fields
     if (data.session.isAdmin) {
         if (data.contest.teams[0].score != null) {
-            data.setData["teams.0.score"] = data.contest.teams[0].score;
+            data.setData['teams.0.score'] = data.contest.teams[0].score;
         }
         if (data.contest.teams[1].score != null) {
-            data.setData["teams.1.score"] = data.contest.teams[1].score;
+            data.setData['teams.1.score'] = data.contest.teams[1].score;
         }
         if (data.contest.manualParticipants != null) {
-            data.setData["manualParticipants "] = data.contest.manualParticipants;
+            data.setData['manualParticipants '] = data.contest.manualParticipants;
         }
         if (data.contest.manualRating != null) {
-            data.setData["manualParticipants "] = data.contest.manualRating;
+            data.setData['manualParticipants '] = data.contest.manualRating;
         }
     }
 
@@ -388,9 +388,9 @@ function prepareContestForClient(contest, session) {
     }
 
     //Fields not to be disclosed to the client
-    delete contest.leader["userId"];
-    delete contest["users"];
-    delete contest["language"];
+    delete contest.leader['userId'];
+    delete contest['users'];
+    delete contest['language'];
 }
 
 //---------------------------------------------------------------------
@@ -429,12 +429,12 @@ function joinContest(req, res, next) {
     var data = req.body;
 
     if (!data.contestId) {
-        exceptions.ServerResponseException(res, "contestId not supplied", null, "warn", 424);
+        exceptions.ServerResponseException(res, 'contestId not supplied', null, 'warn', 424);
         return;
     }
 
     if (data.teamId !== 0 && data.teamId !== 1) {
-        callback(new exceptions.ServerResponseException("SERVER_ERROR_NOT_JOINED_TO_CONTEST"));
+        callback(new exceptions.ServerResponseException('SERVER_ERROR_NOT_JOINED_TO_CONTEST'));
         return;
     }
 
@@ -461,10 +461,10 @@ function joinContest(req, res, next) {
 
             prepareContestForClient(data.contest, data.session);
 
-            data.clientResponse = {"contest": data.contest};
+            data.clientResponse = {'contest': data.contest};
 
             if (data.newJoin) {
-                commonBusinessLogic.addXp(data, "joinContest");
+                commonBusinessLogic.addXp(data, 'joinContest');
                 data.clientResponse.xpProgress = data.xpProgress;
                 dalDb.storeSession(data, callback);
             }
@@ -477,7 +477,7 @@ function joinContest(req, res, next) {
         function (data, callback) {
             //Save the user to the db - session will be stored at the end of this block
             if (data.newJoin) {
-                data.setData = {"xp": data.session.xp, "rank": data.session.rank};
+                data.setData = {'xp': data.session.xp, 'rank': data.session.rank};
                 data.closeConnection = true;
                 dalDb.setUser(data, callback);
             }
@@ -513,13 +513,13 @@ function joinContestTeam(data, callback) {
     //Cannot join a contest that ended
     if (data.contest.endDate < now) {
         data.DbHelper.close();
-        callback(new exceptions.ServerException("Contest has already been finished", data));
+        callback(new exceptions.ServerException('Contest has already been finished', data));
     }
 
     //Already joined this team - exit
     if (data.contest.users && data.contest.users[data.session.userId] && data.contest.users[data.session.userId].team === data.teamId) {
         data.DbHelper.close();
-        callback(new exceptions.ServerException("Already joined to this team", data));
+        callback(new exceptions.ServerException('Already joined to this team', data));
         return;
     }
 
@@ -532,7 +532,7 @@ function joinContestTeam(data, callback) {
         data.setData.lastParticipantJoinDate = (new Date()).getTime();
     }
 
-    data.setData["users." + data.session.userId] = data.contest.users[data.session.userId];
+    data.setData['users.' + data.session.userId] = data.contest.users[data.session.userId];
 
     dalDb.setContest(data, callback);
 }
@@ -550,7 +550,7 @@ function joinToContestObject(contest, teamId, session) {
 
     if (!contest.users) {
         contest.users = {};
-        contest.leader = {"userId": session.userId, "name": session.name, "avatar": session.avatar};
+        contest.leader = {'userId': session.userId, 'name': session.name, 'avatar': session.avatar};
     }
 
     //Increment participants only if I did not join this contest yet
@@ -561,16 +561,16 @@ function joinToContestObject(contest, teamId, session) {
     }
 
     if (!contest.teams[teamId].leader) {
-        contest.teams[teamId].leader = {"userId": session.userId, "name": session.name, "avatar": session.avatar};
+        contest.teams[teamId].leader = {'userId': session.userId, 'name': session.name, 'avatar': session.avatar};
     }
 
     //Actual join
     contest.users[session.userId] = {
-        "userId": session.userId,
-        "joinDate": now,
-        "team": teamId,
-        "score": 0,
-        "teamScores": [0, 0]
+        'userId': session.userId,
+        'joinDate': now,
+        'team': teamId,
+        'score': 0,
+        'teamScores': [0, 0]
     };
 
     return newJoin;
@@ -615,8 +615,8 @@ module.exports.setContest = function (req, res, next) {
 
         //Add/set the contest
         function (data, callback) {
-            if (data.mode == "add") {
-                //Join by default to the first team (on screen appears as "my team")
+            if (data.mode == 'add') {
+                //Join by default to the first team (on screen appears as 'my team')
                 joinToContestObject(data.contest, 0, data.session);
                 dalDb.addContest(data, callback);
             }
@@ -626,7 +626,7 @@ module.exports.setContest = function (req, res, next) {
         },
 
         function (data, callback) {
-            if (data.mode === "add") {
+            if (data.mode === 'add') {
                 //In case of add - contest needed to be added in the previous operation first, to get an _id
                 dalBranchIo.createContestLinks(data, callback);
             }
@@ -637,15 +637,15 @@ module.exports.setContest = function (req, res, next) {
 
         //In case of update - create a branch link first before updating the db
         function (data, callback) {
-            if (data.mode === "add") {
+            if (data.mode === 'add') {
                 //In case of add - update the links to the contest and team objects
                 data.setData = {
-                    "link": data.contest.link,
-                    "leaderLink": data.contest.leaderLink,
-                    "teams.0.link": data.contest.teams[0].link,
-                    "teams.0.leaderLink": data.contest.teams[0].leaderLink,
-                    "teams.1.link": data.contest.teams[1].link,
-                    "teams.1.leaderLink": data.contest.teams[1].leaderLink
+                    'link': data.contest.link,
+                    'leaderLink': data.contest.leaderLink,
+                    'teams.0.link': data.contest.teams[0].link,
+                    'teams.0.leaderLink': data.contest.teams[0].leaderLink,
+                    'teams.1.link': data.contest.teams[1].link,
+                    'teams.1.leaderLink': data.contest.teams[1].leaderLink
                 };
 
                 data.closeConnection = true;
@@ -666,7 +666,7 @@ module.exports.setContest = function (req, res, next) {
 
     async.waterfall(operations, function (err, data) {
         if (!err) {
-            res.json(data.contest)
+            res.json(data.contest);
         }
         else {
             res.send(err.httpStatus, err);
@@ -686,7 +686,7 @@ module.exports.removeContest = function (req, res, next) {
     var data = req.body;
 
     if (!data.contestId) {
-        exceptions.ServerResponseException(res, "contestId not supplied", null, "warn", 424);
+        exceptions.ServerResponseException(res, 'contestId not supplied', null, 'warn', 424);
         return;
     }
 
@@ -705,7 +705,7 @@ module.exports.removeContest = function (req, res, next) {
         //Check that only admins are allowed to remove a contest
         function (data, callback) {
             if (!data.session.isAdmin) {
-                callback(new exceptions.ServerException("Removing contest is allowed only for administrators", data));
+                callback(new exceptions.ServerException('Removing contest is allowed only for administrators', data));
                 return;
             }
             data.closeConnection = true;
@@ -787,7 +787,7 @@ module.exports.getContest = function (req, res, next) {
     var data = req.body;
 
     if (!data.contestId) {
-        exceptions.ServerResponseException(res, "contestId not supplied", null, "warn", 424);
+        exceptions.ServerResponseException(res, 'contestId not supplied', null, 'warn', 424);
         return;
     }
 
@@ -838,7 +838,7 @@ module.exports.getQuestionsByIds = function (req, res, next) {
     var data = req.body;
 
     if (!data.userQuestions) {
-        exceptions.ServerResponseException(res, "userQuestions not supplied", null, "warn", 424);
+        exceptions.ServerResponseException(res, 'userQuestions not supplied', null, 'warn', 424);
         return;
     }
 
@@ -883,7 +883,7 @@ module.exports.searchMyQuestions = function (req, res, next) {
     var data = req.body;
 
     if (!data.text) {
-        exceptions.ServerResponseException(res, "text not supplied", null, "warn", 424);
+        exceptions.ServerResponseException(res, 'text not supplied', null, 'warn', 424);
         return;
     }
 

@@ -22,7 +22,7 @@ export class QuestionStatsPage {
     if (this.chartDataSource) {
       FusionCharts.ready(() => {
         var chart = new FusionCharts({
-          type: "pie2d",
+          type: 'pie2d',
           renderAt: 'questionChart',
           width: this.client.settings.charts.size.width,
           height: this.client.settings.charts.size.height,

@@ -6,6 +6,7 @@ var contest_1 = require('../pages/contest/contest');
 exports.prepareContestChart = function (contest, timeMode) {
     var client = client_1.Client.getInstance();
     var contestCaption;
+    var contestCaptionColor;
     var contestSubCaption;
     var contestSubCaptionColor;
     var contestChart = JSON.parse(JSON.stringify(client.settings.charts.contest));
@@ -22,28 +23,31 @@ exports.prepareContestChart = function (contest, timeMode) {
     setTimePhrase(contest, timeMode);
     if (contest.status === 'finished') {
         //Contest Finished
-        contestCaption = client.translate('WHO_IS_SMARTER_QUESTION_CONTEST_FINISHED');
+        contestCaption = client.translate(contest.content.category.name);
         if (contest.teams[0].chartValue > contest.teams[1].chartValue) {
-            contestSubCaption = contest.teams[0].name;
+            contestCaptionColor = client.settings.charts.captions.finished.win.caption.color;
+            contestSubCaption = client.translate('CONTEST_FINISHED_TEAM_WON_CAPTION', { 'team': contest.teams[0].name });
+            contestSubCaptionColor = client.settings.charts.captions.finished.win.subCaption.color;
             contestChart.chart.paletteColors = client.settings.charts.finishedPalette[teamsOrder[0]];
         }
         else if (contest.teams[0].chartValue < contest.teams[1].chartValue) {
-            contestSubCaption = contest.teams[1].name;
+            contestCaptionColor = client.settings.charts.captions.finished.win.caption.color;
+            contestSubCaption = client.translate('CONTEST_FINISHED_TEAM_WON_CAPTION', { 'team': contest.teams[1].name });
+            contestSubCaptionColor = client.settings.charts.captions.finished.win.subCaption.color;
             contestChart.chart.paletteColors = client.settings.charts.finishedPalette[teamsOrder[1]];
         }
         else {
+            contestCaptionColor = client.settings.charts.captions.finished.tie.caption.color;
             contestSubCaption = client.translate('TIE');
+            contestSubCaptionColor = client.settings.charts.captions.finished.tie.subCaption.color;
             contestChart.chart.paletteColors = client.settings.charts.finishedPalette[2];
         }
-        contestSubCaptionColor = client.settings.charts.subCaption.finished.color;
     }
     else {
-        contestCaption = client.translate('WHO_IS_SMARTER');
-        contestSubCaption = client.translate('CONTEST_NAME', {
-            team0: contest.teams[0].name,
-            team1: contest.teams[1].name
-        });
-        contestSubCaptionColor = client.settings.charts.subCaption.running.color;
+        contestCaption = contest.teams[0].name + ' ' + client.translate('AGAINST') + ' ' + contest.teams[1].name;
+        contestCaptionColor = client.settings.charts.captions.running.caption.color;
+        contestSubCaption = client.translate(contest.content.category.name);
+        contestSubCaptionColor = client.settings.charts.captions.running.subCaption.color;
     }
     var contestTimeWidth = client.canvasContext.measureText(contest.timePhrase.text).width;
     var contestParticipantsString = client.translate('CONTEST_PARTICIPANTS', { participants: contest.participants + contest.manualParticipants });
@@ -81,7 +85,8 @@ exports.prepareContestChart = function (contest, timeMode) {
     }
     contestChart.chart.caption = contestCaption;
     contestChart.chart.subCaption = contestSubCaption;
-    contestChart.chart.subCaptionFontColor = contestSubCaptionColor;
+    contestChart.chart.captionColor = contestCaptionColor;
+    contestChart.chart.subCaptionColor = contestSubCaptionColor;
     return contestChart;
 };
 //------------------------------------------------------
@@ -91,7 +96,7 @@ exports.openContest = function (contestId) {
     var postData = { 'contestId': contestId };
     var client = client_1.Client.getInstance();
     client.serverPost('contests/get', postData).then(function (contest) {
-        client.nav.push(contest_1.ContestPage, { 'contestChart': exports.prepareContestChart(contest, "starts") });
+        client.nav.push(contest_1.ContestPage, { 'contestChart': exports.prepareContestChart(contest, 'starts') });
     });
 };
 //------------------------------------------------------

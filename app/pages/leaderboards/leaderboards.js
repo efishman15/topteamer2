@@ -20,7 +20,12 @@ var LeaderboardsPage = (function () {
         this.mode = 'contests';
         this.client = client_1.Client.getInstance();
     }
-    LeaderboardsPage.prototype.onPageDidEnter = function () {
+    LeaderboardsPage.prototype.onPageWillEnter = function () {
+        if (this.simpleTabsComponent) {
+            this.simpleTabsComponent.switchToTab(0);
+        }
+    };
+    LeaderboardsPage.prototype.ngAfterViewInit = function () {
         this.simpleTabsComponent.switchToTab(0);
     };
     LeaderboardsPage.prototype.showRecentlyFinishedContests = function () {
@@ -38,6 +43,11 @@ var LeaderboardsPage = (function () {
     };
     LeaderboardsPage.prototype.onContestSelected = function (data) {
         contestsService.openContest(data.contest._id);
+    };
+    LeaderboardsPage.prototype.refreshList = function () {
+        if (this.mode === 'contests') {
+            this.contestList.refresh();
+        }
     };
     __decorate([
         core_1.ViewChild(simple_tabs_1.SimpleTabsComponent), 

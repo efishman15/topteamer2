@@ -1,8 +1,8 @@
-var path = require("path");
-var logger = require("bunyan");
+var path = require('path');
+var logger = require('bunyan');
 
 module.exports.console = logger.createLogger({
-    name: "topTeamerConsole",
+    name: 'topTeamerConsole',
     streams: [{
         stream: process.stderr
         // `type: 'stream'` is implied
@@ -10,10 +10,10 @@ module.exports.console = logger.createLogger({
 });
 
 module.exports.server = logger.createLogger({
-    name: "topTeamerServer",
+    name: 'topTeamerServer',
     streams: [{
         type: 'rotating-file',
-        path: path.resolve(__dirname,"../logs/server.log"),
+        path: path.resolve(__dirname,'../logs/server.log'),
         period: '1d',   // daily rotation
         count: 30        // keep back copies
     }],
@@ -23,10 +23,10 @@ module.exports.server = logger.createLogger({
 });
 
 module.exports.paypalIPN = logger.createLogger({
-    name: "topTeamerPayPalIPN",
+    name: 'topTeamerPayPalIPN',
     streams: [{
         type: 'rotating-file',
-        path: path.resolve(__dirname,"../logs/paypal/paypalIPN.log"),
+        path: path.resolve(__dirname,'../logs/paypal/paypalIPN.log'),
         period: '1d',   // daily rotation
         count: 180        // keep back copies
     }],
@@ -36,10 +36,10 @@ module.exports.paypalIPN = logger.createLogger({
 });
 
 module.exports.facebookIPN = logger.createLogger({
-    name: "topTeamerFacebookIPN",
+    name: 'topTeamerFacebookIPN',
     streams: [{
         type: 'rotating-file',
-        path: path.resolve(__dirname,"../logs/facebook/facebookIPN.log"),
+        path: path.resolve(__dirname,'../logs/facebook/facebookIPN.log'),
         period: '1d',   // daily rotation
         count: 180        // keep back copies
     }],

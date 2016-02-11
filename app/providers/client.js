@@ -30,17 +30,15 @@ var Client = (function () {
         return new Promise(function (resolve, reject) {
             _this._ionicApp = ionicApp;
             _this._platform = platform;
-            _this._menu = menuController.get('left');
+            _this._menuController = menuController;
             _this._events = events;
             _this.serverGateway.getSettings().then(function (data) {
-                var dir = document.createAttribute("dir");
+                var dir = document.createAttribute('dir');
                 dir.value = _this.currentLanguage.direction;
                 _this._nav = ionicApp.getComponent('nav');
                 _this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
-                _this._menu.side = _this.currentLanguage.align;
-                _this._menu.id = _this.currentLanguage.align + "Menu";
-                var canvas = document.createElement("canvas");
-                _this._canvasContext = canvas.getContext("2d");
+                var canvas = document.createElement('canvas');
+                _this._canvasContext = canvas.getContext('2d');
                 _this._canvasContext.font = _this.serverGateway.settings.charts.contestAnnotations.annotationsFont;
                 _this._loaded = true;
                 Client.instance = _this;
@@ -95,9 +93,9 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Client.prototype, "menu", {
+    Object.defineProperty(Client.prototype, "menuController", {
         get: function () {
-            return this._menu;
+            return this._menuController;
         },
         enumerable: true,
         configurable: true

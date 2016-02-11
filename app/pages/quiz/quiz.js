@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require("ionic-framework/ionic");
+var ionic_1 = require('ionic-framework/ionic');
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
 var question_stats_1 = require('../../pages/question-stats/question-stats');

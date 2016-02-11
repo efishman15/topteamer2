@@ -1,11 +1,14 @@
-var path = require("path");
-var mathjs = require("mathjs");
-var httpUtils = require(path.resolve(__dirname, "./http"));
-var util = require("util");
-var logger = require(path.resolve(__dirname, "./logger"));
-var async = require("async");
+var path = require('path');
+var mathjs = require('mathjs');
+var httpUtils = require(path.resolve(__dirname, './http'));
+var util = require('util');
+var logger = require(path.resolve(__dirname, './logger'));
+var async = require('async');
 
-var okResposnse = {'status' : 0};
+//-------------------------------------------------------------------------------------------------------
+// returns okResponse sent to the client
+//-------------------------------------------------------------------------------------------------------
+module.exports.okResponse = {'status' : 0};
 
 var settings;
 module.exports.injectSettings = function (dbSettings) {
@@ -19,13 +22,24 @@ module.exports.injectSettings = function (dbSettings) {
     }
   }
 
-  //Generate the "client visible" part of the server settings about the question scores
-  settings.client.quiz.questions = {"score": []};
+  //Generate the 'client visible' part of the server settings about the question scores
+  settings.client.quiz.questions = {'score': []};
   for (var i = 0; i < settings.server.quiz.questions.levels.length; i++) {
     settings.client.quiz.questions.score.push(settings.server.quiz.questions.levels[i].score);
   }
 
   settings.client.newContest.systemTotalQuestions = settings.server.quiz.questions.levels.length;
+
+  //Replace client ui messages containing eval(...) with the respective value
+  var uiLanguageKeys = Object.keys(settings.client.ui);
+  for (var i=0; i< uiLanguageKeys.length; i++) {
+    var translationTerms = Object.keys(settings.client.ui[uiLanguageKeys[i]]);
+    for (var j=0; j<translationTerms.length; j++) {
+      if (settings.client.ui[uiLanguageKeys[i]][translationTerms[j]].indexOf('eval:') >= 0) {
+        settings.client.ui[uiLanguageKeys[i]][translationTerms[j]] = eval(settings.client.ui[uiLanguageKeys[i]][translationTerms[j]].replaceAll('eval:',''));
+      }
+    }
+  }
 
   module.exports.settings = settings;
 
@@ -48,7 +62,7 @@ function getGeoInfo(data, callback) {
   }
 
   var options = {
-    "url": util.format(settings.server.geoIpLocators[data.geoLocator].url, data.ip)
+    'url': util.format(settings.server.geoIpLocators[data.geoLocator].url, data.ip)
   };
   httpUtils.get(options, function (err, result) {
     if (err) {
@@ -118,7 +132,7 @@ function getDirectionByLanguage(languageCodeIso2) {
     return direction;
   }
   else {
-    return settings.server.directionByLanguage["default"];
+    return settings.server.directionByLanguage['default'];
   }
 }
 
@@ -136,7 +150,7 @@ function getLanguageByCountryCode(countryCode) {
     return language;
   }
   else {
-    return settings.server.languageByCountryCode["default"];
+    return settings.server.languageByCountryCode['default'];
   }
 }
 
@@ -198,8 +212,8 @@ module.exports.getSettings = function (req, res, next) {
               //Convert the text array to a simple string picking only the required language
               data.clientResponse.serverPopup.buttons[i].text = data.clientResponse.serverPopup.buttons[i].text[data.language];
             }
-            if (data.clientResponse.serverPopup.buttons[i].link && data.clientResponse.serverPopup.buttons[i].link.indexOf("#storeLink#") > -1) {
-              data.clientResponse.serverPopup.buttons[i].link = data.clientResponse.serverPopup.buttons[i].link.replace("#storeLink#", settings.server.platforms[data.clientInfo.platform].storeLink);
+            if (data.clientResponse.serverPopup.buttons[i].link && data.clientResponse.serverPopup.buttons[i].link.indexOf('#storeLink#') > -1) {
+              data.clientResponse.serverPopup.buttons[i].link = data.clientResponse.serverPopup.buttons[i].link.replace('#storeLink#', settings.server.platforms[data.clientInfo.platform].storeLink);
             }
           }
         }
@@ -242,7 +256,7 @@ XpProgress.prototype.addXp = function (object, action) {
   if (xp) {
 
     object.xp += xp;
-    var result = binaryRangeSearch(settings.server.rankByXp, "xp", object.xp);
+    var result = binaryRangeSearch(settings.server.rankByXp, 'xp', object.xp);
 
     //update object (session, user)
     object.rank = result.rank;
@@ -310,8 +324,8 @@ function versionCompare(v1, v2, options) {
   }
 
   if (zeroExtend) {
-    while (v1parts.length < v2parts.length) v1parts.push("0");
-    while (v2parts.length < v1parts.length) v2parts.push("0");
+    while (v1parts.length < v2parts.length) v1parts.push('0');
+    while (v2parts.length < v1parts.length) v2parts.push('0');
   }
 
   if (!lexicographical) {
@@ -343,7 +357,7 @@ function versionCompare(v1, v2, options) {
 }
 
 //---------------------------------------------------------------------------------------------------
-// add "contains" function to an array to check if an item exists in an array
+// add 'contains' function to an array to check if an item exists in an array
 //---------------------------------------------------------------------------------------------------
 Array.prototype.contains = function (obj) {
   var i = this.length;
@@ -355,6 +369,14 @@ Array.prototype.contains = function (obj) {
   return false;
 };
 
+//---------------------------------------------------------------------------------------------------
+// add 'replaceAll' function to string using RegExp
+//---------------------------------------------------------------------------------------------------
+String.prototype.replaceAll = function(search, replacement) {
+  var target = this;
+  return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 //-------------------------------------------------------------------------------------------------------
 // getWeekYear returns a string of current year and current week (e.g. 201541 - means year 2015 week 41
 //-------------------------------------------------------------------------------------------------------
@@ -364,12 +386,6 @@ module.exports.getYearWeek = function () {
   var thisYear = d.getFullYear();
   var startOfYear = new Date(thisYear, 0, 1);
   var week = Math.ceil((((d - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
-  return "" + thisYear + "" + week;
+  return '' + thisYear + '' + week;
 };
 
-//-------------------------------------------------------------------------------------------------------
-// returns okResponse sent to the client
-//-------------------------------------------------------------------------------------------------------
-module.exports.okResponse = function() {
-  return okResposnse;
-}

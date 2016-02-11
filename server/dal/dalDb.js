@@ -1,13 +1,13 @@
-var path = require("path");
-var CONNECTION_STRING = "mongodb://localhost:27017/topTeamer";
+var path = require('path');
+var CONNECTION_STRING = 'mongodb://localhost:27017/topTeamer';
 
-var mongoClient = require("mongodb").MongoClient;
-var uuid = require("node-uuid");
-var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
-var ObjectId = require("mongodb").ObjectID;
-var random = require(path.resolve(__dirname, "../utils/random"));
-var generalUtils = require(path.resolve(__dirname, "../utils/general"));
-var mathjs = require("mathjs");
+var mongoClient = require('mongodb').MongoClient;
+var uuid = require('node-uuid');
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var ObjectId = require('mongodb').ObjectID;
+var random = require(path.resolve(__dirname, '../utils/random'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var mathjs = require('mathjs');
 
 //---------------------------------------------------------------------
 // Cache variables
@@ -52,9 +52,9 @@ function buildQuestionsResult(questions) {
     for (var i = 0; i < questions.length; i++) {
 
         var question = {
-            "_id": questions[i]._id,
-            "text": questions[i].text,
-            "contests": questions[i].contests
+            '_id': questions[i]._id,
+            'text': questions[i].text,
+            'contests': questions[i].contests
         };
 
         questionsResult.push(question);
@@ -80,7 +80,7 @@ function buildQuestionsResult(questions) {
 // output: user
 //------------------------------------------------------------------------------------------------
 function register(data, callback) {
-    var usersCollection = data.DbHelper.getCollection("Users");
+    var usersCollection = data.DbHelper.getCollection('Users');
 
     var now = (new Date()).getTime();
 
@@ -88,18 +88,18 @@ function register(data, callback) {
 
     data.user.settings.sound = true;
     var newUser = {
-        "facebookUserId": data.user.thirdParty.id,
-        "facebookAccessToken": data.user.thirdParty.accessToken,
-        "name": data.user.name,
-        "email": data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
-        "geoInfo": data.user.geoInfo,
-        "ageRange": data.user.ageRange,
-        "settings": data.user.settings,
-        "score": 0,
-        "xp": 0,
-        "rank": 1,
-        "createdAt": now,
-        "lastLogin": now
+        'facebookUserId': data.user.thirdParty.id,
+        'facebookAccessToken': data.user.thirdParty.accessToken,
+        'name': data.user.name,
+        'email': data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
+        'geoInfo': data.user.geoInfo,
+        'ageRange': data.user.ageRange,
+        'settings': data.user.settings,
+        'score': 0,
+        'xp': 0,
+        'rank': 1,
+        'createdAt': now,
+        'lastLogin': now
     };
 
     usersCollection.insert(newUser
@@ -108,10 +108,10 @@ function register(data, callback) {
 
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error inserting new user", {
-                    "user": newUser,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error inserting new user', {
+                    'user': newUser,
+                    'dbError': err
+                }, 'error'));
                 return;
             }
 
@@ -158,11 +158,11 @@ module.exports.connect = connect;
 function connect(callback) {
     mongoClient.connect(CONNECTION_STRING, function (err, db) {
         if (err) {
-            callback(new exceptions.ServerException("Error connecting to the database", {"dbError": err}, "error"));
+            callback(new exceptions.ServerException('Error connecting to the database', {'dbError': err}, 'error'));
             return;
         }
 
-        callback(null, {"DbHelper": new DbHelper(db)});
+        callback(null, {'DbHelper': new DbHelper(db)});
     })
 }
 
@@ -181,7 +181,7 @@ function loadSettings(data, callback) {
     if (!data || !data.DbHelper) {
         connect(function (err, connectData) {
             if (!data) {
-                data = {"closeConnection": true};
+                data = {'closeConnection': true};
             }
             data.DbHelper = connectData.DbHelper;
             loadSettings(data, callback);
@@ -189,16 +189,16 @@ function loadSettings(data, callback) {
         return;
     }
 
-    var settingsCollection = data.DbHelper.getCollection("Settings");
+    var settingsCollection = data.DbHelper.getCollection('Settings');
     settingsCollection.findOne({}, {}, function (err, settings) {
         if (err || !settings) {
 
             closeDb(data);
 
-            callback(new exceptions.ServerException("Error finding contest", {
-                "data": data,
-                "dbError": err
-            }, "error"));
+            callback(new exceptions.ServerException('Error finding contest', {
+                'data': data,
+                'dbError': err
+            }, 'error'));
 
             return;
         }
@@ -222,28 +222,28 @@ function loadSettings(data, callback) {
 // output: topic
 //---------------------------------------------------------------------
 module.exports.getTopic = function (data, callback) {
-    var topic = topics["" + data.topicId];
+    var topic = topics['' + data.topicId];
     if (topic) {
         data.topic = topic;
         callback(null, data);
     }
     else {
         connect(function (err, connectData) {
-            var topicsCollection = connectData.DbHelper.getCollection("Topics");
+            var topicsCollection = connectData.DbHelper.getCollection('Topics');
             topicsCollection.findOne({
-                "topicId": data.topicId
+                'topicId': data.topicId
             }, {}, function (err, topic) {
                 if (err || !topic) {
 
                     closeDb(connectData);
 
-                    callback(new exceptions.ServerException("Error retrieving topic by id", {
-                        "topicId": data.topicId,
-                        "dbError": err
-                    }, "error"));
+                    callback(new exceptions.ServerException('Error retrieving topic by id', {
+                        'topicId': data.topicId,
+                        'dbError': err
+                    }, 'error'));
                     return;
                 }
-                topics["" + data.topicId] = topic;
+                topics['' + data.topicId] = topic;
 
                 data.topic = topic;
                 callback(null, data);
@@ -267,20 +267,20 @@ function retrieveSession(data, callback) {
 
     var criteria;
     if (data.token) {
-        criteria = {"userToken": data.token}
+        criteria = {'userToken': data.token}
     }
     else if (data.userId) {
-        criteria = {"userId": ObjectId(data.userId)}
+        criteria = {'userId': ObjectId(data.userId)}
     }
     else if (data.facebookUserId) {
-        criteria = {"facebookUserId": data.facebookUserId}
+        criteria = {'facebookUserId': data.facebookUserId}
     }
     else {
-        callback(new exceptions.ServerException("Error retrieving session - no session identifier was supplied", null, "info", 401));
+        callback(new exceptions.ServerException('Error retrieving session - no session identifier was supplied', null, 'info', 401));
         return;
     }
 
-    //If no connection open - call recursively to this function from within the "connect' block
+    //If no connection open - call recursively to this function from within the 'connect' block
     if (!data.DbHelper) {
         connect(function (err, connectData) {
 
@@ -291,7 +291,7 @@ function retrieveSession(data, callback) {
         return;
     }
 
-    var sessionsCollection = data.DbHelper.getCollection("Sessions");
+    var sessionsCollection = data.DbHelper.getCollection('Sessions');
 
     sessionsCollection.findOne(
         criteria, {},
@@ -300,8 +300,8 @@ function retrieveSession(data, callback) {
 
                 closeDb(data);
 
-                //Serverity "low" does not exist - thus skipping writing to logs and console
-                callback(new exceptions.ServerException("Error retrieving session - session expired", {"sessionId": data.token}, "low", 401));
+                //Serverity 'low' does not exist - thus skipping writing to logs and console
+                callback(new exceptions.ServerException('Error retrieving session - session expired', {'sessionId': data.token}, 'low', 401));
                 return;
             }
 
@@ -319,7 +319,7 @@ function retrieveAdminSession(data, callback) {
 
     retrieveSession(data, function (err, data) {
         if (!data.session.isAdmin) {
-            callback(new exceptions.ServerException("This action is permitted for admins only", {"sessionId": data.token}, "warn", 403));
+            callback(new exceptions.ServerException('This action is permitted for admins only', {'sessionId': data.token}, 'warn', 403));
             return;
         }
 
@@ -341,10 +341,10 @@ function retrieveAdminSession(data, callback) {
 module.exports.storeSession = function (data, callback) {
 
     data.session.expires = new Date((new Date()).getTime() + generalUtils.settings.server.db.sessionExpirationMilliseconds)
-    var sessionsCollection = data.DbHelper.getCollection("Sessions");
+    var sessionsCollection = data.DbHelper.getCollection('Sessions');
     sessionsCollection.update(
         {
-            "_id": data.session._id
+            '_id': data.session._id
         },
         data.session,
         function (err, updated) {
@@ -352,7 +352,7 @@ module.exports.storeSession = function (data, callback) {
 
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error storing session expired - session expired", {"sessionId": data.session._id}, "info", 401));
+                callback(new exceptions.ServerException('Error storing session expired - session expired', {'sessionId': data.session._id}, 'info', 401));
                 return;
             }
 
@@ -376,25 +376,25 @@ module.exports.storeSession = function (data, callback) {
 module.exports.setUser = function (data, callback) {
 
     if (!data.setData && !data.unsetData) {
-        callback(new exceptions.ServerException("Cannot update user, either setData or unsetData must be supplied", {
-            "setData": data.setData,
-            "unsetData": data.unsetData,
-            "dbError": err
-        }, "error"));
+        callback(new exceptions.ServerException('Cannot update user, either setData or unsetData must be supplied', {
+            'setData': data.setData,
+            'unsetData': data.unsetData,
+            'dbError': err
+        }, 'error'));
     }
 
-    var usersCollection = data.DbHelper.getCollection("Users");
+    var usersCollection = data.DbHelper.getCollection('Users');
 
     if (!data.setUserWhereClause) {
-        data.setUserWhereClause = {"_id": ObjectId(data.session.userId)};
+        data.setUserWhereClause = {'_id': ObjectId(data.session.userId)};
     }
 
     var updateClause = {};
     if (data.setData) {
-        updateClause["$set"] = data.setData;
+        updateClause['$set'] = data.setData;
     }
     if (data.unsetData) {
-        updateClause["$unset"] = data.unsetData;
+        updateClause['$unset'] = data.unsetData;
     }
 
     usersCollection.updateOne(data.setUserWhereClause, updateClause,
@@ -404,12 +404,12 @@ module.exports.setUser = function (data, callback) {
 
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error updating user", {
-                    "setUserWhereClause": data.setUserWhereClause,
-                    "setData": data.setData,
-                    "unsetData": data.unsetData,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error updating user', {
+                    'setUserWhereClause': data.setUserWhereClause,
+                    'setData': data.setData,
+                    'unsetData': data.unsetData,
+                    'dbError': err
+                }, 'error'));
 
                 return;
             }
@@ -433,10 +433,10 @@ module.exports.setUser = function (data, callback) {
 //---------------------------------------------------------------------
 module.exports.facebookLogin = function (data, callback) {
 
-    var usersCollection = data.DbHelper.getCollection("Users");
+    var usersCollection = data.DbHelper.getCollection('Users');
 
     //Save avatar which is a computed field
-    //The findAndModify will bring a "fresh" user object from db
+    //The findAndModify will bring a 'fresh' user object from db
     //Put the avatar back later on this fresh object
     var avatar = data.user.avatar;
 
@@ -445,7 +445,7 @@ module.exports.facebookLogin = function (data, callback) {
 
     var now = (new Date()).getTime();
 
-    usersCollection.findOne({"facebookUserId": data.user.thirdParty.id}, {}, function (err, user) {
+    usersCollection.findOne({'facebookUserId': data.user.thirdParty.id}, {}, function (err, user) {
             if (err || !user) {
                 register(data, callback);
                 return;
@@ -462,32 +462,32 @@ module.exports.facebookLogin = function (data, callback) {
                 prevLogin.getUTCFullYear() != today.getUTCFullYear()) {
 
                 var xpProgress = new generalUtils.XpProgress(user.xp, user.rank);
-                xpProgress.addXp(user, "login");
+                xpProgress.addXp(user, 'login');
             }
 
             var setObject = {
-                "$set": {
-                    "lastLogin": now,
-                    "facebookAccessToken": data.user.thirdParty.accessToken,
-                    "name": data.user.name,  //keep sync with Facebook changes
-                    "email": data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
-                    "ageRange": data.user.ageRange, //keep sync with Facebook changes
-                    "xp": user.xp,
-                    "rank": user.rank,
-                    "friends": thirdParty.friends
+                '$set': {
+                    'lastLogin': now,
+                    'facebookAccessToken': data.user.thirdParty.accessToken,
+                    'name': data.user.name,  //keep sync with Facebook changes
+                    'email': data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
+                    'ageRange': data.user.ageRange, //keep sync with Facebook changes
+                    'xp': user.xp,
+                    'rank': user.rank,
+                    'friends': thirdParty.friends
                 }
             };
 
-            usersCollection.updateOne({"_id": user._id}, setObject
+            usersCollection.updateOne({'_id': user._id}, setObject
                 , function (err, results) {
 
                     if (err || results.nModified < 1) {
 
                         closeDb(data);
 
-                        callback(new exceptions.ServerException("Error updating user during login", {
-                            "user": user
-                        }, "error"));
+                        callback(new exceptions.ServerException('Error updating user during login', {
+                            'user': user
+                        }, 'error'));
 
                         return;
                     }
@@ -534,29 +534,29 @@ module.exports.facebookLogin = function (data, callback) {
 module.exports.createOrUpdateSession = function (data, callback) {
 
     var userToken = uuid.v1();
-    var sessionsCollection = data.DbHelper.getCollection("Sessions");
+    var sessionsCollection = data.DbHelper.getCollection('Sessions');
 
     var now = new Date();
     var nowEpoch = now.getTime();
 
     var setObject = {
-        "userId": ObjectId(data.user._id),
-        "facebookUserId": data.user.facebookUserId,
-        "friends": data.user.thirdParty.friends,
-        "isAdmin": data.user.isAdmin,
-        "facebookAccessToken": data.user.facebookAccessToken,
-        "name": data.user.name,
-        "ageRange": data.user.ageRange,
-        "avatar": data.user.avatar,
-        "created": nowEpoch,
-        "expires": new Date(nowEpoch + generalUtils.settings.server.db.sessionExpirationMilliseconds), //must be without getTime() since db internally removes by TTL - and ttl works only when it is actual date and not epoch
-        "userToken": userToken,
-        "settings": data.user.settings,
-        "score": data.user.score,
-        "xp": data.user.xp,
-        "rank": data.user.rank,
-        "features": data.features,
-        "clientInfo": data.user.clientInfo,
+        'userId': ObjectId(data.user._id),
+        'facebookUserId': data.user.facebookUserId,
+        'friends': data.user.thirdParty.friends,
+        'isAdmin': data.user.isAdmin,
+        'facebookAccessToken': data.user.facebookAccessToken,
+        'name': data.user.name,
+        'ageRange': data.user.ageRange,
+        'avatar': data.user.avatar,
+        'created': nowEpoch,
+        'expires': new Date(nowEpoch + generalUtils.settings.server.db.sessionExpirationMilliseconds), //must be without getTime() since db internally removes by TTL - and ttl works only when it is actual date and not epoch
+        'userToken': userToken,
+        'settings': data.user.settings,
+        'score': data.user.score,
+        'xp': data.user.xp,
+        'rank': data.user.rank,
+        'features': data.features,
+        'clientInfo': data.user.clientInfo,
     };
 
     if (data.user.justRegistered) {
@@ -567,7 +567,7 @@ module.exports.createOrUpdateSession = function (data, callback) {
         setObject.gcmRegistrationId = data.user.gcmRegistrationId
     }
 
-    sessionsCollection.findAndModify({"userId": ObjectId(data.user._id)}, {},
+    sessionsCollection.findAndModify({'userId': ObjectId(data.user._id)}, {},
         {
             $set: setObject,
         }, {upsert: true, new: true}, function (err, session) {
@@ -576,17 +576,17 @@ module.exports.createOrUpdateSession = function (data, callback) {
 
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error finding/creating session", {
-                    "userId": user._id,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error finding/creating session', {
+                    'userId': user._id,
+                    'dbError': err
+                }, 'error'));
                 return;
             }
 
             data.session = session.value;
 
             //Write to session history
-            var sessionsHistoryCollection = data.DbHelper.getCollection("SessionHistory");
+            var sessionsHistoryCollection = data.DbHelper.getCollection('SessionHistory');
             var sessionHistoryRecord = JSON.parse(JSON.stringify(data.session));
             sessionHistoryRecord.sessionId = sessionHistoryRecord._id;
             delete sessionHistoryRecord._id;
@@ -597,10 +597,10 @@ module.exports.createOrUpdateSession = function (data, callback) {
 
                         closeDb(data);
 
-                        callback(new exceptions.ServerException("Error inserting session history record", {
-                            "session": data.session,
-                            "dbError": sessionHistoryError
-                        }, "error"));
+                        callback(new exceptions.ServerException('Error inserting session history record', {
+                            'session': data.session,
+                            'dbError': sessionHistoryError
+                        }, 'error'));
                         return;
                     }
 
@@ -612,9 +612,9 @@ module.exports.createOrUpdateSession = function (data, callback) {
 
                         //Do not close connection on an inner logAction
                         data.logAction = {
-                            "action": "login",
-                            "userId": data.session.userId,
-                            "sessionId": data.session.userToken
+                            'action': 'login',
+                            'userId': data.session.userId,
+                            'sessionId': data.session.userToken
                         };
 
                         logAction(data, function (err, data) {
@@ -622,11 +622,11 @@ module.exports.createOrUpdateSession = function (data, callback) {
                             if (err) {
                                 closeDb(data);
 
-                                callback(new exceptions.ServerException("Error inserting log record", {
-                                    "action": data.action,
-                                    "session": data.session,
-                                    "dbError": err
-                                }, "error"));
+                                callback(new exceptions.ServerException('Error inserting log record', {
+                                    'action': data.action,
+                                    'session': data.session,
+                                    'dbError': err
+                                }, 'error'));
                                 return;
                             }
 
@@ -656,25 +656,25 @@ module.exports.createOrUpdateSession = function (data, callback) {
 // output: <NA>
 //---------------------------------------------------------------------
 module.exports.logout = function (data, callback) {
-    var sessionsCollection = data.DbHelper.getCollection("Sessions");
+    var sessionsCollection = data.DbHelper.getCollection('Sessions');
     sessionsCollection.findOne({
-        "userToken": data.token
+        'userToken': data.token
     }, {}, function (err, session) {
         if (err || !session) {
 
             closeDb(data);
 
-            callback(new exceptions.ServerException("Error logging out from session - session expired", {
-                "userId": data.token,
-                "dbError": err
-            }, "info"));
+            callback(new exceptions.ServerException('Error logging out from session - session expired', {
+                'userId': data.token,
+                'dbError': err
+            }, 'info'));
             return;
         }
 
         //Actual logout - remove the session
         sessionsCollection.remove(
             {
-                "userToken": data.token
+                'userToken': data.token
             }
             , {w: 1, single: true},
             function (err, numberOfRemovedDocs) {
@@ -683,10 +683,10 @@ module.exports.logout = function (data, callback) {
 
                     closeDb(data);
 
-                    callback(new exceptions.ServerException("Error logging out from session - session expired", {
-                        "userId": data.token,
-                        "dbError": err
-                    }, "info"));
+                    callback(new exceptions.ServerException('Error logging out from session - session expired', {
+                        'userId': data.token,
+                        'dbError': err
+                    }, 'info'));
                     return;
                 }
 
@@ -710,7 +710,7 @@ module.exports.logout = function (data, callback) {
 module.exports.logAction = logAction;
 function logAction(data, callback) {
 
-    var logCollection = data.DbHelper.getCollection("Log");
+    var logCollection = data.DbHelper.getCollection('Log');
 
     data.logAction.date = (new Date()).getTime();
 
@@ -720,10 +720,10 @@ function logAction(data, callback) {
 
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error inserting record to log", {
-                    "action": data.logAction,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error inserting record to log', {
+                    'action': data.logAction,
+                    'dbError': err
+                }, 'error'));
                 return;
             }
 
@@ -754,16 +754,16 @@ function prepareQuestionCriteria(data, callback) {
         var questionLevel = generalUtils.settings.server.quiz.questions.levels[data.session.quiz.clientData.currentQuestionIndex];
 
         questionCriteria = {
-            "$and": [
-                {"_id": {"$nin": data.session.quiz.serverData.previousQuestions}},
-                {"topicId": {"$in": generalUtils.settings.server.triviaTopicsPerLanguage[data.session.settings.language]}},
+            '$and': [
+                {'_id': {'$nin': data.session.quiz.serverData.previousQuestions}},
+                {'topicId': {'$in': generalUtils.settings.server.triviaTopicsPerLanguage[data.session.settings.language]}},
                 {
-                    "$or": [
-                        {"correctAnswers": 0, "wrongAnswers": 0},
+                    '$or': [
+                        {'correctAnswers': 0, 'wrongAnswers': 0},
                         {
-                            "$and": [
-                                {"correctRatio": {$gte: questionLevel.minCorrectRatio}},
-                                {"correctRatio": {$lt: questionLevel.maxCorrectRatio}}
+                            '$and': [
+                                {'correctRatio': {$gte: questionLevel.minCorrectRatio}},
+                                {'correctRatio': {$lt: questionLevel.maxCorrectRatio}}
                             ]
                         }]
                 }
@@ -773,17 +773,17 @@ function prepareQuestionCriteria(data, callback) {
         //Filter by age if available
         if (data.session.ageRange) {
             if (data.session.ageRange.min) {
-                questionCriteria["$and"].push({"minAge": {$lte: data.session.ageRange.min}});
+                questionCriteria['$and'].push({'minAge': {$lte: data.session.ageRange.min}});
             }
 
             if (data.session.ageRange.max) {
-                questionCriteria["$and"].push({"maxAge": {$gte: data.session.ageRange.max}});
+                questionCriteria['$and'].push({'maxAge': {$gte: data.session.ageRange.max}});
             }
         }
     }
     else {
         //User questions - get the exact current question in the quiz
-        questionCriteria = {"_id": ObjectId(data.session.quiz.serverData.userQuestions[data.session.quiz.clientData.currentQuestionIndex])}
+        questionCriteria = {'_id': ObjectId(data.session.quiz.serverData.userQuestions[data.session.quiz.clientData.currentQuestionIndex])}
     }
     data.questionCriteria = questionCriteria;
 
@@ -802,14 +802,14 @@ function prepareQuestionCriteria(data, callback) {
 //---------------------------------------------------------------------
 module.exports.getQuestionsCount = getQuestionsCount;
 function getQuestionsCount(data, callback) {
-    var questionsCollection = data.DbHelper.getCollection("Questions");
+    var questionsCollection = data.DbHelper.getCollection('Questions');
     questionsCollection.count(data.questionCriteria, function (err, count) {
         if (err || count === 0) {
-            callback(new exceptions.ServerException("Error retrieving number of questions from the database", {
-                "count": count,
-                "questionCriteria": data.questionCriteria,
-                "dbError": err
-            }, "error"));
+            callback(new exceptions.ServerException('Error retrieving number of questions from the database', {
+                'count': count,
+                'questionCriteria': data.questionCriteria,
+                'dbError': err
+            }, 'error'));
             return;
         }
 
@@ -840,15 +840,15 @@ function getNextQuestion(data, callback) {
         skip = 0;
     }
 
-    var questionsCollection = data.DbHelper.getCollection("Questions");
+    var questionsCollection = data.DbHelper.getCollection('Questions');
     questionsCollection.findOne(data.questionCriteria, {skip: skip}, function (err, question) {
         if (err || !question) {
-            callback(new exceptions.ServerException("Error retrieving next question from database", {
-                "questionsCount": data.questionsCount,
-                "questionCriteria": data.questionCriteria,
-                "skip": skip,
-                "dbError": err
-            }, "error"));
+            callback(new exceptions.ServerException('Error retrieving next question from database', {
+                'questionsCount': data.questionsCount,
+                'questionCriteria': data.questionCriteria,
+                'skip': skip,
+                'dbError': err
+            }, 'error'));
             return;
         }
 
@@ -859,19 +859,19 @@ function getNextQuestion(data, callback) {
         //Session is dynamic - perform some evals...
         if (question.vars) {
 
-            //define the vars as "global" vars so they can be referenced by further evals
+            //define the vars as 'global' vars so they can be referenced by further evals
             for (var key in question.vars) {
                 global[key] = eval(question.vars[key]);
             }
 
-            //The question.text can include expressions like these: {{xp1}} {{xp2}} which need to be "evaled"
+            //The question.text can include expressions like these: {{xp1}} {{xp2}} which need to be 'evaled'
             question.text = question.text.replace(/\{\{(.*?)\}\}/g, function (match) {
                 return eval(match.substring(2, match.length - 2));
             });
 
-            //The answer.answer can include expressions like these: {{xp1}} {{xp2}} which need to be "evaled"
+            //The answer.answer can include expressions like these: {{xp1}} {{xp2}} which need to be 'evaled'
             question.answers.forEach(function (element, index, array) {
-                element["text"] = element["text"].replace(/\{\{(.*?)\}\}/g, function (match) {
+                element['text'] = element['text'].replace(/\{\{(.*?)\}\}/g, function (match) {
                     return eval(match.substring(2, match.length - 2));
                 });
             })
@@ -885,8 +885,8 @@ function getNextQuestion(data, callback) {
         data.session.quiz.serverData.currentQuestion = question;
 
         data.session.quiz.clientData.currentQuestion = {
-            "text": question.text,
-            "answers": []
+            'text': question.text,
+            'answers': []
         };
 
         //For admins only - give the original answers (in their original order, item0 is the correct answer
@@ -905,7 +905,7 @@ function getNextQuestion(data, callback) {
 
         //Add them to the client question shuffled
         for (var i = 0; i < question.answers.length; i++) {
-            data.session.quiz.clientData.currentQuestion.answers.push({"text" : question.answers[i].text});
+            data.session.quiz.clientData.currentQuestion.answers.push({'text' : question.answers[i].text});
         }
 
         if (data.session.isAdmin) {
@@ -956,7 +956,7 @@ function getNextQuestion(data, callback) {
 //------------------------------------------------------------------------------------------------
 module.exports.addContest = addContest;
 function addContest(data, callback) {
-    var contestsCollection = data.DbHelper.getCollection("Contests");
+    var contestsCollection = data.DbHelper.getCollection('Contests');
 
     contestsCollection.insert(data.contest
         , {}, function (err, insertResult) {
@@ -965,10 +965,10 @@ function addContest(data, callback) {
 
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error adding contest", {
-                    "data": data,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error adding contest', {
+                    'data': data,
+                    'dbError': err
+                }, 'error'));
                 return;
             }
 
@@ -988,13 +988,13 @@ function addContest(data, callback) {
 //------------------------------------------------------------------------------------------------
 module.exports.setContest = setContest;
 function setContest(data, callback) {
-    var contestsCollection = data.DbHelper.getCollection("Contests");
+    var contestsCollection = data.DbHelper.getCollection('Contests');
 
-    var whereClause = {"_id": ObjectId(data.contest._id)};
+    var whereClause = {'_id': ObjectId(data.contest._id)};
 
     //Only contest owners or admins can update the contest
     if (data.checkOwner && !data.session.isAdmin) {
-        whereClause["creator.id"] = ObjectId(data.session.userId);
+        whereClause['creator.id'] = ObjectId(data.session.userId);
     }
 
     contestsCollection.findAndModify(whereClause, {},
@@ -1005,13 +1005,13 @@ function setContest(data, callback) {
             if (err || !contest || !contest.value) {
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error setting contest", {
-                    "whereClause": whereClause,
-                    "session": data.session,
-                    "setData": data.setData,
-                    "contestId": data.contestId,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error setting contest', {
+                    'whereClause': whereClause,
+                    'session': data.session,
+                    'setData': data.setData,
+                    'contestId': data.contestId,
+                    'dbError': err
+                }, 'error'));
                 return;
             }
 
@@ -1036,10 +1036,10 @@ function setContest(data, callback) {
 module.exports.removeContest = removeContest;
 function removeContest(data, callback) {
 
-    var contestsCollection = data.DbHelper.getCollection("Contests");
+    var contestsCollection = data.DbHelper.getCollection('Contests');
     contestsCollection.remove(
         {
-            "_id": ObjectId(data.contestId)
+            '_id': ObjectId(data.contestId)
         }
         , {w: 1, single: true},
         function (err, numberOfRemovedDocs) {
@@ -1048,10 +1048,10 @@ function removeContest(data, callback) {
                 //Contest does not exist - stop the call chain
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error removing contest", {
-                    "data": data,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error removing contest', {
+                    'data': data,
+                    'dbError': err
+                }, 'error'));
                 return;
             }
 
@@ -1074,18 +1074,18 @@ function removeContest(data, callback) {
 module.exports.getContest = getContest;
 function getContest(data, callback) {
 
-    var contestsCollection = data.DbHelper.getCollection("Contests");
+    var contestsCollection = data.DbHelper.getCollection('Contests');
     contestsCollection.findOne({
-        "_id": ObjectId(data.contestId)
+        '_id': ObjectId(data.contestId)
     }, {}, function (err, contest) {
         if (err || !contest) {
 
             closeDb(data);
 
-            callback(new exceptions.ServerException("Error finding contest", {
-                "data": data,
-                "dbError": err
-            }, "error"));
+            callback(new exceptions.ServerException('Error finding contest', {
+                'data': data,
+                'dbError': err
+            }, 'error'));
 
             return;
         }
@@ -1108,43 +1108,43 @@ module.exports.prepareContestsQuery = prepareContestsQuery;
 function prepareContestsQuery(data, callback) {
 
     data.contestQuery = {};
-    data.contestQuery.where = {"language": data.session.settings.language};
+    data.contestQuery.where = {'language': data.session.settings.language};
     data.contestQuery.sort = [];
 
     var now = (new Date()).getTime();
 
     if (generalUtils.settings.server.hostedGames.active && (!generalUtils.settings.server.hostedGames.forAdminsOnly && !data.session.isAdmin)) {
-        data.contestQuery.where["content.source"] = "trivia";
+        data.contestQuery.where['content.source'] = 'trivia';
     }
 
     switch (data.tab) {
-        case "mine":
+        case 'mine':
             data.contestQuery.where.endDate = {$gte: now}; //not finished yet
-            data.contestQuery.where["users." + data.session.userId] = {$exists: true};
+            data.contestQuery.where['users.' + data.session.userId] = {$exists: true};
             data.contestQuery.limit = 0; //Retrieve ALL my running contest
-            data.contestQuery.sort.push(["participants", "desc"]);  //order by participants descending
+            data.contestQuery.sort.push(['participants', 'desc']);  //order by participants descending
             break;
 
-        case "running":
+        case 'running':
             data.contestQuery.where.endDate = {$gte: now}; //not finished yet
             data.contestQuery.limit = generalUtils.settings.server.contestList.pageSize;
-            data.contestQuery.sort.push(["participants", "desc"]);  //order by participants descending
+            data.contestQuery.sort.push(['participants', 'desc']);  //order by participants descending
             break;
 
-        case "recentlyFinished":
+        case 'recentlyFinished':
             data.contestQuery.where.endDate = {
                 $lt: now,
                 $gte: now - (generalUtils.settings.server.contestList.recentlyFinishedDays * 24 * 60 * 60 * 1000)
             }; //finished in the past 2 days
             data.contestQuery.limit = generalUtils.settings.server.contestList.pageSize;
-            data.contestQuery.sort.push(["endDate", "desc"]);  //order by participants descending
+            data.contestQuery.sort.push(['endDate', 'desc']);  //order by participants descending
             break;
 
         default:
             closeDb(data);
-            callback(new exceptions.ServerException("Error getting contests - tab invalid or not supplied", {
-                "data": data
-            }, "error"));
+            callback(new exceptions.ServerException('Error getting contests - tab invalid or not supplied', {
+                'data': data
+            }, 'error'));
             return;
     }
 
@@ -1163,7 +1163,7 @@ function prepareContestsQuery(data, callback) {
 //------------------------------------------------------------------------------------------------
 module.exports.getContests = getContests;
 function getContests(data, callback) {
-    var contestsCollection = data.DbHelper.getCollection("Contests");
+    var contestsCollection = data.DbHelper.getCollection('Contests');
     contestsCollection.find(data.contestQuery.where,
         {
             limit: data.contestQuery.limit,
@@ -1172,10 +1172,10 @@ function getContests(data, callback) {
         function (err, contestsCursor) {
             if (err || !contestsCursor) {
 
-                callback(new exceptions.ServerException("Error retrieving contests", {
-                    "data": data,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error retrieving contests', {
+                    'data': data,
+                    'dbError': err
+                }, 'error'));
 
                 return;
             }
@@ -1201,19 +1201,19 @@ function getContests(data, callback) {
 module.exports.updateQuestionStatistics = updateQuestionStatistics;
 function updateQuestionStatistics(data, callback) {
 
-    var questionsCollection = data.DbHelper.getCollection("Questions");
+    var questionsCollection = data.DbHelper.getCollection('Questions');
     questionsCollection.findOne({
-        "_id": ObjectId(data.session.quiz.serverData.currentQuestion._id)
+        '_id': ObjectId(data.session.quiz.serverData.currentQuestion._id)
     }, {}, function (err, question) {
 
         if (err || !question) {
 
             closeDb(data);
 
-            callback(new exceptions.ServerException("Error finding question to update statistics", {
-                "data": data,
-                "dbError": err
-            }, "error"));
+            callback(new exceptions.ServerException('Error finding question to update statistics', {
+                'data': data,
+                'dbError': err
+            }, 'error'));
             return;
         }
 
@@ -1242,10 +1242,10 @@ function updateQuestionStatistics(data, callback) {
         setClause.correctAnswers = correctAnswers;
         setClause.wrongAnswers = wrongAnswers;
         setClause.correctRatio = correctRatio;
-        setClause["answers." + data.id + ".answered"] = answered;
-        setClause["answers." + data.id + ".answerRatio"] = answerRatio;
+        setClause['answers.' + data.id + '.answered'] = answered;
+        setClause['answers.' + data.id + '.answerRatio'] = answerRatio;
 
-        questionsCollection.updateOne({"_id": ObjectId(data.session.quiz.serverData.currentQuestion._id)},
+        questionsCollection.updateOne({'_id': ObjectId(data.session.quiz.serverData.currentQuestion._id)},
             {
                 $set: setClause
             }, function (err, results) {
@@ -1254,11 +1254,11 @@ function updateQuestionStatistics(data, callback) {
 
                     closeDb(data);
 
-                    callback(new exceptions.ServerException("Error updating question statistics", {
-                        "quesitonId": data.session.quiz.serverData.currentQuestion._id,
-                        "updateResults": results,
-                        "dbError": err
-                    }, "error"));
+                    callback(new exceptions.ServerException('Error updating question statistics', {
+                        'quesitonId': data.session.quiz.serverData.currentQuestion._id,
+                        'updateResults': results,
+                        'dbError': err
+                    }, 'error'));
 
                     return;
                 }
@@ -1295,7 +1295,7 @@ function insertPurchase(data, callback) {
         return;
     }
 
-    var purchasesCollection = data.DbHelper.getCollection("Purchases");
+    var purchasesCollection = data.DbHelper.getCollection('Purchases');
 
     data.newPurchase.created = (new Date()).getTime();
 
@@ -1306,10 +1306,10 @@ function insertPurchase(data, callback) {
 
                     closeDb(data);
 
-                    callback(new exceptions.ServerException("Error inserting purchase record", {
-                        "purchaseRecord": data.newPurchase,
-                        "dbError": err
-                    }, "error"));
+                    callback(new exceptions.ServerException('Error inserting purchase record', {
+                        'purchaseRecord': data.newPurchase,
+                        'dbError': err
+                    }, 'error'));
 
                     return;
                 }
@@ -1337,7 +1337,7 @@ function insertPurchase(data, callback) {
 module.exports.getContestTopParticipants = getContestTopParticipants;
 function getContestTopParticipants(data, callback) {
 
-    var contestsCollection = data.DbHelper.getCollection("Contests");
+    var contestsCollection = data.DbHelper.getCollection('Contests');
 
     data.newPurchase.created = (new Date()).getTime();
 
@@ -1348,10 +1348,10 @@ function getContestTopParticipants(data, callback) {
 
                     closeDb(data);
 
-                    callback(new exceptions.ServerException("Error inserting purchase record", {
-                        "purchaseRecord": data.newPurchase,
-                        "dbError": err
-                    }, "error"));
+                    callback(new exceptions.ServerException('Error inserting purchase record', {
+                        'purchaseRecord': data.newPurchase,
+                        'dbError': err
+                    }, 'error'));
 
                     return;
                 }
@@ -1379,7 +1379,7 @@ function getContestTopParticipants(data, callback) {
 module.exports.insertQuestion = insertQuestion;
 function insertQuestion(data, callback) {
 
-    var questionsCollection = data.DbHelper.getCollection("Questions");
+    var questionsCollection = data.DbHelper.getCollection('Questions');
 
     data.newQuestion.created = (new Date()).getTime();
     data.newQuestion.userIdCreated = data.session.userId;
@@ -1401,10 +1401,10 @@ function insertQuestion(data, callback) {
 
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error inserting question record", {
-                    "questionRecord": data.newQuestion,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error inserting question record', {
+                    'questionRecord': data.newQuestion,
+                    'dbError': err
+                }, 'error'));
 
                 return;
             }
@@ -1428,21 +1428,21 @@ function insertQuestion(data, callback) {
 module.exports.setQuestion = function (data, callback) {
 
     if (!data.setData && !data.unsetData) {
-        callback(new exceptions.ServerException("Cannot update question, setData or unsetData must be supplied", {}, "error"));
+        callback(new exceptions.ServerException('Cannot update question, setData or unsetData must be supplied', {}, 'error'));
         return;
     }
 
-    var questionsCollection = data.DbHelper.getCollection("Questions");
+    var questionsCollection = data.DbHelper.getCollection('Questions');
 
     var updateClause = {};
     if (data.setData) {
-        updateClause["$set"] = data.setData;
+        updateClause['$set'] = data.setData;
     }
     if (data.unsetData) {
-        updateClause["$unset"] = data.unsetData;
+        updateClause['$unset'] = data.unsetData;
     }
 
-    var whereClause = {"_id": ObjectId(data.questionId)};
+    var whereClause = {'_id': ObjectId(data.questionId)};
 
 
     questionsCollection.updateOne(whereClause, updateClause,
@@ -1452,10 +1452,10 @@ module.exports.setQuestion = function (data, callback) {
 
                 closeDb(data);
 
-                callback(new exceptions.ServerException("Error updating question", {
-                    "setData": data.setData,
-                    "dbError": err
-                }, "error"));
+                callback(new exceptions.ServerException('Error updating question', {
+                    'setData': data.setData,
+                    'dbError': err
+                }, 'error'));
 
                 return;
             }
@@ -1478,21 +1478,21 @@ module.exports.setQuestion = function (data, callback) {
 //------------------------------------------------------------------------------------------------
 module.exports.getQuestionsByIds = getQuestionsByIds;
 function getQuestionsByIds(data, callback) {
-    var questionsCollection = data.DbHelper.getCollection("Questions");
+    var questionsCollection = data.DbHelper.getCollection('Questions');
 
     for (var i = 0; i < data.userQuestions.length; i++) {
         data.userQuestions[i] = ObjectId(data.userQuestions[i]);
     }
 
-    questionsCollection.find({"_id": {$in: data.userQuestions}}, {}, function (err, questionsCursor) {
+    questionsCollection.find({'_id': {$in: data.userQuestions}}, {}, function (err, questionsCursor) {
         if (err || !questionsCursor) {
 
             closeDb(data);
 
-            callback(new exceptions.ServerException("Error retrieving questions", {
-                "userQuestions": userQuestions,
-                "dbError": err
-            }, "error"));
+            callback(new exceptions.ServerException('Error retrieving questions', {
+                'userQuestions': userQuestions,
+                'dbError': err
+            }, 'error'));
 
             return;
         }
@@ -1522,7 +1522,7 @@ function getQuestionsByIds(data, callback) {
 module.exports.searchMyQuestions = searchMyQuestions;
 function searchMyQuestions(data, callback) {
 
-    var questionsCollection = data.DbHelper.getCollection("Questions");
+    var questionsCollection = data.DbHelper.getCollection('Questions');
 
     for (var i = 0; i < data.existingQuestionIds.length; i++) {
         data.existingQuestionIds[i] = ObjectId(data.existingQuestionIds[i]);
@@ -1531,31 +1531,31 @@ function searchMyQuestions(data, callback) {
     var criteria =
     {
         $and: [
-            {"userIdCreated": ObjectId(data.session.userId)},
-            {"_id": {"$nin": data.existingQuestionIds}},
+            {'userIdCreated': ObjectId(data.session.userId)},
+            {'_id': {'$nin': data.existingQuestionIds}},
             {
                 $or: [
-                    {"text": {$regex: ".*" + data.text + ".*"}},
-                    {"answers.0.text": {$regex: ".*" + data.text + ".*"}},
-                    {"answers.1.text": {$regex: ".*" + data.text + ".*"}},
-                    {"answers.2.text": {$regex: ".*" + data.text + ".*"}},
-                    {"answers.3.text": {$regex: ".*" + data.text + ".*"}}
+                    {'text': {$regex: '.*' + data.text + '.*'}},
+                    {'answers.0.text': {$regex: '.*' + data.text + '.*'}},
+                    {'answers.1.text': {$regex: '.*' + data.text + '.*'}},
+                    {'answers.2.text': {$regex: '.*' + data.text + '.*'}},
+                    {'answers.3.text': {$regex: '.*' + data.text + '.*'}}
                 ]
             }
         ]
     };
 
-    var sort = [["created", "desc"]];  //order by participants descending
+    var sort = [['created', 'desc']];  //order by participants descending
 
     questionsCollection.find(criteria, {sort: sort}, function (err, questionsCursor) {
         if (err || !questionsCursor) {
 
             closeDb(data);
 
-            callback(new exceptions.ServerException("Error retrieving questions by search text", {
-                "text": data.text,
-                "dbError": err
-            }, "error"));
+            callback(new exceptions.ServerException('Error retrieving questions by search text', {
+                'text': data.text,
+                'dbError': err
+            }, 'error'));
 
             return;
         }

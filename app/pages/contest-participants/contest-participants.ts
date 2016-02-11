@@ -26,7 +26,13 @@ export class ContestParticipantsPage {
     this.client = Client.getInstance();
   }
 
-  onPageDidEnter() {
+  onPageWillEnter() {
+    if (this.leadersComponent) {
+      this.showContestParticipants();
+    }
+  }
+
+  ngAfterViewInit() {
     this.showContestParticipants();
   }
 

@@ -11,7 +11,8 @@ var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
 var FacebookPostPage = (function () {
-    function FacebookPostPage(params) {
+    function FacebookPostPage(params, viewController) {
+        this.viewController = viewController;
         this.client = client_1.Client.getInstance();
         this.quizResults = params.data.quizResults;
     }
@@ -20,16 +21,19 @@ var FacebookPostPage = (function () {
         facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
             _this.close();
         }, function (error) {
-            FlurryAgent.myLogError("FacebookPostError", "Error posting: " + error);
+            FlurryAgent.myLogError('FacebookPostError', 'Error posting: ' + error);
         });
+    };
+    FacebookPostPage.prototype.close = function () {
+        this.viewController.dismiss();
     };
     FacebookPostPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/facebook-post/facebook-post.html'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.ViewController !== 'undefined' && ionic_1.ViewController) === 'function' && _b) || Object])
     ], FacebookPostPage);
     return FacebookPostPage;
-    var _a;
+    var _a, _b;
 })();
 exports.FacebookPostPage = FacebookPostPage;

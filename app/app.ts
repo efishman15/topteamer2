@@ -39,9 +39,9 @@ class topTeamerApp {
 
     this.client.platform.ready().then(() => {
 
-      this.declareStringFormat();
+      this.expandStringPrototype();
       this.declareRequestAnimationFrame();
-      this.declareClearTime();
+      this.expandDatePrototype();
 
       this.initFlurry();
 
@@ -199,7 +199,7 @@ class topTeamerApp {
     })();
   }
 
-  declareStringFormat() {
+  expandStringPrototype() {
 
     if (!String.prototype.format) {
       String.prototype.format = function () {
@@ -234,9 +234,16 @@ class topTeamerApp {
         return str;
       };
     }
+
+    if (!String.prototype.replaceAll) {
+      String.prototype.replaceAll = function (search, replacement) {
+        var target = this;
+        return target.replace(new RegExp(search, 'g'), replacement);
+      };
+    }
   }
 
-  declareClearTime() {
+  expandDatePrototype() {
     if (!Date.prototype.clearTime) {
       Date.prototype.clearTime = function () {
         this.setHours(0);
@@ -248,7 +255,6 @@ class topTeamerApp {
   }
 
   newContest() {
-    this.client.menu.close();
     var modal = Modal.create(ContestTypePage);
     modal.onDismiss( (content) => {
       if (content) {
@@ -261,7 +267,6 @@ class topTeamerApp {
   }
 
   share() {
-    this.client.menu.close();
     shareService.share();
   }
 }

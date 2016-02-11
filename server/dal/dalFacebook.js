@@ -1,10 +1,10 @@
-var path = require("path");
-var FACEBOOK_GRAPH_DOMAIN = "graph.facebook.com";
-var FACEBOOK_GRAPH_URL = "https://" + FACEBOOK_GRAPH_DOMAIN;
-var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
-var crypto = require("crypto");
-var generalUtils = require(path.resolve(__dirname, "../utils/general"));
-var httpUtils = require(path.resolve(__dirname, "../utils/http"));
+var path = require('path');
+var FACEBOOK_GRAPH_DOMAIN = 'graph.facebook.com';
+var FACEBOOK_GRAPH_URL = 'https://' + FACEBOOK_GRAPH_DOMAIN;
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var crypto = require('crypto');
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var httpUtils = require(path.resolve(__dirname, '../utils/http'));
 
 //---------------------------------------------------------------------------------------------------------------------------------
 // getUserInfo
@@ -18,13 +18,13 @@ var httpUtils = require(path.resolve(__dirname, "../utils/http"));
 //---------------------------------------------------------------------------------------------------------------------------------
 module.exports.getUserInfo = function (data, callback) {
 
-  var fields = "id,name,email,age_range";
+  var fields = 'id,name,email,age_range';
 
   if (data.user.thirdParty.signedRequest) {
     //Coming from canvas
     var verifier = new SignedRequest(generalUtils.settings.server.facebook.secretKey, data.user.thirdParty.signedRequest);
     if (!verifier.verify) {
-      callback(new exceptions.ServerException("Invalid signed request received from facebook", {"signedRequest": data.signedRequest}));
+      callback(new exceptions.ServerException('Invalid signed request received from facebook', {'signedRequest': data.signedRequest}));
       return;
     }
 
@@ -32,15 +32,15 @@ module.exports.getUserInfo = function (data, callback) {
     data.user.thirdParty.id = verifier.data.user_id;
 
     if (generalUtils.settings.server.payments.facebook.handleMobilePricePoints) {
-      fields += ",payment_mobile_pricepoints,currency";
+      fields += ',payment_mobile_pricepoints,currency';
     }
   }
 
   var options = {
-    "url": FACEBOOK_GRAPH_URL + "/me",
-    "qs": {
-      "access_token": data.user.thirdParty.accessToken,
-      "fields": fields
+    'url': FACEBOOK_GRAPH_URL + '/me',
+    'qs': {
+      'access_token': data.user.thirdParty.accessToken,
+      'fields': fields
     }
   };
 
@@ -60,18 +60,18 @@ module.exports.getUserInfo = function (data, callback) {
         getUserFriends(data, callback);
       }
       else {
-        callback(new exceptions.ServerException("Error validating facebook access token, token belongs to someone else", {
-          "facebookResponse": responseData,
-          "facebookAccessToken": data.user.thirdParty.accessToken,
-          "actualFacebookId": facebookData.id
+        callback(new exceptions.ServerException('Error validating facebook access token, token belongs to someone else', {
+          'facebookResponse': responseData,
+          'facebookAccessToken': data.user.thirdParty.accessToken,
+          'actualFacebookId': facebookData.id
         }));
         return;
       }
     }
     else {
-      callback(new exceptions.ServerMessageException("SERVER_ERROR_INVALID_FACEBOOK_ACCESS_TOKEN", {
-        "facebookResponse": responseData,
-        "facebookAccessToken": data.user.thirdParty.accessToken
+      callback(new exceptions.ServerMessageException('SERVER_ERROR_INVALID_FACEBOOK_ACCESS_TOKEN', {
+        'facebookResponse': responseData,
+        'facebookAccessToken': data.user.thirdParty.accessToken
       }, 424));
       return;
     }
@@ -85,7 +85,7 @@ module.exports.getUserInfo = function (data, callback) {
 //-------------------------------------------------------------------------------------
 module.exports.getUserAvatar = getUserAvatar;
 function getUserAvatar(facebookUserId) {
-  return "https://graph.facebook.com/" + facebookUserId + "/picture?type=square";
+  return 'https://graph.facebook.com/' + facebookUserId + '/picture?type=square';
 }
 
 //-------------------------------------------------------------------------------------
@@ -143,40 +143,40 @@ SignedRequest.prototype.base64decode = function (data) {
 //---------------------------------------------------------------------------------------------------------------------------------
 module.exports.getPaymentInfo = function (data, callback) {
 
-  var fields = "id,actions,items,disputes,request_id,user";
+  var fields = 'id,actions,items,disputes,request_id,user';
 
-  var facebookResponse = "";
+  var facebookResponse = '';
 
   var options = {
-    "url": FACEBOOK_GRAPH_URL + "/" + data.paymentId,
-    "qs": {
-      "access_token": generalUtils.settings.server.facebook.appAccessToken,
-      "fields": fields
+    'url': FACEBOOK_GRAPH_URL + '/' + data.paymentId,
+    'qs': {
+      'access_token': generalUtils.settings.server.facebook.appAccessToken,
+      'fields': fields
     }
   };
 
   httpUtils.get(options, function (err, facebookData) {
 
     if (err) {
-      callback(new exceptions.ServerException("Error invoking payment graph api", {"signedRequest": data.signedRequest}));
+      callback(new exceptions.ServerException('Error invoking payment graph api', {'signedRequest': data.signedRequest}));
       return;
     }
 
-    //request_id in the format: "featureName|facebookUserId|timeStamp"
-    var requestIdParts = facebookData.request_id.split("|");
+    //request_id in the format: 'featureName|facebookUserId|timeStamp'
+    var requestIdParts = facebookData.request_id.split('|');
 
     if (data.purchaseData && data.purchaseData.signed_request) {
       var verifier = new SignedRequest(generalUtils.settings.server.facebook.secretKey, data.purchaseData.signed_request);
       if (!verifier.verify) {
-        callback(new exceptions.ServerException("Invalid signed request received from facebook", {"signedRequest": data.signedRequest}));
+        callback(new exceptions.ServerException('Invalid signed request received from facebook', {'signedRequest': data.signedRequest}));
         return;
       }
 
       if (verifier.data.request_id !== facebookData.request_id) {
-        callback(new exceptions.ServerException("Error validating payment, payment belongs to someone else", {
-          "facebookData": facebookData,
-          "verifier.data": verifier.data,
-          "paymentFacebookId": requestIdParts[1]
+        callback(new exceptions.ServerException('Error validating payment, payment belongs to someone else', {
+          'facebookData': facebookData,
+          'verifier.data': verifier.data,
+          'paymentFacebookId': requestIdParts[1]
         }));
         return;
       }
@@ -187,14 +187,14 @@ module.exports.getPaymentInfo = function (data, callback) {
     data.featurePurchased = requestIdParts[0];
     data.facebookUserId = requestIdParts[1];
 
-    if (!data.thirdPartyServerCall || data.entry[0].changed_fields.contains("actions")) {
+    if (!data.thirdPartyServerCall || data.entry[0].changed_fields.contains('actions')) {
       //Coming from facebook server notification
       var lastAction = facebookData.actions[facebookData.actions.length - 1];
 
-      data.paymentData.status = lastAction.type + "." + lastAction.status;
+      data.paymentData.status = lastAction.type + '.' + lastAction.status;
 
-      if (lastAction.type === "charge") {
-        if (lastAction.status === "completed") {
+      if (lastAction.type === 'charge') {
+        if (lastAction.status === 'completed') {
           data.proceedPayment = true;
         }
       }
@@ -206,15 +206,15 @@ module.exports.getPaymentInfo = function (data, callback) {
 
     if (data.thirdPartyServerCall) {
 
-      if (data.entry[0].changed_fields.contains("disputes")) {
+      if (data.entry[0].changed_fields.contains('disputes')) {
         var lastDispute = facebookData.disputes[facebookData.disputes.length - 1];
 
-        data.paymentData.status = "dispute." + lastDispute.status;
+        data.paymentData.status = 'dispute.' + lastDispute.status;
 
-        if (lastDispute.status === "pending") {
+        if (lastDispute.status === 'pending') {
           data.dispute = true;
           for (var i = 0; i < facebookData.actions.length; i++) {
-            if (facebookData.actions[i].type === "charge" && facebookData.actions[i].status === "completed") {
+            if (facebookData.actions[i].type === 'charge' && facebookData.actions[i].status === 'completed') {
               data.itemCharged = true;
             }
           }
@@ -240,19 +240,19 @@ module.exports.getPaymentInfo = function (data, callback) {
 module.exports.denyDispute = function (data, callback) {
 
   var options = {
-    "url": FACEBOOK_GRAPH_URL + "/" + data.paymentId + "/dispute",
-    "params": {
-      "access_token": generalUtils.settings.server.facebook.appAccessToken,
-      "reason": "DENIED_REFUND"
+    'url': FACEBOOK_GRAPH_URL + '/' + data.paymentId + '/dispute',
+    'params': {
+      'access_token': generalUtils.settings.server.facebook.appAccessToken,
+      'reason': 'DENIED_REFUND'
     }
   };
 
   httpUtils.post(options, function (facebookData) {
 
     if (!facebookData) {
-      callback(new exceptions.ServerException("Error recevied from facebook while disputing payment id", {
-        "paymentId": data.paymentId,
-        "facebookData": facebookData
+      callback(new exceptions.ServerException('Error recevied from facebook while disputing payment id', {
+        'paymentId': data.paymentId,
+        'facebookData': facebookData
       }));
     }
 
@@ -279,28 +279,28 @@ function getUserFriends(data, callback) {
   }
 
   if (!data.url) {
-    data.url = FACEBOOK_GRAPH_URL + "/me/friends" + "?limit=" + generalUtils.settings.server.facebook.friendsPageSize + "&offset=0&access_token=" + data.user.thirdParty.accessToken;
+    data.url = FACEBOOK_GRAPH_URL + '/me/friends' + '?limit=' + generalUtils.settings.server.facebook.friendsPageSize + '&offset=0&access_token=' + data.user.thirdParty.accessToken;
   }
 
   var options = {
-    "url": data.url
+    'url': data.url
   };
 
   httpUtils.get(options, function (err, facebookData) {
 
     if (err || !facebookData.data) {
-      callback(new exceptions.ServerException("Unable to retrieve user friends", {
-        "accessToken": data.user.thirdParty.accessToken,
-        "error": facebookData
+      callback(new exceptions.ServerException('Unable to retrieve user friends', {
+        'accessToken': data.user.thirdParty.accessToken,
+        'error': facebookData
       }));
       return;
     }
 
-    data.user.thirdParty.friends = {"list": [], "noPermission": false};
+    data.user.thirdParty.friends = {'list': [], 'noPermission': false};
 
     if (facebookData.data.length > 0) {
       for (var i = 0; i < facebookData.data.length; i++) {
-        var friend = {"id": "" + facebookData.data[i].id, "name": facebookData.data[i].name}
+        var friend = {'id': '' + facebookData.data[i].id, 'name': facebookData.data[i].name}
         data.user.thirdParty.friends.list.push(friend);
       }
       if (facebookData.data.length < generalUtils.settings.server.facebook.friendsPageSize) {
@@ -318,12 +318,12 @@ function getUserFriends(data, callback) {
       //Possibly lack of permission - check if user_friends permission has been declined
       if (data.user.thirdParty.friends.list.length === 0) {
         var userFriendsOptions = {
-          "url": FACEBOOK_GRAPH_URL + "/me/permissions/user_friends",
-          "access_token": data.user.thirdParty.accessToken
+          'url': FACEBOOK_GRAPH_URL + '/me/permissions/user_friends',
+          'access_token': data.user.thirdParty.accessToken
         };
 
         httpUtils.get(options, function (err, facebookData) {
-          if (err || !facebookData.data || facebookData.data.length === 0 || facebookData.data[0].status === "declined") {
+          if (err || !facebookData.data || facebookData.data.length === 0 || facebookData.data[0].status === 'declined') {
             data.user.thirdParty.friends.noPermission = true;
           }
           callback(null, data);
@@ -348,13 +348,13 @@ function getUserFriends(data, callback) {
 //---------------------------------------------------------------------------------------------------------------------------------
 module.exports.getGeneralProfile = function (facebookUserId, callback) {
 
-  var fields = "id,first_name,last_name,name";
+  var fields = 'id,first_name,last_name,name';
 
   var options = {
-    "url": FACEBOOK_GRAPH_URL + "/" + facebookUserId,
-    "qs": {
-      "access_token": generalUtils.settings.server.facebook.appAccessToken,
-      "fields": fields
+    'url': FACEBOOK_GRAPH_URL + '/' + facebookUserId,
+    'qs': {
+      'access_token': generalUtils.settings.server.facebook.appAccessToken,
+      'fields': fields
     }
   };
 

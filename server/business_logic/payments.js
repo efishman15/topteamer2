@@ -1,14 +1,14 @@
-var path = require("path");
-var sessionUtils = require(path.resolve(__dirname,"../business_logic/session"));
-var uuid = require("node-uuid");
-var async = require("async");
-var exceptions = require(path.resolve(__dirname,"../utils/exceptions"));
-var ObjectId = require("mongodb").ObjectID;
-var dalDb = require(path.resolve(__dirname,"../dal/dalDb"));
-var dalFacebook = require(path.resolve(__dirname,"../dal/dalFacebook"));
-var generalUtils = require(path.resolve(__dirname,"../utils/general"));
+var path = require('path');
+var sessionUtils = require(path.resolve(__dirname,'../business_logic/session'));
+var uuid = require('node-uuid');
+var async = require('async');
+var exceptions = require(path.resolve(__dirname,'../utils/exceptions'));
+var ObjectId = require('mongodb').ObjectID;
+var dalDb = require(path.resolve(__dirname,'../dal/dalDb'));
+var dalFacebook = require(path.resolve(__dirname,'../dal/dalFacebook'));
+var generalUtils = require(path.resolve(__dirname,'../utils/general'));
 var google = require('googleapis');
-var Androidpublisher = google.androidpublisher("v2");
+var Androidpublisher = google.androidpublisher('v2');
 var jwtClient;
 
 var PaypalObject = require('paypal-express-checkout').Paypal;
@@ -18,9 +18,9 @@ var paypalSettings;
 PaypalObject.prototype.origParams = PaypalObject.prototype.params;
 PaypalObject.prototype.params = function () {
     var myParams = paypal.origParams();
-    myParams.SOLUTIONTYPE = "Sole";
-    myParams.LANDINGPAGE = "Billing";
-    myParams.VERSION = "124";
+    myParams.SOLUTIONTYPE = 'Sole';
+    myParams.LANDINGPAGE = 'Billing';
+    myParams.VERSION = '124';
     return myParams;
 };
 
@@ -41,7 +41,7 @@ function prepareClientResponse(data) {
 //---------------------------------------------------------
 // analyzePaypalStatus
 //
-// Play with "switches" according to the payment status
+// Play with 'switches' according to the payment status
 //---------------------------------------------------------
 function analyzePaypalStatus(data) {
     switch (data.newPurchase.status) {
@@ -49,10 +49,10 @@ function analyzePaypalStatus(data) {
         //------------------------------------------------------------------------------------------------------
         //-- Proceed with the payment and give the asset if it does not exist
         //------------------------------------------------------------------------------------------------------
-        case "Completed":               //The payment has been completed, and the funds have been added successfully to your account balance.
-        case "Canceled_Reversal":       //A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.
-        case "Completed-Funds-Held":    //The payment has been completed, and the funds have been added successfully to your pending balance.
-        case "Completed_Funds_Held":    //The payment has been completed, and the funds have been added successfully to your pending balance.
+        case 'Completed':               //The payment has been completed, and the funds have been added successfully to your account balance.
+        case 'Canceled_Reversal':       //A reversal has been canceled; for example, when you win a dispute and the funds for the reversal have been returned to you.
+        case 'Completed-Funds-Held':    //The payment has been completed, and the funds have been added successfully to your pending balance.
+        case 'Completed_Funds_Held':    //The payment has been completed, and the funds have been added successfully to your pending balance.
             //See the PAYMENTINFO_n_HOLDDECISION field for more information.
             data.proceedPayment = true;
             break;
@@ -60,17 +60,17 @@ function analyzePaypalStatus(data) {
         //------------------------------------------------------------------------------------------------------
         //-- Temporary state, just write the transaction, notify client on pending - if coming from client
         //------------------------------------------------------------------------------------------------------
-        case "Pending":                 //The payment is pending. See the PendingReason field for more information.
-        case "In-Progress":             //The transaction has not terminated, e.g. an authorization may be awaiting completion.
-            data.serverErrorType = "SERVER_ERROR_PURCHASE_IN_PROGRESS";
+        case 'Pending':                 //The payment is pending. See the PendingReason field for more information.
+        case 'In-Progress':             //The transaction has not terminated, e.g. an authorization may be awaiting completion.
+            data.serverErrorType = 'SERVER_ERROR_PURCHASE_IN_PROGRESS';
             break;
 
         //------------------------------------------------------------------------------------------------------
         //-- Revoke the asset
         //------------------------------------------------------------------------------------------------------
-        case "Partially_Refunded":      //The payment has been partially refunded.
-        case "Refunded":                //You refunded the payment.
-        case "Reversed":                //A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer. The reason for the reversal is specified in the ReasonCode element.
+        case 'Partially_Refunded':      //The payment has been partially refunded.
+        case 'Refunded':                //You refunded the payment.
+        case 'Reversed':                //A payment was reversed due to a chargeback or other type of reversal. The funds have been removed from your account balance and returned to the buyer. The reason for the reversal is specified in the ReasonCode element.
             data.revokeAsset = true;
             data.itemCharged = true;
             break;
@@ -78,18 +78,18 @@ function analyzePaypalStatus(data) {
         //------------------------------------------------------------------------------------------------------
         //-- Terminal state - purchase failed, money has not been recieved - just log the transaction
         //------------------------------------------------------------------------------------------------------
-        case "Denied":                  //You denied the payment. This happens only if the payment was previously pending because of possible reasons described for the PendingReason element.
-        case "Expired":                 //the authorization period for this payment has been reached.
-        case "None":                    //No status.
-        case "Failed":                  //The payment has failed. This happens only if the payment was made from your buyer's bank account.
-        case "Voided":                 //An authorization for this transaction has been voided.
-            data.serverErrorType = "SERVER_ERROR_PURCHASE_FAILED";
+        case 'Denied':                  //You denied the payment. This happens only if the payment was previously pending because of possible reasons described for the PendingReason element.
+        case 'Expired':                 //the authorization period for this payment has been reached.
+        case 'None':                    //No status.
+        case 'Failed':                  //The payment has failed. This happens only if the payment was made from your buyer's bank account.
+        case 'Voided':                 //An authorization for this transaction has been voided.
+            data.serverErrorType = 'SERVER_ERROR_PURCHASE_FAILED';
             break;
 
         //------------------------------------------------------------------------------------------------------
         //-- Just log the transaction
         //------------------------------------------------------------------------------------------------------
-        case "Processed":               //A payment has been accepted.
+        case 'Processed':               //A payment has been accepted.
             break;
 
         //------------------------------------------------------------------------------------------------------
@@ -113,14 +113,14 @@ module.exports.payPalBuy = function (req, res, next) {
         paypalSettings = generalUtils.settings.server.payments.paypal;
 
         //returnUrl, cancelUrl will be set just before each buy
-        paypal = require('paypal-express-checkout').init(paypalSettings.user, paypalSettings.password, paypalSettings.signature, "", "", paypalSettings.debug);
+        paypal = require('paypal-express-checkout').init(paypalSettings.user, paypalSettings.password, paypalSettings.signature, '', '', paypalSettings.debug);
     }
 
     var token = req.headers.authorization;
     var data = req.body;
 
     if (!data.language) {
-        exceptions.ServerResponseException(res, "Language not received during payPal buy", null, "warn", 424);
+        exceptions.ServerResponseException(res, 'Language not received during payPal buy', null, 'warn', 424);
         return;
     }
 
@@ -136,18 +136,18 @@ module.exports.payPalBuy = function (req, res, next) {
         function (data, callback) {
 
             //Invoice number will contain the product id which will be required later for validation
-            var invoiceNumber = uuid.v1() + "_" + data.session.userId + "_" + data.feature;
+            var invoiceNumber = uuid.v1() + '_' + data.session.userId + '_' + data.feature;
 
             var feature = generalUtils.settings.server.features[data.feature];
             if (!feature) {
-                exceptions.ServerResponseException(res, "Invalid feature received during payPal buy", {"feature": data.feature}, "warn", 424);
+                exceptions.ServerResponseException(res, 'Invalid feature received during payPal buy', {'feature': data.feature}, 'warn', 424);
                 return;
             }
 
             var purchaseProduct = generalUtils.settings.server.payments.purchaseProducts[feature.purchaseProductId];
             var purchaseProductDisplayName = purchaseProduct.displayNames[data.language];
             if (!purchaseProductDisplayName) {
-                exceptions.ServerResponseException(res, "Unable to find product display name during payPal buy", {"data": data}, "warn", 424);
+                exceptions.ServerResponseException(res, 'Unable to find product display name during payPal buy', {'data': data}, 'warn', 424);
                 return;
             }
 
@@ -164,16 +164,16 @@ module.exports.payPalBuy = function (req, res, next) {
 
             paypal.pay(invoiceNumber,
                 purchaseProduct.cost,
-                purchaseProductDisplayName, "USD", function (err, url) {
+                purchaseProductDisplayName, 'USD', function (err, url) {
                     if (err) {
 
                         dalDb.closeDb(data);
-                        exceptions.ServerResponseException(res, err, null, "warn", 424);
+                        exceptions.ServerResponseException(res, err, null, 'warn', 424);
                         return;
 
                     }
 
-                    data.response = {"url": url};
+                    data.response = {'url': url};
 
                     dalDb.closeDb(data);
 
@@ -222,7 +222,7 @@ module.exports.processPayment = function (req, res, next) {
     var data = req.body;
     data.token = token;
 
-    if (data.method === "facebook") {
+    if (data.method === 'facebook') {
         //For facebook payments
         data.paymentId = data.purchaseData.payment_id;
     }
@@ -235,10 +235,10 @@ module.exports.processPayment = function (req, res, next) {
             res.send(err.httpStatus, err);
         }
         else {
-            if (err.message === "DuplicatePurchase") {
+            if (err.message === 'DuplicatePurchase') {
                 //This is an intentional stop - data contains client response
                 //A duplicate purchase which has completed successfully by another thread
-                //The "additionalInfo" of the err object is the data
+                //The 'additionalInfo' of the err object is the data
                 res.json(err.additionalInfo.clientResponse)
 
             }
@@ -263,17 +263,17 @@ function innerProcessPayment(data, callback) {
 
         function (callback) {
 
-            data.newPurchase = {"method": data.method};
+            data.newPurchase = {'method': data.method};
 
             switch (data.method) {
-                case "paypal":
+                case 'paypal':
                     if (!data.thirdPartyServerCall) {
                         //comming from client
                         paypal.detail(data.purchaseData.purchaseToken, data.purchaseData.payerId, function (err, paypalData, invoiceNumber, amount) {
                             if (err) {
-                                callback(new exceptions.ServerException("Error during DoExpressCheckoutPayment", {
-                                    "error": err,
-                                    "purchaseData": data.purchaseData
+                                callback(new exceptions.ServerException('Error during DoExpressCheckoutPayment', {
+                                    'error': err,
+                                    'purchaseData': data.purchaseData
                                 }, 403));
                             }
 
@@ -286,7 +286,7 @@ function innerProcessPayment(data, callback) {
                             data.newPurchase.extraData = data.paymentData;
 
                             //invoiceNumber is in the format InvoiceNumner_userId_featureName
-                            data.featurePurchased = invoiceNumber.split("_")[2];
+                            data.featurePurchased = invoiceNumber.split('_')[2];
 
                             analyzePaypalStatus(data);
 
@@ -303,7 +303,7 @@ function innerProcessPayment(data, callback) {
 
                         analyzePaypalStatus(data);
 
-                        var invoiceNumberParts = data.paymentData.invoice.split("_");
+                        var invoiceNumberParts = data.paymentData.invoice.split('_');
 
                         data.userId = invoiceNumberParts[1];
                         data.featurePurchased = invoiceNumberParts[2];
@@ -312,7 +312,7 @@ function innerProcessPayment(data, callback) {
                     }
                     break;
 
-                case "facebook":
+                case 'facebook':
                     dalFacebook.getPaymentInfo(data, function () {
                         data.newPurchase.transactionId = data.paymentData.id;
                         data.newPurchase.status = data.paymentData.status;
@@ -323,7 +323,7 @@ function innerProcessPayment(data, callback) {
                     });
                     break;
 
-                case "android":
+                case 'android':
 
                     if (!jwtClient) {
                         jwtClient = new google.auth.JWT(generalUtils.settings.server.google.api.auth.email, null, generalUtils.settings.server.google.api.auth.privateKey, generalUtils.settings.server.google.api.auth.scopes, null);
@@ -331,7 +331,7 @@ function innerProcessPayment(data, callback) {
 
                     jwtClient.authorize(function(err, tokens) {
                         if (err) {
-                            callback(new exceptions.ServerException("Unable to authorize to google with jwt", {"purchaseData": data.purchaseData, "googleError" : err}));
+                            callback(new exceptions.ServerException('Unable to authorize to google with jwt', {'purchaseData': data.purchaseData, 'googleError' : err}));
                             return;
                         }
 
@@ -345,12 +345,12 @@ function innerProcessPayment(data, callback) {
                         Androidpublisher.purchases.products.get(params, function(purchaseError, purchaseResponse) {
                             // handle err and response
                             if (err) {
-                                callback(new exceptions.ServerException("Unable to verify google purchase", {"purchaseData": data.purchaseData, "googleError" : purchaseError}));
+                                callback(new exceptions.ServerException('Unable to verify google purchase', {'purchaseData': data.purchaseData, 'googleError' : purchaseError}));
                                 return;
                             }
 
                             if (purchaseResponse.consumptionState !== 0) {
-                                callback(new exceptions.ServerException("This purchase has already been consumed", {"purchaseData": data.purchaseData, "purchaseResponse" : purchaseResponse}));
+                                callback(new exceptions.ServerException('This purchase has already been consumed', {'purchaseData': data.purchaseData, 'purchaseResponse' : purchaseResponse}));
                                 return;
                             }
 
@@ -364,15 +364,15 @@ function innerProcessPayment(data, callback) {
 
                             switch (purchaseResponse.purchaseState) {
                                 case 0: //completed
-                                    data.newPurchase.status = "completed";
+                                    data.newPurchase.status = 'completed';
                                     data.proceedPayment = true;
                                     break;
                                 case 1: //canceled
-                                    data.newPurchase.status = "canceled";
+                                    data.newPurchase.status = 'canceled';
                                     data.revokeAsset = true;
                                     break;
                                 case 2: //refunded
-                                    data.newPurchase.status = "refunded";
+                                    data.newPurchase.status = 'refunded';
                                     data.proceedPayment = true;
                                     break;
                             }
@@ -398,7 +398,7 @@ function innerProcessPayment(data, callback) {
                 if (!data.thirdPartyServerCall) {
                     prepareClientResponse(data);
                 }
-                callback(new exceptions.InternalServerException("DuplicatePurchase", data));
+                callback(new exceptions.InternalServerException('DuplicatePurchase', data));
             }
             else {
                 callback(null, data);
@@ -409,19 +409,19 @@ function innerProcessPayment(data, callback) {
         function (data, callback) {
 
             switch (data.method) {
-                case "paypal":
-                case "android":
+                case 'paypal':
+                case 'android':
                     callback(null, data);
                     break;
 
-                case "facebook":
+                case 'facebook':
                     //Double check - if client tries to hack without a signed request
                     //Make sure the purchase belongs to him
                     if (data.session && data.purchaseData && !data.purchaseData.signed_request && data.paymentData.user && data.paymentData.user.id !== data.session.facebookUserId) {
-                        callback(new exceptions.ServerException("Error validating payment, payment belongs to someone else", {
-                            "purchaseData": data.purchaseData,
-                            "paymentData": data.paymentData,
-                            "actualFacebookId": data.session.facebookUserId
+                        callback(new exceptions.ServerException('Error validating payment, payment belongs to someone else', {
+                            'purchaseData': data.purchaseData,
+                            'paymentData': data.paymentData,
+                            'actualFacebookId': data.session.facebookUserId
                         }));
                         return;
                     }
@@ -430,7 +430,7 @@ function innerProcessPayment(data, callback) {
                     break;
 
                 default:
-                    callback(new exceptions.ServerException("Method not supported for payment validation", {"method": data.method}, 403));
+                    callback(new exceptions.ServerException('Method not supported for payment validation', {'method': data.method}, 403));
                     return;
             }
         },
@@ -453,7 +453,7 @@ function innerProcessPayment(data, callback) {
                         data.session.assets = {};
                     }
 
-                    data.session.assets[data.featurePurchased] = {"purchaseDate": now, "method": data.method};
+                    data.session.assets[data.featurePurchased] = {'purchaseDate': now, 'method': data.method};
                     data.session.features = sessionUtils.computeFeatures(data.session);
                 }
 
@@ -474,26 +474,26 @@ function innerProcessPayment(data, callback) {
             if ((data.proceedPayment || data.revokeAsset || (data.dispute && data.itemCharged))) {
                 if (!data.session) {
                     if (data.userId) {
-                        data.setUserWhereClause = {"_id": ObjectId(data.userId)};
+                        data.setUserWhereClause = {'_id': ObjectId(data.userId)};
                     }
                     else if (data.facebookUserId) {
-                        data.setUserWhereClause = {"facebookUserId": data.facebookUserId};
+                        data.setUserWhereClause = {'facebookUserId': data.facebookUserId};
                     }
                 }
                 else {
-                    data.setUserWhereClause = {"_id": ObjectId(data.session.userId)};
+                    data.setUserWhereClause = {'_id': ObjectId(data.session.userId)};
                 }
 
                 if (data.revokeAsset) {
                     data.unsetData = {};
-                    data.unsetData["assets." + data.featurePurchased] = "";
+                    data.unsetData['assets.' + data.featurePurchased] = '';
                 }
                 else {
                     data.setData = {};
-                    data.setData["assets." + data.featurePurchased] = {"purchaseDate": now, "method": data.method};
+                    data.setData['assets.' + data.featurePurchased] = {'purchaseDate': now, 'method': data.method};
 
                     //Update only if asset does not exist yet
-                    data.setUserWhereClause["assets." + data.featurePurchased] = {$exists: false};
+                    data.setUserWhereClause['assets.' + data.featurePurchased] = {$exists: false};
                 }
 
                 dalDb.setUser(data, callback);
@@ -506,7 +506,7 @@ function innerProcessPayment(data, callback) {
         //Handle facebook dispute or revoke if required
         function (data, callback) {
 
-            if (data.dispute && data.method === "facebook") {
+            if (data.dispute && data.method === 'facebook') {
                 //At this time - asset must already exist from previous steps
                 //Deny the dispute - currently dispute supported on facebook only
                 dalFacebook.denyDispute(data, callback);
@@ -521,7 +521,7 @@ function innerProcessPayment(data, callback) {
 
             data.closeConnection = true;
 
-            data.logAction = {"action": "payment", "extraData": data.paymentData};
+            data.logAction = {'action': 'payment', 'extraData': data.paymentData};
             if (!data.session) {
                 if (data.userId) {
                     data.logAction.userId = data.userId;

@@ -1,13 +1,13 @@
-var path = require("path");
+var path = require('path');
 var async = require('async');
-var dalFacebook = require(path.resolve(__dirname,"../dal/dalFacebook"));
-var exceptions = require(path.resolve(__dirname,"../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname,"../utils/general"));
-var sessionUtils = require(path.resolve(__dirname,"../business_logic/session"));
-var dalDb = require(path.resolve(__dirname,"../dal/dalDb"));
-var paymentUtils = require(path.resolve(__dirname,"../business_logic/payments"));
-var logger = require(path.resolve(__dirname,"../utils/logger"));
-var util = require("util");
+var dalFacebook = require(path.resolve(__dirname,'../dal/dalFacebook'));
+var exceptions = require(path.resolve(__dirname,'../utils/exceptions'));
+var generalUtils = require(path.resolve(__dirname,'../utils/general'));
+var sessionUtils = require(path.resolve(__dirname,'../business_logic/session'));
+var dalDb = require(path.resolve(__dirname,'../dal/dalDb'));
+var paymentUtils = require(path.resolve(__dirname,'../business_logic/payments'));
+var logger = require(path.resolve(__dirname,'../utils/logger'));
+var util = require('util');
 
 //------------------------------------------------------------------------------------------------
 // Private functions
@@ -20,7 +20,7 @@ var util = require("util");
 function renderContest(viewName, req, res, next) {
 
     if (!req.params.contestId) {
-        new exceptions.ServerResponseException(res, "contestId is required", {}, "warn", 403);
+        new exceptions.ServerResponseException(res, 'contestId is required', {}, 'warn', 403);
         return;
     }
 
@@ -33,10 +33,10 @@ function renderContest(viewName, req, res, next) {
 
             res.render(viewName,
                 {
-                    "appId": generalUtils.settings.server.facebook.appId,
-                    "title": data.contest.name,
-                    "description": generalUtils.settings.server.text[data.contest.language].gameDescription,
-                    "contestId" : req.params.contestId
+                    'appId': generalUtils.settings.server.facebook.appId,
+                    'title': data.contest.name,
+                    'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
+                    'contestId' : req.params.contestId
                 });
         });
     });
@@ -49,16 +49,16 @@ function renderContest(viewName, req, res, next) {
 function renderTeam(viewName, req, res, next) {
 
     if (!req.params.contestId) {
-        new exceptions.ServerResponseException(res, "contestId is required", {}, "warn", 403);
+        new exceptions.ServerResponseException(res, 'contestId is required', {}, 'warn', 403);
         return;
     }
 
     if (req.params.teamId == null) {
-        new exceptions.ServerResponseException(res, "teamId required", {}, "warn", 403);
+        new exceptions.ServerResponseException(res, 'teamId required', {}, 'warn', 403);
         return;
     }
-    if (req.params.teamId !== "0" && req.params.teamId !== "1") {
-        new exceptions.ServerResponseException(res, "teamId must be 0 or 1", {}, "warn", 403);
+    if (req.params.teamId !== '0' && req.params.teamId !== '1') {
+        new exceptions.ServerResponseException(res, 'teamId must be 0 or 1', {}, 'warn', 403);
         return;
     }
 
@@ -73,11 +73,11 @@ function renderTeam(viewName, req, res, next) {
 
             res.render(viewName,
                 {
-                    "appId": generalUtils.settings.server.facebook.appId,
-                    "title": util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, data.contest.name),
-                    "description": generalUtils.settings.server.text[data.contest.language].gameDescription,
-                    "contestId" : req.params.contestId,
-                    "teamId" : req.params.teamId
+                    'appId': generalUtils.settings.server.facebook.appId,
+                    'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, data.contest.name),
+                    'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
+                    'contestId' : req.params.contestId,
+                    'teamId' : req.params.teamId
                 });
         });
     });
@@ -93,26 +93,26 @@ function renderTeam(viewName, req, res, next) {
 //
 // The signed_request is used only to verify if the user is logged in and
 // has authorized the app.
-// In both cases server redirects to client "/fb" route state with 2 states:
+// In both cases server redirects to client '/fb' route state with 2 states:
 // 1. connected=true - the signed request is also sent back to the client and client will authenticate our server again with this signed request.
-// 2. connected=false - "standard" scenario using client JS SDK to authenticate to facebook
+// 2. connected=false - 'standard' scenario using client JS SDK to authenticate to facebook
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 module.exports.canvas = function (req, res, next) {
     var data = req.body;
     var verifier = new dalFacebook.SignedRequest(generalUtils.settings.server.facebook.secretKey, data.signed_request);
     if (!verifier.verify) {
-        new exceptions.ServerResponseException(res, "Invalid signed request received from facebook", {"facebookData": data});
+        new exceptions.ServerResponseException(res, 'Invalid signed request received from facebook', {'facebookData': data});
         return;
     }
 
     var redirectUrl = generalUtils.settings.server.facebook.signedRequestRedirectUrl;
     var language = generalUtils.getLanguageByCountryCode(verifier.data.user.country.toUpperCase())
-    redirectUrl += "?signedRequest=" + data.signed_request + "&language=" + language;
+    redirectUrl += '?signedRequest=' + data.signed_request + '&language=' + language;
     if (verifier.data.oauth_token) {
-        redirectUrl += "&connected=true";
+        redirectUrl += '&connected=true';
     }
     else {
-        redirectUrl += "&connected=false";
+        redirectUrl += '&connected=false';
     }
     res.redirect(redirectUrl);
 }
@@ -130,24 +130,24 @@ module.exports.getProductDetails = function (req, res, next) {
     if (product) {
 
         if (product.displayNames[language]) {
-            res.render("fbproduct",
+            res.render('fbproduct',
                 {
-                    "title": product.displayNames[language],
-                    "description": product.displayNames[language],
-                    "productUrl": generalUtils.settings.client.general.baseUrlSecured + "fb/payments?productId=" + productId + "&language=" + language,
-                    "language": language,
-                    "productId": productId
+                    'title': product.displayNames[language],
+                    'description': product.displayNames[language],
+                    'productUrl': generalUtils.settings.client.general.baseUrlSecured + 'fb/payments?productId=' + productId + '&language=' + language,
+                    'language': language,
+                    'productId': productId
                 });
         }
         else {
-            new exceptions.ServerResponseException(res, "Invalid language received from facebook", {
-                "productId": productId,
-                "language": language
-            }, "warn", 403);
+            new exceptions.ServerResponseException(res, 'Invalid language received from facebook', {
+                'productId': productId,
+                'language': language
+            }, 'warn', 403);
         }
     }
     else {
-        new exceptions.ServerResponseException(res, "Invalid product id received from facebook", {"productId": productId}, "warn", 403);
+        new exceptions.ServerResponseException(res, 'Invalid product id received from facebook', {'productId': productId}, 'warn', 403);
     }
 }
 
@@ -158,16 +158,16 @@ module.exports.getProductDetails = function (req, res, next) {
 module.exports.getGameDetails = function (req, res, next) {
 
     if (!req.params.language) {
-        new exceptions.ServerResponseException(res, "language is required", {}, "warn", 403);
+        new exceptions.ServerResponseException(res, 'language is required', {}, 'warn', 403);
         return;
     }
 
-    res.render("fbgame",
+    res.render('fbgame',
         {
-            "appId": generalUtils.settings.server.facebook.appId,
-            "title": generalUtils.settings.server.text[req.params.language].gameTitle,
-            "description": generalUtils.settings.server.text[req.params.language].gameDescription,
-            "language" : req.params.language
+            'appId': generalUtils.settings.server.facebook.appId,
+            'title': generalUtils.settings.server.text[req.params.language].gameTitle,
+            'description': generalUtils.settings.server.text[req.params.language].gameDescription,
+            'language' : req.params.language
         });
 };
 
@@ -178,32 +178,32 @@ module.exports.getGameDetails = function (req, res, next) {
 module.exports.getProfileDetails = function (req, res, next) {
 
     if (!req.params.id) {
-        new exceptions.ServerResponseException(res, "id is required", {}, "warn", 403);
+        new exceptions.ServerResponseException(res, 'id is required', {}, 'warn', 403);
         return;
     }
 
     if (!req.params.language) {
-        new exceptions.ServerResponseException(res, "language is required", {}, "warn", 403);
+        new exceptions.ServerResponseException(res, 'language is required', {}, 'warn', 403);
         return;
     }
 
     dalFacebook.getGeneralProfile(req.params.id, function(err, facebookData) {
 
         if (err) {
-            new exceptions.ServerResponseException(res, err.message, err, "warn", 403);
+            new exceptions.ServerResponseException(res, err.message, err, 'warn', 403);
             return;
         }
 
-        res.render("fbprofile",
+        res.render('fbprofile',
             {
-                "appId": generalUtils.settings.server.facebook.appId,
-                "id" : facebookData.id,
-                "name" : facebookData.name,
-                "firstName": facebookData.first_name,
-                "lastName": facebookData.last_name,
-                "description" : generalUtils.settings.server.text[req.params.language].gameDescription,
-                "language" : req.params.language,
-                "redirectLink" : generalUtils.settings.client.general.downloadUrl[req.params.language]
+                'appId': generalUtils.settings.server.facebook.appId,
+                'id' : facebookData.id,
+                'name' : facebookData.name,
+                'firstName': facebookData.first_name,
+                'lastName': facebookData.last_name,
+                'description' : generalUtils.settings.server.text[req.params.language].gameDescription,
+                'language' : req.params.language,
+                'redirectLink' : generalUtils.settings.client.general.downloadUrl[req.params.language]
             });
 
     });
@@ -215,7 +215,7 @@ module.exports.getProfileDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getContestDetails = function (req, res, next) {
-    renderContest("fbcontest", req, res, next);
+    renderContest('fbcontest', req, res, next);
 };
 
 //----------------------------------------------------
@@ -223,7 +223,7 @@ module.exports.getContestDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getContestLeaderDetails = function (req, res, next) {
-    renderContest("fbcontestleader", req, res, next);
+    renderContest('fbcontestleader', req, res, next);
 };
 
 //----------------------------------------------------
@@ -231,7 +231,7 @@ module.exports.getContestLeaderDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getTeamDetails = function (req, res, next) {
-    renderTeam("fbteam", req, res, next);
+    renderTeam('fbteam', req, res, next);
 };
 
 //----------------------------------------------------
@@ -239,7 +239,7 @@ module.exports.getTeamDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getTeamLeaderDetails = function (req, res, next) {
-    renderTeam("fbteamleader", req, res, next);
+    renderTeam('fbteamleader', req, res, next);
 };
 
 
@@ -249,8 +249,8 @@ module.exports.getTeamLeaderDetails = function (req, res, next) {
 //----------------------------------------------------
 module.exports.getChallenge = function (req, res, next) {
 
-    console.log("facebook coming 2...");
-    var hubChallenge = req.query["hub.challenge"];
+    console.log('facebook coming 2...');
+    var hubChallenge = req.query['hub.challenge'];
     if (hubChallenge) {
         res.send(200, hubChallenge);
         res.end();
@@ -270,12 +270,12 @@ module.exports.dynamicPricing = function (req, res, next) {
     var data = req.body;
     var verifier = new dalFacebook.SignedRequest(generalUtils.settings.server.facebook.secretKey, data.signed_request);
     if (!verifier.verify) {
-        new exceptions.ServerResponseException(res, "Invalid signed request received from facebook", {"facebookData": data}, "warn", 403);
+        new exceptions.ServerResponseException(res, 'Invalid signed request received from facebook', {'facebookData': data}, 'warn', 403);
         return;
     }
 
     //requestId in the format  featureName|timeStamp
-    var requestIdParts = data.request_id.split("|");
+    var requestIdParts = data.request_id.split('|');
     var featureName = requestIdParts[0];
 
     //The user's session holds the features with the adjusted cost for the feature (e.g. for mobile payments)
@@ -293,7 +293,7 @@ module.exports.dynamicPricing = function (req, res, next) {
         function (data, callback) {
             if (!data.session.features[featureName]) {
                 dalDb.closeDb(data);
-                callback(new exceptions.ServerResponseException(res, "Invalid signed request received from facebook", {"facebookData": data}, "warn", 403));
+                callback(new exceptions.ServerResponseException(res, 'Invalid signed request received from facebook', {'facebookData': data}, 'warn', 403));
                 return;
             }
 
@@ -327,9 +327,9 @@ module.exports.ipn = function (req, res, next) {
 
     var data = req.body;
 
-    logger.facebookIPN.info(data, "incoming facebook ipn");
+    logger.facebookIPN.info(data, 'incoming facebook ipn');
 
-    data.method = "facebook";
+    data.method = 'facebook';
     data.thirdPartyServerCall = true;
 
     data.sessionOptional = true;
@@ -339,12 +339,12 @@ module.exports.ipn = function (req, res, next) {
         if (!err) {
             res.send(200);
         }
-        else if (err.message === "DuplicatePurchase") {
-            logger.facebookIPN.info(data, "Duplicate purchase - already credited online");
+        else if (err.message === 'DuplicatePurchase') {
+            logger.facebookIPN.info(data, 'Duplicate purchase - already credited online');
             res.send(200);
         }
         else {
-            logger.facebookIPN.info(err, "Error during processing facebook ipn message");
+            logger.facebookIPN.info(err, 'Error during processing facebook ipn message');
             res.send(500);
         }
     });

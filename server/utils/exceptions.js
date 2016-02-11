@@ -1,9 +1,9 @@
-var path = require("path");
-var logger = require(path.resolve(__dirname,"./logger"));
+var path = require('path');
+var logger = require(path.resolve(__dirname,'./logger'));
 
 //-------------------------------------------------------------------------------------
 // Class ServerMessageException
-// Exception returned back to the client - which converts the "type"
+// Exception returned back to the client - which converts the 'type'
 // to an ionic alert popup (including translation).
 // additionalInfo can be passed to the tranlation object to add additional data
 //-------------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ function ServerMessageException(type, additionalInfo, httpStatus) {
 
 //-------------------------------------------------------------------------------------
 // Class UnhandledServerException
-// Exception returned back to the client as a "general" error.
+// Exception returned back to the client as a 'general' error.
 // Usually points to a bug
 // to an ionic alert popup (including translation).
 // additionalInfo can be passed to the tranlation object to add additional data
@@ -37,7 +37,7 @@ function ServerMessageException(type, additionalInfo, httpStatus) {
 module.exports.UnhandledServerException = UnhandledServerException;
 function UnhandledServerException(err) {
 
-    var exception = new ServerMessageException("SERVER_ERROR_GENERAL", null, 500);
+    var exception = new ServerMessageException('SERVER_ERROR_GENERAL', null, 500);
     logger.server.fatal(err);
     logger.console.fatal(err);
 
@@ -48,7 +48,7 @@ function UnhandledServerException(err) {
 
 //-------------------------------------------------------------------------------------
 // Class ServerException
-// Exception returned back to the client as a "general" error.
+// Exception returned back to the client as a 'general' error.
 // Usually points to a client hack, wrong data being sent to the server
 // Will write to the log the details of the hack
 //-------------------------------------------------------------------------------------
@@ -59,26 +59,26 @@ function ServerException(message, additionalInfo, severity, httpStatus) {
         httpStatus = 403;
     }
 
-    var exception = new ServerMessageException("SERVER_ERROR_GENERAL", null, httpStatus);
+    var exception = new ServerMessageException('SERVER_ERROR_GENERAL', null, httpStatus);
 
     if (!additionalInfo) {
         additionalInfo = {};
     }
 
     if (!severity) {
-        severity = "info";
+        severity = 'info';
     }
 
     switch (severity) {
-        case "info":
+        case 'info':
             logger.server.info(additionalInfo, message);
             logger.console.info(additionalInfo, message);
             break;
-        case "warn":
+        case 'warn':
             logger.server.warn(additionalInfo, message);
             logger.console.info(additionalInfo, message);
             break;
-        case "error":
+        case 'error':
             logger.server.error(additionalInfo, message);
             logger.console.info(additionalInfo, message);
             break;
@@ -109,7 +109,7 @@ function ServerResponseException(res, message, additionalInfo, severity, httpSta
 module.exports.InternalServerException = InternalServerException;
 function InternalServerException(message, additionalInfo) {
 
-    var exception = {"message" : message};
+    var exception = {'message' : message};
 
     if (additionalInfo) {
         exception.additionalInfo = additionalInfo;

@@ -1,5 +1,5 @@
-var path = require("path");
-var generalUtils = require(path.resolve(__dirname,"../utils/general"));
+var path = require('path');
+var generalUtils = require(path.resolve(__dirname,'../utils/general'));
 
 //---------------------------------------------------------------------------------
 // addXp

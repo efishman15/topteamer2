@@ -1,8 +1,8 @@
-var path = require("path");
-var async = require("async");
-var dalDb = require(path.resolve(__dirname, "../dal/dalDb"));
-var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname, "../utils/general"));
+var path = require('path');
+var async = require('async');
+var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 
 //----------------------------------------------------
 // private functions
@@ -131,7 +131,7 @@ module.exports.saveSettings = function (req, res, next) {
 
     //Save the settings to the user object
     function (data, callback) {
-      data.setData = {"settings": data.session.settings};
+      data.setData = {'settings': data.session.settings};
       data.closeConnection = true;
       dalDb.setUser(data, callback);
     }
@@ -173,7 +173,7 @@ module.exports.toggleSound = function (req, res, next) {
 
     //Save the settings to the user object
     function (data, callback) {
-      data.setData = {"settings.sound": data.session.settings.sound};
+      data.setData = {'settings.sound': data.session.settings.sound};
       data.closeConnection = true;
       dalDb.setUser(data, callback);
     }
@@ -200,7 +200,7 @@ module.exports.setGcmRegistration = function (req, res, next) {
   var data = req.body;
 
   if (!data.registrationId) {
-    exceptions.ServerResponseException(res, "registrationId not supplied", null, "warn", 424);
+    exceptions.ServerResponseException(res, 'registrationId not supplied', null, 'warn', 424);
     return;
   }
 
@@ -221,7 +221,7 @@ module.exports.setGcmRegistration = function (req, res, next) {
 
     //Save the settings to the user object
     function (data, callback) {
-      data.setData = {"gcmRegistrationId": data.registrationId};
+      data.setData = {'gcmRegistrationId': data.registrationId};
       data.closeConnection = true;
       dalDb.setUser(data, callback);
     }
@@ -273,12 +273,12 @@ module.exports.computeFeatures = function (userOrSession) {
       }
 
       switch (property) {
-        case "newContest":
+        case 'newContest':
           features[property].locked = !(userOrSession.isAdmin) &&
             userOrSession.rank < serverFeature.unlockRank &&
             (!userOrSession.assets || !userOrSession.assets[property])
           break;
-        case "challengeFriendContest":
+        case 'challengeFriendContest':
           features[property].locked = true;
       }
     }

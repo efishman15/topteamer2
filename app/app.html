@@ -1,6 +1,6 @@
 
 <!-- left menu -->
-<ion-menu [content]="content">
+<ion-menu *ngIf="client.loaded" [content]="content" side="{{client.currentLanguage.align}}">
 
   <ion-toolbar *ngIf="client.loaded">
     <ion-title>{{client.translate('TOOLS')}}</ion-title>
@@ -10,11 +10,11 @@
 
     <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
 
-      <button ion-item (click)="newContest()">
+      <button menuClose ion-item (click)="newContest()">
         <ion-icon name="add"></ion-icon>
         {{client.translate('NEW_CONTEST')}}
       </button>
-      <button ion-item (click)="share()">
+      <button menuClose ion-item (click)="share()">
         <ion-icon name="share-alt"></ion-icon>
         {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
       </button>
@@ -25,4 +25,5 @@
 </ion-menu>
 
 <!-- main navigation -->
-<ion-nav id="nav" [root]="root" #content swipe-back-enabled="false"></ion-nav>
+<ion-nav id="nav" [root]="root" #content swipe-back-enabled="false">
+</ion-nav>

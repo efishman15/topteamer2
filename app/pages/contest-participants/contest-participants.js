@@ -20,7 +20,12 @@ var ContestParticipantsPage = (function () {
         this.source = params.data.source;
         this.client = client_1.Client.getInstance();
     }
-    ContestParticipantsPage.prototype.onPageDidEnter = function () {
+    ContestParticipantsPage.prototype.onPageWillEnter = function () {
+        if (this.leadersComponent) {
+            this.showContestParticipants();
+        }
+    };
+    ContestParticipantsPage.prototype.ngAfterViewInit = function () {
         this.showContestParticipants();
     };
     ContestParticipantsPage.prototype.showContestParticipants = function () {

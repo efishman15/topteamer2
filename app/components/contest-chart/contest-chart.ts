@@ -21,7 +21,7 @@ export class ContestChartComponent {
   @Output() teamSelected = new EventEmitter();
 
   events:Object = {
-    "dataplotClick": (eventObj, dataObj) => {
+    'dataplotClick': (eventObj, dataObj) => {
       var teamId = dataObj.dataIndex;
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
@@ -29,7 +29,7 @@ export class ContestChartComponent {
       this.teamSelected.emit({'teamId': teamId, 'source': 'bar', 'contest': this.contestChart.contest});
       this.chartTeamEventHandled = true;
     },
-    "dataLabelClick": (eventObj, dataObj) => {
+    'dataLabelClick': (eventObj, dataObj) => {
       var teamId = dataObj.dataIndex;
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
@@ -37,7 +37,7 @@ export class ContestChartComponent {
       this.teamSelected.emit({'teamId': teamId, 'source': 'label', 'contest': this.contestChart.contest});
       this.chartTeamEventHandled = true;
     },
-    "chartClick": (eventObj, dataObj) => {
+    'chartClick': (eventObj, dataObj) => {
       if (!this.chartTeamEventHandled) {
         this.contestSelected.emit({'contest': this.contestChart.contest})
       }

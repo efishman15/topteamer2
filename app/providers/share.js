@@ -42,7 +42,7 @@ exports.getVariables = function (contest) {
         shareVariables.shareSubject = client.translate('SHARE_SUBJECT');
         shareVariables.shareBody = client.translate('SHARE_BODY', { url: shareVariables.shareUrl });
         shareVariables.shareBodyEmail = client.translate('SHARE_BODY', { url: shareVariables.shareUrl + emailRef });
-        shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' - "' + client.translate('WHO_IS_SMARTER_QUESTION') + '"';
+        shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' - "' + client.translate('GAME_NAME') + '"';
     }
     return shareVariables;
 };

@@ -1,14 +1,14 @@
-var path = require("path");
-var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname, "../utils/general"));
-var sessionUtils = require(path.resolve(__dirname, "./session"));
-var logger = require(path.resolve(__dirname, "../utils/logger"));
-var async = require("async");
-var httpUtils = require(path.resolve(__dirname, "../utils/http"));
-var dalDb = require(path.resolve(__dirname, "../dal/dalDb"));
-var cache = require(path.resolve(__dirname, "../utils/cache"));
+var path = require('path');
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var sessionUtils = require(path.resolve(__dirname, './session'));
+var logger = require(path.resolve(__dirname, '../utils/logger'));
+var async = require('async');
+var httpUtils = require(path.resolve(__dirname, '../utils/http'));
+var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
+var cache = require(path.resolve(__dirname, '../utils/cache'));
 
-var HOSTED_GAMES_API_PREFIX = "https://games.gamepix.com/";
+var HOSTED_GAMES_API_PREFIX = 'https://games.gamepix.com/';
 
 //--------------------------------------------------------------------------
 // getCategories
@@ -38,7 +38,7 @@ module.exports.getCategories = function (req, res, next) {
         return;
       }
 
-      var categories = cache.get("categories");
+      var categories = cache.get('categories');
 
       if (categories) {
         data.hostedGamesCategories = categories;
@@ -46,8 +46,8 @@ module.exports.getCategories = function (req, res, next) {
       }
       else {
         var options = {
-          "url": HOSTED_GAMES_API_PREFIX + "categories",
-          "json": true
+          'url': HOSTED_GAMES_API_PREFIX + 'categories',
+          'json': true
         };
 
         httpUtils.get(options, function (err, hostedGamesCategories) {
@@ -58,9 +58,9 @@ module.exports.getCategories = function (req, res, next) {
           }
           data.hostedGamesCategories = {};
           for (var i = 0; i < hostedGamesCategories.data.length; i++) {
-            data.hostedGamesCategories["" + hostedGamesCategories.data[i].id] = hostedGamesCategories.data[i];
+            data.hostedGamesCategories['' + hostedGamesCategories.data[i].id] = hostedGamesCategories.data[i];
           }
-          cache.set("categories", data.hostedGamesCategories);
+          cache.set('categories', data.hostedGamesCategories);
           dalDb.closeDb(data);
           callback(null, data);
         });
@@ -89,22 +89,22 @@ module.exports.getGames = function (req, res, next) {
   var data = req.body;
 
   if (!data.categoryId) {
-    exceptions.ServerResponseException(res, "categoryId not supplied", null, "warn", 424);
+    exceptions.ServerResponseException(res, 'categoryId not supplied', null, 'warn', 424);
     return;
   }
 
-  var categories = cache.get("categories");
+  var categories = cache.get('categories');
 
   if (!categories) {
-    exceptions.ServerResponseException(res, "Trying to retrieve games from category while categories not yet retrieved", data, "warn", 424);
+    exceptions.ServerResponseException(res, 'Trying to retrieve games from category while categories not yet retrieved', data, 'warn', 424);
     return;
   }
 
-  if (!categories["" + data.categoryId]) {
-    exceptions.ServerResponseException(res, "Trying to retrieve games from category while category does not exist", {
-      "categories": categories,
-      "data": data
-    }, "warn", 424);
+  if (!categories['' + data.categoryId]) {
+    exceptions.ServerResponseException(res, 'Trying to retrieve games from category while category does not exist', {
+      'categories': categories,
+      'data': data
+    }, 'warn', 424);
     return;
   }
 
@@ -126,16 +126,16 @@ module.exports.getGames = function (req, res, next) {
         return;
       }
 
-      var games = categories["" + data.categoryId].games;
+      var games = categories['' + data.categoryId].games;
       if (games) {
         data.hostedGames = games;
         callback(null, data);
       }
       else {
         var options = {
-          "url": HOSTED_GAMES_API_PREFIX + "games",
-          "qs": {"category": data.categoryId},
-          "json": true
+          'url': HOSTED_GAMES_API_PREFIX + 'games',
+          'qs': {'category': data.categoryId},
+          'json': true
         };
 
         httpUtils.get(options, function (err, hostedGames) {
@@ -146,11 +146,11 @@ module.exports.getGames = function (req, res, next) {
           }
           data.hostedGames = [];
           for (var i = 0; i < hostedGames.data.length; i++) {
-            if (hostedGames.data[i].orientation === "portrait") {
+            if (hostedGames.data[i].orientation === 'portrait') {
               data.hostedGames.push(hostedGames.data[i]);
             }
           }
-          categories["" + data.categoryId].games = data.hostedGames;
+          categories['' + data.categoryId].games = data.hostedGames;
           dalDb.closeDb(data);
           callback(null, data);
         });

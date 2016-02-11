@@ -1,11 +1,11 @@
-var path = require("path");
-var exceptions = require(path.resolve(__dirname,"../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname,"../utils/general"));
-var logger = require(path.resolve(__dirname,"../utils/logger"));
-var async = require("async");
-var sessionUtils = require(path.resolve(__dirname,"./session"));
-var dalDb = require(path.resolve(__dirname,"../dal/dalDb"));
-var cache = require(path.resolve(__dirname,"../utils/cache"));
+var path = require('path');
+var exceptions = require(path.resolve(__dirname,'../utils/exceptions'));
+var generalUtils = require(path.resolve(__dirname,'../utils/general'));
+var logger = require(path.resolve(__dirname,'../utils/logger'));
+var async = require('async');
+var sessionUtils = require(path.resolve(__dirname,'./session'));
+var dalDb = require(path.resolve(__dirname,'../dal/dalDb'));
+var cache = require(path.resolve(__dirname,'../utils/cache'));
 
 //--------------------------------------------------------------------------
 // clearCache
@@ -71,7 +71,7 @@ module.exports.restart = function (req, res, next) {
         res.json(generalUtils.okResponse);
         res.end();
 
-        logger.server.info({"user" : data.session.name}, "Restarting server per admins request");
+        logger.server.info({'user' : data.session.name}, 'Restarting server per admins request');
 
         //Forever module will take care of restarting the process again
         setTimeout(function() {

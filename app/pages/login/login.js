@@ -16,7 +16,7 @@ var LoginPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     LoginPage.prototype.onPageLoaded = function () {
-        this.client.setPageTitle('WHO_IS_SMARTER_QUESTION');
+        this.client.setPageTitle('GAME_NAME');
     };
     LoginPage.prototype.login = function () {
         var _this = this;

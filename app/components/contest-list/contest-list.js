@@ -17,15 +17,11 @@ var ContestListComponent = (function () {
         this.contestSelected = new core_1.EventEmitter();
         this.teamSelected = new core_1.EventEmitter();
         this.events = {
-            "chartClick": function (eventObj, dataObj) {
+            'chartClick': function (eventObj, dataObj) {
                 _this.selectContest(eventObj.sender.args.dataSource.contest);
             }
         };
         this.client = client_1.Client.getInstance();
-        this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
-            console.log('contest updated - refreshing list');
-            _this.refresh();
-        });
     }
     ContestListComponent.prototype.selectContest = function (contest) {
         this.contestSelected.emit(contest);
@@ -37,7 +33,7 @@ var ContestListComponent = (function () {
             _this.contests = contests;
             _this.contestCharts = [];
             for (var i = 0; i < contests.length; i++) {
-                _this.contestCharts.push(contestsService.prepareContestChart(contests[i], "ends"));
+                _this.contestCharts.push(contestsService.prepareContestChart(contests[i], 'ends'));
             }
         });
     };
@@ -45,7 +41,7 @@ var ContestListComponent = (function () {
         this.contestSelected.emit(data);
     };
     ContestListComponent.prototype.onTeamSelected = function (data) {
-        //This is not a mistake - on chart lists - any click in any area should "select" the entire contest
+        //This is not a mistake - on chart lists - any click in any area should 'select' the entire contest
         this.contestSelected.emit(data);
     };
     __decorate([

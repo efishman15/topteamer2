@@ -1,14 +1,14 @@
-var path = require("path");
-var sessionUtils = require(path.resolve(__dirname, "../business_logic/session"));
-var async = require("async");
-var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
-var random = require(path.resolve(__dirname, "../utils/random"));
-var dalDb = require(path.resolve(__dirname, "../dal/dalDb"));
-var generalUtils = require(path.resolve(__dirname, "../utils/general"));
-var contestsBusinessLogic = require(path.resolve(__dirname, "../business_logic/contests"));
-var dalLeaderboard = require(path.resolve(__dirname, "../dal/dalLeaderboards"));
-var commonBusinessLogic = require(path.resolve(__dirname, "./common"));
-var util = require("util");
+var path = require('path');
+var sessionUtils = require(path.resolve(__dirname, '../business_logic/session'));
+var async = require('async');
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var random = require(path.resolve(__dirname, '../utils/random'));
+var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var contestsBusinessLogic = require(path.resolve(__dirname, '../business_logic/contests'));
+var dalLeaderboard = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
+var commonBusinessLogic = require(path.resolve(__dirname, './common'));
+var util = require('util');
 
 //--------------------------------------------------------------------------
 //Private functions
@@ -90,7 +90,7 @@ module.exports.start = function (req, res, next) {
   data.clientResponse = {};
 
   if (!data.contestId) {
-    exceptions.ServerResponseException(res, "contestId not supplied", null, "warn", 424);
+    exceptions.ServerResponseException(res, 'contestId not supplied', null, 'warn', 424);
     return;
   }
 
@@ -109,7 +109,7 @@ module.exports.start = function (req, res, next) {
 
       if (!data.contest.users || !data.contest.users[data.session.userId]) {
         data.DbHelper.close();
-        callback(new exceptions.ServerMessageException("SERVER_ERROR_NOT_JOINED_TO_CONTEST"));
+        callback(new exceptions.ServerMessageException('SERVER_ERROR_NOT_JOINED_TO_CONTEST'));
       }
       else {
         callback(null, data);
@@ -121,29 +121,29 @@ module.exports.start = function (req, res, next) {
 
       var quiz = {};
       quiz.clientData = {
-        "currentQuestionIndex": -1, //First question will be incremented to 0
-        "finished": false
+        'currentQuestionIndex': -1, //First question will be incremented to 0
+        'finished': false
       };
 
       quiz.serverData = {
-        "contestId": data.contestId,
-        "score": 0,
-        "correctAnswers": 0,
-        "share": {"data": {}}
+        'contestId': data.contestId,
+        'score': 0,
+        'correctAnswers': 0,
+        'share': {'data': {}}
       };
 
-      if (data.contest.content.category.id === "user" && data.contest.creator.id.toString() === data.session.userId.toString()) {
-        quiz.clientData.reviewMode = {"reason": "REVIEW_MODE_OWNER"};
+      if (data.contest.content.category.id === 'user' && data.contest.creator.id.toString() === data.session.userId.toString()) {
+        quiz.clientData.reviewMode = {'reason': 'REVIEW_MODE_OWNER'};
       }
-      else if (data.contest.content.category.id === "user" && data.contest.users[data.session.userId].lastPlayed) {
+      else if (data.contest.content.category.id === 'user' && data.contest.users[data.session.userId].lastPlayed) {
         //user is allowed to play a user-based questions contest that he DID NOT create - only once for real points
         //other plays - are for review only
-        quiz.clientData.reviewMode = {"reason": "REVIEW_MODE_PLAY_AGAIN"};
+        quiz.clientData.reviewMode = {'reason': 'REVIEW_MODE_PLAY_AGAIN'};
       }
 
       //Number of questions (either entered by user or X random questions from the system
-      if (data.contest.content.category.id !== "user") {
-        quiz.clientData.totalQuestions = generalUtils.settings.client.quiz.questions.score.length;
+      if (data.contest.content.category.id !== 'user') {
+        quiz.clientData.totalQuestions = 2;//generalUtils.settings.client.quiz.questions.score.length;
         quiz.serverData.previousQuestions = [];
       }
       else {
@@ -154,7 +154,7 @@ module.exports.start = function (req, res, next) {
       var myTeam = data.contest.users[data.session.userId].team;
 
       //--------------------------------------------------------------------------------------------------
-      //-- prepare "background check" data for stories - to later evaludate if they happened
+      //-- prepare 'background check' data for stories - to later evaludate if they happened
       //--------------------------------------------------------------------------------------------------
 
       //-- store the leading team
@@ -167,7 +167,7 @@ module.exports.start = function (req, res, next) {
       else {
         //Tie between the teams - take the OTHER team which I am not playing for
         //Any positive score achieved for my team will create a share story
-        //"My score just made my team lead..."
+        //'My score just made my team lead...'
         quiz.serverData.share.data.leadingTeam = 1 - myTeam;
       }
 
@@ -243,7 +243,7 @@ module.exports.answer = function (req, res, next) {
   var token = req.headers.authorization;
   var data = req.body;
 
-  data.clientResponse = {"question": {}};
+  data.clientResponse = {'question': {}};
 
   var operations = [
 
@@ -258,13 +258,13 @@ module.exports.answer = function (req, res, next) {
 
       if (!data.session.quiz) {
         dalDb.closeDb(data);
-        callback(new exceptions.ServerMessageException("SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ", null, 403));
+        callback(new exceptions.ServerMessageException('SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ', null, 403));
         return;
       }
 
       var answers = data.session.quiz.serverData.currentQuestion.answers;
       if (data.id < 0 || data.id > answers.length - 1) {
-        callback(new exceptions.ServerException("Invalid answer id", {"answerId": data.id}));
+        callback(new exceptions.ServerException('Invalid answer id', {'answerId': data.id}));
       }
 
       data.clientResponse.question.answerId = data.id;
@@ -273,7 +273,7 @@ module.exports.answer = function (req, res, next) {
 
         data.session.quiz.serverData.correctAnswers++;
 
-        commonBusinessLogic.addXp(data, "correctAnswer");
+        commonBusinessLogic.addXp(data, 'correctAnswer');
 
         var questionScore;
         if (!data.session.quiz.clientData.reviewMode) {
@@ -349,9 +349,9 @@ module.exports.answer = function (req, res, next) {
       if (data.session.quiz.clientData.finished || (data.xpProgress && data.xpProgress.addition > 0)) {
 
         data.setData = {
-          "score": data.session.score,
-          "xp": data.session.xp,
-          "rank": data.session.rank
+          'score': data.session.score,
+          'xp': data.session.xp,
+          'rank': data.session.rank
         };
         dalDb.setUser(data, callback);
       }
@@ -384,8 +384,8 @@ module.exports.answer = function (req, res, next) {
 
       //PerfectScore story
       if (data.session.quiz.serverData.correctAnswers === data.session.quiz.clientData.totalQuestions) {
-        commonBusinessLogic.addXp(data, "quizFullScore");
-        setPostStory(data, "gotPerfectScore", data.contest.teams[myTeam].link);
+        commonBusinessLogic.addXp(data, 'quizFullScore');
+        setPostStory(data, 'gotPerfectScore', data.contest.teams[myTeam].link);
       }
 
       //Update all leaderboards with the score achieved - don't wait for any callbacks of the leaderboard - can
@@ -401,49 +401,49 @@ module.exports.answer = function (req, res, next) {
       // 3. My score in my teams contribution
       // 4. My team's score in this contest
       data.setData = {};
-      data.setData["users." + data.session.userId + ".score"] = myContestUser.score;
-      data.setData["users." + data.session.userId + ".teamScores." + myTeam] = myContestUser.teamScores[myTeam];
-      data.setData["users." + data.session.userId + ".lastPlayed"] = (new Date()).getTime();
+      data.setData['users.' + data.session.userId + '.score'] = myContestUser.score;
+      data.setData['users.' + data.session.userId + '.teamScores.' + myTeam] = myContestUser.teamScores[myTeam];
+      data.setData['users.' + data.session.userId + '.lastPlayed'] = (new Date()).getTime();
       data.setData.score = data.contest.score + data.session.quiz.serverData.score;
 
       // Check if need to replace the contest leader
       // Leader is the participant that has contributed max points for the contest regardless of teams)
       if (myContestUser.score > data.contest.users[data.contest.leader.userId].score) {
-        data.setData["leader.userId"] = data.session.userId;
-        data.setData["leader.avatar"] = data.session.avatar;
-        data.setData["leader.name"] = data.session.name;
-        setPostStory(data, "becameContestLeader", data.contest.leaderLink);
+        data.setData['leader.userId'] = data.session.userId;
+        data.setData['leader.avatar'] = data.session.avatar;
+        data.setData['leader.name'] = data.session.name;
+        setPostStory(data, 'becameContestLeader', data.contest.leaderLink);
       }
 
       // Check if need to replace the my team's leader
       // Team leader is the participant that has contributed max points for his/her team)
       if (!data.contest.teams[myTeam].leader || myContestUser.teamScores[myTeam] > data.contest.users[data.contest.teams[myTeam].leader.userId].teamScores[myTeam]) {
-        data.setData["teams." + myTeam + ".leader.userId"] = data.session.userId;
-        data.setData["teams." + myTeam + ".leader.avatar"] = data.session.avatar;
-        data.setData["teams." + myTeam + ".leader.name"] = data.session.name;
-        setPostStory(data, "becameTeamLeader", data.contest.teams[myTeam].leaderLink);
+        data.setData['teams.' + myTeam + '.leader.userId'] = data.session.userId;
+        data.setData['teams.' + myTeam + '.leader.avatar'] = data.session.avatar;
+        data.setData['teams.' + myTeam + '.leader.name'] = data.session.name;
+        setPostStory(data, 'becameTeamLeader', data.contest.teams[myTeam].leaderLink);
       }
 
       //Update the team score
       data.contest.teams[data.contest.users[data.session.userId].team].score += data.session.quiz.serverData.score;
-      data.setData["teams." + data.contest.users[data.session.userId].team + ".score"] = data.contest.teams[data.contest.users[data.session.userId].team].score;
+      data.setData['teams.' + data.contest.users[data.session.userId].team + '.score'] = data.contest.teams[data.contest.users[data.session.userId].team].score;
 
       //Check if one of 2 stories happened:
       // 1. My team started leading
       // 2. My team is very close to lead
       if (data.session.quiz.serverData.share.data.myTeamStartedBehind) {
         if (data.contest.teams[myTeam].score > data.contest.teams[1 - myTeam].score) {
-          setPostStory(data, "madeMyTeamLead", data.contest.teams[myTeam].link);
+          setPostStory(data, 'madeMyTeamLead', data.contest.teams[myTeam].link);
         }
         else if (data.contest.teams[myTeam].score < data.contest.teams[1 - myTeam].score &&
           contestsBusinessLogic.getTeamDistancePercent(data.contest, 1 - myTeam) < generalUtils.settings.server.quiz.teamPercentDistanceForShare) {
-          setPostStory(data, "myTeamIsCloseToLead", data.contest.teams[myTeam].link);
+          setPostStory(data, 'myTeamIsCloseToLead', data.contest.teams[myTeam].link);
         }
       }
 
       if (
         //Call the leaderboard to check passed friends only if there is no story to post up until now
-      //Or the "passed friends" story is a "better" story in terms of priority
+      //Or the 'passed friends' story is a 'better' story in terms of priority
       data.session.quiz.serverData.share.data.friendsAboveMe &&
       (
         !data.session.quiz.serverData.share.story ||
@@ -469,23 +469,23 @@ module.exports.answer = function (req, res, next) {
 
       //Common data to be replaced in all potential messages
       data.session.quiz.serverData.share.data.clientData = {
-        "score": data.session.quiz.serverData.score,
-        "team": data.contest.teams[data.contest.users[data.session.userId].team].name
+        'score': data.session.quiz.serverData.score,
+        'team': data.contest.teams[data.contest.users[data.session.userId].team].name
       }
 
       if (data.passedFriends && data.passedFriends.length > 0) {
         data.session.quiz.serverData.share.data.clientData.friend = data.passedFriends[0].name;
-        var replaced = setPostStory(data, "passedFriendInLeaderboard", util.format(generalUtils.settings.server.facebook.userOpenGraphProfileUrl, data.passedFriends[0].id, data.session.settings.language));
+        var replaced = setPostStory(data, 'passedFriendInLeaderboard', util.format(generalUtils.settings.server.facebook.userOpenGraphProfileUrl, data.passedFriends[0].id, data.session.settings.language));
         if (replaced) {
           data.session.quiz.serverData.share.story.facebookPost.dialogImage.url = util.format(data.session.quiz.serverData.share.story.facebookPost.dialogImage.url, data.passedFriends[0].id, data.session.quiz.serverData.share.story.facebookPost.dialogImage.width, data.session.quiz.serverData.share.story.facebookPost.dialogImage.height);
         }
       }
 
       if (data.session.quiz.serverData.score > 0) {
-        setPostStory(data, "gotScore");
+        setPostStory(data, 'gotScore');
       }
       else {
-        setPostStory(data, "gotZeroScore");
+        setPostStory(data, 'gotZeroScore');
       }
 
       data.closeConnection = true;
@@ -501,25 +501,25 @@ module.exports.answer = function (req, res, next) {
         if (data.session.quiz.clientData.reviewMode) {
 
           if (data.session.quiz.serverData.correctAnswers === data.session.quiz.clientData.totalQuestions) {
-            setPostStory(data, "reviewPerfectScore");
+            setPostStory(data, 'reviewPerfectScore');
             data.session.quiz.serverData.share.data.clientData = {
-              "correct": data.session.quiz.serverData.correctAnswers,
-              "questions": data.session.quiz.clientData.totalQuestions
+              'correct': data.session.quiz.serverData.correctAnswers,
+              'questions': data.session.quiz.clientData.totalQuestions
             };
           }
           else if (data.session.quiz.serverData.correctAnswers > 0) {
-            setPostStory(data, "reviewGotScore");
+            setPostStory(data, 'reviewGotScore');
             data.session.quiz.serverData.share.data.clientData = {
-              "correct": data.session.quiz.serverData.correctAnswers,
-              "questions": data.session.quiz.clientData.totalQuestions
+              'correct': data.session.quiz.serverData.correctAnswers,
+              'questions': data.session.quiz.clientData.totalQuestions
             };
           }
           else {
-            setPostStory(data, "reviewZeroScore");
+            setPostStory(data, 'reviewZeroScore');
           }
         }
 
-        data.clientResponse.results = {"contest": data.contest, "data": {}};
+        data.clientResponse.results = {'contest': data.contest, 'data': {}};
 
         contestsBusinessLogic.prepareContestForClient(data.clientResponse.results.contest, data.session);
 
@@ -613,7 +613,7 @@ module.exports.setQuestionByAdmin = function (req, res, next) {
   if (!data.question || !data.question._id || !data.question.text ||
     !data.question.answers |
     data.question.answers.length < 4) {
-    exceptions.ServerResponseException(res, "question required data is not supplied", data, "warn", 424);
+    exceptions.ServerResponseException(res, 'question required data is not supplied', data, 'warn', 424);
     return;
   }
 
@@ -631,7 +631,7 @@ module.exports.setQuestionByAdmin = function (req, res, next) {
     function (data, callback) {
       if (!data.session.isAdmin) {
         dalDb.closeDb(data);
-        callback(new exceptions.ServerMessageException("SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ", null, 403));
+        callback(new exceptions.ServerMessageException('SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ', null, 403));
         return;
       }
 
@@ -639,7 +639,7 @@ module.exports.setQuestionByAdmin = function (req, res, next) {
       data.setData = {};
       data.setData.text = data.question.text;
       for (j = 0; j < data.question.answers.length; j++) {
-        data.setData["answers." + j + ".text"] = data.question.answers[j];
+        data.setData['answers.' + j + '.text'] = data.question.answers[j];
       }
 
       data.closeConnection = true;

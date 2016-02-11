@@ -2,7 +2,7 @@
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
-  <ion-title>{{client.translate('WHO_IS_SMARTER_QUESTION')}}</ion-title>
+  <ion-title>{{contestChart.contest.name}}</ion-title>
 </ion-navbar>
 
 <ion-content>
@@ -15,7 +15,7 @@
     <p class="contest-leader-row2">{{contestChart.contest.timePhrase.text}}</p>
   </ion-item>
 
-  <div class="contest-chart-background">
+  <div padding-top class="contest-chart-background">
 
     <contest-chart id="contest-{{contestChart.contest._id}}"
                    width="{{client.settings.charts.size.width}}"
@@ -28,7 +28,7 @@
     <div padding-top text-center>
       <div *ngIf="contestChart.contest.state==='play'">
         <button danger class="button button-small no-wrap-text"
-                (click)="playContest('button')">{{client.translate('PLAY_CONTEST')}}
+                (click)="playContest('button')">{{client.translate('PLAY_CONTEST', {'team' : contestChart.contest.teams[contestChart.contest.myTeam].name}) }}
         </button>
       </div>
       <div *ngIf="contestChart.contest.state==='join'">
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div padding-top>
+    <div padding>
       <div class="pointer contest-footer-text float-{{client.currentLanguage.align}}"
            (click)="showParticipants('leader')">
         {{client.translate('CONTEST_LEADER')}}: {{contestChart.contest.leader.name}}
@@ -63,13 +63,11 @@
     <h3>{{client.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
   </div>
 
-  <my-date-picker dir="ltr" [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event)" [selDate]="selectedDate"></my-date-picker>
-
   <button fab fab-bottom fab-left (click)="share('fab')">
     <ion-icon name="share"></ion-icon>
   </button>
   <ion-buttons>
-    <div text-center>
+    <div text-center padding-top>
       <button secondary class="bar-button" (click)="share('button')">{{client.translate('SHARE')}}</button>
       <button secondary class="bar-button" (click)="like()">{{client.translate('LIKE')}}</button>
       <button *ngIf="contestChart.contest.state==='play'" secondary class="bar-button" (click)="switchTeams('button')">

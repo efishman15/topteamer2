@@ -16,21 +16,12 @@
 
     <ion-list>
 
-      <ion-item divider class="pointer" (click)="selectContestContent({'source' : 'trivia', 'icon' : 'images/facebook/contest.png', 'category' : {'id' : 'system', 'title' : client.translate('CONTEST_TYPE_TRIVIA_SYSTEM_TITLE')}})">
+      <ion-item *ngFor="#contestType of client.settings.newContest.contestTypes" divider class="pointer" (click)="selectContestContent(contestType)">
         <ion-thumbnail item-left>
-          <img src="images/facebook/contest.png">
+          <img src="{{contestType.icon}}">
         </ion-thumbnail>
-          <h2>{{client.translate('CONTEST_TYPE_TRIVIA_SYSTEM_TITLE')}}</h2>
-          <p class="white-space-pre-line">{{client.translate('CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION',{questions : client.settings.newContest.systemTotalQuestions}) }}</p>
+          <h2>{{client.translate(contestType.category.title)}}</h2>
+          <p class="white-space-pre-line">{{client.translate(contestType.category.description)}}</p>
       </ion-item>
-
-      <ion-item divider class="pointer" (click)="selectContestContent({'source' : 'trivia', 'icon' : 'images/facebook/winner2.jpg', 'category' : {'id' : 'user', 'title' : client.translate('CONTEST_TYPE_TRIVIA_USER_TITLE')}})">
-        <ion-thumbnail item-left>
-          <img src="images/facebook/winner2.jpg">
-        </ion-thumbnail>
-        <h2>{{client.translate('CONTEST_TYPE_TRIVIA_USER_TITLE')}}</h2>
-        <p class="white-space-pre-line">{{client.translate('CONTEST_TYPE_TRIVIA_USER_DESCRIPTION',{min: client.settings.newContest.privateQuestions.min, max: client.settings.newContest.privateQuestions.max}) }}</p>
-      </ion-item>
-
     </ion-list>
   </ion-content>

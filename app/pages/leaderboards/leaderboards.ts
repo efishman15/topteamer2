@@ -24,7 +24,13 @@ export class LeaderboardsPage {
     this.client = Client.getInstance();
   }
 
-  onPageDidEnter() {
+  onPageWillEnter() {
+    if (this.simpleTabsComponent) {
+      this.simpleTabsComponent.switchToTab(0);
+    }
+  }
+
+  ngAfterViewInit() {
     this.simpleTabsComponent.switchToTab(0);
   }
 
@@ -48,4 +54,9 @@ export class LeaderboardsPage {
     contestsService.openContest(data.contest._id);
   }
 
+  refreshList() {
+    if (this.mode === 'contests') {
+      this.contestList.refresh();
+    }
+  }
 }

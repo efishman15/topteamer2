@@ -16,7 +16,7 @@ export class Client {
   _platform:Platform;
   _events: Events;
   _nav:NavController;
-  _menu: Menu;
+  _menuController: MenuController;
   _loaded:Boolean = false;
 
   serverGateway:ServerGateway;
@@ -45,21 +45,18 @@ export class Client {
 
       this._ionicApp = ionicApp;
       this._platform = platform;
-      this._menu = menuController.get('left');
+      this._menuController= menuController;
       this._events = events;
 
       this.serverGateway.getSettings().then((data) => {
 
-        var dir = document.createAttribute("dir");
+        var dir = document.createAttribute('dir');
         dir.value = this.currentLanguage.direction;
         this._nav = ionicApp.getComponent('nav');
         this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
 
-        this._menu.side = this.currentLanguage.align;
-        this._menu.id = this.currentLanguage.align + "Menu";
-
-        var canvas = document.createElement("canvas");
-        this._canvasContext = canvas.getContext("2d");
+        var canvas = document.createElement('canvas');
+        this._canvasContext = canvas.getContext('2d');
         this._canvasContext.font = this.serverGateway.settings.charts.contestAnnotations.annotationsFont;
 
         this._loaded = true;
@@ -107,8 +104,8 @@ export class Client {
     return this._nav;
   }
 
-  get menu():Menu{
-    return this._menu;
+  get menuController():MenuController{
+    return this._menuController;
   }
 
   get endPoint():String {

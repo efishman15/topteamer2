@@ -15,7 +15,7 @@ var ContestChartComponent = (function () {
         this.contestSelected = new core_1.EventEmitter();
         this.teamSelected = new core_1.EventEmitter();
         this.events = {
-            "dataplotClick": function (eventObj, dataObj) {
+            'dataplotClick': function (eventObj, dataObj) {
                 var teamId = dataObj.dataIndex;
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
@@ -23,7 +23,7 @@ var ContestChartComponent = (function () {
                 _this.teamSelected.emit({ 'teamId': teamId, 'source': 'bar', 'contest': _this.contestChart.contest });
                 _this.chartTeamEventHandled = true;
             },
-            "dataLabelClick": function (eventObj, dataObj) {
+            'dataLabelClick': function (eventObj, dataObj) {
                 var teamId = dataObj.dataIndex;
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
@@ -31,7 +31,7 @@ var ContestChartComponent = (function () {
                 _this.teamSelected.emit({ 'teamId': teamId, 'source': 'label', 'contest': _this.contestChart.contest });
                 _this.chartTeamEventHandled = true;
             },
-            "chartClick": function (eventObj, dataObj) {
+            'chartClick': function (eventObj, dataObj) {
                 if (!_this.chartTeamEventHandled) {
                     _this.contestSelected.emit({ 'contest': _this.contestChart.contest });
                 }

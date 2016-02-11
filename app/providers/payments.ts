@@ -45,7 +45,8 @@ export let buy = (feature:Object, isMobile:Boolean) => new Promise((resolve, rej
 
     case 'ios' :
       method = 'ios';
-      alert("TBD - purchase in ios");
+      //TODO: Purchase in ios
+      alert('TBD - purchase in ios');
       break;
 
     case 'facebook' :

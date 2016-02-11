@@ -24,7 +24,7 @@ export class PurchaseSuccessPage {
     this.client.nav.pop();
     if (!this.client.nav.canGoBack()) {
       //This is the root view - coming from paypal purchase over the web
-      //TODO: navigate back to the app main page and from there dynamically to the "this.params.datanextView"
+      //TODO: navigate back to the app main page and from there dynamically to the 'this.params.datanextView'
     }
   }
 

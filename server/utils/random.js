@@ -4,7 +4,7 @@
 var seedrandom = require('seedrandom');
 var uuid = require('node-uuid');
 var rng = seedrandom(uuid.v1());
-var mathjs = require("mathjs")
+var mathjs = require('mathjs')
 
 //-----------------------------------------------------------------------
 // rnd

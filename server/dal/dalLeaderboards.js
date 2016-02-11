@@ -1,10 +1,10 @@
-var path = require("path");
-var exceptions = require(path.resolve(__dirname,"../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname,"../utils/general"));
-var Leaderboard = require("agoragames-leaderboard");
+var path = require('path');
+var exceptions = require(path.resolve(__dirname,'../utils/exceptions'));
+var generalUtils = require(path.resolve(__dirname,'../utils/general'));
+var Leaderboard = require('agoragames-leaderboard');
 
 //Open connection to general leaderboards (not timebased)
-var generalLeaderboard = new Leaderboard("topteamer:general");
+var generalLeaderboard = new Leaderboard('topteamer:general');
 
 //---------------------------------------------------------------------------------------------------------------------------
 // private functions
@@ -15,7 +15,7 @@ var generalLeaderboard = new Leaderboard("topteamer:general");
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.getContestLeaderboard = getContestLeaderboard;
 function getContestLeaderboard(contestId) {
-    return new Leaderboard("topteamer:contest_" + contestId);
+    return new Leaderboard('topteamer:contest_' + contestId);
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ function getContestLeaderboard(contestId) {
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.getTeamLeaderboard = getTeamLeaderboard;
 function getTeamLeaderboard(contestId, teamId) {
-    return new Leaderboard("topteamer:contest_" + contestId + "_team" + teamId);
+    return new Leaderboard('topteamer:contest_' + contestId + '_team' + teamId);
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -31,20 +31,20 @@ function getTeamLeaderboard(contestId, teamId) {
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.getWeeklyLeaderboard = getWeeklyLeaderboard;
 function getWeeklyLeaderboard() {
-    return new Leaderboard("topteamer:weekly_" + generalUtils.getYearWeek());
+    return new Leaderboard('topteamer:weekly_' + generalUtils.getYearWeek());
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
 // prepareLeaderObject - parse member_data
 //---------------------------------------------------------------------------------------------------------------------------
 function prepareLeaderObject(id, leader, outsideLeaderboard) {
-    var memberDataParts = leader.member_data.split("|");
+    var memberDataParts = leader.member_data.split('|');
     var leaderObject = {
-        "id": id,
-        "rank": leader.rank,
-        "score": leader.score,
-        "avatar": memberDataParts[0],
-        "name": memberDataParts[1],
+        'id': id,
+        'rank': leader.rank,
+        'score': leader.score,
+        'avatar': memberDataParts[0],
+        'name': memberDataParts[1],
     };
 
     if (outsideLeaderboard) {
@@ -59,9 +59,9 @@ function prepareLeaderObject(id, leader, outsideLeaderboard) {
 //
 // The following leaderboards are updated:
 // =======================================
-// 1. Contest general leaderboard - "contest_<contestId>"
-// 2. Contest team leaderboard - "contest_<contestId>_team_<teamId>"
-// 3. General Leaderboard (ever) - "general" (will be used to display my friends' scores)
+// 1. Contest general leaderboard - 'contest_<contestId>'
+// 2. Contest team leaderboard - 'contest_<contestId>_team_<teamId>'
+// 3. General Leaderboard (ever) - 'general' (will be used to display my friends' scores)
 // 4. Weekly leaderboard - weekly_<YearWeek>
 //
 // @deltaScore - the score currently achieved which should be increased in all leaderboards
@@ -75,23 +75,23 @@ function addScore(contestId, teamId, deltaScore, facebookUserId, name, avatar) {
     var weeklyLeaderboard = getWeeklyLeaderboard();
 
     generalLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-        generalLeaderboard.updateMemberData(facebookUserId, avatar + "|" + name);
+        generalLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name);
     });
 
     contestGeneralLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-        contestGeneralLeaderboard.updateMemberData(facebookUserId, avatar + "|" + name, function (reply) {
+        contestGeneralLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
             contestGeneralLeaderboard.disconnect();
         });
     });
 
     contestTeamLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-        contestTeamLeaderboard.updateMemberData(facebookUserId, avatar + "|" + name, function (reply) {
+        contestTeamLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
             contestTeamLeaderboard.disconnect();
         });
     });
 
     weeklyLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-        weeklyLeaderboard.updateMemberData(facebookUserId, avatar + "|" + name, function (reply) {
+        weeklyLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
             weeklyLeaderboard.disconnect();
         });
     });
@@ -110,9 +110,9 @@ module.exports.getLeaders = getLeaders;
 function getLeaders(data, callback) {
 
     var options = {
-        "withMemberData": true,
-        "sortBy": "rank",
-        "pageSize": generalUtils.settings.server.leaderboard.pageSize
+        'withMemberData': true,
+        'sortBy': 'rank',
+        'pageSize': generalUtils.settings.server.leaderboard.pageSize
     };
 
     data.clientResponse = [];
@@ -131,7 +131,7 @@ function getLeaders(data, callback) {
         if (!data.inLeaderboard && data.clientResponse.length > 0) {
 
             //I am not in the first page of the leaderboard
-            var options = {"withMemberData": true, "sortBy": "rank", "pageSize": 1};
+            var options = {'withMemberData': true, 'sortBy': 'rank', 'pageSize': 1};
             data.leaderboard.aroundMe(data.session.facebookUserId, options, function (leaders) {
                 if (leaders && leaders.length > 0) {
                     //I am in the leaderboard (not at the first page)
@@ -163,9 +163,9 @@ module.exports.getFriends = getFriends;
 function getFriends(data, callback) {
 
     var options = {
-        "withMemberData": true,
-        "sortBy": "rank",
-        "pageSize": generalUtils.settings.server.leaderboard.pageSize
+        'withMemberData': true,
+        'sortBy': 'rank',
+        'pageSize': generalUtils.settings.server.leaderboard.pageSize
     };
 
     data.clientResponse = [];
@@ -203,9 +203,9 @@ module.exports.getFriendsAboveMe = getFriendsAboveMe;
 function getFriendsAboveMe(data, callback) {
 
     var options = {
-        "withMemberData": true,
-        "sortBy": "rank",
-        "pageSize": generalUtils.settings.server.leaderboard.friendsAboveMePageSize
+        'withMemberData': true,
+        'sortBy': 'rank',
+        'pageSize': generalUtils.settings.server.leaderboard.friendsAboveMePageSize
     };
 
     data.friendsAboveMe = [];
@@ -240,9 +240,9 @@ module.exports.getPassedFriends = getPassedFriends;
 function getPassedFriends(data, callback) {
 
     var options = {
-        "withMemberData": true,
-        "sortBy": "rank",
-        "pageSize": data.friendsAboveMe.length
+        'withMemberData': true,
+        'sortBy': 'rank',
+        'pageSize': data.friendsAboveMe.length
     };
 
     data.passedFriends = [];

@@ -18,18 +18,13 @@ export class ContestListComponent {
   contestCharts:Array<Object>;
   client:Client;
   events:Object = {
-    "chartClick": (eventObj, dataObj) => {
+    'chartClick': (eventObj, dataObj) => {
       this.selectContest(eventObj.sender.args.dataSource.contest);
     }
   }
 
   constructor() {
     this.client = Client.getInstance();
-
-    this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
-      console.log('contest updated - refreshing list');
-      this.refresh();
-    });
   }
 
   selectContest(contest:Object) {
@@ -42,7 +37,7 @@ export class ContestListComponent {
       this.contests = contests;
       this.contestCharts = [];
       for(var i=0; i<contests.length; i++) {
-        this.contestCharts.push(contestsService.prepareContestChart(contests[i],"ends"));
+        this.contestCharts.push(contestsService.prepareContestChart(contests[i],'ends'));
       }
     });
   }
@@ -52,7 +47,7 @@ export class ContestListComponent {
   }
 
   onTeamSelected(data) {
-    //This is not a mistake - on chart lists - any click in any area should "select" the entire contest
+    //This is not a mistake - on chart lists - any click in any area should 'select' the entire contest
     this.contestSelected.emit(data);
   }
 

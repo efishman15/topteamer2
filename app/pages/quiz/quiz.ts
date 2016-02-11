@@ -1,4 +1,4 @@
-import {Page, NavParams,Modal} from "ionic-framework/ionic";
+import {Page, NavParams,Modal} from 'ionic-framework/ionic';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener'
 import {TransitionListener} from '../../directives/transition-listener/transition-listener'
 import {QuestionStatsPage} from '../../pages/question-stats/question-stats'

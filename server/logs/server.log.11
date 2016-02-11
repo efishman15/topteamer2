@@ -1,0 +1,2 @@
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":5680,"level":50,"dbError":{"name":"MongoError","message":"connect ECONNREFUSED 127.0.0.1:27017"},"msg":"Error connecting to the database","time":"2016-01-28T16:00:55.468Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3928,"level":30,"msg":"server up!","time":"2016-01-28T16:06:17.351Z","v":0}

@@ -14,20 +14,22 @@
 
 <ion-content dir="{{client.currentLanguage.direction}}">
 
-  <img *ngIf="quizResults.data.facebookPost.dialogImage"
-       src="{{quizResults.data.facebookPost.dialogImage.url}}"
-       width="{{quizResults.data.facebookPost.dialogImage.width}}"
-       height="{{quizResults.data.facebookPost.dialogImage.height}}">
+  <div text-center>
+    <img *ngIf="quizResults.data.facebookPost.dialogImage"
+         src="{{quizResults.data.facebookPost.dialogImage.url}}"
+         width="{{quizResults.data.facebookPost.dialogImage.width}}"
+         height="{{quizResults.data.facebookPost.dialogImage.height}}">
 
-  <div class="item-divider center long-animated {{quizResults.data.animation}}">
-    <h4>{{client.translate(quizResults.data.clientKey + '_TITLE')}}</h4>
-    <h5>{{client.translate(quizResults.data.clientKey + '_MESSAGE', quizResults.data.clientValues) }}</h5>
+    <div class="item-divider center long-animated {{quizResults.data.animation}}">
+      <h4>{{client.translate(quizResults.data.clientKey + '_TITLE')}}</h4>
+      <h5>{{client.translate(quizResults.data.clientKey + '_MESSAGE', quizResults.data.clientValues) }}</h5>
+    </div>
   </div>
 
   <div padding>
   </div>
 
-  <div padding class="button-bar">
+  <div text-center padding class="button-bar">
     <button padding class="button button-bar button-facebook" (click)="post()">{{client.translate('SHARE')}}
     </button>
     <button padding class="button button-bar button-clear"

@@ -36,7 +36,8 @@ exports.buy = function (feature, isMobile) { return new Promise(function (resolv
             break;
         case 'ios':
             method = 'ios';
-            alert("TBD - purchase in ios");
+            //TODO: Purchase in ios
+            alert('TBD - purchase in ios');
             break;
         case 'facebook':
             method = 'facebook';

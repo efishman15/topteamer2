@@ -21,7 +21,7 @@ var QuestionStatsPage = (function () {
         if (this.chartDataSource) {
             FusionCharts.ready(function () {
                 var chart = new FusionCharts({
-                    type: "pie2d",
+                    type: 'pie2d',
                     renderAt: 'questionChart',
                     width: _this.client.settings.charts.size.width,
                     height: _this.client.settings.charts.size.height,

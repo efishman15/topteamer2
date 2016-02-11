@@ -1,27 +1,27 @@
-var path = require("path");
-var async = require("async");
-var dalDb = require(path.resolve(__dirname, "../dal/dalDb"));
-var dalFacebook = require(path.resolve(__dirname, "../dal/dalFacebook"));
-var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname, "../utils/general"));
-var sessionUtils = require(path.resolve(__dirname, "./session"));
+var path = require('path');
+var async = require('async');
+var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
+var dalFacebook = require(path.resolve(__dirname, '../dal/dalFacebook'));
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var sessionUtils = require(path.resolve(__dirname, './session'));
 
 //--------------------------------------------------------------------------
 // private functions
 //--------------------------------------------------------------------------
 function getSessionResponse(session) {
   var clientSession = {
-    "token": session.userToken,
-    "userId": session.userId,
-    "thirdParty": {"id": session.facebookUserId, "accessToken": session.facebookAccessToken, "type": "facebook"},
-    "isAdmin": session.isAdmin,
-    "avatar": session.avatar,
-    "name": session.name,
-    "score": session.score,
-    "rank": session.rank,
-    "xpProgress": new generalUtils.XpProgress(session.xp, session.rank),
-    "settings": session.settings,
-    "features": session.features
+    'token': session.userToken,
+    'userId': session.userId,
+    'thirdParty': {'id': session.facebookUserId, 'accessToken': session.facebookAccessToken, 'type': 'facebook'},
+    'isAdmin': session.isAdmin,
+    'avatar': session.avatar,
+    'name': session.name,
+    'score': session.score,
+    'rank': session.rank,
+    'xpProgress': new generalUtils.XpProgress(session.xp, session.rank),
+    'settings': session.settings,
+    'features': session.features
   };
 
   if (session.justRegistered) {

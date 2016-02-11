@@ -1,13 +1,13 @@
-var path = require("path");
-var exceptions = require(path.resolve(__dirname, "../utils/exceptions"));
-var generalUtils = require(path.resolve(__dirname, "../utils/general"));
-var Leaderboard = require("agoragames-leaderboard");
-var logger = require(path.resolve(__dirname, "../utils/logger"));
-var async = require("async");
-var sessionUtils = require(path.resolve(__dirname, "./session"));
-var dalLeaderboards = require(path.resolve(__dirname, "../dal/dalLeaderboards"));
-var dalFacebook = require(path.resolve(__dirname, "../dal/dalFacebook"));
-var dalDb = require(path.resolve(__dirname, "../dal/dalDb"));
+var path = require('path');
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var Leaderboard = require('agoragames-leaderboard');
+var logger = require(path.resolve(__dirname, '../utils/logger'));
+var async = require('async');
+var sessionUtils = require(path.resolve(__dirname, './session'));
+var dalLeaderboards = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
+var dalFacebook = require(path.resolve(__dirname, '../dal/dalFacebook'));
+var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
 
 //--------------------------------------------------------------------------
 // private functions
@@ -52,12 +52,12 @@ module.exports.getContestLeaders = function (req, res, next) {
   data.token = token;
 
   if (!data.contestId) {
-    exceptions.ServerResponseException(res, "contestId not supplied", null, "warn", 424);
+    exceptions.ServerResponseException(res, 'contestId not supplied', null, 'warn', 424);
     return;
   }
 
   if (data.teamId != null && data.teamId !== 0 && data.teamId !== 1) {
-    exceptions.ServerResponseException(res, "invalid teamId supplied", {"teamId": data.teamId}, "warn", 424);
+    exceptions.ServerResponseException(res, 'invalid teamId supplied', {'teamId': data.teamId}, 'warn', 424);
     return;
   }
 
@@ -86,7 +86,7 @@ module.exports.getContestLeaders = function (req, res, next) {
 module.exports.getWeeklyLeaders = function (req, res, next) {
 
   var token = req.headers.authorization;
-  var data = {"token": token};
+  var data = {'token': token};
 
   data.leaderboard = dalLeaderboards.getWeeklyLeaderboard();
 
@@ -119,17 +119,17 @@ module.exports.getFriends = function (req, res, next) {
     },
 
     //If no permission for friends - 2 cases:
-    //1. User "just granted" the permission - give another try to facebook to validate that and retrieve user friends
+    //1. User 'just granted' the permission - give another try to facebook to validate that and retrieve user friends
     //2. User did not just grant - return with an error message to the client to ask for the permission
     function (data, callback) {
       if (data.session.friends.noPermission) {
         if (!data.friendsPermissionJustGranted) {
-          callback(new exceptions.ServerMessageException("SERVER_ERROR_MISSING_FRIENDS_PERMISSION"));
+          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION'));
           return;
         }
         else {
           //User just granted - try to retrieve user friends again from facebook
-          data.user = {"thirdParty": {"accessToken": data.session.facebookAccessToken}};
+          data.user = {'thirdParty': {'accessToken': data.session.facebookAccessToken}};
           dalFacebook.getUserFriends(data, callback);
         }
       }
@@ -147,7 +147,7 @@ module.exports.getFriends = function (req, res, next) {
 
         //Still no luck - user gave no permission
         if (data.session.friends.noPermission) {
-          callback(new exceptions.ServerMessageException("SERVER_ERROR_MISSING_FRIENDS_PERMISSION"));
+          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION'));
           return;
         }
         else {
@@ -162,7 +162,7 @@ module.exports.getFriends = function (req, res, next) {
     //If permission was just granted - store it in the user's profile as well
     function (data, callback) {
       if (data.friendsPermissionJustGranted) {
-        data.setData = {"friends": data.session.friends};
+        data.setData = {'friends': data.session.friends};
         data.closeConnection = true;
         dalDb.setUser(data, callback);
       }
