@@ -1,8 +1,10 @@
-import {Page, NavParams, Item, Input, Select, Label} from 'ionic/ionic';
+import {Page, NavParams, Item, Input, Select, Label,Modal} from 'ionic/ionic';
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import {ContestPage} from '../../pages/contest/contest';
+import {QuestionEditorPage} from '../../pages/question-editor/question-editor';
+import {SearchQuestionsPage} from '../../pages/search-questions/search-questions';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
@@ -34,7 +36,8 @@ export class SetContestPage {
   contestForm:ControlGroup;
   team0:Control;
   team1:Control;
-  contestNameChanged:boolean;
+  contestNameChanged:Boolean;
+  userQuestionsInvalid:String;
 
   constructor(params:NavParams, formBuilder:FormBuilder) {
 
@@ -72,7 +75,7 @@ export class SetContestPage {
       }
 
       if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
-        retrieveUserQuestions();
+        this.retrieveUserQuestions();
       }
     }
     else if (this.params.data.mode === 'add') {
@@ -88,6 +91,7 @@ export class SetContestPage {
         'teams': [{'name': null, 'score': 0}, {'name': null, 'score': 0}]
       };
       this.showStartDate = true;
+      this.contestLocalCopy.questions = {'visibleCount': 0, 'list': []};
     }
 
     this.client.session.features.newContest.purchaseData.retrieved = false;
@@ -265,23 +269,106 @@ export class SetContestPage {
   }
 
   removeContest() {
-
     alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.contestLocalCopy.name}).then(() => {
       contestsService.removeContest(this.contestLocalCopy._id).then(() => {
         this.client.events.publish('topTeamer:contestRemoved');
-        this.client.nav.popToRoot({animate: false});
+        setTimeout(() => {
+          this.client.nav.popToRoot({animate: false});
+        }, 1000);
       });
     });
   }
+
+  userQuestionsMinimumCheck() {
+    if (this.client.settings.newContest.privateQuestions.min === 1) {
+      this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings.newContest.privateQuestions.min});
+    }
+    else {
+      this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings.newContest.privateQuestions.min});
+    }
+
+    if (this.userQuestionsInvalid) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  maxQuestionsReached() {
+    return (this.contestLocalCopy.questions && this.contestLocalCopy.questions.visibleCount === this.client.settings.newContest.privateQuestions.max);
+  }
+
+  openQuestionEditor(mode, question) {
+
+    if (mode === "add") {
+      if (this.maxQuestionsReached()) {
+        alertService.alert(this.client.translate("MAX_USER_QUESTIONS_REACHED", {max: this.client.settings.newContest.privateQuestions.max}));
+        return;
+      }
+    }
+
+    var modal = Modal.create(QuestionEditorPage, {'question': question, 'mode': mode, 'currentQuestions' : this.contestLocalCopy.questions});
+    modal.onDismiss((result) => {
+      if (!result) {
+        return;
+      }
+
+      this.userQuestionsInvalid = null;
+
+      if (!result.question._id) {
+        //New questions
+        result.question._id = "new";
+        this.contestLocalCopy.questions.list.push(result.question);
+        this.contestLocalCopy.questions.visibleCount++;
+      }
+      else if (result.question._id !== "new") {
+        //Set dirty flag for the question - so server will update it in the db
+        result.question.isDirty = true;
+      }
+    });
+
+    this.client.nav.present(modal);
+  }
+
+  openSearchQuestions() {
+
+    if (this.maxQuestionsReached()) {
+      alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', {max: this.client.settings.newContest.privateQuestions.max}));
+      return;
+    }
+
+    var modal = Modal.create(SearchQuestionsPage, {'currentQuestions': this.contestLocalCopy.questions});
+
+    this.client.nav.present(modal);
+
+  }
+
+  removeQuestion(index) {
+
+    alertService.confirm('REMOVE_QUESTION', 'CONFIRM_REMOVE_QUESTION', {}).then(() => {
+      if (this.contestLocalCopy.questions.list && index < this.contestLocalCopy.questions.list.length) {
+        if (this.contestLocalCopy.questions.list[index]._id && this.contestLocalCopy.questions.list[index]._id !== "new") {
+          //Question has an id in the database - logically remove
+          this.contestLocalCopy.questions.list[index].deleted = true;
+        }
+        else {
+          //Question does not have an actual id in the database - physically remove
+          this.contestLocalCopy.questions.list.splice(index, 1);
+        }
+        this.contestLocalCopy.questions.visibleCount--;
+      }
+    });
+  };
 
   setContest() {
 
     if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
       if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
-        //TODO - min questions check
-        //minimumQuestionsSingle
-        //minimumQuestionsPlural
-        return;
+
+        if (!this.userQuestionsMinimumCheck()) {
+          return;
+        }
       }
     }
 

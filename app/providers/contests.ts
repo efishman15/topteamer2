@@ -144,7 +144,22 @@ export let setContest = (contest: Object, mode: string, nameChanged: boolean) =>
   return client.serverPost('contests/set', postData);
 }
 
+//------------------------------------------------------
+//-- searchMyQuestions
+//------------------------------------------------------
+export let searchMyQuestions = (text: String, existingQuestionIds: Array<String>) => {
+  var postData = {'text': text, 'existingQuestionIds': existingQuestionIds};
+  var client = Client.getInstance();
+  return client.serverPost('contests/searchMyQuestions', postData);
+};
 
+//------------------------------------------------------
+//-- getQuestions
+//------------------------------------------------------
+export let getQuestions = (userQuestions) => {
+  var postData = {'userQuestions': userQuestions};
+  return client.serverPost('contests/getQuestions', postData);
+};
 
 //------------------------------------------------------
 //-- setTimePhrase

@@ -1,0 +1,169 @@
+<ion-toolbar>
+
+  <ion-buttons>
+    <button (click)="dismiss(false)">
+      <ion-icon name="close-circle"></ion-icon>
+    </button>
+  </ion-buttons>
+
+  <ion-title>
+    {{title}}
+  </ion-title>
+
+</ion-toolbar>
+
+<ion-content>
+
+  <form [ngFormModel]="questionEditorForm" name="questionEditorForm" novalidate="novalidate">
+
+    <div padding-top></div>
+    <ion-row>
+      <ion-col>
+        <ion-textarea
+          rows="5"
+          class="question-editor-input question-editor-question"
+          placeholder="{{client.translate('QUESTION')}}"
+          [(ngModel)]="question.text"
+          ngControl="questionControl"
+          maxlength="90"
+          required>
+        </ion-textarea>
+      </ion-col>
+      <ion-col width-5>
+            <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
+                  class="question-editor-characters-length">
+                  {{question.text ? question.text.length : 0}}/{{client.settings.quiz.question.maxLength}}
+            </div>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="questionControl.dirty && (questionControl.errors && questionControl.errors.required || questionError)">
+      <div *ngIf="questionControl.errors && questionControl.errors.required" padding-left padding-right text-center
+           class="invalid-input">
+        {{client.translate('FIELD_REQUIRED')}}
+      </div>
+      <div *ngIf="questionControl.errors && questionControl.errors.required" padding-left padding-right text-center
+           class="invalid-input">
+        {{questionError}}
+      </div>
+    </ion-row>
+
+    <div padding-top></div>
+
+    <ion-row>
+      <ion-col>
+        <ion-textarea
+          rows="2"
+          class="question-editor-input question-editor-correct-answer"
+          placeholder="{{client.translate('CORRECT_ANSWER')}}"
+          [(ngModel)]="question.answers[0]"
+          ngControl="answer0Control"
+          maxlength="45"
+          required>
+        </ion-textarea>
+      </ion-col>
+      <ion-col width-5>
+        <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
+             class="question-editor-characters-length">
+          {{question.answers[0] ? question.answers[0].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="answer0Control.dirty && answer0Control.errors && answer0Control.errors.required">
+      <div padding-left padding-right text-center
+           class="invalid-input">
+        {{client.translate('FIELD_REQUIRED')}}
+      </div>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-textarea
+          rows="2"
+          class="question-editor-input question-editor-wrong-answer"
+          placeholder="{{client.translate('WRONG_ANSWER')}}"
+          [(ngModel)]="question.answers[1]"
+          ngControl="answer1Control"
+          required>
+        </ion-textarea>
+      </ion-col>
+      <ion-col width-5>
+        <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
+             class="question-editor-characters-length">
+          {{question.answers[1] ? question.answers[1].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="answer1Control.dirty && answer1Control.errors && answer1Control.errors.required">
+      <div padding-left padding-right text-center
+           class="invalid-input">
+        {{client.translate('FIELD_REQUIRED')}}
+      </div>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-textarea
+          rows="2"
+          class="question-editor-input question-editor-wrong-answer"
+          placeholder="{{client.translate('WRONG_ANSWER')}}"
+          [(ngModel)]="question.answers[2]"
+          ngControl="answer2Control"
+          required>
+        </ion-textarea>
+      </ion-col>
+      <ion-col width-5>
+        <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
+             class="question-editor-characters-length">
+          {{question.answers[2] ? question.answers[2].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="answer2Control.dirty && answer2Control.errors && answer2Control.errors.required">
+      <div padding-left padding-right text-center
+           class="invalid-input">
+        {{client.translate('FIELD_REQUIRED')}}
+      </div>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-textarea
+          rows="2"
+          class="question-editor-input question-editor-wrong-answer"
+          placeholder="{{client.translate('WRONG_ANSWER')}}"
+          [(ngModel)]="question.answers[3]"
+          ngControl="answer3Control"
+          required>
+        </ion-textarea>
+      </ion-col>
+      <ion-col width-5>
+        <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
+             class="question-editor-characters-length">
+          {{question.answers[3] ? question.answers[3].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="answer3Control.dirty && (answer3Control.errors && answer3Control.errors.required || answersError)">
+      <div *ngIf="answer3Control.errors && answer3Control.errors.required" padding-left padding-right text-center
+           class="invalid-input">
+        {{client.translate('FIELD_REQUIRED')}}
+      </div>
+      <div *ngIf="answersError" padding-left padding-right text-center
+           class="invalid-input">
+        {{answersError}}
+      </div>
+    </ion-row>
+
+    <div padding-left padding-right>
+        <span class="question-editor-answers-note">
+          {{client.translate('RANDOM_ANSWERS_NOTE')}}
+        </span>
+    </div>
+
+    <div padding class="question-editor-set-button">
+      <button class="button-full"
+              (click)="questionEditorForm.valid && dismiss(true)">{{client.translate('OK')}}
+      </button>
+    </div>
+  </form>
+</ion-content>

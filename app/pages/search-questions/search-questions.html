@@ -1,0 +1,38 @@
+<ion-toolbar>
+
+  <ion-buttons>
+    <button (click)="dismiss(false)">
+      <ion-icon name="close-circle"></ion-icon>
+    </button>
+  </ion-buttons>
+
+  <ion-title>
+    {{client.translate('SEARCH_MY_QUESTIONS')}}
+  </ion-title>
+
+</ion-toolbar>
+
+<ion-content>
+  <ion-searchbar placeholder="{{client.translate('SEARCH')}}" [(ngModel)]="searchText" (input)="search($event)" cancelButtonText="{{client.translate('CANCEL')}}">
+  </ion-searchbar>
+
+  <ion-list>
+    <ion-item *ngFor="#question of questions">
+      <ion-label>{{question.text}}</ion-label>
+      <ion-checkbox [(ngModel)]="question.checked" dark></ion-checkbox>
+    </ion-item>
+  </ion-list>
+
+  <div text-center padding *ngIf="searchText && (!questions || questions.length===0)">
+    <h3><strong>{{client.translate('NO_RESULTS')}}</strong>
+    </h3>
+  </div>
+
+  <ion-toolbar *ngIf="questions && questions.length > 0" position="buttom">
+    <button primary class="button-full"
+            (click)="dismiss(true)">{{client.translate('OK')}}
+    </button>
+  </ion-toolbar>
+
+</ion-content>
+

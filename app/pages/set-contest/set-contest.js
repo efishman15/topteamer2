@@ -12,6 +12,8 @@ var common_1 = require('angular2/common');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
 var contest_1 = require('../../pages/contest/contest');
+var question_editor_1 = require('../../pages/question-editor/question-editor');
+var search_questions_1 = require('../../pages/search-questions/search-questions');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
 var alertService = require('../../providers/alert');
@@ -45,7 +47,7 @@ var SetContestPage = (function () {
                 this.showStartDate = true;
             }
             if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
-                retrieveUserQuestions();
+                this.retrieveUserQuestions();
             }
         }
         else if (this.params.data.mode === 'add') {
@@ -61,6 +63,7 @@ var SetContestPage = (function () {
                 'teams': [{ 'name': null, 'score': 0 }, { 'name': null, 'score': 0 }]
             };
             this.showStartDate = true;
+            this.contestLocalCopy.questions = { 'visibleCount': 0, 'list': [] };
         }
         this.client.session.features.newContest.purchaseData.retrieved = false;
         this.showRemoveContest = (this.params.data.mode === 'edit' && this.client.session.isAdmin);
@@ -212,18 +215,88 @@ var SetContestPage = (function () {
         alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.contestLocalCopy.name }).then(function () {
             contestsService.removeContest(_this.contestLocalCopy._id).then(function () {
                 _this.client.events.publish('topTeamer:contestRemoved');
-                _this.client.nav.popToRoot({ animate: false });
+                setTimeout(function () {
+                    _this.client.nav.popToRoot({ animate: false });
+                }, 1000);
             });
         });
     };
+    SetContestPage.prototype.userQuestionsMinimumCheck = function () {
+        if (this.client.settings.newContest.privateQuestions.min === 1) {
+            this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings.newContest.privateQuestions.min });
+        }
+        else {
+            this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings.newContest.privateQuestions.min });
+        }
+        if (this.userQuestionsInvalid) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+    SetContestPage.prototype.maxQuestionsReached = function () {
+        return (this.contestLocalCopy.questions && this.contestLocalCopy.questions.visibleCount === this.client.settings.newContest.privateQuestions.max);
+    };
+    SetContestPage.prototype.openQuestionEditor = function (mode, question) {
+        var _this = this;
+        if (mode === "add") {
+            if (this.maxQuestionsReached()) {
+                alertService.alert(this.client.translate("MAX_USER_QUESTIONS_REACHED", { max: this.client.settings.newContest.privateQuestions.max }));
+                return;
+            }
+        }
+        var modal = ionic_1.Modal.create(question_editor_1.QuestionEditorPage, { 'question': question, 'mode': mode, 'currentQuestions': this.contestLocalCopy.questions });
+        modal.onDismiss(function (result) {
+            if (!result) {
+                return;
+            }
+            _this.userQuestionsInvalid = null;
+            if (!result.question._id) {
+                //New questions
+                result.question._id = "new";
+                _this.contestLocalCopy.questions.list.push(result.question);
+                _this.contestLocalCopy.questions.visibleCount++;
+            }
+            else if (result.question._id !== "new") {
+                //Set dirty flag for the question - so server will update it in the db
+                result.question.isDirty = true;
+            }
+        });
+        this.client.nav.present(modal);
+    };
+    SetContestPage.prototype.openSearchQuestions = function () {
+        if (this.maxQuestionsReached()) {
+            alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', { max: this.client.settings.newContest.privateQuestions.max }));
+            return;
+        }
+        var modal = ionic_1.Modal.create(search_questions_1.SearchQuestionsPage, { 'currentQuestions': this.contestLocalCopy.questions });
+        this.client.nav.present(modal);
+    };
+    SetContestPage.prototype.removeQuestion = function (index) {
+        var _this = this;
+        alertService.confirm('REMOVE_QUESTION', 'CONFIRM_REMOVE_QUESTION', {}).then(function () {
+            if (_this.contestLocalCopy.questions.list && index < _this.contestLocalCopy.questions.list.length) {
+                if (_this.contestLocalCopy.questions.list[index]._id && _this.contestLocalCopy.questions.list[index]._id !== "new") {
+                    //Question has an id in the database - logically remove
+                    _this.contestLocalCopy.questions.list[index].deleted = true;
+                }
+                else {
+                    //Question does not have an actual id in the database - physically remove
+                    _this.contestLocalCopy.questions.list.splice(index, 1);
+                }
+                _this.contestLocalCopy.questions.visibleCount--;
+            }
+        });
+    };
+    ;
     SetContestPage.prototype.setContest = function () {
         var _this = this;
         if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
             if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
-                //TODO - min questions check
-                //minimumQuestionsSingle
-                //minimumQuestionsPlural
-                return;
+                if (!this.userQuestionsMinimumCheck()) {
+                    return;
+                }
             }
         }
         //Tweak the manual participants

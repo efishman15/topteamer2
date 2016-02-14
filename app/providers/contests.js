@@ -119,6 +119,21 @@ exports.setContest = function (contest, mode, nameChanged) {
     return client.serverPost('contests/set', postData);
 };
 //------------------------------------------------------
+//-- searchMyQuestions
+//------------------------------------------------------
+exports.searchMyQuestions = function (text, existingQuestionIds) {
+    var postData = { 'text': text, 'existingQuestionIds': existingQuestionIds };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/searchMyQuestions', postData);
+};
+//------------------------------------------------------
+//-- getQuestions
+//------------------------------------------------------
+exports.getQuestions = function (userQuestions) {
+    var postData = { 'userQuestions': userQuestions };
+    return client.serverPost('contests/getQuestions', postData);
+};
+//------------------------------------------------------
 //-- setTimePhrase
 //-- Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
 //------------------------------------------------------
