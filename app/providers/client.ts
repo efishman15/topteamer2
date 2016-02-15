@@ -147,6 +147,15 @@ export class Client {
 
     return translatedValue;
   }
+
+  toggleSound() {
+    return this.serverPost('user/toggleSound');
+  }
+
+  switchLanguage(language: string) {
+    var postData = {'language': language};
+    return this.serverPost('user/switchLanguage',postData);
+  }
 }
 
 export class ServerGateway {

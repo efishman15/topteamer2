@@ -10,34 +10,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var client_1 = require('../../providers/client');
 var core_1 = require('angular2/core');
 var ionic_1 = require('ionic/ionic');
+var leaderboardsService = require('../../providers/leaderboards');
 var LeadersComponent = (function () {
     function LeadersComponent() {
         this.client = client_1.Client.getInstance();
     }
     LeadersComponent.prototype.showFriends = function (friendsPermissionJustGranted) {
         var _this = this;
-        var postData = {};
-        if (friendsPermissionJustGranted) {
-            postData.friendsPermissionJustGranted = friendsPermissionJustGranted;
-        }
-        this.client.serverPost('leaderboard/friends', postData).then(function (leaders) {
+        leaderboardsService.friends(friendsPermissionJustGranted).then(function (leaders) {
             _this.leaders = leaders;
         });
     };
     LeadersComponent.prototype.showWeekly = function () {
         var _this = this;
-        this.client.serverPost('leaderboard/weekly').then(function (leaders) {
+        leaderboardsService.weekly().then(function (leaders) {
             _this.leaders = leaders;
         });
     };
     //If teamId is not passed - general contest leaderboard is shown
     LeadersComponent.prototype.showContestParticipants = function (contestId, teamId) {
         var _this = this;
-        var postData = { 'contestId': contestId };
-        if (teamId === 0 || teamId === 1) {
-            postData.teamId = teamId;
-        }
-        this.client.serverPost('leaderboard/contest', postData).then(function (leaders) {
+        leaderboardsService.contest(contestId, teamId).then(function (leaders) {
             _this.leaders = leaders;
         });
     };

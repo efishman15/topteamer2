@@ -1,6 +1,6 @@
 import {Page,NavParams} from 'ionic/ionic';
 import {Client} from '../../providers/client';
-import * as ShareService from '../../providers/share';
+import * as shareService from '../../providers/share';
 
 @Page({
   templateUrl: 'build/pages/share/share.html'
@@ -18,7 +18,7 @@ export class SharePage {
       this.contest = params.data.contest;
     }
 
-    this.shareVariables = ShareService.getVariables(this.contest);
+    this.shareVariables = shareService.getVariables(this.contest);
   }
 
 }

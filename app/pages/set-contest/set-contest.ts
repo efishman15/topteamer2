@@ -38,6 +38,7 @@ export class SetContestPage {
   team1:Control;
   contestNameChanged:Boolean;
   userQuestionsInvalid:String;
+  submitted:Boolean;
 
   constructor(params:NavParams, formBuilder:FormBuilder) {
 
@@ -148,9 +149,12 @@ export class SetContestPage {
 
   }
 
+  onPageWillEnter() {
+    this.submitted = false;
+  }
+
   retrieveUserQuestions() {
-    var postData = {'userQuestions': this.contestLocalCopy.userQuestions};
-    this.client.serverPost('contests/getQuestions', postData).then((questions) => {
+    contestsService.getQuestions(this.contestLocalCopy.userQuestions).then((questions) => {
       this.contestLocalCopy.questions = {'visibleCount': questions.length, 'list': questions};
     });
   }
@@ -363,6 +367,11 @@ export class SetContestPage {
 
   setContest() {
 
+    this.submitted = true;
+    if (!this.contestForm.valid) {
+      return;
+    }
+
     if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
       if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
 
@@ -446,6 +455,12 @@ export class SetContestPage {
     let valid = true;
 
     for (name in group.controls) {
+
+      //Empty value in one of the teams will be caught in the required validator
+      if (!group.controls[name].value) {
+        return null;
+      }
+
       if (val === undefined) {
         val = group.controls[name].value;
       }

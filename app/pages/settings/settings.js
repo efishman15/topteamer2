@@ -9,22 +9,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
-var shareService = require('../../providers/share');
-var SharePage = (function () {
-    function SharePage(params) {
+var SettingsPage = (function () {
+    function SettingsPage() {
         this.client = client_1.Client.getInstance();
-        if (params && params.data) {
-            this.contest = params.data.contest;
-        }
-        this.shareVariables = shareService.getVariables(this.contest);
     }
-    SharePage = __decorate([
+    SettingsPage.prototype.toggleSound = function () {
+        var _this = this;
+        this.client.toggleSound().then(function () {
+            _this.client.session.settings.sound = !_this.client.session.settings.sound;
+        });
+    };
+    SettingsPage.prototype.switchLanguage = function () {
+        var _this = this;
+        this.client.switchLanguage(this.client.currentLanguage.value).then(function () {
+            _this.client.session.settings.language = _this.client.currentLanguage.value;
+        });
+    };
+    SettingsPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/share/share.html'
+            templateUrl: 'build/pages/settings/settings.html'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
-    ], SharePage);
-    return SharePage;
-    var _a;
+        __metadata('design:paramtypes', [])
+    ], SettingsPage);
+    return SettingsPage;
 })();
-exports.SharePage = SharePage;
+exports.SettingsPage = SettingsPage;

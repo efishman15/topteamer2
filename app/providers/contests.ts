@@ -4,7 +4,7 @@ import {ContestPage} from '../pages/contest/contest'
 //------------------------------------------------------
 //-- prepareContestChart
 //------------------------------------------------------
-export let prepareContestChart = (contest, timeMode) => {
+export let prepareContestChart = (contest) => {
 
   var client = Client.getInstance();
 
@@ -28,7 +28,7 @@ export let prepareContestChart = (contest, timeMode) => {
     teamsOrder = [1, 0];
   }
 
-  setTimePhrase(contest, timeMode);
+  setTimeDisplay(contest);
 
   if (contest.status === 'finished') {
     //Contest Finished
@@ -61,15 +61,15 @@ export let prepareContestChart = (contest, timeMode) => {
     contestSubCaptionColor = client.settings.charts.captions.running.subCaption.color;
   }
 
-  var contestTimeWidth = client.canvasContext.measureText(contest.timePhrase.text).width;
+  var contestTimeWidth = client.canvasContext.measureText(contest.time.end.text).width;
   var contestParticipantsString = client.translate('CONTEST_PARTICIPANTS', {participants: contest.participants + contest.manualParticipants});
   var contestParticipantsWidth = client.canvasContext.measureText(contestParticipantsString).width;
 
   var magicNumbers = client.settings.charts.contestAnnotations.annotationHorizontalMagicNumbers[direction];
 
-  contestChart.annotations.groups[0].items[magicNumbers.time.id].text = contest.timePhrase.text;
+  contestChart.annotations.groups[0].items[magicNumbers.time.id].text = contest.time.end.text;
   contestChart.annotations.groups[0].items[magicNumbers.time.id].x = magicNumbers.time.position + (contestTimeWidth / 2 + magicNumbers.time.spacing);
-  contestChart.annotations.groups[0].items[magicNumbers.time.id].fontColor = contest.timePhrase.color;
+  contestChart.annotations.groups[0].items[magicNumbers.time.id].fontColor = contest.time.end.color;
 
   contestChart.annotations.groups[0].items[magicNumbers.participants.id].text = contestParticipantsString;
   contestChart.annotations.groups[0].items[magicNumbers.participants.id].x = magicNumbers.participants.position + (contestParticipantsWidth / 2 + magicNumbers.participants.spacing);
@@ -111,21 +111,40 @@ export let prepareContestChart = (contest, timeMode) => {
 };
 
 //------------------------------------------------------
+//-- list
+//------------------------------------------------------
+export let list = (tab:string) => {
+  var postData = {'tab': tab};
+  var client = Client.getInstance();
+  return client.serverPost('contests/list', postData);
+}
+
+//------------------------------------------------------
+//-- join
+//------------------------------------------------------
+export let join = (contestId:number, teamId:number) => {
+  var postData = {'contestId': contestId, 'teamId': teamId};
+  var client = Client.getInstance();
+  return client.serverPost('contests/join', postData);
+}
+
+
+//------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
-export let openContest = (contestId: string) => {
+export let openContest = (contestId:string) => {
 
   var postData = {'contestId': contestId};
   var client = Client.getInstance();
   client.serverPost('contests/get', postData).then((contest) => {
-    client.nav.push(ContestPage, {'contestChart' : prepareContestChart(contest, 'starts')});
+    client.nav.push(ContestPage, {'contestChart': prepareContestChart(contest)});
   });
 };
 
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
-export let removeContest = (contestId: string) => {
+export let removeContest = (contestId:string) => {
   var postData = {'contestId': contestId};
   var client = Client.getInstance();
   return client.serverPost('contests/remove', postData);
@@ -134,7 +153,7 @@ export let removeContest = (contestId: string) => {
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
-export let setContest = (contest: Object, mode: string, nameChanged: boolean) => {
+export let setContest = (contest:Object, mode:string, nameChanged:boolean) => {
   var postData = {'contest': contest, 'mode': mode};
   if (nameChanged) {
     postData.nameChanged = nameChanged;
@@ -147,7 +166,7 @@ export let setContest = (contest: Object, mode: string, nameChanged: boolean) =>
 //------------------------------------------------------
 //-- searchMyQuestions
 //------------------------------------------------------
-export let searchMyQuestions = (text: String, existingQuestionIds: Array<String>) => {
+export let searchMyQuestions = (text:String, existingQuestionIds:Array<String>) => {
   var postData = {'text': text, 'existingQuestionIds': existingQuestionIds};
   var client = Client.getInstance();
   return client.serverPost('contests/searchMyQuestions', postData);
@@ -158,18 +177,30 @@ export let searchMyQuestions = (text: String, existingQuestionIds: Array<String>
 //------------------------------------------------------
 export let getQuestions = (userQuestions) => {
   var postData = {'userQuestions': userQuestions};
+  var client = Client.getInstance();
   return client.serverPost('contests/getQuestions', postData);
 };
 
 //------------------------------------------------------
-//-- setTimePhrase
-//-- Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
+//-- setTimeDisplay
+//-- Sets the contest.time object - see as follows
 //------------------------------------------------------
-function setTimePhrase(contest, timeMode) {
+function setTimeDisplay(contest) {
 
   var client = Client.getInstance();
 
   var now = (new Date()).getTime();
+
+  contest.time = {
+    'start': {
+      'text': null,
+      'color': null
+    },
+    'end': {
+      'text': null,
+      'color': null
+    }
+  };
 
   //Set contest status
   if (contest.endDate < now) {
@@ -182,65 +213,63 @@ function setTimePhrase(contest, timeMode) {
     contest.status = 'running';
   }
 
-  var contestTimeTerm;
-  var contestTimeNumber;
-  var contestTimeUnits;
-  var contestTimeColor;
+  var term;
+  var number;
+  var units;
+  var color;
+  var minutes;
 
-  if (timeMode === 'starts') {
-    var startMinutes = Math.abs(now - contest.startDate) / 1000 / 60;
-    if (startMinutes >= 60 * 24) {
-      contestTimeNumber = Math.ceil(startMinutes / 24 / 60);
-      contestTimeUnits = 'DAYS';
-    }
-    else if (startMinutes >= 60) {
-      contestTimeNumber = Math.ceil(startMinutes / 60);
-      contestTimeUnits = 'HOURS';
-    }
-    else {
-      contestTimeNumber = Math.ceil(startMinutes);
-      contestTimeUnits = 'MINUTES';
-    }
-
-    contestTimeColor = client.settings.charts.contestAnnotations.time.running.color;
-
-    if (contest.status === 'running') {
-      contestTimeTerm = 'CONTEST_STARTED';
-    }
-    else {
-      contestTimeTerm = 'CONTEST_STARTING';
-    }
+  //-------------------
+  // Start Time
+  //-------------------
+  minutes = Math.abs(now - contest.startDate) / 1000 / 60;
+  if (minutes >= 60 * 24) {
+    number = Math.ceil(minutes / 24 / 60);
+    units = 'DAYS';
   }
-  else if (timeMode === 'ends') {
-    var endMinutes = Math.abs(contest.endDate - now) / 1000 / 60;
-    if (endMinutes >= 60 * 24) {
-      contestTimeNumber = Math.ceil(endMinutes / 24 / 60);
-      contestTimeUnits = 'DAYS';
-    }
-    else if (endMinutes >= 60) {
-      contestTimeNumber = Math.ceil(endMinutes / 60);
-      contestTimeUnits = 'HOURS';
-    }
-    else {
-      contestTimeNumber = Math.ceil(endMinutes);
-      contestTimeUnits = 'MINUTES';
-    }
-
-    if (contest.status === 'running') {
-      contestTimeTerm = 'CONTEST_ENDS_IN';
-      contestTimeColor = client.settings.charts.contestAnnotations.time.running.color;
-    }
-    else {
-      //Contest Finished
-      contestTimeTerm = 'CONTEST_ENDED';
-      contestTimeColor = client.settings.charts.contestAnnotations.time.finished.color;
-    }
+  else if (minutes >= 60) {
+    number = Math.ceil(minutes / 60);
+    units = 'HOURS';
   }
+  else {
+    number = Math.ceil(minutes);
+    units = 'MINUTES';
+  }
+  if (now > contest.startDate) {
+    term = 'CONTEST_STARTED';
+    color = client.settings.charts.contestAnnotations.time.running.color;
+  }
+  else {
+    term = 'CONTEST_STARTING';
+    color = client.settings.charts.contestAnnotations.time.starting.color;
+  }
+  contest.time.start.text = client.translate(term, {number: number, units: client.translate(units)});
+  contest.time.start.color = color;
 
-  var contestTimeString = client.translate(contestTimeTerm,{
-    number: contestTimeNumber,
-    units: client.translate(contestTimeUnits)
-  });
-
-  contest.timePhrase = {'text': contestTimeString, 'color': contestTimeColor};
+  //-------------------
+  // End Time
+  //-------------------
+  minutes = Math.abs(contest.endDate - now) / 1000 / 60;
+  if (minutes >= 60 * 24) {
+    number = Math.ceil(minutes / 24 / 60);
+    units = 'DAYS';
+  }
+  else if (minutes >= 60) {
+    number = Math.ceil(minutes / 60);
+    units = 'HOURS';
+  }
+  else {
+    number = Math.ceil(minutes);
+    units = 'MINUTES';
+  }
+  if (now < contest.endDate) {
+    term = 'CONTEST_ENDS_IN';
+    color = client.settings.charts.contestAnnotations.time.running.color;
+  }
+  else {
+    term = 'CONTEST_ENDED';
+    color = client.settings.charts.contestAnnotations.time.finished.color;
+  }
+  contest.time.end.text = client.translate(term, {number: number, units: client.translate(units)});
+  contest.time.end.color = color;
 }

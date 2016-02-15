@@ -55,18 +55,18 @@
     </ion-row>
     <ion-row>
       <ion-col width-40>
-        <div text-center *ngIf="team0.dirty && team0.errors && team0.errors.required" class="invalid-input">
+        <div text-center *ngIf="(team0.dirty || submitted) && team0.errors && team0.errors.required" class="invalid-input">
           {{client.translate('FIELD_REQUIRED')}}
         </div>
       </ion-col>
       <ion-col>
-        <div text-center *ngIf="contestForm.dirty && contestForm.errors && contestForm.errors.matchingTeams"
+        <div text-center *ngIf="(contestForm.dirty || submitted) && contestForm.errors && contestForm.errors.matchingTeams"
              class="invalid-input">
           {{client.translate('SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES_MESSAGE')}}
         </div>
       </ion-col>
       <ion-col width-40>
-        <div text-center *ngIf="team1.dirty && team1.errors && team1.errors.required" class="invalid-input">
+        <div text-center *ngIf="(team1.dirty || submitted) && team1.errors && team1.errors.required" class="invalid-input">
           {{client.translate('FIELD_REQUIRED')}}
         </div>
       </ion-col>
@@ -80,9 +80,8 @@
                     cancelText="{{client.translate('CANCEL')}}">
           <ion-option *ngFor="#endOptionKey of endOptionKeys"
                       value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
-                      checked="{{contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value}}">
-            {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number:
-            client.settings.newContest.endOptions[endOptionKey].number}) }}
+                      checked="contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value">
+            {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number: client.settings.newContest.endOptions[endOptionKey].number}) }}
           </ion-option>
         </ion-select>
       </ion-item>
@@ -145,12 +144,12 @@
         </ion-list>
       </div>
 
-      <div class="invalid-input"
-           *ngIf="contestLocalCopy.content.source === 'trivia' && contestLocalCopy.content.category.id === 'user' && userQuestionsInvalid">
-        {{userQuestionsInvalid}}
-      </div>
-
     </ion-item>
+
+    <div padding-left padding-right class="invalid-input"
+         *ngIf="submitted && contestLocalCopy.content.source === 'trivia' && contestLocalCopy.content.category.id === 'user' && userQuestionsInvalid">
+      {{userQuestionsInvalid}}
+    </div>
 
     <div padding class="set-contest-label" *ngIf="client.session.isAdmin">
       <span class="pointer" (click)="toggleAdminInfo()">{{client.translate('CONTEST_ADMIN_INFO')}} {{getArrowDirection(!showAdminInfo)}}</span>
@@ -215,7 +214,7 @@
     </div>
 
     <div padding>
-      <button (click)="contestForm.valid && setContest()" block>{{client.translate('OK')}}</button>
+      <button (click)="setContest()" block>{{client.translate('OK')}}</button>
     </div>
   </form>
 </ion-content>

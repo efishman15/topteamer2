@@ -6,11 +6,14 @@ import * as shareService from './providers/share';
 import {Client} from './providers/client';
 import {ContestTypePage} from './pages/contest-type/contest-type';
 import {SetContestPage} from './pages/set-contest/set-contest';
+import {SettingsPage} from './pages/settings/settings';
+import {SystemToolsPage} from './pages/system-tools/system-tools';
 
 @App({
   templateUrl: 'app.html',
   moduleId: 'build/app.html',
-  providers: [Client]
+  providers: [Client],
+  config: {backButtonText: ''}
 })
 class topTeamerApp {
 
@@ -269,4 +272,13 @@ class topTeamerApp {
   share() {
     shareService.share();
   }
+
+  settings() {
+    this.client.nav.push(SettingsPage);
+  }
+
+  systemTools() {
+    this.client.nav.push(SystemToolsPage);
+  }
+
 }

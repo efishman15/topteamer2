@@ -2,7 +2,9 @@ import {Page, NavParams,Modal} from 'ionic-framework/ionic';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener'
 import {TransitionListener} from '../../directives/transition-listener/transition-listener'
 import {QuestionStatsPage} from '../../pages/question-stats/question-stats'
+import {QuestionEditorPage} from '../../pages/question-editor/question-editor'
 import {Client} from '../../providers/client';
+import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
 import * as alertService from '../../providers/alert';
 
@@ -29,7 +31,8 @@ export class QuizPage {
   imgCorrectSrc:String = 'images/correct.png';
   imgErrorSrc:String = 'images/error.png';
   imgQuestionInfoSrc:String = 'images/info_question.png';
-
+  pageInitiated:Boolean = false;
+  modalJustClosed:Boolean = false;
 
   //Hash map - each item's key is the img.src and the value is an object like this:
   // loaded: true/false
@@ -43,8 +46,29 @@ export class QuizPage {
   }
 
   ngOnInit() {
+    this.init();
+  }
+
+  onPageWillEnter() {
+
+    //onPageWillEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
+
+    if (this.modalJustClosed) {
+      this.modalJustClosed = false;
+      //Quiz already started - just a modal dialog was dismissed
+      return;
+    }
+
+    this.init();
     this.contestId = this.params.data.contestId;
     this.source = this.params.data.source;
+    this.startQuiz();
+  }
+
+  init() {
+    if (this.pageInitiated) {
+      return;
+    }
 
     this.quizCanvas = document.getElementById('quizCanvas');
     this.quizContext = this.quizCanvas.getContext('2d');
@@ -54,25 +78,28 @@ export class QuizPage {
     this.initDrawImageQueue(this.imgErrorSrc);
     this.initDrawImageQueue(this.imgQuestionInfoSrc);
 
-    this.startQuiz();
+    this.pageInitiated = true;
   }
 
   startQuiz() {
     FlurryAgent.logEvent('quiz/' + this.source + '/started');
-    var postData = {'contestId': this.contestId};
-    this.client.serverPost('quiz/start', postData).then((data) => {
+    quizService.start(this.contestId).then((data) => {
       this.quizData = data.quiz;
       this.quizData.currentQuestion.answered = false;
-
-      if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
-        alertService.alert(this.quizData.reviewMode.reason);
-      }
 
       for (var i = 0; i < data.quiz.totalQuestions; i++) {
         this.questionHistory.push({'score': this.client.settings.quiz.questions.score[i]});
       }
 
       this.drawQuizProgress();
+
+      if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
+        setTimeout(() => {
+          alertService.alert(this.client.translate(this.quizData.reviewMode.reason)).then(() => {
+            this.modalJustClosed = true;
+          });
+        }, 1000);
+      }
 
     });
   }
@@ -84,16 +111,7 @@ export class QuizPage {
     //TODO: respond to server errors by going back and restarting quiz:
     //'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ': {'next': startQuiz},
     //'SERVER_ERROR_GENERAL':
-
-    var postData = {'id': answerId};
-    if (this.questionHistory[this.quizData.currentQuestionIndex].hintUsed) {
-      postData.hintUsed = this.questionHistory[this.quizData.currentQuestionIndex].hintUsed;
-    }
-    if (this.questionHistory[this.quizData.currentQuestionIndex].answerUsed) {
-      postData.answerUsed = this.questionHistory[this.quizData.currentQuestionIndex].answerUsed;
-    }
-
-    this.client.serverPost('quiz/answer', postData).then((data) => {
+    quizService.answer(answerId,this.questionHistory[this.quizData.currentQuestionIndex].hintUsed,this.questionHistory[this.quizData.currentQuestionIndex].answerUsed).then((data) => {
 
       var correctAnswerId;
 
@@ -142,7 +160,7 @@ export class QuizPage {
 
   nextQuestion() {
 
-    this.client.serverPost('quiz/nextQuestion').then((data) => {
+    quizService.nextQuestion().then((data) => {
 
       this.quizData = data;
       this.quizData.currentQuestion.answered = false;
@@ -235,7 +253,8 @@ export class QuizPage {
           'chartDataSource': questionChart
         });
 
-        modal.onDismiss( (action) => {
+        modal.onDismiss((action) => {
+          this.modalJustClosed = true;
           switch (action) {
             case 'hint':
               this.questionHistory[this.quizData.currentQuestionIndex].hintUsed = true;
@@ -408,7 +427,6 @@ export class QuizPage {
     this.drawQuizScores();
 
   }
-  ;
 
   clearQuizScores() {
     this.quizContext.beginPath();
@@ -471,6 +489,32 @@ export class QuizPage {
       }
     }
   }
-  ;
 
+  openQuestionEditor() {
+
+    var question = {
+      '_id': this.quizData.currentQuestion._id,
+      'text': this.quizData.currentQuestion.text,
+      'answers': []
+    };
+
+    for (var i = 0; i < this.quizData.currentQuestion.answers.length; i++) {
+      question.answers[this.quizData.currentQuestion.answers[i].originalIndex] = this.quizData.currentQuestion.answers[i].text;
+    }
+    var modal = Modal.create(QuestionEditorPage, {'question': question, 'mode': 'edit'});
+    modal.onDismiss((result) => {
+      this.modalJustClosed = true;
+      if (!result) {
+        return;
+      }
+
+      quizService.setQuestionByAdmin(result.question).then( () => {
+        this.quizData.currentQuestion.text = result.question.text;
+        for (var i = 0; i < result.question.answers.length; i++) {
+          this.quizData.currentQuestion.answers[i].text = result.question.answers[this.quizData.currentQuestion.answers[i].originalIndex];
+        }
+      })
+    })
+    this.client.nav.present(modal);
+  }
 }

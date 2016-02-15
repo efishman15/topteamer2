@@ -1,0 +1,19 @@
+<ion-navbar *navbar>
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>{{client.translate('SYSTEM_TOOLS')}}</ion-title>
+</ion-navbar>
+
+<ion-content>
+
+  <div text-center padding>
+    <button class="button-full" (click)="clearCache()">{{client.translate('SYSTEM_CLEAR_CACHE')}}
+    </button>
+  </div>
+  <div text-center padding>
+    <button danger class="button-full" (click)="restart()">{{client.translate('SYSTEM_RESTART_SERVER')}}
+    </button>
+  </div>
+
+</ion-content>

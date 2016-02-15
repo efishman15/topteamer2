@@ -4,7 +4,7 @@ var ionic_1 = require('ionic/ionic');
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-exports.alert = function (error) {
+exports.alert = function (error) { return new Promise(function (resolve, reject) {
     var client = client_1.Client.getInstance();
     var alert;
     if (error) {
@@ -16,19 +16,26 @@ exports.alert = function (error) {
                 'cssClass': client.currentLanguage.direction,
                 'title': client.translate(error.type + '_TITLE'),
                 'message': client.translate(error.type + '_MESSAGE', error.additionalInfo),
-                'buttons': [client.translate('OK')]
             });
         }
         else {
             alert = ionic_1.Alert.create({
                 'cssClass': client.currentLanguage.direction,
-                'message': error,
-                'buttons': [client.translate('OK')]
+                'message': error
             });
         }
+        alert.addButton({
+            'role': 'cancel',
+            'text': client.translate('OK'),
+            'handler': function () {
+                if (resolve) {
+                    resolve();
+                }
+            }
+        });
         client.nav.present(alert);
     }
-};
+}); };
 //------------------------------------------------------
 //-- confirm
 //------------------------------------------------------

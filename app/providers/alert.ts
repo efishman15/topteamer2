@@ -4,7 +4,7 @@ import {Alert, ActionSheet} from 'ionic/ionic';
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-export let alert = (error) => {
+export let alert = (error) => new Promise((resolve, reject) => {
 
   var client = Client.getInstance();
 
@@ -20,20 +20,30 @@ export let alert = (error) => {
           'cssClass': client.currentLanguage.direction,
           'title': client.translate(error.type + '_TITLE'),
           'message': client.translate(error.type + '_MESSAGE', error.additionalInfo),
-          'buttons': [client.translate('OK')]
         });
     }
     else {
       alert = Alert.create({
         'cssClass': client.currentLanguage.direction,
-        'message': error,
-        'buttons': [client.translate('OK')]
+        'message': error
       });
     }
 
+    alert.addButton(
+      {
+        'role': 'cancel',
+        'text': client.translate('OK'),
+        'handler': () => {
+          if (resolve) {
+            resolve();
+          }
+        }
+      });
+
     client.nav.present(alert);
   }
-};
+
+});
 
 //------------------------------------------------------
 //-- confirm

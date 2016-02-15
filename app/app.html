@@ -18,7 +18,14 @@
         <ion-icon name="share-alt"></ion-icon>
         {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
       </button>
-
+      <button menuClose ion-item (click)="settings()">
+        <ion-icon name="settings"></ion-icon>
+        {{client.translate('SETTINGS')}}
+      </button>
+      <button *ngIf="client.session && client.session.isAdmin" menuClose ion-item (click)="systemTools()">
+        <ion-icon name="hammer"></ion-icon>
+        {{client.translate('SYSTEM_TOOLS')}}
+      </button>
     </ion-list>
   </ion-content>
 

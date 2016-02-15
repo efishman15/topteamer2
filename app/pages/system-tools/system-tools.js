@@ -9,22 +9,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
-var shareService = require('../../providers/share');
-var SharePage = (function () {
-    function SharePage(params) {
+var systemService = require('../../providers/system');
+var SystemToolsPage = (function () {
+    function SystemToolsPage() {
         this.client = client_1.Client.getInstance();
-        if (params && params.data) {
-            this.contest = params.data.contest;
-        }
-        this.shareVariables = shareService.getVariables(this.contest);
     }
-    SharePage = __decorate([
+    SystemToolsPage.prototype.clearCache = function () {
+        var _this = this;
+        systemService.clearCache().then(function () {
+            _this.client.nav.pop();
+        });
+    };
+    SystemToolsPage.prototype.restart = function () {
+        var _this = this;
+        systemService.restart().then(function () {
+            _this.client.nav.pop();
+        });
+    };
+    SystemToolsPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/share/share.html'
+            templateUrl: 'build/pages/system-tools/system-tools.html'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
-    ], SharePage);
-    return SharePage;
-    var _a;
+        __metadata('design:paramtypes', [])
+    ], SystemToolsPage);
+    return SystemToolsPage;
 })();
-exports.SharePage = SharePage;
+exports.SystemToolsPage = SystemToolsPage;

@@ -20,7 +20,7 @@
 
     <div class="question-text"
          [ngClass]="{'pointer' : client.session.isAdmin}"
-         (click)="client.session.isAdmin && openQuestionModal()"
+         (click)="client.session.isAdmin && openQuestionEditor()"
          [innerHtml]="quizData.currentQuestion.text">
     </div>
 

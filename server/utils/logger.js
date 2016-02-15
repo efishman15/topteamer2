@@ -2,60 +2,66 @@ var path = require('path');
 var logger = require('bunyan');
 
 module.exports.console = logger.createLogger({
-    name: 'topTeamerConsole',
-    streams: [{
-        stream: process.stderr
-        // `type: 'stream'` is implied
-    }]
+  name: 'topTeamerConsole',
+  streams: [{
+    stream: process.stderr
+    // `type: 'stream'` is implied
+  }]
 });
 
+//Server log is dual - both to a file and to the console
 module.exports.server = logger.createLogger({
-    name: 'topTeamerServer',
-    streams: [{
-        type: 'rotating-file',
-        path: path.resolve(__dirname,'../logs/server.log'),
-        period: '1d',   // daily rotation
-        count: 30        // keep back copies
+  name: 'topTeamerServer',
+  streams: [
+    {
+      type: 'rotating-file',
+      path: path.resolve(__dirname, '../logs/server.log'),
+      period: '1d',   // daily rotation
+      count: 30        // keep back copies
+    },
+    {
+      stream: process.stderr
+      // `type: 'stream'` is implied
     }],
-    serializers: {
-        req: reqSerializer
-    }
+  serializers: {
+    req: reqSerializer
+  }
 });
 
 module.exports.paypalIPN = logger.createLogger({
-    name: 'topTeamerPayPalIPN',
-    streams: [{
-        type: 'rotating-file',
-        path: path.resolve(__dirname,'../logs/paypal/paypalIPN.log'),
-        period: '1d',   // daily rotation
-        count: 180        // keep back copies
-    }],
-    serializers: {
-        req: reqSerializer
-    }
+  name: 'topTeamerPayPalIPN',
+  streams: [{
+    type: 'rotating-file',
+    path: path.resolve(__dirname, '../logs/paypal/paypalIPN.log'),
+    period: '1d',   // daily rotation
+    count: 180        // keep back copies
+  }],
+  serializers: {
+    req: reqSerializer
+  }
 });
 
 module.exports.facebookIPN = logger.createLogger({
-    name: 'topTeamerFacebookIPN',
-    streams: [{
-        type: 'rotating-file',
-        path: path.resolve(__dirname,'../logs/facebook/facebookIPN.log'),
-        period: '1d',   // daily rotation
-        count: 180        // keep back copies
-    }],
-    serializers: {
-        req: reqSerializer
-    }
+  name: 'topTeamerFacebookIPN',
+  streams: [{
+    type: 'rotating-file',
+    path: path.resolve(__dirname, '../logs/facebook/facebookIPN.log'),
+    period: '1d',   // daily rotation
+    count: 180        // keep back copies
+  }],
+  serializers: {
+    req: reqSerializer
+  }
 });
 
 //-------------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------------
 function reqSerializer(req) {
-    return {
-        method: req.method,
-        url: req.url,
-        headers: req.headers,
-        body: req.body
-    }
+  return {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    body: req.body
+  }
 }

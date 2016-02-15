@@ -38,7 +38,14 @@ var QuestionEditorPage = (function () {
         });
         this.currentQuestions = params.data.currentQuestions;
     }
+    QuestionEditorPage.prototype.onPageWillEnter = function () {
+        this.submitted = false;
+    };
     QuestionEditorPage.prototype.dismiss = function (applyChanges) {
+        this.submitted = true;
+        if (!this.questionEditorForm.valid) {
+            return;
+        }
         var result;
         if (applyChanges) {
             //Check for duplicate questions
@@ -46,7 +53,7 @@ var QuestionEditorPage = (function () {
                 //Check if question exists
                 var matchCount = 0;
                 for (var i = 0; i < this.currentQuestions.list.length; i++) {
-                    if (this.question.text.trim() === this.currentQuestions.questions.list[i].text.trim()) {
+                    if (this.question.text.trim() === this.currentQuestions.list[i].text.trim()) {
                         matchCount++;
                     }
                 }

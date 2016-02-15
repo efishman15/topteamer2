@@ -1,6 +1,8 @@
 import {Client} from '../../providers/client';
 import {Component} from 'angular2/core';
 import {List, Item} from 'ionic/ionic';
+import * as leaderboardsService from '../../providers/leaderboards';
+
 
 @Component({
   selector: 'leaders',
@@ -18,30 +20,21 @@ export class LeadersComponent {
   }
 
   showFriends(friendsPermissionJustGranted : boolean) {
-    var postData = {};
-    if (friendsPermissionJustGranted) {
-      postData.friendsPermissionJustGranted = friendsPermissionJustGranted;
-    }
-    this.client.serverPost('leaderboard/friends', postData).then((leaders) => {
+    leaderboardsService.friends(friendsPermissionJustGranted).then((leaders) => {
       this.leaders = leaders;
     });
   }
 
   showWeekly() {
-    this.client.serverPost('leaderboard/weekly').then((leaders) => {
+    leaderboardsService.weekly().then((leaders) => {
       this.leaders = leaders;
     });
   }
 
   //If teamId is not passed - general contest leaderboard is shown
   showContestParticipants(contestId: string, teamId? : number) {
-    var postData = {'contestId' : contestId};
-    if (teamId === 0 || teamId === 1) {
-      postData.teamId = teamId;
-    }
-    this.client.serverPost('leaderboard/contest', postData).then((leaders) => {
+    leaderboardsService.contest(contestId, teamId).then((leaders) => {
       this.leaders = leaders;
     });
   }
-
 }

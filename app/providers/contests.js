@@ -3,7 +3,7 @@ var contest_1 = require('../pages/contest/contest');
 //------------------------------------------------------
 //-- prepareContestChart
 //------------------------------------------------------
-exports.prepareContestChart = function (contest, timeMode) {
+exports.prepareContestChart = function (contest) {
     var client = client_1.Client.getInstance();
     var contestCaption;
     var contestCaptionColor;
@@ -20,7 +20,7 @@ exports.prepareContestChart = function (contest, timeMode) {
     else {
         teamsOrder = [1, 0];
     }
-    setTimePhrase(contest, timeMode);
+    setTimeDisplay(contest);
     if (contest.status === 'finished') {
         //Contest Finished
         contestCaption = client.translate(contest.content.category.name);
@@ -49,13 +49,13 @@ exports.prepareContestChart = function (contest, timeMode) {
         contestSubCaption = client.translate(contest.content.category.name);
         contestSubCaptionColor = client.settings.charts.captions.running.subCaption.color;
     }
-    var contestTimeWidth = client.canvasContext.measureText(contest.timePhrase.text).width;
+    var contestTimeWidth = client.canvasContext.measureText(contest.time.end.text).width;
     var contestParticipantsString = client.translate('CONTEST_PARTICIPANTS', { participants: contest.participants + contest.manualParticipants });
     var contestParticipantsWidth = client.canvasContext.measureText(contestParticipantsString).width;
     var magicNumbers = client.settings.charts.contestAnnotations.annotationHorizontalMagicNumbers[direction];
-    contestChart.annotations.groups[0].items[magicNumbers.time.id].text = contest.timePhrase.text;
+    contestChart.annotations.groups[0].items[magicNumbers.time.id].text = contest.time.end.text;
     contestChart.annotations.groups[0].items[magicNumbers.time.id].x = magicNumbers.time.position + (contestTimeWidth / 2 + magicNumbers.time.spacing);
-    contestChart.annotations.groups[0].items[magicNumbers.time.id].fontColor = contest.timePhrase.color;
+    contestChart.annotations.groups[0].items[magicNumbers.time.id].fontColor = contest.time.end.color;
     contestChart.annotations.groups[0].items[magicNumbers.participants.id].text = contestParticipantsString;
     contestChart.annotations.groups[0].items[magicNumbers.participants.id].x = magicNumbers.participants.position + (contestParticipantsWidth / 2 + magicNumbers.participants.spacing);
     contestChart.data.push({
@@ -90,13 +90,29 @@ exports.prepareContestChart = function (contest, timeMode) {
     return contestChart;
 };
 //------------------------------------------------------
+//-- list
+//------------------------------------------------------
+exports.list = function (tab) {
+    var postData = { 'tab': tab };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/list', postData);
+};
+//------------------------------------------------------
+//-- join
+//------------------------------------------------------
+exports.join = function (contestId, teamId) {
+    var postData = { 'contestId': contestId, 'teamId': teamId };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/join', postData);
+};
+//------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
 exports.openContest = function (contestId) {
     var postData = { 'contestId': contestId };
     var client = client_1.Client.getInstance();
     client.serverPost('contests/get', postData).then(function (contest) {
-        client.nav.push(contest_1.ContestPage, { 'contestChart': exports.prepareContestChart(contest, 'starts') });
+        client.nav.push(contest_1.ContestPage, { 'contestChart': exports.prepareContestChart(contest) });
     });
 };
 //------------------------------------------------------
@@ -131,15 +147,26 @@ exports.searchMyQuestions = function (text, existingQuestionIds) {
 //------------------------------------------------------
 exports.getQuestions = function (userQuestions) {
     var postData = { 'userQuestions': userQuestions };
+    var client = client_1.Client.getInstance();
     return client.serverPost('contests/getQuestions', postData);
 };
 //------------------------------------------------------
-//-- setTimePhrase
-//-- Retruns an object {'time' : 'ends in xxx, started in xxx, ended xxx days ago, starting etc...', 'color' : #color
+//-- setTimeDisplay
+//-- Sets the contest.time object - see as follows
 //------------------------------------------------------
-function setTimePhrase(contest, timeMode) {
+function setTimeDisplay(contest) {
     var client = client_1.Client.getInstance();
     var now = (new Date()).getTime();
+    contest.time = {
+        'start': {
+            'text': null,
+            'color': null
+        },
+        'end': {
+            'text': null,
+            'color': null
+        }
+    };
     //Set contest status
     if (contest.endDate < now) {
         contest.status = 'finished';
@@ -150,59 +177,61 @@ function setTimePhrase(contest, timeMode) {
     else {
         contest.status = 'running';
     }
-    var contestTimeTerm;
-    var contestTimeNumber;
-    var contestTimeUnits;
-    var contestTimeColor;
-    if (timeMode === 'starts') {
-        var startMinutes = Math.abs(now - contest.startDate) / 1000 / 60;
-        if (startMinutes >= 60 * 24) {
-            contestTimeNumber = Math.ceil(startMinutes / 24 / 60);
-            contestTimeUnits = 'DAYS';
-        }
-        else if (startMinutes >= 60) {
-            contestTimeNumber = Math.ceil(startMinutes / 60);
-            contestTimeUnits = 'HOURS';
-        }
-        else {
-            contestTimeNumber = Math.ceil(startMinutes);
-            contestTimeUnits = 'MINUTES';
-        }
-        contestTimeColor = client.settings.charts.contestAnnotations.time.running.color;
-        if (contest.status === 'running') {
-            contestTimeTerm = 'CONTEST_STARTED';
-        }
-        else {
-            contestTimeTerm = 'CONTEST_STARTING';
-        }
+    var term;
+    var number;
+    var units;
+    var color;
+    var minutes;
+    //-------------------
+    // Start Time
+    //-------------------
+    minutes = Math.abs(now - contest.startDate) / 1000 / 60;
+    if (minutes >= 60 * 24) {
+        number = Math.ceil(minutes / 24 / 60);
+        units = 'DAYS';
     }
-    else if (timeMode === 'ends') {
-        var endMinutes = Math.abs(contest.endDate - now) / 1000 / 60;
-        if (endMinutes >= 60 * 24) {
-            contestTimeNumber = Math.ceil(endMinutes / 24 / 60);
-            contestTimeUnits = 'DAYS';
-        }
-        else if (endMinutes >= 60) {
-            contestTimeNumber = Math.ceil(endMinutes / 60);
-            contestTimeUnits = 'HOURS';
-        }
-        else {
-            contestTimeNumber = Math.ceil(endMinutes);
-            contestTimeUnits = 'MINUTES';
-        }
-        if (contest.status === 'running') {
-            contestTimeTerm = 'CONTEST_ENDS_IN';
-            contestTimeColor = client.settings.charts.contestAnnotations.time.running.color;
-        }
-        else {
-            //Contest Finished
-            contestTimeTerm = 'CONTEST_ENDED';
-            contestTimeColor = client.settings.charts.contestAnnotations.time.finished.color;
-        }
+    else if (minutes >= 60) {
+        number = Math.ceil(minutes / 60);
+        units = 'HOURS';
     }
-    var contestTimeString = client.translate(contestTimeTerm, {
-        number: contestTimeNumber,
-        units: client.translate(contestTimeUnits)
-    });
-    contest.timePhrase = { 'text': contestTimeString, 'color': contestTimeColor };
+    else {
+        number = Math.ceil(minutes);
+        units = 'MINUTES';
+    }
+    if (now > contest.startDate) {
+        term = 'CONTEST_STARTED';
+        color = client.settings.charts.contestAnnotations.time.running.color;
+    }
+    else {
+        term = 'CONTEST_STARTING';
+        color = client.settings.charts.contestAnnotations.time.starting.color;
+    }
+    contest.time.start.text = client.translate(term, { number: number, units: client.translate(units) });
+    contest.time.start.color = color;
+    //-------------------
+    // End Time
+    //-------------------
+    minutes = Math.abs(contest.endDate - now) / 1000 / 60;
+    if (minutes >= 60 * 24) {
+        number = Math.ceil(minutes / 24 / 60);
+        units = 'DAYS';
+    }
+    else if (minutes >= 60) {
+        number = Math.ceil(minutes / 60);
+        units = 'HOURS';
+    }
+    else {
+        number = Math.ceil(minutes);
+        units = 'MINUTES';
+    }
+    if (now < contest.endDate) {
+        term = 'CONTEST_ENDS_IN';
+        color = client.settings.charts.contestAnnotations.time.running.color;
+    }
+    else {
+        term = 'CONTEST_ENDED';
+        color = client.settings.charts.contestAnnotations.time.finished.color;
+    }
+    contest.time.end.text = client.translate(term, { number: number, units: client.translate(units) });
+    contest.time.end.color = color;
 }

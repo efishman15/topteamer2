@@ -33,11 +33,11 @@ export class ContestListComponent {
 
   refresh() {
     var postData = {'tab': this.tab};
-    this.client.serverPost('contests/list', postData).then((contests) => {
+    contestsService.list(this.tab).then((contests) => {
       this.contests = contests;
       this.contestCharts = [];
-      for(var i=0; i<contests.length; i++) {
-        this.contestCharts.push(contestsService.prepareContestChart(contests[i],'ends'));
+      for (var i = 0; i < contests.length; i++) {
+        this.contestCharts.push(contestsService.prepareContestChart(contests[i]));
       }
     });
   }

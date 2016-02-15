@@ -36,7 +36,7 @@ export class ContestPage {
     }
     else {
       //Just created this contest - no chart
-      this.contestChart = contestsService.prepareContestChart(this.params.data.contest, 'starts');
+      this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
     }
 
     this.client.events.subscribe('topTeamer:quizFinished', (eventData) => {
@@ -93,8 +93,7 @@ export class ContestPage {
 
   joinContest(team, source, action:string = 'join') {
 
-    var postData = {'contestId': this.contestChart.contest._id, 'teamId': team};
-    this.client.serverPost('contests/join', postData).then((data) => {
+    contestsService.join(this.contestChart.contest._id, team).then((data) => {
 
       FlurryAgent.logEvent('contest/' + action, {
         'contestId': this.contestChart.contest._id,
@@ -108,7 +107,7 @@ export class ContestPage {
   }
 
   refreshContest(contest) {
-    this.contestChart = contestsService.prepareContestChart(contest, 'starts');
+    this.contestChart = contestsService.prepareContestChart(contest);
     this.contestChartComponent.refresh(this.contestChart);
   }
 

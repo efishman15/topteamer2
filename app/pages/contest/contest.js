@@ -32,7 +32,7 @@ var ContestPage = (function () {
         }
         else {
             //Just created this contest - no chart
-            this.contestChart = contestsService.prepareContestChart(this.params.data.contest, 'starts');
+            this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
         }
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (last quiz results)
@@ -75,8 +75,7 @@ var ContestPage = (function () {
     ContestPage.prototype.joinContest = function (team, source, action) {
         var _this = this;
         if (action === void 0) { action = 'join'; }
-        var postData = { 'contestId': this.contestChart.contest._id, 'teamId': team };
-        this.client.serverPost('contests/join', postData).then(function (data) {
+        contestsService.join(this.contestChart.contest._id, team).then(function (data) {
             FlurryAgent.logEvent('contest/' + action, {
                 'contestId': _this.contestChart.contest._id,
                 'team': '' + team,
@@ -86,7 +85,7 @@ var ContestPage = (function () {
         });
     };
     ContestPage.prototype.refreshContest = function (contest) {
-        this.contestChart = contestsService.prepareContestChart(contest, 'starts');
+        this.contestChart = contestsService.prepareContestChart(contest);
         this.contestChartComponent.refresh(this.contestChart);
     };
     ContestPage.prototype.switchTeams = function (source) {

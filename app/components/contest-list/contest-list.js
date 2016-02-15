@@ -29,11 +29,11 @@ var ContestListComponent = (function () {
     ContestListComponent.prototype.refresh = function () {
         var _this = this;
         var postData = { 'tab': this.tab };
-        this.client.serverPost('contests/list', postData).then(function (contests) {
+        contestsService.list(this.tab).then(function (contests) {
             _this.contests = contests;
             _this.contestCharts = [];
             for (var i = 0; i < contests.length; i++) {
-                _this.contestCharts.push(contestsService.prepareContestChart(contests[i], 'ends'));
+                _this.contestCharts.push(contestsService.prepareContestChart(contests[i]));
             }
         });
     };

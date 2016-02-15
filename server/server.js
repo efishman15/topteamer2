@@ -90,6 +90,7 @@ dalDb.loadSettings(null, function (err, data) {
   app.post('/user/settings', sessionUtils.saveSettings);
   app.post('/user/setGcmRegistration', sessionUtils.setGcmRegistration);
   app.post('/user/toggleSound', sessionUtils.toggleSound);
+  app.post('/user/switchLanguage', sessionUtils.switchLanguage);
   app.post('/quiz/start', isAuthenticated, quiz.start);
   app.post('/quiz/answer', isAuthenticated, quiz.answer);
   app.post('/quiz/nextQuestion', isAuthenticated, quiz.nextQuestion);
@@ -149,7 +150,6 @@ dalDb.loadSettings(null, function (err, data) {
   http.createServer(app).listen(80);
   https.createServer(certificate, app).listen(443);
 
-  logger.console.info(null, 'server up!');
   logger.server.info(null, 'server up!');
 
 })

@@ -68,7 +68,7 @@ export let mobileShare = (contest) => {
   );
 }
 
-export let share = (contest) => {
+export let share = (contest?) => {
 
   var client = Client.getInstance();
   if (client.user.clientInfo.mobile) {

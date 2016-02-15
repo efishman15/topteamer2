@@ -159,6 +159,13 @@ var Client = (function () {
         }
         return translatedValue;
     };
+    Client.prototype.toggleSound = function () {
+        return this.serverPost('user/toggleSound');
+    };
+    Client.prototype.switchLanguage = function (language) {
+        var postData = { 'language': language };
+        return this.serverPost('user/switchLanguage', postData);
+    };
     Client = __decorate([
         core_1.Injectable(), 
         __metadata('design:paramtypes', [http_1.Http])

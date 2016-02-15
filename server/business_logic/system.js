@@ -35,6 +35,7 @@ module.exports.clearCache = function (req, res, next) {
         //Inject the settings back to memory
         function (data, callback) {
             generalUtils.injectSettings(data.settings);
+            logger.server.info({'user' : data.session.name}, 'cache cleared!');
             callback(null, data);
         }
     ];

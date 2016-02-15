@@ -108,10 +108,12 @@ var SetContestPage = (function () {
         this.showAdminInfo = false;
         this.setDateLimits();
     }
+    SetContestPage.prototype.onPageWillEnter = function () {
+        this.submitted = false;
+    };
     SetContestPage.prototype.retrieveUserQuestions = function () {
         var _this = this;
-        var postData = { 'userQuestions': this.contestLocalCopy.userQuestions };
-        this.client.serverPost('contests/getQuestions', postData).then(function (questions) {
+        contestsService.getQuestions(this.contestLocalCopy.userQuestions).then(function (questions) {
             _this.contestLocalCopy.questions = { 'visibleCount': questions.length, 'list': questions };
         });
     };
@@ -292,6 +294,10 @@ var SetContestPage = (function () {
     ;
     SetContestPage.prototype.setContest = function () {
         var _this = this;
+        this.submitted = true;
+        if (!this.contestForm.valid) {
+            return;
+        }
         if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
             if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
                 if (!this.userQuestionsMinimumCheck()) {
@@ -360,6 +366,10 @@ var SetContestPage = (function () {
         var val;
         var valid = true;
         for (name in group.controls) {
+            //Empty value in one of the teams will be caught in the required validator
+            if (!group.controls[name].value) {
+                return null;
+            }
             if (val === undefined) {
                 val = group.controls[name].value;
             }

@@ -36,12 +36,12 @@
             </div>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="questionControl.dirty && (questionControl.errors && questionControl.errors.required || questionError)">
+    <ion-row *ngIf="(questionControl.dirty || submitted) && (questionControl.errors && questionControl.errors.required || questionError)">
       <div *ngIf="questionControl.errors && questionControl.errors.required" padding-left padding-right text-center
            class="invalid-input">
         {{client.translate('FIELD_REQUIRED')}}
       </div>
-      <div *ngIf="questionControl.errors && questionControl.errors.required" padding-left padding-right text-center
+      <div *ngIf="questionError" padding-left padding-right text-center
            class="invalid-input">
         {{questionError}}
       </div>
@@ -68,7 +68,7 @@
         </div>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="answer0Control.dirty && answer0Control.errors && answer0Control.errors.required">
+    <ion-row *ngIf="(answer0Control.dirty || submitted) && answer0Control.errors && answer0Control.errors.required">
       <div padding-left padding-right text-center
            class="invalid-input">
         {{client.translate('FIELD_REQUIRED')}}
@@ -93,7 +93,7 @@
         </div>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="answer1Control.dirty && answer1Control.errors && answer1Control.errors.required">
+    <ion-row *ngIf="(answer1Control.dirty || submitted) && answer1Control.errors && answer1Control.errors.required">
       <div padding-left padding-right text-center
            class="invalid-input">
         {{client.translate('FIELD_REQUIRED')}}
@@ -118,7 +118,7 @@
         </div>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="answer2Control.dirty && answer2Control.errors && answer2Control.errors.required">
+    <ion-row *ngIf="(answer2Control.dirty || submitted) && answer2Control.errors && answer2Control.errors.required">
       <div padding-left padding-right text-center
            class="invalid-input">
         {{client.translate('FIELD_REQUIRED')}}
@@ -143,13 +143,11 @@
         </div>
       </ion-col>
     </ion-row>
-    <ion-row *ngIf="answer3Control.dirty && (answer3Control.errors && answer3Control.errors.required || answersError)">
-      <div *ngIf="answer3Control.errors && answer3Control.errors.required" padding-left padding-right text-center
-           class="invalid-input">
+    <ion-row *ngIf="(answer3Control.dirty || submitted) && (answer3Control.errors && answer3Control.errors.required || answersError)">
+      <div *ngIf="(answer3Control.errors && answer3Control.errors.required) && !answersError" padding-left padding-right padding-bottom class="invalid-input">
         {{client.translate('FIELD_REQUIRED')}}
       </div>
-      <div *ngIf="answersError" padding-left padding-right text-center
-           class="invalid-input">
+      <div *ngIf="answersError && !(answer3Control.errors && answer3Control.errors.required)" padding-left padding-right padding-bottom class="invalid-input">
         {{answersError}}
       </div>
     </ion-row>
@@ -162,7 +160,7 @@
 
     <div padding class="question-editor-set-button">
       <button class="button-full"
-              (click)="questionEditorForm.valid && dismiss(true)">{{client.translate('OK')}}
+              (click)="dismiss(true)">{{client.translate('OK')}}
       </button>
     </div>
   </form>

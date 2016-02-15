@@ -111,6 +111,12 @@ module.exports.saveSettings = function (req, res, next) {
   var data = req.body;
   var token = req.headers.authorization;
 
+  //Empty settings
+  if (!data.settings) {
+    callback(new exceptions.ServerException('settings not supplied'));
+    return;
+  }
+
   var operations = [
 
     //Connect to the database
@@ -149,6 +155,8 @@ module.exports.saveSettings = function (req, res, next) {
 
 //----------------------------------------------------
 // Toggle Sound
+//
+// data: <NA>
 //----------------------------------------------------
 module.exports.toggleSound = function (req, res, next) {
 
@@ -167,13 +175,69 @@ module.exports.toggleSound = function (req, res, next) {
 
     //Store the session back
     function (data, callback) {
-      data.session.settings.sound = !data.session.settings.sound
+      data.session.settings.sound = !data.session.settings.sound;
       dalDb.storeSession(data, callback);
     },
 
     //Save the settings to the user object
     function (data, callback) {
       data.setData = {'settings.sound': data.session.settings.sound};
+      data.closeConnection = true;
+      dalDb.setUser(data, callback);
+    }
+
+  ];
+
+  async.waterfall(operations, function (err) {
+    if (!err) {
+      res.json(generalUtils.okResponse);
+    }
+    else {
+      res.send(err.httpStatus, err);
+    }
+  });
+};
+
+//----------------------------------------------------
+// Switch Language
+//
+// data: language (ISO 2 characters)
+//----------------------------------------------------
+module.exports.switchLanguage = function (req, res, next) {
+
+  var data = req.body;
+  var token = req.headers.authorization;
+
+  //Empty language
+  if (!data.language) {
+    callback(new exceptions.ServerException('language not supplied'));
+    return;
+  }
+  else if (!generalUtils.settings.client.languages[data.language]) {
+    callback(new exceptions.ServerException('language ' + data.language + ' is not supported'));
+    return;
+  }
+
+  var operations = [
+
+    //Connect to the database
+    dalDb.connect,
+
+    //Retrieve the session
+    function (data, callback) {
+      data.token = token;
+      dalDb.retrieveSession(data, callback);
+    },
+
+    //Store the session back
+    function (data, callback) {
+      data.session.settings.language = data.language;
+      dalDb.storeSession(data, callback);
+    },
+
+    //Save the settings to the user object
+    function (data, callback) {
+      data.setData = {'settings.language': data.language};
       data.closeConnection = true;
       dalDb.setUser(data, callback);
     }
