@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var core_1 = require('angular2/core');
+var player_info_1 = require('../../components/player-info/player-info');
 var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var contest_list_1 = require('../../components/contest-list/contest-list');
@@ -64,7 +65,7 @@ var LeaderboardsPage = (function () {
     LeaderboardsPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/leaderboards/leaderboards.html',
-            directives: [simple_tabs_1.SimpleTabsComponent, simple_tab_1.SimpleTabComponent, contest_list_1.ContestListComponent, leaders_1.LeadersComponent]
+            directives: [player_info_1.PlayerInfoComponent, simple_tabs_1.SimpleTabsComponent, simple_tab_1.SimpleTabComponent, contest_list_1.ContestListComponent, leaders_1.LeadersComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], LeaderboardsPage);

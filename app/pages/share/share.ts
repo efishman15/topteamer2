@@ -1,9 +1,11 @@
 import {Page,NavParams} from 'ionic/ionic';
 import {Client} from '../../providers/client';
 import * as shareService from '../../providers/share';
+import {PlayerInfoComponent} from '../../components/player-info/player-info';
 
 @Page({
-  templateUrl: 'build/pages/share/share.html'
+  templateUrl: 'build/pages/share/share.html',
+  directives: [PlayerInfoComponent]
 })
 
 export class SharePage {

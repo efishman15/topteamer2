@@ -1,4 +1,5 @@
 import {Page,NavParams} from 'ionic/ionic';
+import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {LeadersComponent} from '../../components/leaders/leaders';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
@@ -7,7 +8,7 @@ import {Client} from '../../providers/client';
 
 @Page({
   templateUrl: 'build/pages/contest-participants/contest-participants.html',
-  directives: [SimpleTabsComponent, SimpleTabComponent,LeadersComponent]
+  directives: [PlayerInfoComponent,SimpleTabsComponent, SimpleTabComponent,LeadersComponent]
 })
 export class ContestParticipantsPage {
 

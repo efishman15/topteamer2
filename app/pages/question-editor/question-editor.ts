@@ -64,13 +64,13 @@ export class QuestionEditorPage {
 
   dismiss(applyChanges) {
 
-    this.submitted = true;
-    if (!this.questionEditorForm.valid) {
-      return;
-    }
-
     var result;
     if (applyChanges) {
+
+      this.submitted = true;
+      if (!this.questionEditorForm.valid) {
+        return;
+      }
 
       //Check for duplicate questions
       if (this.currentQuestions && this.currentQuestions.list && this.currentQuestions.list.length > 0) {

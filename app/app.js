@@ -71,6 +71,7 @@ var topTeamerApp = (function () {
             FB.init({
                 appId: '344342552056',
                 xfbml: true,
+                cookie: true,
                 version: 'v2.5'
             });
             _this.initFacebook();

@@ -1,5 +1,6 @@
 import {Page, NavParams, Item, Input, Select, Label,Modal} from 'ionic/ionic';
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
+import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import {ContestPage} from '../../pages/contest/contest';
@@ -12,7 +13,7 @@ import * as shareService from '../../providers/share';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html',
-  directives: [FORM_DIRECTIVES, DatePickerComponent]
+  directives: [FORM_DIRECTIVES, PlayerInfoComponent, DatePickerComponent]
 })
 
 export class SetContestPage {
@@ -350,7 +351,7 @@ export class SetContestPage {
 
   removeQuestion(index) {
 
-    alertService.confirm('REMOVE_QUESTION', 'CONFIRM_REMOVE_QUESTION', {}).then(() => {
+    alertService.confirm('REMOVE_QUESTION', 'CONFIRM_REMOVE_QUESTION').then(() => {
       if (this.contestLocalCopy.questions.list && index < this.contestLocalCopy.questions.list.length) {
         if (this.contestLocalCopy.questions.list[index]._id && this.contestLocalCopy.questions.list[index]._id !== "new") {
           //Question has an id in the database - logically remove

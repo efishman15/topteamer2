@@ -9,6 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
+var login_1 = require('../login/login');
+var facebookService = require('../../providers/facebook');
+var player_info_1 = require('../../components/player-info/player-info');
 var SettingsPage = (function () {
     function SettingsPage() {
         this.client = client_1.Client.getInstance();
@@ -22,9 +25,18 @@ var SettingsPage = (function () {
             _this.client.session.settings.language = _this.client.user.settings.language;
         });
     };
+    SettingsPage.prototype.logout = function () {
+        var _this = this;
+        facebookService.logout().then(function (response) {
+            _this.client.nav.pop().then(function () {
+                _this.client.nav.setRoot(login_1.LoginPage);
+            });
+        });
+    };
     SettingsPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/settings/settings.html'
+            templateUrl: 'build/pages/settings/settings.html',
+            directives: [player_info_1.PlayerInfoComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], SettingsPage);

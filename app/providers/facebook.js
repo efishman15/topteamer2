@@ -1,3 +1,4 @@
+var client_1 = require('./client');
 //------------------------------------------------------
 //-- getLoginStatus
 //------------------------------------------------------
@@ -44,11 +45,11 @@ exports.getLoginStatus = function () { return new Promise(function (resolve, rej
 //-- login
 //------------------------------------------------------
 exports.login = function (rerequestDeclinedPermissions) { return new Promise(function (resolve, reject) {
-    var permissions = ['public_profile', 'email', 'user_friends'];
+    var client = client_1.Client.getInstance();
     if (!window.cordova) {
         var permissionObject = {};
-        if (permissions && permissions.length > 0) {
-            permissionObject.scope = permissions.toString();
+        if (client.settings.facebook.readPermissions && client.settings.facebook.readPermissions.length > 0) {
+            permissionObject.scope = client.settings.facebook.readPermissions.toString();
             if (rerequestDeclinedPermissions) {
                 permissionObject.auth_type = 'rerequest';
             }
@@ -60,10 +61,10 @@ exports.login = function (rerequestDeclinedPermissions) { return new Promise(fun
             else {
                 reject(response.status);
             }
-        });
+        }, permissionObject);
     }
     else {
-        facebookConnectPlugin.login(permissions, function (response) {
+        facebookConnectPlugin.login(client.settings.facebook.readPermissions, function (response) {
             resolve(response);
         }, function (err) {
             reject(err);
@@ -75,13 +76,13 @@ exports.login = function (rerequestDeclinedPermissions) { return new Promise(fun
 //------------------------------------------------------
 exports.logout = function () { return new Promise(function (resolve, reject) {
     if (!window.cordova) {
-        FB.logout(function () {
-            resolve();
+        FB.logout(function (response) {
+            resolve(response);
         });
     }
     else {
-        facebookConnectPlugin.logout(function () {
-            resolve();
+        facebookConnectPlugin.logout(function (response) {
+            resolve(response);
         });
     }
 }); };

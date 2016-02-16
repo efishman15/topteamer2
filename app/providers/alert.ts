@@ -48,7 +48,7 @@ export let alert = (error) => new Promise((resolve, reject) => {
 //------------------------------------------------------
 //-- confirm
 //------------------------------------------------------
-export let confirm = (title, message, params) => new Promise((resolve, reject) => {
+export let confirm = (title, message, params?) => new Promise((resolve, reject) => {
 
   var client = Client.getInstance();
 

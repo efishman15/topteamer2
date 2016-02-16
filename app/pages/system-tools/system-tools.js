@@ -9,7 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
+var alertService = require('../../providers/alert');
 var systemService = require('../../providers/system');
+var player_info_1 = require('../../components/player-info/player-info');
 var SystemToolsPage = (function () {
     function SystemToolsPage() {
         this.client = client_1.Client.getInstance();
@@ -22,13 +24,16 @@ var SystemToolsPage = (function () {
     };
     SystemToolsPage.prototype.restart = function () {
         var _this = this;
-        systemService.restart().then(function () {
-            _this.client.nav.pop();
+        alertService.confirm('SYSTEM_RESTART_CONFIRM_TITLE', 'SYSTEM_RESTART_CONFIRM_TEMPLATE').then(function () {
+            systemService.restart().then(function () {
+                _this.client.nav.pop();
+            });
         });
     };
     SystemToolsPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/system-tools/system-tools.html'
+            templateUrl: 'build/pages/system-tools/system-tools.html',
+            directives: [player_info_1.PlayerInfoComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], SystemToolsPage);

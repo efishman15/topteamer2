@@ -1,3 +1,4 @@
+import {Client} from './client';
 //------------------------------------------------------
 //-- getLoginStatus
 //------------------------------------------------------
@@ -5,10 +6,10 @@ export let getLoginStatus = () => new Promise((resolve, reject) => {
   if (!window.cordova) {
     FB.getLoginStatus((response) => {
       if (response.status === 'connected') {
-        resolve({'connected' : true, 'response' : response});
+        resolve({'connected': true, 'response': response});
       }
       else {
-        resolve({'connected' : false, 'response' : response});
+        resolve({'connected': false, 'response': response});
       }
     });
   }
@@ -19,24 +20,25 @@ export let getLoginStatus = () => new Promise((resolve, reject) => {
         setTimeout(() => {
           facebookConnectPlugin.getLoginStatus((response) => {
             if (response && response.status === 'connected') {
-              resolve({'connected' : true, 'response' : response});
+              resolve({'connected': true, 'response': response});
             }
             else {
-              resolve({'connected' : false, 'response' : response});
+              resolve({'connected': false, 'response': response});
             }
           }, (error) => {
-            resolve({'connected' : false, 'error' : error})})
+            resolve({'connected': false, 'error': error})
+          })
         }, 500);
       }
       else if (response && response.status === 'connected') {
-        resolve({'connected' : true, 'response' : response});
+        resolve({'connected': true, 'response': response});
       }
       else {
-        resolve({'connected' : false, 'response' : response});
+        resolve({'connected': false, 'response': response});
       }
 
     }, (error) => {
-      resolve({'connected' : false, 'error' : error});
+      resolve({'connected': false, 'error': error});
     });
   }
 });
@@ -46,12 +48,13 @@ export let getLoginStatus = () => new Promise((resolve, reject) => {
 //------------------------------------------------------
 export let login = (rerequestDeclinedPermissions) => new Promise((resolve, reject) => {
 
-  var permissions = ['public_profile', 'email', 'user_friends'];
+  var client = Client.getInstance();
+
   if (!window.cordova) {
 
     var permissionObject = {};
-    if (permissions && permissions.length > 0) {
-      permissionObject.scope = permissions.toString();
+    if (client.settings.facebook.readPermissions && client.settings.facebook.readPermissions.length > 0) {
+      permissionObject.scope = client.settings.facebook.readPermissions.toString();
       if (rerequestDeclinedPermissions) {
         permissionObject.auth_type = 'rerequest';
       }
@@ -64,10 +67,10 @@ export let login = (rerequestDeclinedPermissions) => new Promise((resolve, rejec
       else {
         reject(response.status)
       }
-    });
+    },permissionObject);
   }
   else {
-    facebookConnectPlugin.login(permissions,
+    facebookConnectPlugin.login(client.settings.facebook.readPermissions,
       (response) => {
         resolve(response);
       },
@@ -85,13 +88,13 @@ export let logout = () => new Promise((resolve, reject) => {
 
   if (!window.cordova) {
 
-    FB.logout(() => {
-      resolve();
+    FB.logout((response) => {
+      resolve(response);
     });
   }
   else {
-    facebookConnectPlugin.logout(() => {
-        resolve();
+    facebookConnectPlugin.logout((response) => {
+        resolve(response);
       }
     );
   }
@@ -139,11 +142,11 @@ export let post = (story) => new Promise((resolve, reject) => {
 //------------------------------------------------------
 export let buy = (purchaseDialogData) => new Promise((resolve, reject) => {
 
-    try {
-      FB.ui(purchaseDialogData, (response) => {
-        resolve(response);
-      });
-    } catch (error) {
-      reject(error);
-    }
+  try {
+    FB.ui(purchaseDialogData, (response) => {
+      resolve(response);
+    });
+  } catch (error) {
+    reject(error);
+  }
 });

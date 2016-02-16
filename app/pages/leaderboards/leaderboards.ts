@@ -1,5 +1,6 @@
 import {Page} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
+import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ContestListComponent} from '../../components/contest-list/contest-list';
@@ -9,7 +10,7 @@ import * as contestsService from '../../providers/contests';
 
 @Page({
   templateUrl: 'build/pages/leaderboards/leaderboards.html',
-  directives: [SimpleTabsComponent, SimpleTabComponent,ContestListComponent,LeadersComponent]
+  directives: [PlayerInfoComponent,SimpleTabsComponent, SimpleTabComponent,ContestListComponent,LeadersComponent]
 })
 
 export class LeaderboardsPage {

@@ -1,32 +1,30 @@
-
 <!-- left menu -->
 <ion-menu *ngIf="client.loaded" [content]="content" side="{{client.currentLanguage.align}}">
 
-  <ion-toolbar *ngIf="client.loaded">
+  <ion-toolbar danger *ngIf="client.loaded">
     <ion-title>{{client.translate('TOOLS')}}</ion-title>
   </ion-toolbar>
 
   <ion-content>
 
-    <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
-
-      <button menuClose ion-item (click)="newContest()">
-        <ion-icon name="add"></ion-icon>
-        {{client.translate('NEW_CONTEST')}}
-      </button>
-      <button menuClose ion-item (click)="share()">
-        <ion-icon name="share-alt"></ion-icon>
-        {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
-      </button>
-      <button menuClose ion-item (click)="settings()">
-        <ion-icon name="settings"></ion-icon>
-        {{client.translate('SETTINGS')}}
-      </button>
-      <button *ngIf="client.session && client.session.isAdmin" menuClose ion-item (click)="systemTools()">
-        <ion-icon name="hammer"></ion-icon>
-        {{client.translate('SYSTEM_TOOLS')}}
-      </button>
-    </ion-list>
+      <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
+        <button menuClose ion-item (click)="newContest()">
+          <ion-icon name="add"></ion-icon>
+          {{client.translate('NEW_CONTEST')}}
+        </button>
+        <button menuClose ion-item (click)="share()">
+          <ion-icon name="share-alt"></ion-icon>
+          {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
+        </button>
+        <button menuClose ion-item (click)="settings()">
+          <ion-icon name="settings"></ion-icon>
+          {{client.translate('SETTINGS')}}
+        </button>
+        <button *ngIf="client.session && client.session.isAdmin" menuClose ion-item (click)="systemTools()">
+          <ion-icon name="hammer"></ion-icon>
+          {{client.translate('SYSTEM_TOOLS')}}
+        </button>
+      </ion-list>
   </ion-content>
 
 </ion-menu>
@@ -34,3 +32,6 @@
 <!-- main navigation -->
 <ion-nav id="nav" [root]="root" #content swipe-back-enabled="false">
 </ion-nav>
+
+<ion-navbar *navbar>
+</ion-navbar>

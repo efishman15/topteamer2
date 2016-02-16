@@ -1,5 +1,6 @@
 import {Page, NavParams,Modal} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
+import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
@@ -13,7 +14,7 @@ import * as soundService from '../../providers/sound';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [ContestChartComponent]
+  directives: [PlayerInfoComponent,ContestChartComponent]
 })
 
 export class ContestPage {

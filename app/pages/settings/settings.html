@@ -1,8 +1,10 @@
-<ion-navbar *navbar>
+<ion-navbar dark1 *navbar>
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
   <ion-title>{{client.translate('SETTINGS')}}</ion-title>
+  <player-info>
+  </player-info>
 </ion-navbar>
 
 <ion-content>
@@ -27,6 +29,14 @@
         </ion-option>
       </ion-select>
     </ion-item>
+
+    <ion-item>
+      <button *ngIf="client.session" menuClose ion-item (click)="logout()">
+        <ion-icon name="log-out"></ion-icon>
+        {{client.translate('SIGN_OUT')}}
+      </button>
+    </ion-item>
+
   </ion-list>
 
 

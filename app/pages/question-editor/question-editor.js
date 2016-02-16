@@ -42,12 +42,12 @@ var QuestionEditorPage = (function () {
         this.submitted = false;
     };
     QuestionEditorPage.prototype.dismiss = function (applyChanges) {
-        this.submitted = true;
-        if (!this.questionEditorForm.valid) {
-            return;
-        }
         var result;
         if (applyChanges) {
+            this.submitted = true;
+            if (!this.questionEditorForm.valid) {
+                return;
+            }
             //Check for duplicate questions
             if (this.currentQuestions && this.currentQuestions.list && this.currentQuestions.list.length > 0) {
                 //Check if question exists

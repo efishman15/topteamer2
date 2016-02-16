@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var core_1 = require('angular2/core');
+var player_info_1 = require('../../components/player-info/player-info');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
 var quiz_1 = require('../../pages/quiz/quiz');
@@ -125,7 +126,7 @@ var ContestPage = (function () {
     ContestPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/contest/contest.html',
-            directives: [contest_chart_1.ContestChartComponent]
+            directives: [player_info_1.PlayerInfoComponent, contest_chart_1.ContestChartComponent]
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
     ], ContestPage);

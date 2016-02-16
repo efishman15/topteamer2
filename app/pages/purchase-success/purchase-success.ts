@@ -1,8 +1,10 @@
 import {Page,NavParams} from 'ionic/ionic';
+import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {Client} from '../../providers/client';
 
 @Page({
-  templateUrl: 'build/pages/purchase-sucess/purchase-success.html'
+  templateUrl: 'build/pages/purchase-sucess/purchase-success.html',
+  directives: [PlayerInfoComponent]
 })
 
 export class PurchaseSuccessPage {

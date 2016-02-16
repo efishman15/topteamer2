@@ -7,24 +7,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
-var player_info_1 = require('../../components/player-info/player-info');
 var client_1 = require('../../providers/client');
-var LikePage = (function () {
-    function LikePage(params) {
+var core_1 = require("angular2/core");
+var PlayerInfoComponent = (function () {
+    function PlayerInfoComponent() {
         this.client = client_1.Client.getInstance();
-        if (params && params.data) {
-            this.contest = params.data.contest;
-        }
     }
-    LikePage = __decorate([
-        ionic_1.Page({
-            templateUrl: 'build/pages/like/like.html',
-            directives: [player_info_1.PlayerInfoComponent]
+    PlayerInfoComponent = __decorate([
+        core_1.Component({
+            selector: 'player-info',
+            templateUrl: 'build/components/player-info/player-info.html'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
-    ], LikePage);
-    return LikePage;
-    var _a;
+        __metadata('design:paramtypes', [])
+    ], PlayerInfoComponent);
+    return PlayerInfoComponent;
 })();
-exports.LikePage = LikePage;
+exports.PlayerInfoComponent = PlayerInfoComponent;

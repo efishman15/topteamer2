@@ -8,6 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
+var player_info_1 = require('../../components/player-info/player-info');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
 var FacebookPostPage = (function () {
@@ -29,7 +30,8 @@ var FacebookPostPage = (function () {
     };
     FacebookPostPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/facebook-post/facebook-post.html'
+            templateUrl: 'build/pages/facebook-post/facebook-post.html',
+            directives: [player_info_1.PlayerInfoComponent]
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.ViewController !== 'undefined' && ionic_1.ViewController) === 'function' && _b) || Object])
     ], FacebookPostPage);

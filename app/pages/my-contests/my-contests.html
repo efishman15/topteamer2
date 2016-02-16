@@ -1,11 +1,16 @@
-<ion-navbar *navbar>
+<ion-navbar dark1 *navbar>
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
+
   <ion-title>{{client.translate('MY_CONTESTS')}}</ion-title>
+
+  <player-info>
+  </player-info>
+
 </ion-navbar>
 
-<ion-content>
+<ion-content style="overflow: hidden;">
 
   <contest-list tab="mine"
                 (contestSelected)="onContestSelected($event)">

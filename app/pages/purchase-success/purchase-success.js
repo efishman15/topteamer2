@@ -8,6 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic/ionic');
+var player_info_1 = require('../../components/player-info/player-info');
 var client_1 = require('../../providers/client');
 var PurchaseSuccessPage = (function () {
     function PurchaseSuccessPage(params) {
@@ -24,7 +25,8 @@ var PurchaseSuccessPage = (function () {
     };
     PurchaseSuccessPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/purchase-sucess/purchase-success.html'
+            templateUrl: 'build/pages/purchase-sucess/purchase-success.html',
+            directives: [player_info_1.PlayerInfoComponent]
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
     ], PurchaseSuccessPage);

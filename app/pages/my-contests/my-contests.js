@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var core_1 = require('angular2/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
+var player_info_1 = require('../../components/player-info/player-info');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var MyContestsPage = (function () {
@@ -37,7 +38,7 @@ var MyContestsPage = (function () {
     MyContestsPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/my-contests/my-contests.html',
-            directives: [contest_list_1.ContestListComponent]
+            directives: [contest_list_1.ContestListComponent, player_info_1.PlayerInfoComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], MyContestsPage);

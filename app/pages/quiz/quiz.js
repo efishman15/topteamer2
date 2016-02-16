@@ -8,6 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_1 = require('ionic-framework/ionic');
+var player_info_1 = require('../../components/player-info/player-info');
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
 var question_stats_1 = require('../../pages/question-stats/question-stats');
@@ -419,7 +420,7 @@ var QuizPage = (function () {
     QuizPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/quiz/quiz.html',
-            directives: [animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
+            directives: [player_info_1.PlayerInfoComponent, animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
         }), 
         __metadata('design:paramtypes', [ionic_1.NavParams])
     ], QuizPage);

@@ -19,7 +19,7 @@ class topTeamerApp {
 
   client:Client;
 
-  constructor(ionicApp:IonicApp, platform:Platform, client:Client, events:Events, menuController: MenuController) {
+  constructor(ionicApp:IonicApp, platform:Platform, client:Client, events:Events, menuController:MenuController) {
 
     this.client = client;
 
@@ -84,6 +84,7 @@ class topTeamerApp {
       FB.init({
         appId: '344342552056',
         xfbml: true,
+        cookie: true,
         version: 'v2.5'
       });
 
@@ -259,11 +260,11 @@ class topTeamerApp {
 
   newContest() {
     var modal = Modal.create(ContestTypePage);
-    modal.onDismiss( (content) => {
+    modal.onDismiss((content) => {
       if (content) {
-        setTimeout( () => {
+        setTimeout(() => {
           this.client.nav.push(SetContestPage, {'mode': 'add', 'content': content});
-        },500);
+        }, 500);
       }
     });
     this.client.nav.present(modal);
