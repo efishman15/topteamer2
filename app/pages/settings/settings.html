@@ -8,9 +8,9 @@
 <ion-content>
   <ion-list>
     <ion-item>
-      <ion-icon name="{{client.user.settings.sound ? 'volume-up' : 'volume-off'}}" item-left></ion-icon>
-      <ion-label>{{client.user.settings.sound ? client.translate('SOUND_ON') : client.translate('SOUND_OFF') }}</ion-label>
-      <ion-toggle [(ngModel)]="client.user.settings.sound" (registerOnChange)="toggleSound()"></ion-toggle>
+      <ion-icon name="{{client.session.settings.sound ? 'volume-up' : 'volume-off'}}" item-left></ion-icon>
+      <ion-label>{{client.session.settings.sound ? client.translate('SOUND_ON') : client.translate('SOUND_OFF') }}</ion-label>
+      <ion-toggle [(ngModel)]="client.session.settings.sound" (click)="toggleSound()"></ion-toggle>
     </ion-item>
 
     <ion-item>
@@ -18,11 +18,12 @@
       <ion-label>{{client.translate('LANGUAGE')}}</ion-label>
       <ion-select multiple="false" [(ngModel)]="client.user.settings.language"
                   okText="{{client.translate('OK')}}"
-                  cancelText="{{client.translate('CANCEL')}}" (onchange)="switchLanguage()">
+                  cancelText="{{client.translate('CANCEL')}}"
+                  (change)="switchLanguage()">
         <ion-option *ngFor="#languageKey of client.languageKeys"
                     value="{{languageKey}}"
-                    checked="languageKey===client.user.settings.language">
-          {{client.settings.languages[languageKey].displayNames[client.user.settings.language]}}
+                    checked="languageKey===client.user.settings.language"                    >
+          {{client.settings.languages[languageKey].displayNames[languageKey]}}
         </ion-option>
       </ion-select>
     </ion-item>

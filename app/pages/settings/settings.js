@@ -14,15 +14,12 @@ var SettingsPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     SettingsPage.prototype.toggleSound = function () {
-        var _this = this;
-        this.client.toggleSound().then(function () {
-            _this.client.session.settings.sound = !_this.client.session.settings.sound;
-        });
+        this.client.toggleSound();
     };
     SettingsPage.prototype.switchLanguage = function () {
         var _this = this;
         this.client.switchLanguage(this.client.currentLanguage.value).then(function () {
-            _this.client.session.settings.language = _this.client.currentLanguage.value;
+            _this.client.session.settings.language = _this.client.user.settings.language;
         });
     };
     SettingsPage = __decorate([

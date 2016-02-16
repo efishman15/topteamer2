@@ -62,7 +62,6 @@
     <h2>{{client.translate(lastQuizResults.data.clientKey + '_TITLE')}}</h2>
     <h3>{{client.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
   </div>
-
   <button fab fab-bottom fab-left (click)="share('fab')">
     <ion-icon name="share"></ion-icon>
   </button>
@@ -76,6 +75,7 @@
       <button *ngIf="contestChart.contest.owner" secondary class="bar-button" (click)="editContest()">
         {{client.translate('EDIT_CONTEST')}}
       </button>
+
     </div>
   </ion-buttons>
 

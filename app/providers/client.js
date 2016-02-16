@@ -33,10 +33,7 @@ var Client = (function () {
             _this._menuController = menuController;
             _this._events = events;
             _this.serverGateway.getSettings().then(function (data) {
-                var dir = document.createAttribute('dir');
-                dir.value = _this.currentLanguage.direction;
-                _this._nav = ionicApp.getComponent('nav');
-                _this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
+                _this.setDirection();
                 var canvas = document.createElement('canvas');
                 _this._canvasContext = canvas.getContext('2d');
                 _this._canvasContext.font = _this.serverGateway.settings.charts.contestAnnotations.annotationsFont;
@@ -45,6 +42,12 @@ var Client = (function () {
                 resolve();
             }, function (err) { return reject(err); });
         });
+    };
+    Client.prototype.setDirection = function () {
+        var dir = document.createAttribute('dir');
+        dir.value = this.currentLanguage.direction;
+        this._nav = this._ionicApp.getComponent('nav');
+        this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
     };
     Client.prototype.facebookServerConnect = function (facebookAuthResponse) {
         return this.serverGateway.facebookConnect(facebookAuthResponse);
@@ -163,6 +166,8 @@ var Client = (function () {
         return this.serverPost('user/toggleSound');
     };
     Client.prototype.switchLanguage = function (language) {
+        localStorage.setItem('language', language);
+        this.setDirection();
         var postData = { 'language': language };
         return this.serverPost('user/switchLanguage', postData);
     };
@@ -259,6 +264,7 @@ var ServerGateway = (function () {
                 postData.language = language;
             }
             else {
+                //TODO - get geo info
                 postData.defaultLanguage = _this.getDefaultLanguage();
             }
             _this.post('info/settings', postData).then(function (data) {

@@ -374,9 +374,6 @@ function updateContest(data, callback) {
 module.exports.prepareContestForClient = prepareContestForClient;
 function prepareContestForClient(contest, session) {
 
-    //Status
-    var now = (new Date()).getTime();
-
     if (contest.users && contest.users[session.userId]) {
         contest.myTeam = contest.users[session.userId].team;
     }

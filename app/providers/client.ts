@@ -50,11 +50,7 @@ export class Client {
 
       this.serverGateway.getSettings().then((data) => {
 
-        var dir = document.createAttribute('dir');
-        dir.value = this.currentLanguage.direction;
-        this._nav = ionicApp.getComponent('nav');
-        this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
-
+        this.setDirection();
         var canvas = document.createElement('canvas');
         this._canvasContext = canvas.getContext('2d');
         this._canvasContext.font = this.serverGateway.settings.charts.contestAnnotations.annotationsFont;
@@ -66,6 +62,13 @@ export class Client {
 
       }, (err) => reject(err));
     })
+  }
+
+  setDirection() {
+    var dir = document.createAttribute('dir');
+    dir.value = this.currentLanguage.direction;
+    this._nav = this._ionicApp.getComponent('nav');
+    this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
   }
 
   facebookServerConnect(facebookAuthResponse) {
@@ -153,6 +156,8 @@ export class Client {
   }
 
   switchLanguage(language: string) {
+    localStorage.setItem('language', language);
+    this.setDirection();
     var postData = {'language': language};
     return this.serverPost('user/switchLanguage',postData);
   }
@@ -268,6 +273,7 @@ export class ServerGateway {
         postData.language = language;
       }
       else {
+        //TODO - get geo info
         postData.defaultLanguage = this.getDefaultLanguage();
       }
 

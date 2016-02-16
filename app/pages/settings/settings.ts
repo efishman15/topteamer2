@@ -14,14 +14,12 @@ export class SettingsPage {
   }
 
   toggleSound() {
-    this.client.toggleSound().then(() => {
-      this.client.session.settings.sound = !this.client.session.settings.sound;
-    });
+    this.client.toggleSound();
   }
 
   switchLanguage() {
     this.client.switchLanguage(this.client.currentLanguage.value).then(() => {
-      this.client.session.settings.language = this.client.currentLanguage.value;
+      this.client.session.settings.language = this.client.user.settings.language;
     });
   }
 

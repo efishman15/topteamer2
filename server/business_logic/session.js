@@ -161,6 +161,7 @@ module.exports.saveSettings = function (req, res, next) {
 module.exports.toggleSound = function (req, res, next) {
 
   var token = req.headers.authorization;
+  var data = {};
 
   var operations = [
 
@@ -168,7 +169,8 @@ module.exports.toggleSound = function (req, res, next) {
     dalDb.connect,
 
     //Retrieve the session
-    function (data, callback) {
+    function (connectData, callback) {
+      data.DbHelper = connectData.DbHelper;
       data.token = token;
       dalDb.retrieveSession(data, callback);
     },
@@ -224,7 +226,8 @@ module.exports.switchLanguage = function (req, res, next) {
     dalDb.connect,
 
     //Retrieve the session
-    function (data, callback) {
+    function (connectData, callback) {
+      data.DbHelper = connectData.DbHelper;
       data.token = token;
       dalDb.retrieveSession(data, callback);
     },
