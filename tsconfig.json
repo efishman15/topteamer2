@@ -31,6 +31,7 @@
     "app/pages/login/login.ts",
     "app/pages/main-tabs/main-tabs.ts",
     "app/pages/my-contests/my-contests.ts",
+    "app/pages/new-rank/new-rank.ts",
     "app/pages/purchase-success/purchase-success.ts",
     "app/pages/question-editor/question-editor.ts",
     "app/pages/question-stats/question-stats.ts",

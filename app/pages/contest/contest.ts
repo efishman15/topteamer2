@@ -7,6 +7,7 @@ import {QuizPage} from '../../pages/quiz/quiz';
 import {SetContestPage} from '../../pages/set-contest/set-contest';
 import {FacebookPostPage} from '../../pages/facebook-post/facebook-post';
 import {LikePage} from '../../pages/like/like';
+import {NewRankPage} from '../../pages/new-rank/new-rank'
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as shareService from '../../providers/share';
@@ -14,13 +15,14 @@ import * as soundService from '../../providers/sound';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [PlayerInfoComponent,ContestChartComponent]
+  directives: [PlayerInfoComponent, ContestChartComponent]
 })
 
 export class ContestPage {
 
   client:Client;
   params:NavParams;
+  @ViewChild(PlayerInfoComponent) playerInfo:PlayerInfoComponent;
   contestChart:Object = {};
   lastQuizResults:Object = null;
   animateLastResults:Boolean = false;
@@ -46,11 +48,11 @@ export class ContestPage {
       this.lastQuizResults = eventData[0];
 
       //Exit from the quiz
-      this.client.nav.pop().then( () => {
+      this.client.nav.pop().then(() => {
 
         if (this.lastQuizResults.data.facebookPost) {
           this.animateLastResults = false;
-          var modal = Modal.create(FacebookPostPage, {'quizResults' : this.lastQuizResults});
+          var modal = Modal.create(FacebookPostPage, {'quizResults': this.lastQuizResults});
           this.client.nav.present(modal);
         }
         else {
@@ -104,6 +106,15 @@ export class ContestPage {
 
       this.refreshContest(data.contest);
 
+      //Should get xp if fresh join
+      if (data.xpProgress && data.xpProgress.addition > 0) {
+        this.playerInfo.addXp(data.xpProgress).then(() => {
+          var modal = Modal.create(NewRankPage, {
+            'xpProgress': data.xpProgress
+          });
+          this.client.nav.present(modal);
+        })
+      }
     });
   }
 
@@ -117,7 +128,7 @@ export class ContestPage {
   }
 
   editContest() {
-    this.client.nav.push(SetContestPage, {'mode' : 'edit', 'contest' : this.contestChart.contest});
+    this.client.nav.push(SetContestPage, {'mode': 'edit', 'contest': this.contestChart.contest});
   }
 
   share(source) {

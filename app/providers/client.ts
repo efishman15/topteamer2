@@ -10,7 +10,13 @@ export class Client {
   static instance:Client;
 
   _languageKeys:Array<String>;
+
+  canvas:any;
   _canvasContext:any;
+  circle:number = Math.PI * 2;
+  quarter:number = Math.PI / 2;
+  canvasCenterX:number;
+  canvasCenterY:number;
 
   _ionicApp:IonicApp;
   _platform:Platform;
@@ -18,6 +24,7 @@ export class Client {
   _nav:NavController;
   _menuController: MenuController;
   _loaded:Boolean = false;
+  _showPlayerInfo:Boolean = true;
 
   serverGateway:ServerGateway;
 
@@ -50,10 +57,9 @@ export class Client {
 
       this.serverGateway.getSettings().then((data) => {
 
+        this.initXpCanvas();
+        
         this.setDirection();
-        var canvas = document.createElement('canvas');
-        this._canvasContext = canvas.getContext('2d');
-        this._canvasContext.font = this.serverGateway.settings.charts.contestAnnotations.annotationsFont;
 
         this._loaded = true;
         Client.instance = this;
@@ -64,11 +70,136 @@ export class Client {
     })
   }
 
+  initXpCanvas() {
+    //Player info rank canvas
+    this.canvas = document.getElementById('playerInfoRankCanvas');
+    this._canvasContext = this.canvas.getContext('2d');
+    this.canvasCenterX = this.settings.xpControl.canvas.width / 2;
+    this.canvasCenterY = this.settings.xpControl.canvas.height / 2;
+    this.canvas.width = this.settings.xpControl.canvas.width;
+    this.canvas.style.width = this.settings.xpControl.canvas.width + 'px';
+    this.canvas.height = this.settings.xpControl.canvas.height;
+    this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
+  }
+
+  initXp() {
+    this._canvasContext.clearRect(0, 0, this.settings.xpControl.canvas.width, this.settings.xpControl.canvas.height);
+
+    //-------------------------------------------------------------------------------------
+    // Draw the full circle representing the entire xp required for the next level
+    //-------------------------------------------------------------------------------------
+    this._canvasContext.beginPath();
+
+    this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, 0, this.circle, false);
+    this._canvasContext.fillStyle = this.settings.xpControl.fillColor;
+    this._canvasContext.fill();
+
+    //Full line color
+    this._canvasContext.lineWidth = this.settings.xpControl.lineWidth;
+    this._canvasContext.strokeStyle = this.settings.xpControl.fullLineColor;
+    this._canvasContext.stroke();
+    this._canvasContext.closePath();
+
+    //-------------------------------------------------------------------------------------
+    //Draw the arc representing the xp in the current level
+    //-------------------------------------------------------------------------------------
+    this._canvasContext.beginPath();
+
+    // line color
+    this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, -(this.quarter), ((this.session.xpProgress.current / this.session.xpProgress.max) * this.circle) - this.quarter, false);
+    this._canvasContext.strokeStyle = this.settings.xpControl.progressLineColor;
+    this._canvasContext.stroke();
+
+    //Rank Text
+    var font = '';
+    if (this.settings.xpControl.font.bold) {
+      font += 'bold ';
+    }
+
+    var fontSize;
+    if (this.session.rank < 10) {
+      //1 digit font
+      fontSize = this.settings.xpControl.font.d1;
+    }
+    else if (this.session.rank < 100) {
+      //2 digits font
+      fontSize = this.settings.xpControl.font.d2;
+    }
+    else {
+      fontSize = this.settings.xpControl.font.d3;
+    }
+    font += fontSize + ' ';
+
+    font += this.settings.xpControl.font.name;
+
+    this._canvasContext.font = font;
+
+    // Move it down by half the text height and left by half the text width
+    var rankText = '' + this.session.rank;
+    var textWidth = this._canvasContext.measureText(rankText).width;
+    var textHeight = this._canvasContext.measureText('w').width;
+
+    this._canvasContext.fillStyle = this.settings.xpControl.textColor;
+    this._canvasContext.fillText(rankText, this.canvasCenterX - (textWidth / 2), this.canvasCenterY + (textHeight / 2));
+
+    this._canvasContext.closePath();
+  }
+
+  animateXpAddition(startPoint, endPoint) {
+
+    this._canvasContext.beginPath();
+    this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, (this.circle * startPoint) - this.quarter, (this.circle * endPoint) - this.quarter, false);
+    this._canvasContext.strokeStyle = this.settings.xpControl.progressLineColor;
+    this._canvasContext.stroke();
+    this._canvasContext.closePath();
+  }
+
+  addXp(xpProgress) {
+
+    return new Promise((resolve, reject) => {
+
+      var startPoint = this.session.xpProgress.current / this.session.xpProgress.max;
+
+      //Occurs after xp has already been added to the session
+      var addition = xpProgress.addition;
+      for (var i = 1; i <= addition; i++) {
+        myRequestAnimationFrame(() => {
+          var endPoint = (this.session.xpProgress.current + i) / this.session.xpProgress.max;
+          this.animateXpAddition(startPoint, endPoint, this.quarter, this.circle);
+
+          //Last iteration should be performed after the animation frame event happened
+          if (i >= addition) {
+
+            //Add the actual xp to the client side
+            this.session.xpProgress = xpProgress;
+
+            //Zero the addition
+            this.session.xpProgress.addition = 0;
+
+            if (xpProgress.rankChanged) {
+              this.session.rank = xpProgress.rank;
+              this.initXp();
+            }
+          }
+        })
+      }
+      resolve();
+    });
+
+  }
+
   setDirection() {
     var dir = document.createAttribute('dir');
     dir.value = this.currentLanguage.direction;
     this._nav = this._ionicApp.getComponent('nav');
     this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
+
+    var playerInfo = document.getElementById('playerInfo');
+    if (playerInfo) {
+      playerInfo.className = 'player-info-' + this.currentLanguage.direction;
+    }
+
+    this.canvas.className = 'player-info-canvas' + this.currentLanguage.direction;
   }
 
   facebookServerConnect(facebookAuthResponse) {
@@ -140,6 +271,14 @@ export class Client {
 
   get canvasContext():any {
     return this._canvasContext;
+  }
+
+  get showPlayerInfo():boolean {
+    return this._showPlayerInfo;
+  }
+
+  set showPlayerInfo(value: boolean) {
+    this._showPlayerInfo = value;
   }
 
   translate(key:String, params? : Object) {

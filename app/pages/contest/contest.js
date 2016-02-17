@@ -16,6 +16,7 @@ var quiz_1 = require('../../pages/quiz/quiz');
 var set_contest_1 = require('../../pages/set-contest/set-contest');
 var facebook_post_1 = require('../../pages/facebook-post/facebook-post');
 var like_1 = require('../../pages/like/like');
+var new_rank_1 = require('../../pages/new-rank/new-rank');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var shareService = require('../../providers/share');
@@ -83,6 +84,15 @@ var ContestPage = (function () {
                 'sourceClick': source
             });
             _this.refreshContest(data.contest);
+            //Should get xp if fresh join
+            if (data.xpProgress && data.xpProgress.addition > 0) {
+                _this.playerInfo.addXp(data.xpProgress).then(function () {
+                    var modal = ionic_1.Modal.create(new_rank_1.NewRankPage, {
+                        'xpProgress': data.xpProgress
+                    });
+                    _this.client.nav.present(modal);
+                });
+            }
         });
     };
     ContestPage.prototype.refreshContest = function (contest) {
@@ -119,6 +129,10 @@ var ContestPage = (function () {
             this.playContest('chart');
         }
     };
+    __decorate([
+        core_1.ViewChild(player_info_1.PlayerInfoComponent), 
+        __metadata('design:type', player_info_1.PlayerInfoComponent)
+    ], ContestPage.prototype, "playerInfo", void 0);
     __decorate([
         core_1.ViewChild(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', contest_chart_1.ContestChartComponent)

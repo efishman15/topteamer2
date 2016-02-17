@@ -1,9 +1,11 @@
+import {ViewChild} from 'angular2/core';
 import {Page, NavParams,Modal} from 'ionic-framework/ionic';
 import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener'
 import {TransitionListener} from '../../directives/transition-listener/transition-listener'
 import {QuestionStatsPage} from '../../pages/question-stats/question-stats'
 import {QuestionEditorPage} from '../../pages/question-editor/question-editor'
+import {NewRankPage} from '../../pages/new-rank/new-rank'
 import {Client} from '../../providers/client';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
@@ -18,6 +20,7 @@ export class QuizPage {
 
   client:Client;
   params:NavParams;
+  @ViewChild(PlayerInfoComponent) playerInfo:PlayerInfoComponent;
   contestId:string;
   source:string;
   quizData:Object;
@@ -182,11 +185,29 @@ export class QuizPage {
   buttonAnimationEnded(event:Event) {
 
     if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
-      //TODO: XpService.addXp($scope.quiz.xpProgress, $scope.quizProceed);
-    }
+      this.playerInfo.addXp(this.quizData.xpProgress).then( () => {
+        if (this.correctButtonName === event.srcElement.name) {
+          if (!this.quizData.xpProgress.rankChanged) {
+            this.quizProceed();
+          }
+          else {
+            var modal = Modal.create(NewRankPage, {
+              'xpProgress': this.quizData.xpProgress
+            });
 
-    if (this.correctButtonName === event.srcElement.name && (!this.quizData.xpProgress || !this.quizData.xpProgress.rankChanged)) {
-      this.quizProceed();
+            modal.onDismiss((okPressed) => {
+              this.modalJustClosed = true;
+              this.quizProceed();
+            });
+
+            this.client.nav.present(modal);
+
+          }
+        }
+      });
+    }
+    else if (this.correctButtonName === event.srcElement.name) {
+        this.quizProceed();
     }
   };
 

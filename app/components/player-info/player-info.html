@@ -2,3 +2,8 @@
   <img src="{{client.session.avatar}}"
        class="player-info-avatar-{{client.currentLanguage.direction}}">
 </div>
+<canvas id="playerInfoRankCanvas"
+        width="{{client.settings.xpControl.canvas.width}}"
+        height="{{client.settings.xpControl.canvas.height}}"
+        [ngStyle]="{'width': client.settings.xpControl.canvas.width + 'px', 'height': client.settings.xpControl.canvas.height + 'px'}">
+</canvas>

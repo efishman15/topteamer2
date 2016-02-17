@@ -7,6 +7,8 @@
 // By default each design mode includes these shared imports.
 // App Shared Sass variables belong in app.variables.scss.
 
+@import "app";
+
 @import "components/contest-chart/contest-chart";
 
 @import "components/contest-list/contest-list";
@@ -38,6 +40,8 @@
 @import "pages/main-tabs/main-tabs";
 
 @import "pages/my-contests/my-contests";
+
+@import "pages/new-rank/new-rank";
 
 @import "pages/question-editor/question-editor";
 

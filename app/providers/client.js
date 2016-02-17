@@ -13,7 +13,10 @@ require('rxjs/add/operator/map');
 require('rxjs/add/operator/timeout');
 var Client = (function () {
     function Client(http) {
+        this.circle = Math.PI * 2;
+        this.quarter = Math.PI / 2;
         this._loaded = false;
+        this._showPlayerInfo = true;
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
         }
@@ -33,14 +36,106 @@ var Client = (function () {
             _this._menuController = menuController;
             _this._events = events;
             _this.serverGateway.getSettings().then(function (data) {
+                _this.initXpCanvas();
                 _this.setDirection();
-                var canvas = document.createElement('canvas');
-                _this._canvasContext = canvas.getContext('2d');
-                _this._canvasContext.font = _this.serverGateway.settings.charts.contestAnnotations.annotationsFont;
                 _this._loaded = true;
                 Client.instance = _this;
                 resolve();
             }, function (err) { return reject(err); });
+        });
+    };
+    Client.prototype.initXpCanvas = function () {
+        //Player info rank canvas
+        this.canvas = document.getElementById('playerInfoRankCanvas');
+        this._canvasContext = this.canvas.getContext('2d');
+        this.canvasCenterX = this.settings.xpControl.canvas.width / 2;
+        this.canvasCenterY = this.settings.xpControl.canvas.height / 2;
+        this.canvas.width = this.settings.xpControl.canvas.width;
+        this.canvas.style.width = this.settings.xpControl.canvas.width + 'px';
+        this.canvas.height = this.settings.xpControl.canvas.height;
+        this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
+    };
+    Client.prototype.initXp = function () {
+        this._canvasContext.clearRect(0, 0, this.settings.xpControl.canvas.width, this.settings.xpControl.canvas.height);
+        //-------------------------------------------------------------------------------------
+        // Draw the full circle representing the entire xp required for the next level
+        //-------------------------------------------------------------------------------------
+        this._canvasContext.beginPath();
+        this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, 0, this.circle, false);
+        this._canvasContext.fillStyle = this.settings.xpControl.fillColor;
+        this._canvasContext.fill();
+        //Full line color
+        this._canvasContext.lineWidth = this.settings.xpControl.lineWidth;
+        this._canvasContext.strokeStyle = this.settings.xpControl.fullLineColor;
+        this._canvasContext.stroke();
+        this._canvasContext.closePath();
+        //-------------------------------------------------------------------------------------
+        //Draw the arc representing the xp in the current level
+        //-------------------------------------------------------------------------------------
+        this._canvasContext.beginPath();
+        // line color
+        this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, -(this.quarter), ((this.session.xpProgress.current / this.session.xpProgress.max) * this.circle) - this.quarter, false);
+        this._canvasContext.strokeStyle = this.settings.xpControl.progressLineColor;
+        this._canvasContext.stroke();
+        //Rank Text
+        var font = '';
+        if (this.settings.xpControl.font.bold) {
+            font += 'bold ';
+        }
+        var fontSize;
+        if (this.session.rank < 10) {
+            //1 digit font
+            fontSize = this.settings.xpControl.font.d1;
+        }
+        else if (this.session.rank < 100) {
+            //2 digits font
+            fontSize = this.settings.xpControl.font.d2;
+        }
+        else {
+            fontSize = this.settings.xpControl.font.d3;
+        }
+        font += fontSize + ' ';
+        font += this.settings.xpControl.font.name;
+        this._canvasContext.font = font;
+        // Move it down by half the text height and left by half the text width
+        var rankText = '' + this.session.rank;
+        var textWidth = this._canvasContext.measureText(rankText).width;
+        var textHeight = this._canvasContext.measureText('w').width;
+        this._canvasContext.fillStyle = this.settings.xpControl.textColor;
+        this._canvasContext.fillText(rankText, this.canvasCenterX - (textWidth / 2), this.canvasCenterY + (textHeight / 2));
+        this._canvasContext.closePath();
+    };
+    Client.prototype.animateXpAddition = function (startPoint, endPoint) {
+        this._canvasContext.beginPath();
+        this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, (this.circle * startPoint) - this.quarter, (this.circle * endPoint) - this.quarter, false);
+        this._canvasContext.strokeStyle = this.settings.xpControl.progressLineColor;
+        this._canvasContext.stroke();
+        this._canvasContext.closePath();
+    };
+    Client.prototype.addXp = function (xpProgress) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var startPoint = _this.session.xpProgress.current / _this.session.xpProgress.max;
+            //Occurs after xp has already been added to the session
+            var addition = xpProgress.addition;
+            for (var i = 1; i <= addition; i++) {
+                myRequestAnimationFrame(function () {
+                    var endPoint = (_this.session.xpProgress.current + i) / _this.session.xpProgress.max;
+                    _this.animateXpAddition(startPoint, endPoint, _this.quarter, _this.circle);
+                    //Last iteration should be performed after the animation frame event happened
+                    if (i >= addition) {
+                        //Add the actual xp to the client side
+                        _this.session.xpProgress = xpProgress;
+                        //Zero the addition
+                        _this.session.xpProgress.addition = 0;
+                        if (xpProgress.rankChanged) {
+                            _this.session.rank = xpProgress.rank;
+                            _this.initXp();
+                        }
+                    }
+                });
+            }
+            resolve();
         });
     };
     Client.prototype.setDirection = function () {
@@ -48,6 +143,11 @@ var Client = (function () {
         dir.value = this.currentLanguage.direction;
         this._nav = this._ionicApp.getComponent('nav');
         this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
+        var playerInfo = document.getElementById('playerInfo');
+        if (playerInfo) {
+            playerInfo.className = 'player-info-' + this.currentLanguage.direction;
+        }
+        this.canvas.className = 'player-info-canvas' + this.currentLanguage.direction;
     };
     Client.prototype.facebookServerConnect = function (facebookAuthResponse) {
         return this.serverGateway.facebookConnect(facebookAuthResponse);
@@ -151,6 +251,16 @@ var Client = (function () {
     Object.defineProperty(Client.prototype, "canvasContext", {
         get: function () {
             return this._canvasContext;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Client.prototype, "showPlayerInfo", {
+        get: function () {
+            return this._showPlayerInfo;
+        },
+        set: function (value) {
+            this._showPlayerInfo = value;
         },
         enumerable: true,
         configurable: true
