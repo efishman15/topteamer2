@@ -20,11 +20,10 @@ export class Client {
 
   _ionicApp:IonicApp;
   _platform:Platform;
-  _events: Events;
+  _events:Events;
   _nav:NavController;
-  _menuController: MenuController;
+  _menuController:MenuController;
   _loaded:Boolean = false;
-  _showPlayerInfo:Boolean = true;
 
   serverGateway:ServerGateway;
 
@@ -46,19 +45,19 @@ export class Client {
     return Client.instance;
   }
 
-  init(ionicApp:IonicApp, platform:Platform, menuController: MenuController, events: Events) {
+  init(ionicApp:IonicApp, platform:Platform, menuController:MenuController, events:Events) {
 
     return new Promise((resolve, reject) => {
 
       this._ionicApp = ionicApp;
       this._platform = platform;
-      this._menuController= menuController;
+      this._menuController = menuController;
       this._events = events;
 
       this.serverGateway.getSettings().then((data) => {
 
         this.initXpCanvas();
-        
+
         this.setDirection();
 
         this._loaded = true;
@@ -199,7 +198,7 @@ export class Client {
       playerInfo.className = 'player-info-' + this.currentLanguage.direction;
     }
 
-    this.canvas.className = 'player-info-canvas' + this.currentLanguage.direction;
+    this.canvas.className = 'player-info-canvas-' + this.currentLanguage.direction;
   }
 
   facebookServerConnect(facebookAuthResponse) {
@@ -214,32 +213,32 @@ export class Client {
     return this.serverGateway.post(path, postData, timeout, blockUserInterface);
   }
 
-  setPageTitle(key : string, params? : Object) {
+  setPageTitle(key:string, params?:Object) {
     this.ionicApp.setTitle(this.translate(key, params));
   }
 
-  get loaded() : Boolean {
+  get loaded():Boolean {
     return this._loaded;
   }
 
-  get ionicApp() : IonicApp {
+  get ionicApp():IonicApp {
     return this._ionicApp;
   }
 
-  get platform() : Platform {
+  get platform():Platform {
     return this._platform;
   }
 
-  get events() : Events {
+  get events():Events {
     return this._events;
   }
 
-  get nav():NavController{
+  get nav():NavController {
     return this._nav;
   }
 
-  get menuController():MenuController{
-    return this._menuController;
+  get isMenuOpen():Boolean  {
+    return (this._menuController._menus.length > 0 && this._menuController._menus[0].isOpen);
   }
 
   get endPoint():String {
@@ -273,15 +272,7 @@ export class Client {
     return this._canvasContext;
   }
 
-  get showPlayerInfo():boolean {
-    return this._showPlayerInfo;
-  }
-
-  set showPlayerInfo(value: boolean) {
-    this._showPlayerInfo = value;
-  }
-
-  translate(key:String, params? : Object) {
+  translate(key:String, params?:Object) {
     var translatedValue = this.serverGateway.settings.ui[this.serverGateway.user.settings.language][key];
     if (params) {
       translatedValue = translatedValue.format(params);
@@ -294,11 +285,11 @@ export class Client {
     return this.serverPost('user/toggleSound');
   }
 
-  switchLanguage(language: string) {
+  switchLanguage(language:string) {
     localStorage.setItem('language', language);
     this.setDirection();
     var postData = {'language': language};
-    return this.serverPost('user/switchLanguage',postData);
+    return this.serverPost('user/switchLanguage', postData);
   }
 }
 
@@ -306,9 +297,9 @@ export class ServerGateway {
 
   http:Http;
   _session:Object;
-  _settings: Object;
+  _settings:Object;
   _endPoint:string;
-  _user: Object;
+  _user:Object;
 
   constructor(http:Http) {
     this.http = http;
@@ -342,7 +333,7 @@ export class ServerGateway {
     });
   };
 
-  post(path : string, postData : Object, timeout? : number, blockUserInterface? : boolean) {
+  post(path:string, postData:Object, timeout?:number, blockUserInterface?:boolean) {
 
     return new Promise((resolve, reject) => {
 

@@ -235,6 +235,9 @@ var topTeamerApp = (function () {
     topTeamerApp.prototype.systemTools = function () {
         this.client.nav.push(system_tools_1.SystemToolsPage);
     };
+    topTeamerApp.prototype.menuOpening = function (event) {
+        console.log('menu opening: ' + JSON.stringify(event));
+    };
     topTeamerApp = __decorate([
         ionic_1.App({
             templateUrl: 'app.html',

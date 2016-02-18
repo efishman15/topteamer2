@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var common_1 = require('angular2/common');
-var player_info_1 = require('../../components/player-info/player-info');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
 var contest_1 = require('../../pages/contest/contest');
@@ -421,7 +420,7 @@ var SetContestPage = (function () {
     SetContestPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/set-contest/set-contest.html',
-            directives: [common_1.FORM_DIRECTIVES, player_info_1.PlayerInfoComponent, date_picker_1.DatePickerComponent]
+            directives: [common_1.FORM_DIRECTIVES, date_picker_1.DatePickerComponent]
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, common_1.FormBuilder])
     ], SetContestPage);

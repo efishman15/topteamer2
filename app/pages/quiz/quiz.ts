@@ -1,6 +1,4 @@
-import {ViewChild} from 'angular2/core';
 import {Page, NavParams,Modal} from 'ionic-framework/ionic';
-import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener'
 import {TransitionListener} from '../../directives/transition-listener/transition-listener'
 import {QuestionStatsPage} from '../../pages/question-stats/question-stats'
@@ -13,14 +11,13 @@ import * as alertService from '../../providers/alert';
 
 @Page({
   templateUrl: 'build/pages/quiz/quiz.html',
-  directives: [PlayerInfoComponent,AnimationListener, TransitionListener]
+  directives: [AnimationListener, TransitionListener]
 })
 
 export class QuizPage {
 
   client:Client;
   params:NavParams;
-  @ViewChild(PlayerInfoComponent) playerInfo:PlayerInfoComponent;
   contestId:string;
   source:string;
   quizData:Object;
@@ -185,7 +182,7 @@ export class QuizPage {
   buttonAnimationEnded(event:Event) {
 
     if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
-      this.playerInfo.addXp(this.quizData.xpProgress).then( () => {
+      this.client.addXp(this.quizData.xpProgress).then( () => {
         if (this.correctButtonName === event.srcElement.name) {
           if (!this.quizData.xpProgress.rankChanged) {
             this.quizProceed();

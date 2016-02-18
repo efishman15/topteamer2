@@ -2,11 +2,9 @@ import {Page} from 'ionic/ionic';
 import {Client} from '../../providers/client';
 import * as alertService from '../../providers/alert';
 import * as systemService from '../../providers/system';
-import {PlayerInfoComponent} from '../../components/player-info/player-info';
 
 @Page({
-  templateUrl: 'build/pages/system-tools/system-tools.html',
-  directives: [PlayerInfoComponent]
+  templateUrl: 'build/pages/system-tools/system-tools.html'
 })
 
 export class SystemToolsPage {

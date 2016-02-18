@@ -39,6 +39,10 @@ export class MainTabsPage {
     });
   }
 
+  ngAfterViewInit() {
+    this.client.initXp();
+  }
+
   onPageWillEnter() {
     if (this.needToRefreshList) {
       var selectedPage = this.mainTabs.getSelected().getActive();

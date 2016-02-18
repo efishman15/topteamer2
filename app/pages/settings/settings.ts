@@ -2,11 +2,9 @@ import {Page,NavParams} from 'ionic/ionic';
 import {Client} from '../../providers/client';
 import {LoginPage} from '../login/login';
 import * as facebookService from '../../providers/facebook';
-import {PlayerInfoComponent} from '../../components/player-info/player-info';
 
 @Page({
-  templateUrl: 'build/pages/settings/settings.html',
-  directives: [PlayerInfoComponent]
+  templateUrl: 'build/pages/settings/settings.html'
 })
 
 export class SettingsPage {

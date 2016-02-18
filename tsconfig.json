@@ -17,7 +17,6 @@
     "app/components/contest-list/contest-list.ts",
     "app/components/date-picker/date-picker.ts",
     "app/components/leaders/leaders.ts",
-    "app/components/player-info/player-info.ts",
     "app/components/simple-tabs/simple-tabs.ts",
     "app/components/simple-tab/simple-tab.ts",
     "app/directives/animation-listener/animation-listener.ts",

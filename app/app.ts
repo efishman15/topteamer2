@@ -282,4 +282,8 @@ class topTeamerApp {
     this.client.nav.push(SystemToolsPage);
   }
 
+  menuOpening(event) {
+    console.log('menu opening: ' + JSON.stringify(event));
+  }
+
 }

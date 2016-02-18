@@ -1,5 +1,6 @@
 import {Page,NavParams,ViewController} from 'ionic/ionic';
 import {Client} from '../../providers/client';
+import * as soundService from '../../providers/sound';
 
 @Page({
   templateUrl: 'build/pages/new-rank/new-rank.html'
@@ -14,6 +15,10 @@ export class NewRankPage {
     this.client = Client.getInstance();
     this.xpProgress = params.data.xpProgress;
     this.viewController = viewController;
+  }
+
+  onPageDidEnter() {
+    soundService.play('audio/finish_great_1');
   }
 
   dismiss(okPressed) {

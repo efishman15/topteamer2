@@ -10,7 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
 var shareService = require('../../providers/share');
-var player_info_1 = require('../../components/player-info/player-info');
 var SharePage = (function () {
     function SharePage(params) {
         this.client = client_1.Client.getInstance();
@@ -21,8 +20,7 @@ var SharePage = (function () {
     }
     SharePage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/share/share.html',
-            directives: [player_info_1.PlayerInfoComponent]
+            templateUrl: 'build/pages/share/share.html'
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
     ], SharePage);

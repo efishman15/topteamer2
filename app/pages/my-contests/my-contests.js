@@ -22,7 +22,6 @@ var MyContestsPage = (function () {
         }
     };
     MyContestsPage.prototype.ngAfterViewInit = function () {
-        this.client.initXp();
         this.refreshList();
     };
     MyContestsPage.prototype.onContestSelected = function (data) {

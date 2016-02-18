@@ -25,7 +25,6 @@ export class MyContestsPage {
   }
 
   ngAfterViewInit() {
-    this.client.initXp();
     this.refreshList();
   }
 

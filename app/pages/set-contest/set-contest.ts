@@ -1,6 +1,5 @@
 import {Page, NavParams, Item, Input, Select, Label,Modal} from 'ionic/ionic';
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
-import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import {ContestPage} from '../../pages/contest/contest';
@@ -13,7 +12,7 @@ import * as shareService from '../../providers/share';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html',
-  directives: [FORM_DIRECTIVES, PlayerInfoComponent, DatePickerComponent]
+  directives: [FORM_DIRECTIVES, DatePickerComponent]
 })
 
 export class SetContestPage {

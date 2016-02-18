@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var core_1 = require('angular2/core');
-var player_info_1 = require('../../components/player-info/player-info');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
 var quiz_1 = require('../../pages/quiz/quiz');
@@ -83,10 +82,10 @@ var ContestPage = (function () {
                 'team': '' + team,
                 'sourceClick': source
             });
-            _this.refreshContest(data.contest);
+            _this.client.events.publish('topTeamer:contestUpdated', contest);
             //Should get xp if fresh join
             if (data.xpProgress && data.xpProgress.addition > 0) {
-                _this.playerInfo.addXp(data.xpProgress).then(function () {
+                _this.client.addXp(data.xpProgress).then(function () {
                     var modal = ionic_1.Modal.create(new_rank_1.NewRankPage, {
                         'xpProgress': data.xpProgress
                     });
@@ -130,17 +129,13 @@ var ContestPage = (function () {
         }
     };
     __decorate([
-        core_1.ViewChild(player_info_1.PlayerInfoComponent), 
-        __metadata('design:type', player_info_1.PlayerInfoComponent)
-    ], ContestPage.prototype, "playerInfo", void 0);
-    __decorate([
         core_1.ViewChild(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', contest_chart_1.ContestChartComponent)
     ], ContestPage.prototype, "contestChartComponent", void 0);
     ContestPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/contest/contest.html',
-            directives: [player_info_1.PlayerInfoComponent, contest_chart_1.ContestChartComponent]
+            directives: [contest_chart_1.ContestChartComponent]
         }), 
         __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
     ], ContestPage);

@@ -11,7 +11,6 @@ var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
 var alertService = require('../../providers/alert');
 var systemService = require('../../providers/system');
-var player_info_1 = require('../../components/player-info/player-info');
 var SystemToolsPage = (function () {
     function SystemToolsPage() {
         this.client = client_1.Client.getInstance();
@@ -32,8 +31,7 @@ var SystemToolsPage = (function () {
     };
     SystemToolsPage = __decorate([
         ionic_1.Page({
-            templateUrl: 'build/pages/system-tools/system-tools.html',
-            directives: [player_info_1.PlayerInfoComponent]
+            templateUrl: 'build/pages/system-tools/system-tools.html'
         }), 
         __metadata('design:paramtypes', [])
     ], SystemToolsPage);

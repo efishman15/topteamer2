@@ -9,12 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
+var soundService = require('../../providers/sound');
 var NewRankPage = (function () {
     function NewRankPage(params, viewController) {
         this.client = client_1.Client.getInstance();
         this.xpProgress = params.data.xpProgress;
         this.viewController = viewController;
     }
+    NewRankPage.prototype.onPageDidEnter = function () {
+        soundService.play('audio/finish_great_1');
+    };
     NewRankPage.prototype.dismiss = function (okPressed) {
         this.viewController.dismiss(okPressed);
     };

@@ -7,9 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('angular2/core');
 var ionic_1 = require('ionic-framework/ionic');
-var player_info_1 = require('../../components/player-info/player-info');
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
 var question_stats_1 = require('../../pages/question-stats/question-stats');
@@ -140,7 +138,7 @@ var QuizPage = (function () {
     QuizPage.prototype.buttonAnimationEnded = function (event) {
         var _this = this;
         if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
-            this.playerInfo.addXp(this.quizData.xpProgress).then(function () {
+            this.client.addXp(this.quizData.xpProgress).then(function () {
                 if (_this.correctButtonName === event.srcElement.name) {
                     if (!_this.quizData.xpProgress.rankChanged) {
                         _this.quizProceed();
@@ -437,14 +435,10 @@ var QuizPage = (function () {
         });
         this.client.nav.present(modal);
     };
-    __decorate([
-        core_1.ViewChild(player_info_1.PlayerInfoComponent), 
-        __metadata('design:type', player_info_1.PlayerInfoComponent)
-    ], QuizPage.prototype, "playerInfo", void 0);
     QuizPage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/quiz/quiz.html',
-            directives: [player_info_1.PlayerInfoComponent, animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
+            directives: [animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
         }), 
         __metadata('design:paramtypes', [ionic_1.NavParams])
     ], QuizPage);

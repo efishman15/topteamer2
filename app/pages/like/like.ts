@@ -1,10 +1,8 @@
 import {Page,NavParams} from 'ionic/ionic';
-import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {Client} from '../../providers/client';
 
 @Page({
-  templateUrl: 'build/pages/like/like.html',
-  directives: [PlayerInfoComponent]
+  templateUrl: 'build/pages/like/like.html'
 })
 export class LikePage {
 

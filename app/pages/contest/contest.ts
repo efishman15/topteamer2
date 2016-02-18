@@ -1,6 +1,5 @@
 import {Page, NavParams,Modal} from 'ionic/ionic';
 import {ViewChild} from 'angular2/core';
-import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
@@ -15,14 +14,13 @@ import * as soundService from '../../providers/sound';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [PlayerInfoComponent, ContestChartComponent]
+  directives: [ContestChartComponent]
 })
 
 export class ContestPage {
 
   client:Client;
   params:NavParams;
-  @ViewChild(PlayerInfoComponent) playerInfo:PlayerInfoComponent;
   contestChart:Object = {};
   lastQuizResults:Object = null;
   animateLastResults:Boolean = false;
@@ -104,11 +102,11 @@ export class ContestPage {
         'sourceClick': source
       });
 
-      this.refreshContest(data.contest);
+      this.client.events.publish('topTeamer:contestUpdated', contest);
 
       //Should get xp if fresh join
       if (data.xpProgress && data.xpProgress.addition > 0) {
-        this.playerInfo.addXp(data.xpProgress).then(() => {
+        this.client.addXp(data.xpProgress).then(() => {
           var modal = Modal.create(NewRankPage, {
             'xpProgress': data.xpProgress
           });

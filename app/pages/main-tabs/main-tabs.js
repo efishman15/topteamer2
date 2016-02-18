@@ -31,6 +31,9 @@ var MainTabsPage = (function () {
             _this.needToRefreshList = true;
         });
     }
+    MainTabsPage.prototype.ngAfterViewInit = function () {
+        this.client.initXp();
+    };
     MainTabsPage.prototype.onPageWillEnter = function () {
         if (this.needToRefreshList) {
             var selectedPage = this.mainTabs.getSelected().getActive();

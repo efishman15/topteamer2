@@ -16,7 +16,6 @@ var Client = (function () {
         this.circle = Math.PI * 2;
         this.quarter = Math.PI / 2;
         this._loaded = false;
-        this._showPlayerInfo = true;
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
         }
@@ -147,7 +146,7 @@ var Client = (function () {
         if (playerInfo) {
             playerInfo.className = 'player-info-' + this.currentLanguage.direction;
         }
-        this.canvas.className = 'player-info-canvas' + this.currentLanguage.direction;
+        this.canvas.className = 'player-info-canvas-' + this.currentLanguage.direction;
     };
     Client.prototype.facebookServerConnect = function (facebookAuthResponse) {
         return this.serverGateway.facebookConnect(facebookAuthResponse);
@@ -196,9 +195,9 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Client.prototype, "menuController", {
+    Object.defineProperty(Client.prototype, "isMenuOpen", {
         get: function () {
-            return this._menuController;
+            return (this._menuController._menus.length > 0 && this._menuController._menus[0].isOpen);
         },
         enumerable: true,
         configurable: true
@@ -251,16 +250,6 @@ var Client = (function () {
     Object.defineProperty(Client.prototype, "canvasContext", {
         get: function () {
             return this._canvasContext;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "showPlayerInfo", {
-        get: function () {
-            return this._showPlayerInfo;
-        },
-        set: function (value) {
-            this._showPlayerInfo = value;
         },
         enumerable: true,
         configurable: true

@@ -1,11 +1,9 @@
 import {Page,NavParams,ViewController} from 'ionic/ionic';
-import {PlayerInfoComponent} from '../../components/player-info/player-info';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
 
 @Page({
-  templateUrl: 'build/pages/facebook-post/facebook-post.html',
-  directives: [PlayerInfoComponent]
+  templateUrl: 'build/pages/facebook-post/facebook-post.html'
 })
 export class FacebookPostPage {
 
