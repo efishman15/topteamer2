@@ -27,6 +27,7 @@ export class SettingsPage {
 
   logout() {
     facebookService.logout().then((response) => {
+      this.client.logout();
       this.client.nav.pop().then(() => {
         this.client.nav.setRoot(LoginPage);
       });

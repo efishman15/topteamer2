@@ -28,18 +28,7 @@ module.exports.injectSettings = function (dbSettings) {
     settings.client.quiz.questions.score.push(settings.server.quiz.questions.levels[i].score);
   }
 
-  settings.client.newContest.systemTotalQuestions = settings.server.quiz.questions.levels.length;
-
-  //Replace client ui messages containing eval(...) with the respective value
-  var uiLanguageKeys = Object.keys(settings.client.ui);
-  for (var i=0; i< uiLanguageKeys.length; i++) {
-    var translationTerms = Object.keys(settings.client.ui[uiLanguageKeys[i]]);
-    for (var j=0; j<translationTerms.length; j++) {
-      if (settings.client.ui[uiLanguageKeys[i]][translationTerms[j]].indexOf('eval:') >= 0) {
-        settings.client.ui[uiLanguageKeys[i]][translationTerms[j]] = eval(settings.client.ui[uiLanguageKeys[i]][translationTerms[j]].replaceAll('eval:',''));
-      }
-    }
-  }
+  checkForEvalSettings(settings);
 
   module.exports.settings = settings;
 
@@ -48,6 +37,25 @@ module.exports.injectSettings = function (dbSettings) {
 //-------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+// checkForEvalSettings
+//
+// Iterates recursively through all the currentObject (root=settings) and replaces items containing eval to their respective setting
+// data: geoLocator (0,1,...), ip
+//-----------------------------------------------------------------------------------------------------------------------------------------
+function checkForEvalSettings(currentObject) {
+  for (var property in currentObject) {
+    if (currentObject.hasOwnProperty(property)) {
+      if (typeof currentObject[property] === 'object') {
+        checkForEvalSettings(currentObject[property]);
+      }
+      else if (typeof currentObject[property] === 'string' && currentObject[property].indexOf('eval:') >= 0) {
+        currentObject[property] = eval(currentObject[property].replaceAll('eval:',''));
+      }
+    }
+  }
+}
 
 //---------------------------------------------------------------------------------------------------
 // getGeoInfo
@@ -179,7 +187,7 @@ module.exports.getSettings = function (req, res, next) {
           getGeoInfo(data, callback);
         }
         else {
-          data.language = data.defaultLanguage;
+          data.clientResponse.language = data.defaultLanguage;
           callback(null, data);
         }
       }
@@ -188,42 +196,12 @@ module.exports.getSettings = function (req, res, next) {
       }
     },
 
-    //Check must update
+    //The setttings for the client
     function (data, callback) {
 
-      if (data.clientInfo && data.clientInfo.appVersion) {
-
-        if (versionCompare(settings.server.versions.mustUpdate.minVersion, data.clientInfo.appVersion) === 1) {
-          data.clientResponse = JSON.parse(JSON.stringify(settings.client));
-
-          data.clientResponse.serverPopup = JSON.parse(JSON.stringify(settings.server.versions.mustUpdate.popup));
-
-          if (data.clientResponse.serverPopup.title) {
-            //Convert the text array to a simple string picking only the required language
-            data.clientResponse.serverPopup.title = data.clientResponse.serverPopup.title[data.language];
-          }
-          if (data.clientResponse.serverPopup.message) {
-            //Convert the text array to a simple string picking only the required language
-            data.clientResponse.serverPopup.message = data.clientResponse.serverPopup.message[data.language];
-          }
-
-          for (var i = 0; i < data.clientResponse.serverPopup.buttons.length; i++) {
-            if (data.clientResponse.serverPopup.buttons[i].text) {
-              //Convert the text array to a simple string picking only the required language
-              data.clientResponse.serverPopup.buttons[i].text = data.clientResponse.serverPopup.buttons[i].text[data.language];
-            }
-            if (data.clientResponse.serverPopup.buttons[i].link && data.clientResponse.serverPopup.buttons[i].link.indexOf('#storeLink#') > -1) {
-              data.clientResponse.serverPopup.buttons[i].link = data.clientResponse.serverPopup.buttons[i].link.replace('#storeLink#', settings.server.platforms[data.clientInfo.platform].storeLink);
-            }
-          }
-        }
-      }
-
-      if (!data.clientResponse.serverPopup) {
-        data.clientResponse.settings = settings.client;
-      }
+      data.clientResponse.settings = settings.client;
       callback(null, data);
-    },
+    }
   ];
 
   async.waterfall(operations, function (err, data) {
@@ -234,6 +212,23 @@ module.exports.getSettings = function (req, res, next) {
       res.send(err.httpStatus, err);
     }
   })
+}
+
+//-----------------------------------------------------------------------
+// checkAppVersion
+//
+// returns a serverPopup object to be concatenated to any server result
+//-----------------------------------------------------------------------
+module.exports.checkAppVersion = checkAppVersion;
+function checkAppVersion(clientInfo, language) {
+
+  if (!clientInfo || !clientInfo.appVersion) {
+    return null;
+  }
+
+  if (versionCompare(settings.server.versions.mustUpdate.minVersion, clientInfo.appVersion) === 1) {
+    return settings.server.versions.mustUpdate.popup[language];
+  }
 }
 
 //---------------------------------------------------------------------------------------------------

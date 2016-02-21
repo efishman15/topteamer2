@@ -1,7 +1,8 @@
-import {Page} from 'ionic/ionic';
+import {Page,Modal} from 'ionic/ionic';
 import {MainTabsPage} from '../main-tabs/main-tabs';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
+import {ServerPopupPage} from '../server-popup/server-popup';
 
 @Page({
   templateUrl: 'build/pages/login/login.html'
@@ -12,6 +13,12 @@ export class LoginPage {
 
   constructor() {
     this.client = Client.getInstance();
+
+    this.client.events.subscribe('topTeamer:serverPopup', (eventData) => {
+      var modal = Modal.create(ServerPopupPage, {'serverPopup': eventData[0]});
+      this.client.nav.present(modal);
+    });
+
   }
 
   onPageLoaded() {
@@ -32,4 +39,8 @@ export class LoginPage {
     localStorage.setItem('language', language);
   }
 
+  onPageDidEnter() {
+    //Events here could be serverPopup just as the app loads - the page should be fully visible
+    this.client.processInternalEvents();
+  }
 }

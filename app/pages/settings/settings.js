@@ -27,6 +27,7 @@ var SettingsPage = (function () {
     SettingsPage.prototype.logout = function () {
         var _this = this;
         facebookService.logout().then(function (response) {
+            _this.client.logout();
             _this.client.nav.pop().then(function () {
                 _this.client.nav.setRoot(login_1.LoginPage);
             });

@@ -45,6 +45,8 @@ function getSessionResponse(session) {
 module.exports.facebookConnect = function (req, res, next) {
   var data = req.body;
 
+  var clientResponse = {};
+
   var operations = [
 
     //Validate token
@@ -68,12 +70,22 @@ module.exports.facebookConnect = function (req, res, next) {
       data.features = sessionUtils.computeFeatures(data.user);
       data.closeConnection = true;
       dalDb.createOrUpdateSession(data, callback);
+    },
+
+    //Build session for client and check app version
+    function (data, callback) {
+      clientResponse.session = getSessionResponse(data.session);
+      var serverPopup = generalUtils.checkAppVersion(data.session.clientInfo, data.session.settings.language);
+      if (serverPopup) {
+        clientResponse.serverPopup = serverPopup;
+      }
+      callback(null, data);
     }
   ];
 
   async.waterfall(operations, function (err, data) {
     if (!err) {
-      res.json(getSessionResponse(data.session))
+      res.json(clientResponse);
     }
     else {
       res.send(err.httpStatus, err);

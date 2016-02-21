@@ -13,6 +13,7 @@ var my_contests_1 = require('../my-contests/my-contests');
 var running_contests_1 = require('../running-contests/running-contests');
 var leaderboards_1 = require('../leaderboards/leaderboards');
 var client_1 = require('../../providers/client');
+var server_popup_1 = require('../server-popup/server-popup');
 var MainTabsPage = (function () {
     function MainTabsPage() {
         var _this = this;
@@ -30,6 +31,10 @@ var MainTabsPage = (function () {
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
             _this.needToRefreshList = true;
         });
+        this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
+            var modal = ionic_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
+            _this.client.nav.present(modal);
+        });
     }
     MainTabsPage.prototype.ngAfterViewInit = function () {
         this.client.initXp();
@@ -42,6 +47,10 @@ var MainTabsPage = (function () {
             }
             this.needToRefreshList = false;
         }
+    };
+    MainTabsPage.prototype.onPageDidEnter = function () {
+        //Events here could be serverPopup just as the app loads - the page should be fully visible
+        this.client.processInternalEvents();
     };
     __decorate([
         core_1.ViewChild(ionic_1.Tabs), 

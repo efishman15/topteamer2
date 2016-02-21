@@ -103,8 +103,8 @@ export let prepareContestChart = (contest) => {
 
   contestChart.chart.caption = contestCaption;
   contestChart.chart.subCaption = contestSubCaption;
-  contestChart.chart.captionColor = contestCaptionColor;
-  contestChart.chart.subCaptionColor = contestSubCaptionColor;
+  contestChart.chart.captionFontColor = contestCaptionColor;
+  contestChart.chart.subCaptionFontColor = contestSubCaptionColor;
 
   return contestChart;
 
@@ -128,18 +128,28 @@ export let join = (contestId:number, teamId:number) => {
   return client.serverPost('contests/join', postData);
 }
 
+//------------------------------------------------------
+//-- getContest
+//------------------------------------------------------
+export let getContest = (contestId:string) => {
+
+  var postData = {'contestId': contestId};
+  var client = Client.getInstance();
+  return client.serverPost('contests/get', postData);
+}
 
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
-export let openContest = (contestId:string) => {
+export let openContest = (contestId:string) => new Promise((resolve, reject) => {
 
-  var postData = {'contestId': contestId};
   var client = Client.getInstance();
-  client.serverPost('contests/get', postData).then((contest) => {
+
+  getContest(contestId).then( (contest) => {
     client.nav.push(ContestPage, {'contestChart': prepareContestChart(contest)});
-  });
-};
+    resolve();
+  })
+})
 
 //------------------------------------------------------
 //-- openContest

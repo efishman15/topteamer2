@@ -11,9 +11,15 @@ var ionic_1 = require('ionic/ionic');
 var main_tabs_1 = require('../main-tabs/main-tabs');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
+var server_popup_1 = require('../server-popup/server-popup');
 var LoginPage = (function () {
     function LoginPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
+            var modal = ionic_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
+            _this.client.nav.present(modal);
+        });
     }
     LoginPage.prototype.onPageLoaded = function () {
         this.client.setPageTitle('GAME_NAME');
@@ -31,6 +37,10 @@ var LoginPage = (function () {
     LoginPage.prototype.changeLanguage = function (language) {
         this.client.user.settings.language = language;
         localStorage.setItem('language', language);
+    };
+    LoginPage.prototype.onPageDidEnter = function () {
+        //Events here could be serverPopup just as the app loads - the page should be fully visible
+        this.client.processInternalEvents();
     };
     LoginPage = __decorate([
         ionic_1.Page({

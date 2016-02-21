@@ -85,8 +85,8 @@ exports.prepareContestChart = function (contest) {
     }
     contestChart.chart.caption = contestCaption;
     contestChart.chart.subCaption = contestSubCaption;
-    contestChart.chart.captionColor = contestCaptionColor;
-    contestChart.chart.subCaptionColor = contestSubCaptionColor;
+    contestChart.chart.captionFontColor = contestCaptionColor;
+    contestChart.chart.subCaptionFontColor = contestSubCaptionColor;
     return contestChart;
 };
 //------------------------------------------------------
@@ -106,15 +106,23 @@ exports.join = function (contestId, teamId) {
     return client.serverPost('contests/join', postData);
 };
 //------------------------------------------------------
-//-- openContest
+//-- getContest
 //------------------------------------------------------
-exports.openContest = function (contestId) {
+exports.getContest = function (contestId) {
     var postData = { 'contestId': contestId };
     var client = client_1.Client.getInstance();
-    client.serverPost('contests/get', postData).then(function (contest) {
-        client.nav.push(contest_1.ContestPage, { 'contestChart': exports.prepareContestChart(contest) });
-    });
+    return client.serverPost('contests/get', postData);
 };
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+exports.openContest = function (contestId) { return new Promise(function (resolve, reject) {
+    var client = client_1.Client.getInstance();
+    exports.getContest(contestId).then(function (contest) {
+        client.nav.push(contest_1.ContestPage, { 'contestChart': exports.prepareContestChart(contest) });
+        resolve();
+    });
+}); };
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------

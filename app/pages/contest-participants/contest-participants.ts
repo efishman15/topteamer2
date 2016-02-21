@@ -4,6 +4,7 @@ import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ViewChild} from 'angular2/core';
 import {Client} from '../../providers/client';
+import * as contestsService from '../../providers/contests';
 
 @Page({
   templateUrl: 'build/pages/contest-participants/contest-participants.html',
@@ -20,10 +21,17 @@ export class ContestParticipantsPage {
 
   constructor(params:NavParams) {
     // set the root pages for each tab
-    this.contest = params.data.contest;
     this.source = params.data.source;
-
     this.client = Client.getInstance();
+
+    if (params.data.contest) {
+      this.contest = params.data.contest;
+    }
+    else {
+      contestsService.getContest(params.data.contestId).then((contest) => {
+        this.contest = contest;
+      });
+    }
   }
 
   onPageWillEnter() {
@@ -37,8 +45,18 @@ export class ContestParticipantsPage {
   }
 
   showContestParticipants() {
+
+    if (!this.contest) {
+      //In case contest has not been loaded yet
+      setTimeout(() => {
+        this.showContestParticipants();
+      },500)
+      return;
+    }
+
     FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/all');
     this.leadersComponent.showContestParticipants(this.contest._id)
+
   }
 
   showTeamParticipants(teamId) {

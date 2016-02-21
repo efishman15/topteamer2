@@ -22,8 +22,12 @@ export class Client {
   _platform:Platform;
   _events:Events;
   _nav:NavController;
-  _menuController:MenuController;
+  menuController:MenuController;
+  _user:Object;
+  _session:Object;
+  _settings:Object;
   _loaded:Boolean = false;
+  clientInfo:Object;
 
   serverGateway:ServerGateway;
 
@@ -31,6 +35,27 @@ export class Client {
 
     if (Client.instance) {
       throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
+    }
+
+    this.clientInfo = {};
+
+    if (!window.cordova) {
+      this.clientInfo.mobile = false;
+      if (window.self !== window.top) {
+        this.clientInfo.platform = 'facebook';
+      }
+      else {
+        this.clientInfo.platform = 'web';
+      }
+    }
+    else {
+      this.clientInfo.mobile = true;
+      if (this.platform.is('android')) {
+        this.clientInfo.platform = 'android';
+      }
+      else if (this.platform.is('ios')) {
+        this.clientInfo.platform = 'ios';
+      }
     }
 
     this.serverGateway = new ServerGateway(http);
@@ -51,10 +76,22 @@ export class Client {
 
       this._ionicApp = ionicApp;
       this._platform = platform;
-      this._menuController = menuController;
+      this.menuController = menuController;
       this._events = events;
+      this.serverGateway.events = events;
 
-      this.serverGateway.getSettings().then((data) => {
+      var language = localStorage.getItem('language');
+
+      this.getSettings(language).then((data) => {
+
+        this._settings = data.settings;
+        if (!language) {
+          //Language was computed on the server using geoInfo or the fallback to the default language
+          language = settings.language;
+          localStorage.setItem('language', language);
+        }
+
+        this.initUser(language, data.geoInfo);
 
         this.initXpCanvas();
 
@@ -66,7 +103,39 @@ export class Client {
         resolve();
 
       }, (err) => reject(err));
-    })
+    });
+  }
+
+  getSettings(localStorageLanguage) {
+
+    var postData = {};
+    postData.clientInfo = this.clientInfo;
+
+    if (localStorageLanguage) {
+      //This will indicate to the server NOT to retrieve geo info - since language is already determined
+      postData.language = localStorageLanguage;
+    }
+    else {
+      //Server will try to retrieve geo info based on client ip - if fails - will revert to this default language
+      postData.defaultLanguage = this.getDefaultLanguage();
+    }
+
+    return this.serverPost('info/settings', postData);
+  }
+
+  initUser(language, geoInfo) {
+
+    this._user = {
+      'settings': {
+        'language': language,
+        'timezoneOffset': (new Date).getTimezoneOffset()
+      },
+      'clientInfo': this.clientInfo
+    };
+
+    if (geoInfo) {
+      this.user.geoInfo = geoInfo;
+    }
   }
 
   initXpCanvas() {
@@ -190,8 +259,8 @@ export class Client {
   setDirection() {
     var dir = document.createAttribute('dir');
     dir.value = this.currentLanguage.direction;
-    this._nav = this._ionicApp.getComponent('nav');
-    this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
+    this._nav = this.ionicApp.getComponent('nav');
+    this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
 
     var playerInfo = document.getElementById('playerInfo');
     if (playerInfo) {
@@ -202,19 +271,122 @@ export class Client {
   }
 
   facebookServerConnect(facebookAuthResponse) {
-    return this.serverGateway.facebookConnect(facebookAuthResponse);
-  }
+
+    return new Promise((resolve, reject) => {
+
+      if (!this.user.thirdParty) {
+        this.user.thirdParty = {};
+      }
+      this.user.thirdParty.type = 'facebook';
+      this.user.thirdParty.id = facebookAuthResponse.userID;
+      this.user.thirdParty.accessToken = facebookAuthResponse.accessToken;
+
+      this.serverPost('user/facebookConnect', {'user': this.user}).then((data) => {
+        if (this.user.settings.language !== data.session.settings.language) {
+          this.user.settings.language = session.settings.language;
+          localStorage.setItem('language', this.user.settings.language);
+        }
+
+        this.user.settings = data.session.settings;
+
+        this._session = data.session;
+        this.serverGateway.token = data.session.token;
+
+        FlurryAgent.setUserId(data.session.userId);
+
+        if (data.session.justRegistered) {
+          FlurryAgent.logEvent('server/register');
+        }
+        else {
+          FlurryAgent.logEvent('server/login');
+        }
+
+        if (this.clientInfo.platform === 'android') {
+
+          var push = PushNotification.init(
+            {
+              'android': this.settings.google.gcm,
+              'ios': {'alert': 'true', 'badge': 'true', 'sound': 'true'},
+              'windows': {}
+            }
+          );
+
+          push.on('registration', function (registrationData) {
+
+            if (!registrationData || !registrationData.registrationId) {
+              return;
+            }
+
+            localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
+
+            //Update the server with the registration id - if server has no registration or it has a different reg id
+            //Just submit and forget
+            if (!data.session.gcmRegistrationId || data.session.gcmRegistrationId !== registrationData.registrationId) {
+              this.post('user/setGcmRegistration', {'registrationId': registrationData.registrationId});
+            }
+          });
+
+          push.on('notification', function (notificationData) {
+            if (notificationData.additionalData && notificationData.additionalData.contestId) {
+              //$rootScope.gotoView('app.contest', false, {id: data.additionalData.contestId}); TODO: Deep link to contest
+            }
+          });
+
+          push.on('error', function (error) {
+            FlurryAgent.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+          });
+
+          var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
+          if (storedGcmRegistration && !session.gcmRegistrationId) {
+            this.post('user/setGcmRegistration', {'registrationId': storedGcmRegistration});
+          }
+        }
+
+        resolve();
+
+      });
+
+    })
+  };
 
   serverGet(path, timeout) {
     return this.serverGateway.get(path, timeout);
   }
 
-  serverPost(path, postData?, timeout?, blockUserInterface?) {
-    return this.serverGateway.post(path, postData, timeout, blockUserInterface);
+  serverPost(path, postData ?, timeout ?, blockUserInterface ?) {
+    return new Promise((resolve, reject) => {
+      this.serverGateway.post(path, postData, timeout, blockUserInterface).then ((data) => {
+        if (this.nav && this.nav.length() > 0) {
+          //GUI is initiated - process the events right away
+          this.processInternalEvents();
+        }
+        resolve(data);
+      });
+    });
   }
 
-  setPageTitle(key:string, params?:Object) {
+  processInternalEvents() {
+    while (this.serverGateway.eventQueue.length > 0) {
+      var internalEvent = this.serverGateway.eventQueue.shift();
+      this.events.publish(internalEvent.eventName, internalEvent.eventData);
+    }
+  }
+
+  setPageTitle(key:string, params ?:Object) {
     this.ionicApp.setTitle(this.translate(key, params));
+  }
+
+  private getDefaultLanguage() {
+    //Always return a language - get the browser's language
+    var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage)
+    if (!language) {
+      language = 'en';
+    }
+    if (language.length > 2) {
+      language = language.toLowerCase().substring(0, 2);
+    }
+
+    return language;
   }
 
   get loaded():Boolean {
@@ -237,8 +409,12 @@ export class Client {
     return this._nav;
   }
 
-  get isMenuOpen():Boolean  {
-    return (this._menuController._menus.length > 0 && this._menuController._menus[0].isOpen);
+  get user():Object {
+    return this._user;
+  }
+
+  get isMenuOpen() {
+    return (this.menuController._menus.length > 0 && this.menuController._menus[0].isOpen);
   }
 
   get endPoint():String {
@@ -246,24 +422,22 @@ export class Client {
   }
 
   get settings():Object {
-    return this.serverGateway.settings;
-  }
-
-  get user():Object {
-    return this.serverGateway.user;
+    return this._settings;
   }
 
   get session():Object {
-    return this.serverGateway.session;
+    return this._session;
   }
 
   get currentLanguage():Object {
-    return this.serverGateway.settings.languages[this.serverGateway.user.settings.language];
+    return this.settings.languages[this.user.settings.language];
   }
 
   get languageKeys():Array < String > {
-    if (!this._languageKeys) {
-      this._languageKeys = Object.keys(this.serverGateway.settings.languages);
+    if (
+      !this._languageKeys
+    ) {
+      this._languageKeys = Object.keys(this.settings.languages);
     }
     return this._languageKeys;
   }
@@ -272,8 +446,8 @@ export class Client {
     return this._canvasContext;
   }
 
-  translate(key:String, params?:Object) {
-    var translatedValue = this.serverGateway.settings.ui[this.serverGateway.user.settings.language][key];
+  translate(key:String, params ?:Object) {
+    var translatedValue = this.settings.ui[this.user.settings.language][key];
     if (params) {
       translatedValue = translatedValue.format(params);
     }
@@ -291,18 +465,32 @@ export class Client {
     var postData = {'language': language};
     return this.serverPost('user/switchLanguage', postData);
   }
+
+  logout() {
+    this.serverGateway.token = null;
+    this._session = null;
+  }
 }
 
 export class ServerGateway {
 
   http:Http;
-  _session:Object;
-  _settings:Object;
   _endPoint:string;
-  _user:Object;
+  _token:string;
+  _eventQueue: Array<InternalEvent>;
 
   constructor(http:Http) {
     this.http = http;
+
+    if (!window.cordova) {
+      //this._endPoint = 'http://www.topteamer.com/'
+      this._endPoint = window.location.protocol + '//' + window.location.host + '/';
+    }
+    else {
+      this._endPoint = 'http://www.topteamer.com/'
+    }
+
+    this._eventQueue = [];
   }
 
   get(path, timeout) {
@@ -314,8 +502,8 @@ export class ServerGateway {
         timeout = 10000;
       }
 
-      if (this.session) {
-        headers.append('Authorization', this.session.token);
+      if (this._token) {
+        headers.append('Authorization', this._token);
       }
 
       this.http.get(path, {headers: headers})
@@ -340,8 +528,8 @@ export class ServerGateway {
       var headers = new Headers();
       headers.append('Content-Type', 'application/json');
 
-      if (this._session) {
-        headers.append('Authorization', this._session.token);
+      if (this._token) {
+        headers.append('Authorization', this._token);
       }
 
       if (!timeout) {
@@ -352,7 +540,12 @@ export class ServerGateway {
         .timeout(timeout)
         .map((res:Response) => res.json())
         .subscribe(
-          (res:Object) => resolve(res),
+          (res:Object) => {
+            if (res.serverPopup) {
+              this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res.serverPopup));
+            }
+            resolve(res);
+          },
           (err:Object) => {
             if (reject) {
               reject(err);
@@ -365,184 +558,35 @@ export class ServerGateway {
     });
   };
 
-  getSettings() {
-
-    return new Promise((resolve, reject) => {
-
-      var clientInfo = {};
-
-      if (!window.cordova) {
-        //this._endPoint = 'http://www.topteamer.com/'
-        this._endPoint = window.location.protocol + '//' + window.location.host + '/';
-        clientInfo.mobile = false;
-        if (window.self !== window.top) {
-          clientInfo.platform = 'facebook';
-        }
-        else {
-          clientInfo.platform = 'web';
-        }
-      }
-      else {
-        this._endPoint = 'http://www.topteamer.com/'
-        clientInfo.mobile = true;
-        if (this.platform.is('android')) {
-          clientInfo.platform = 'android';
-        }
-        else if (this.platform.is('ios')) {
-          clientInfo.platform = 'ios';
-        }
-      }
-
-      var postData = {};
-      postData.clientInfo = clientInfo;
-
-      var language = localStorage.getItem('language');
-
-      if (language) {
-        //This will indicate to the server NOT to retrieve geo info - since language is already determined
-        postData.language = language;
-      }
-      else {
-        //TODO - get geo info
-        postData.defaultLanguage = this.getDefaultLanguage();
-      }
-
-      this.post('info/settings', postData).then((data) => {
-        this._settings = data.settings;
-        if (!language) {
-          //Language was computed on the server using geoInfo or the fallback to the default language
-          language = data.language;
-          localStorage.setItem('language', language);
-        }
-
-        this.initUser(language, clientInfo, data.geoInfo);
-
-        resolve();
-
-      }, (err) => reject(err));
-    });
-  }
-
-  initUser(language, clientInfo, geoInfo) {
-
-    this._user = {
-      'settings': {
-        'language': language,
-        'timezoneOffset': (new Date).getTimezoneOffset()
-      },
-      'clientInfo': clientInfo
-    };
-
-    if (geoInfo) {
-      this.user.geoInfo = geoInfo;
-    }
-  }
-
-  facebookConnect(facebookAuthResponse) {
-
-    return new Promise((resolve, reject) => {
-
-      if (!this._user.thirdParty) {
-        this._user.thirdParty = {};
-      }
-      this._user.thirdParty.type = 'facebook';
-      this._user.thirdParty.id = facebookAuthResponse.userID;
-      this._user.thirdParty.accessToken = facebookAuthResponse.accessToken;
-
-      this.post('user/facebookConnect', {'user': this._user}).then((session) => {
-        if (this._user.settings.language !== session.settings.language) {
-          this._user.settings.language = session.settings.language;
-          localStorage.setItem('language', this._user.settings.language);
-        }
-
-        this._user.settings = session.settings;
-
-        this._session = session;
-
-        FlurryAgent.setUserId(session.userId);
-
-        if (session.justRegistered) {
-          FlurryAgent.logEvent('server/register');
-        }
-        else {
-          FlurryAgent.logEvent('server/login');
-        }
-
-        if (this._user.clientInfo.platform === 'android') {
-
-          var push = PushNotification.init(
-            {
-              'android': this._settings.google.gcm,
-              'ios': {'alert': 'true', 'badge': 'true', 'sound': 'true'},
-              'windows': {}
-            }
-          );
-
-          push.on('registration', function (data) {
-
-            if (!data || !data.registrationId) {
-              return;
-            }
-
-            localStorage.setItem('gcmRegistrationId', data.registrationId);
-
-            //Update the server with the registration id - if server has no registration or it has a different reg id
-            //Just submit and forget
-            if (!session.gcmRegistrationId || session.gcmRegistrationId !== data.registrationId) {
-              this.post('user/setGcmRegistration', {'registrationId': data.registrationId});
-            }
-          });
-
-          push.on('notification', function (data) {
-            if (data.additionalData && data.additionalData.contestId) {
-              //$rootScope.gotoView('app.contest', false, {id: data.additionalData.contestId}); TODO: Deep link to contest
-            }
-          });
-
-          push.on('error', function (e) {
-            FlurryAgent.myLogError('PushNotificationError', 'Error during push: ' + e.message);
-          });
-
-          var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
-          if (storedGcmRegistration && !session.gcmRegistrationId) {
-            this.post('user/setGcmRegistration', {'registrationId': storedGcmRegistration});
-          }
-        }
-
-        resolve();
-
-      });
-
-    })
-  };
-
   get endPoint():String {
     return this._endPoint;
   }
 
-  get settings():Object {
-    return this._settings;
+  get eventQueue():Array<InternalEvent> {
+    return this._eventQueue;
   }
 
-  get user():Object {
-    return this._user;
+  set token(value: string) {
+    this._token = value;
   }
 
-  get session():Object {
-    return this._session;
+}
+
+export class InternalEvent {
+  _eventName: String;
+  _eventData: Object;
+
+  constructor(eventName: String, eventData: Object) {
+    this._eventName = eventName;
+    this._eventData = eventData;
   }
 
-  private getDefaultLanguage() {
-    //Always return a language - get the browser's language
-    var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage)
-    if (!language) {
-      language = 'en';
-    }
-    if (language.length > 2) {
-      language = language.toLowerCase().substring(0, 2);
-    }
+  get eventName() : String {
+    return this._eventName;
+  }
 
-    return language;
+  get eventData() : Object {
+    return this._eventData;
   }
 
 }

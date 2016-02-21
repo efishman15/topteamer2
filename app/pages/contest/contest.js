@@ -31,9 +31,15 @@ var ContestPage = (function () {
         if (this.params.data.contestChart) {
             this.contestChart = this.params.data.contestChart;
         }
-        else {
+        else if (this.params.data.contest) {
             //Just created this contest - no chart
             this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
+        }
+        else {
+            //Retrieve contest by id
+            contestsService.getContest(this.params.data.contestId).then(function (contest) {
+                _this.contestChart = contestsService.prepareContestChart(contest);
+            });
         }
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (last quiz results)
@@ -56,13 +62,9 @@ var ContestPage = (function () {
         });
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (contest)
-            var contest = eventData[0];
-            _this.refreshContest(contest);
+            _this.refreshContest(eventData[0]);
         });
     }
-    ContestPage.prototype.onDateChanged = function (event) {
-        console.log('onDateChanged(): ', event.date, ' - formatted: ', event.formatted, ' - epoc timestamp: ', event.epoc);
-    };
     ContestPage.prototype.onPageWillLeave = function () {
         this.animateLastResults = false;
         this.lastQuizResults = null;
@@ -82,7 +84,8 @@ var ContestPage = (function () {
                 'team': '' + team,
                 'sourceClick': source
             });
-            _this.client.events.publish('topTeamer:contestUpdated', contest);
+            //Should also cause refresh internally to our contest chart as well as notifying the tabs outside
+            _this.client.events.publish('topTeamer:contestUpdated', data.contest);
             //Should get xp if fresh join
             if (data.xpProgress && data.xpProgress.addition > 0) {
                 _this.client.addXp(data.xpProgress).then(function () {

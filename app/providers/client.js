@@ -19,6 +19,25 @@ var Client = (function () {
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
         }
+        this.clientInfo = {};
+        if (!window.cordova) {
+            this.clientInfo.mobile = false;
+            if (window.self !== window.top) {
+                this.clientInfo.platform = 'facebook';
+            }
+            else {
+                this.clientInfo.platform = 'web';
+            }
+        }
+        else {
+            this.clientInfo.mobile = true;
+            if (this.platform.is('android')) {
+                this.clientInfo.platform = 'android';
+            }
+            else if (this.platform.is('ios')) {
+                this.clientInfo.platform = 'ios';
+            }
+        }
         this.serverGateway = new ServerGateway(http);
     }
     Client.getInstance = function () {
@@ -32,9 +51,18 @@ var Client = (function () {
         return new Promise(function (resolve, reject) {
             _this._ionicApp = ionicApp;
             _this._platform = platform;
-            _this._menuController = menuController;
+            _this.menuController = menuController;
             _this._events = events;
-            _this.serverGateway.getSettings().then(function (data) {
+            _this.serverGateway.events = events;
+            var language = localStorage.getItem('language');
+            _this.getSettings(language).then(function (data) {
+                _this._settings = data.settings;
+                if (!language) {
+                    //Language was computed on the server using geoInfo or the fallback to the default language
+                    language = settings.language;
+                    localStorage.setItem('language', language);
+                }
+                _this.initUser(language, data.geoInfo);
                 _this.initXpCanvas();
                 _this.setDirection();
                 _this._loaded = true;
@@ -42,6 +70,31 @@ var Client = (function () {
                 resolve();
             }, function (err) { return reject(err); });
         });
+    };
+    Client.prototype.getSettings = function (localStorageLanguage) {
+        var postData = {};
+        postData.clientInfo = this.clientInfo;
+        if (localStorageLanguage) {
+            //This will indicate to the server NOT to retrieve geo info - since language is already determined
+            postData.language = localStorageLanguage;
+        }
+        else {
+            //Server will try to retrieve geo info based on client ip - if fails - will revert to this default language
+            postData.defaultLanguage = this.getDefaultLanguage();
+        }
+        return this.serverPost('info/settings', postData);
+    };
+    Client.prototype.initUser = function (language, geoInfo) {
+        this._user = {
+            'settings': {
+                'language': language,
+                'timezoneOffset': (new Date).getTimezoneOffset()
+            },
+            'clientInfo': this.clientInfo
+        };
+        if (geoInfo) {
+            this.user.geoInfo = geoInfo;
+        }
     };
     Client.prototype.initXpCanvas = function () {
         //Player info rank canvas
@@ -140,8 +193,8 @@ var Client = (function () {
     Client.prototype.setDirection = function () {
         var dir = document.createAttribute('dir');
         dir.value = this.currentLanguage.direction;
-        this._nav = this._ionicApp.getComponent('nav');
-        this._nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
+        this._nav = this.ionicApp.getComponent('nav');
+        this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
         var playerInfo = document.getElementById('playerInfo');
         if (playerInfo) {
             playerInfo.className = 'player-info-' + this.currentLanguage.direction;
@@ -149,16 +202,97 @@ var Client = (function () {
         this.canvas.className = 'player-info-canvas-' + this.currentLanguage.direction;
     };
     Client.prototype.facebookServerConnect = function (facebookAuthResponse) {
-        return this.serverGateway.facebookConnect(facebookAuthResponse);
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            if (!_this.user.thirdParty) {
+                _this.user.thirdParty = {};
+            }
+            _this.user.thirdParty.type = 'facebook';
+            _this.user.thirdParty.id = facebookAuthResponse.userID;
+            _this.user.thirdParty.accessToken = facebookAuthResponse.accessToken;
+            _this.serverPost('user/facebookConnect', { 'user': _this.user }).then(function (data) {
+                if (_this.user.settings.language !== data.session.settings.language) {
+                    _this.user.settings.language = session.settings.language;
+                    localStorage.setItem('language', _this.user.settings.language);
+                }
+                _this.user.settings = data.session.settings;
+                _this._session = data.session;
+                _this.serverGateway.token = data.session.token;
+                FlurryAgent.setUserId(data.session.userId);
+                if (data.session.justRegistered) {
+                    FlurryAgent.logEvent('server/register');
+                }
+                else {
+                    FlurryAgent.logEvent('server/login');
+                }
+                if (_this.clientInfo.platform === 'android') {
+                    var push = PushNotification.init({
+                        'android': _this.settings.google.gcm,
+                        'ios': { 'alert': 'true', 'badge': 'true', 'sound': 'true' },
+                        'windows': {}
+                    });
+                    push.on('registration', function (registrationData) {
+                        if (!registrationData || !registrationData.registrationId) {
+                            return;
+                        }
+                        localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
+                        //Update the server with the registration id - if server has no registration or it has a different reg id
+                        //Just submit and forget
+                        if (!data.session.gcmRegistrationId || data.session.gcmRegistrationId !== registrationData.registrationId) {
+                            this.post('user/setGcmRegistration', { 'registrationId': registrationData.registrationId });
+                        }
+                    });
+                    push.on('notification', function (notificationData) {
+                        if (notificationData.additionalData && notificationData.additionalData.contestId) {
+                        }
+                    });
+                    push.on('error', function (error) {
+                        FlurryAgent.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+                    });
+                    var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
+                    if (storedGcmRegistration && !session.gcmRegistrationId) {
+                        _this.post('user/setGcmRegistration', { 'registrationId': storedGcmRegistration });
+                    }
+                }
+                resolve();
+            });
+        });
     };
+    ;
     Client.prototype.serverGet = function (path, timeout) {
         return this.serverGateway.get(path, timeout);
     };
     Client.prototype.serverPost = function (path, postData, timeout, blockUserInterface) {
-        return this.serverGateway.post(path, postData, timeout, blockUserInterface);
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.serverGateway.post(path, postData, timeout, blockUserInterface).then(function (data) {
+                if (_this.nav && _this.nav.length() > 0) {
+                    //GUI is initiated - process the events right away
+                    _this.processInternalEvents();
+                }
+                resolve(data);
+            });
+        });
+    };
+    Client.prototype.processInternalEvents = function () {
+        while (this.serverGateway.eventQueue.length > 0) {
+            var internalEvent = this.serverGateway.eventQueue.shift();
+            this.events.publish(internalEvent.eventName, internalEvent.eventData);
+        }
     };
     Client.prototype.setPageTitle = function (key, params) {
         this.ionicApp.setTitle(this.translate(key, params));
+    };
+    Client.prototype.getDefaultLanguage = function () {
+        //Always return a language - get the browser's language
+        var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        if (!language) {
+            language = 'en';
+        }
+        if (language.length > 2) {
+            language = language.toLowerCase().substring(0, 2);
+        }
+        return language;
     };
     Object.defineProperty(Client.prototype, "loaded", {
         get: function () {
@@ -195,9 +329,16 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Client.prototype, "user", {
+        get: function () {
+            return this._user;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Client.prototype, "isMenuOpen", {
         get: function () {
-            return (this._menuController._menus.length > 0 && this._menuController._menus[0].isOpen);
+            return (this.menuController._menus.length > 0 && this.menuController._menus[0].isOpen);
         },
         enumerable: true,
         configurable: true
@@ -211,28 +352,21 @@ var Client = (function () {
     });
     Object.defineProperty(Client.prototype, "settings", {
         get: function () {
-            return this.serverGateway.settings;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "user", {
-        get: function () {
-            return this.serverGateway.user;
+            return this._settings;
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Client.prototype, "session", {
         get: function () {
-            return this.serverGateway.session;
+            return this._session;
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Client.prototype, "currentLanguage", {
         get: function () {
-            return this.serverGateway.settings.languages[this.serverGateway.user.settings.language];
+            return this.settings.languages[this.user.settings.language];
         },
         enumerable: true,
         configurable: true
@@ -240,7 +374,7 @@ var Client = (function () {
     Object.defineProperty(Client.prototype, "languageKeys", {
         get: function () {
             if (!this._languageKeys) {
-                this._languageKeys = Object.keys(this.serverGateway.settings.languages);
+                this._languageKeys = Object.keys(this.settings.languages);
             }
             return this._languageKeys;
         },
@@ -255,7 +389,7 @@ var Client = (function () {
         configurable: true
     });
     Client.prototype.translate = function (key, params) {
-        var translatedValue = this.serverGateway.settings.ui[this.serverGateway.user.settings.language][key];
+        var translatedValue = this.settings.ui[this.user.settings.language][key];
         if (params) {
             translatedValue = translatedValue.format(params);
         }
@@ -270,6 +404,10 @@ var Client = (function () {
         var postData = { 'language': language };
         return this.serverPost('user/switchLanguage', postData);
     };
+    Client.prototype.logout = function () {
+        this.serverGateway.token = null;
+        this._session = null;
+    };
     Client = __decorate([
         core_1.Injectable(), 
         __metadata('design:paramtypes', [http_1.Http])
@@ -280,6 +418,14 @@ exports.Client = Client;
 var ServerGateway = (function () {
     function ServerGateway(http) {
         this.http = http;
+        if (!window.cordova) {
+            //this._endPoint = 'http://www.topteamer.com/'
+            this._endPoint = window.location.protocol + '//' + window.location.host + '/';
+        }
+        else {
+            this._endPoint = 'http://www.topteamer.com/';
+        }
+        this._eventQueue = [];
     }
     ServerGateway.prototype.get = function (path, timeout) {
         var _this = this;
@@ -288,8 +434,8 @@ var ServerGateway = (function () {
             if (!timeout) {
                 timeout = 10000;
             }
-            if (_this.session) {
-                headers.append('Authorization', _this.session.token);
+            if (_this._token) {
+                headers.append('Authorization', _this._token);
             }
             _this.http.get(path, { headers: headers })
                 .timeout(timeout)
@@ -310,8 +456,8 @@ var ServerGateway = (function () {
         return new Promise(function (resolve, reject) {
             var headers = new http_1.Headers();
             headers.append('Content-Type', 'application/json');
-            if (_this._session) {
-                headers.append('Authorization', _this._session.token);
+            if (_this._token) {
+                headers.append('Authorization', _this._token);
             }
             if (!timeout) {
                 timeout = 10000;
@@ -319,130 +465,18 @@ var ServerGateway = (function () {
             _this.http.post(_this._endPoint + path, JSON.stringify(postData), { headers: headers })
                 .timeout(timeout)
                 .map(function (res) { return res.json(); })
-                .subscribe(function (res) { return resolve(res); }, function (err) {
+                .subscribe(function (res) {
+                if (res.serverPopup) {
+                    _this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res.serverPopup));
+                }
+                resolve(res);
+            }, function (err) {
                 if (reject) {
                     reject(err);
                 }
                 else {
                     FlurryAgent.myLogError('ServerPost', err);
                 }
-            });
-        });
-    };
-    ;
-    ServerGateway.prototype.getSettings = function () {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var clientInfo = {};
-            if (!window.cordova) {
-                //this._endPoint = 'http://www.topteamer.com/'
-                _this._endPoint = window.location.protocol + '//' + window.location.host + '/';
-                clientInfo.mobile = false;
-                if (window.self !== window.top) {
-                    clientInfo.platform = 'facebook';
-                }
-                else {
-                    clientInfo.platform = 'web';
-                }
-            }
-            else {
-                _this._endPoint = 'http://www.topteamer.com/';
-                clientInfo.mobile = true;
-                if (_this.platform.is('android')) {
-                    clientInfo.platform = 'android';
-                }
-                else if (_this.platform.is('ios')) {
-                    clientInfo.platform = 'ios';
-                }
-            }
-            var postData = {};
-            postData.clientInfo = clientInfo;
-            var language = localStorage.getItem('language');
-            if (language) {
-                //This will indicate to the server NOT to retrieve geo info - since language is already determined
-                postData.language = language;
-            }
-            else {
-                //TODO - get geo info
-                postData.defaultLanguage = _this.getDefaultLanguage();
-            }
-            _this.post('info/settings', postData).then(function (data) {
-                _this._settings = data.settings;
-                if (!language) {
-                    //Language was computed on the server using geoInfo or the fallback to the default language
-                    language = data.language;
-                    localStorage.setItem('language', language);
-                }
-                _this.initUser(language, clientInfo, data.geoInfo);
-                resolve();
-            }, function (err) { return reject(err); });
-        });
-    };
-    ServerGateway.prototype.initUser = function (language, clientInfo, geoInfo) {
-        this._user = {
-            'settings': {
-                'language': language,
-                'timezoneOffset': (new Date).getTimezoneOffset()
-            },
-            'clientInfo': clientInfo
-        };
-        if (geoInfo) {
-            this.user.geoInfo = geoInfo;
-        }
-    };
-    ServerGateway.prototype.facebookConnect = function (facebookAuthResponse) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            if (!_this._user.thirdParty) {
-                _this._user.thirdParty = {};
-            }
-            _this._user.thirdParty.type = 'facebook';
-            _this._user.thirdParty.id = facebookAuthResponse.userID;
-            _this._user.thirdParty.accessToken = facebookAuthResponse.accessToken;
-            _this.post('user/facebookConnect', { 'user': _this._user }).then(function (session) {
-                if (_this._user.settings.language !== session.settings.language) {
-                    _this._user.settings.language = session.settings.language;
-                    localStorage.setItem('language', _this._user.settings.language);
-                }
-                _this._user.settings = session.settings;
-                _this._session = session;
-                FlurryAgent.setUserId(session.userId);
-                if (session.justRegistered) {
-                    FlurryAgent.logEvent('server/register');
-                }
-                else {
-                    FlurryAgent.logEvent('server/login');
-                }
-                if (_this._user.clientInfo.platform === 'android') {
-                    var push = PushNotification.init({
-                        'android': _this._settings.google.gcm,
-                        'ios': { 'alert': 'true', 'badge': 'true', 'sound': 'true' },
-                        'windows': {}
-                    });
-                    push.on('registration', function (data) {
-                        if (!data || !data.registrationId) {
-                            return;
-                        }
-                        localStorage.setItem('gcmRegistrationId', data.registrationId);
-                        //Update the server with the registration id - if server has no registration or it has a different reg id
-                        //Just submit and forget
-                        if (!session.gcmRegistrationId || session.gcmRegistrationId !== data.registrationId) {
-                            this.post('user/setGcmRegistration', { 'registrationId': data.registrationId });
-                        }
-                    });
-                    push.on('notification', function (data) {
-                        if (data.additionalData && data.additionalData.contestId) {
-                        }
-                    });
-                    push.on('error', function (e) {
-                        FlurryAgent.myLogError('PushNotificationError', 'Error during push: ' + e.message);
-                    });
-                    var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
-                    if (storedGcmRegistration && !session.gcmRegistrationId) {
-                        _this.post('user/setGcmRegistration', { 'registrationId': storedGcmRegistration });
-                    }
-                }
-                resolve();
             });
         });
     };
@@ -454,38 +488,42 @@ var ServerGateway = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ServerGateway.prototype, "settings", {
+    Object.defineProperty(ServerGateway.prototype, "eventQueue", {
         get: function () {
-            return this._settings;
+            return this._eventQueue;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ServerGateway.prototype, "user", {
-        get: function () {
-            return this._user;
+    Object.defineProperty(ServerGateway.prototype, "token", {
+        set: function (value) {
+            this._token = value;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ServerGateway.prototype, "session", {
-        get: function () {
-            return this._session;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ServerGateway.prototype.getDefaultLanguage = function () {
-        //Always return a language - get the browser's language
-        var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
-        if (!language) {
-            language = 'en';
-        }
-        if (language.length > 2) {
-            language = language.toLowerCase().substring(0, 2);
-        }
-        return language;
-    };
     return ServerGateway;
 })();
 exports.ServerGateway = ServerGateway;
+var InternalEvent = (function () {
+    function InternalEvent(eventName, eventData) {
+        this._eventName = eventName;
+        this._eventData = eventData;
+    }
+    Object.defineProperty(InternalEvent.prototype, "eventName", {
+        get: function () {
+            return this._eventName;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(InternalEvent.prototype, "eventData", {
+        get: function () {
+            return this._eventData;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return InternalEvent;
+})();
+exports.InternalEvent = InternalEvent;

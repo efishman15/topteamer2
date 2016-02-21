@@ -37,6 +37,7 @@
     "app/pages/quiz/quiz.ts",
     "app/pages/running-contests/running-contests.ts",
     "app/pages/search-questions/search-questions.ts",
+    "app/pages/server-popup/server-popup.ts",
     "app/pages/set-contest/set-contest.ts",
     "app/pages/settings/settings.ts",
     "app/pages/share/share.ts",

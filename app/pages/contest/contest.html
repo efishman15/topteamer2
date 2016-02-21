@@ -2,83 +2,86 @@
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
-  <ion-title>{{contestChart.contest.name}}</ion-title>
-  <player-info>
-  </player-info>
+  <ion-title *ngIf="contestChart && contestChart.contest">
+      {{contestChart.contest.name}}
+  </ion-title>
 </ion-navbar>
 
-<ion-content>
+<ion-content *ngIf="contestChart && contestChart.contest">
 
-  <ion-item class="contest-leader-background">
-    <ion-avatar item-left>
-      <img src="{{contestChart.contest.creator.avatar}}">
-    </ion-avatar>
-    <h2 class="contest-leader-row1">{{ client.translate('CREATED_BY',{name : contestChart.contest.creator.name}) }}</h2>
-    <p class="contest-leader-row2">{{contestChart.contest.time.start.text}}</p>
-  </ion-item>
+    <ion-item class="contest-leader-background">
+      <ion-avatar item-left>
+        <img src="{{contestChart.contest.creator.avatar}}">
+      </ion-avatar>
+      <h2 class="contest-leader-row1">{{ client.translate('CREATED_BY',{name : contestChart.contest.creator.name})
+        }}</h2>
+      <p class="contest-leader-row2">{{contestChart.contest.time.start.text}}</p>
+    </ion-item>
 
-  <div padding-top class="contest-chart-background">
+    <div padding-top class="contest-chart-background">
 
-    <contest-chart id="contest-{{contestChart.contest._id}}"
-                   width="{{client.settings.charts.size.width}}"
-                   height="{{client.settings.charts.size.height}}"
-                   [(contestChart)]="contestChart"
-                   (contestSelected)="onContestSelected($event)"
-                   (teamSelected)="onTeamSelected($event)">
-    </contest-chart>
+      <contest-chart id="contest-{{contestChart.contest._id}}"
+                     width="{{client.settings.charts.size.width}}"
+                     height="{{client.settings.charts.size.height}}"
+                     [(contestChart)]="contestChart"
+                     (contestSelected)="onContestSelected($event)"
+                     (teamSelected)="onTeamSelected($event)">
+      </contest-chart>
 
-    <div padding-top text-center>
-      <div *ngIf="contestChart.contest.state==='play'">
-        <button danger class="button button-small no-wrap-text"
-                (click)="playContest('button')">{{client.translate('PLAY_CONTEST', {'team' : contestChart.contest.teams[contestChart.contest.myTeam].name}) }}
-        </button>
+      <div padding-top text-center>
+        <div *ngIf="contestChart.contest.state==='play'">
+          <button danger class="button button-small no-wrap-text"
+                  (click)="playContest('button')">{{client.translate('PLAY_CONTEST', {'team' :
+            contestChart.contest.teams[contestChart.contest.myTeam].name}) }}
+          </button>
+        </div>
+        <div *ngIf="contestChart.contest.state==='join'">
+          <button danger [ngStyle]="{'width': (client.settings.charts.size.width / 2) + 'px'}"
+                  class="button button-small join-contest no-wrap-text"
+                  (click)="joinContest(0,'button')">{{ client.translate('JOIN_TEAM',
+            {team:contestChart.contest.teams[0].name}) }}
+          </button>
+          <button danger [ngStyle]="{'width': (client.settings.charts.size.width / 2) + 'px'}"
+                  class="button button-small join-contest no-wrap-text"
+                  (click)="joinContest(1,'button')">{{ client.translate('JOIN_TEAM',
+            {team:contestChart.contest.teams[1].name}) }}
+          </button>
+        </div>
       </div>
-      <div *ngIf="contestChart.contest.state==='join'">
-        <button danger [ngStyle]="{'width': (client.settings.charts.size.width / 2) + 'px'}"
-                class="button button-small join-contest no-wrap-text"
-                (click)="joinContest(0,'button')">{{ client.translate('JOIN_TEAM',
-          {team:contestChart.contest.teams[0].name}) }}
-        </button>
-        <button danger [ngStyle]="{'width': (client.settings.charts.size.width / 2) + 'px'}"
-                class="button button-small join-contest no-wrap-text"
-                (click)="joinContest(1,'button')">{{ client.translate('JOIN_TEAM',
-          {team:contestChart.contest.teams[1].name}) }}
-        </button>
+
+      <div padding>
+        <div class="pointer contest-footer-text float-{{client.currentLanguage.align}}"
+             (click)="showParticipants('leader')">
+          {{client.translate('CONTEST_LEADER')}}: {{contestChart.contest.leader.name}}
+        </div>
+        <div class="pointer contest-footer-text float-{{client.currentLanguage.oppositeAlign}}"
+             (click)="showParticipants('topLeaders')">{{client.translate('CONTEST_LEADERS_MORE')}}
+        </div>
       </div>
+
     </div>
 
-    <div padding>
-      <div class="pointer contest-footer-text float-{{client.currentLanguage.align}}"
-           (click)="showParticipants('leader')">
-        {{client.translate('CONTEST_LEADER')}}: {{contestChart.contest.leader.name}}
-      </div>
-      <div class="pointer contest-footer-text float-{{client.currentLanguage.oppositeAlign}}"
-           (click)="showParticipants('topLeaders')">{{client.translate('CONTEST_LEADERS_MORE')}}
-      </div>
+    <div *ngIf="animateLastResults"
+         padding-left padding-right text-center class="long-animated {{lastQuizResults.data.animation}}">
+      <h2>{{client.translate(lastQuizResults.data.clientKey + '_TITLE')}}</h2>
+      <h3>{{client.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
     </div>
+    <button fab fab-bottom fab-left (click)="share('fab')">
+      <ion-icon name="share"></ion-icon>
+    </button>
+    <ion-buttons>
+      <div text-center padding-top>
+        <button secondary class="bar-button" (click)="share('button')">{{client.translate('SHARE')}}</button>
+        <button secondary class="bar-button" (click)="like()">{{client.translate('LIKE')}}</button>
+        <button *ngIf="contestChart.contest.state==='play'" secondary class="bar-button"
+                (click)="switchTeams('button')">
+          {{client.translate('SWITCH_TEAMS')}}
+        </button>
+        <button *ngIf="contestChart.contest.owner" secondary class="bar-button" (click)="editContest()">
+          {{client.translate('EDIT_CONTEST')}}
+        </button>
 
-  </div>
-
-  <div *ngIf="animateLastResults"
-       padding-left padding-right text-center class="long-animated {{lastQuizResults.data.animation}}">
-    <h2>{{client.translate(lastQuizResults.data.clientKey + '_TITLE')}}</h2>
-    <h3>{{client.translate(lastQuizResults.data.clientKey + '_MESSAGE', lastQuizResults.data.clientValues) }}</h3>
-  </div>
-  <button fab fab-bottom fab-left (click)="share('fab')">
-    <ion-icon name="share"></ion-icon>
-  </button>
-  <ion-buttons>
-    <div text-center padding-top>
-      <button secondary class="bar-button" (click)="share('button')">{{client.translate('SHARE')}}</button>
-      <button secondary class="bar-button" (click)="like()">{{client.translate('LIKE')}}</button>
-      <button *ngIf="contestChart.contest.state==='play'" secondary class="bar-button" (click)="switchTeams('button')">
-        {{client.translate('SWITCH_TEAMS')}}
-      </button>
-      <button *ngIf="contestChart.contest.owner" secondary class="bar-button" (click)="editContest()">
-        {{client.translate('EDIT_CONTEST')}}
-      </button>
-
-    </div>
-  </ion-buttons>
+      </div>
+    </ion-buttons>
 
 </ion-content>

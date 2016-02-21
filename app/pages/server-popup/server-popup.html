@@ -1,0 +1,22 @@
+<ion-toolbar danger>
+
+  <ion-title>
+    <div [innerHtml]="serverPopup.title"></div>
+  </ion-title>
+
+</ion-toolbar>
+
+<ion-content>
+
+  <div text-center>
+    <img *ngIf="serverPopup.image" padding src="{{serverPopup.image}}">
+    <div padding [innerHtml]="serverPopup.message"></div>
+    <ion-buttons padding>
+      <button *ngFor="#serverPopupButton of serverPopup.buttons" (click)="buttonAction(serverPopupButton)" [innerHtml]="serverPopupButton.text">
+      </button>
+    </ion-buttons>
+
+  </div>
+
+</ion-content>
+

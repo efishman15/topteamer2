@@ -13,12 +13,21 @@ var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var core_1 = require('angular2/core');
 var client_1 = require('../../providers/client');
+var contestsService = require('../../providers/contests');
 var ContestParticipantsPage = (function () {
     function ContestParticipantsPage(params) {
+        var _this = this;
         // set the root pages for each tab
-        this.contest = params.data.contest;
         this.source = params.data.source;
         this.client = client_1.Client.getInstance();
+        if (params.data.contest) {
+            this.contest = params.data.contest;
+        }
+        else {
+            contestsService.getContest(params.data.contestId).then(function (contest) {
+                _this.contest = contest;
+            });
+        }
     }
     ContestParticipantsPage.prototype.onPageWillEnter = function () {
         if (this.leadersComponent) {
@@ -29,6 +38,14 @@ var ContestParticipantsPage = (function () {
         this.showContestParticipants();
     };
     ContestParticipantsPage.prototype.showContestParticipants = function () {
+        var _this = this;
+        if (!this.contest) {
+            //In case contest has not been loaded yet
+            setTimeout(function () {
+                _this.showContestParticipants();
+            }, 500);
+            return;
+        }
         FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/all');
         this.leadersComponent.showContestParticipants(this.contest._id);
     };
