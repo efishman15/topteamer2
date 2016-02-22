@@ -36,8 +36,8 @@ var QuizPage = (function () {
     QuizPage.prototype.ngOnInit = function () {
         this.init();
     };
-    QuizPage.prototype.onPageWillEnter = function () {
-        //onPageWillEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
+    QuizPage.prototype.onPageDidEnter = function () {
+        //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
         if (this.modalJustClosed) {
             this.modalJustClosed = false;
             //Quiz already started - just a modal dialog was dismissed
@@ -71,20 +71,21 @@ var QuizPage = (function () {
             }
             _this.drawQuizProgress();
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
-                setTimeout(function () {
-                    alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason)).then(function () {
-                        _this.modalJustClosed = true;
-                    });
-                }, 1000);
+                alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason)).then(function () {
+                    _this.modalJustClosed = true;
+                });
             }
+        }, function (err) {
+            _this.modalJustClosed = true;
+            //TODO: IonicBug - wait for the prev alert to be fully dismissed
+            setTimeout(function () {
+                _this.client.nav.pop();
+            }, 1000);
         });
     };
     QuizPage.prototype.submitAnswer = function (answerId) {
         var _this = this;
         this.quizData.currentQuestion.answered = true;
-        //TODO: respond to server errors by going back and restarting quiz:
-        //'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ': {'next': startQuiz},
-        //'SERVER_ERROR_GENERAL':
         quizService.answer(answerId, this.questionHistory[this.quizData.currentQuestionIndex].hintUsed, this.questionHistory[this.quizData.currentQuestionIndex].answerUsed).then(function (data) {
             var correctAnswerId;
             _this.questionHistory[_this.quizData.currentQuestionIndex].answer = data.question.correct;
@@ -118,6 +119,16 @@ var QuizPage = (function () {
                 }, 3000);
             }
             _this.correctButtonName = 'buttonAnswer' + correctAnswerId;
+        }, function (err) {
+            _this.modalJustClosed = true;
+            switch (err.type) {
+                case 'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ':
+                    _this.startQuiz();
+                    break;
+                case 'SERVER_ERROR_GENERAL':
+                    _this.client.nav.pop();
+                    break;
+            }
         });
     };
     QuizPage.prototype.nextQuestion = function () {
@@ -160,7 +171,6 @@ var QuizPage = (function () {
             this.quizProceed();
         }
     };
-    ;
     QuizPage.prototype.quizProceed = function () {
         var _this = this;
         if (this.quizData.finished) {
@@ -173,7 +183,9 @@ var QuizPage = (function () {
             });
             //Give enough time to draw the circle progress of the last question
             setTimeout(function () {
-                _this.client.events.publish('topTeamer:quizFinished', _this.quizData.results);
+                _this.client.nav.pop().then(function () {
+                    _this.client.events.publish('topTeamer:quizFinished', _this.quizData.results);
+                });
             }, 1000);
         }
         else {

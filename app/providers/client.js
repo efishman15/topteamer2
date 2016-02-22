@@ -11,6 +11,8 @@ var core_1 = require('angular2/core');
 var http_1 = require('angular2/http');
 require('rxjs/add/operator/map');
 require('rxjs/add/operator/timeout');
+var facebookService = require('./facebook');
+var alertService = require('./alert');
 var Client = (function () {
     function Client(http) {
         this.circle = Math.PI * 2;
@@ -271,6 +273,49 @@ var Client = (function () {
                     _this.processInternalEvents();
                 }
                 resolve(data);
+            }, function (err) {
+                if (err && err.httpStatus === 401) {
+                    facebookService.getLoginStatus().then(function (result) {
+                        if (result.connected) {
+                            _this.facebookServerConnect(result.response.authResponse).then(function () {
+                                return _this.serverPost(path, postData, timeout, blockUserInterface).then(function (data) {
+                                    resolve(data);
+                                }, function (err) {
+                                    reject(err);
+                                });
+                            });
+                        }
+                        else {
+                            facebookService.login(false).then(function (response) {
+                                _this.facebookServerConnect(result.response.authResponse).then(function () {
+                                    return _this.serverPost(path, postData, timeout, blockUserInterface).then(function (data) {
+                                        resolve(data);
+                                    }, function (err) {
+                                        reject(err);
+                                    });
+                                });
+                            });
+                        }
+                    });
+                }
+                else {
+                    //Display an alert or confirm message and continue the reject so further "catch" blocks
+                    //will be invoked if any
+                    if (!err.confirm) {
+                        alertService.alert(err).then(function () {
+                            reject(err);
+                        });
+                    }
+                    else {
+                        var title = _this.translate(err.type + '_TITLE');
+                        var message = _this.translate(err.type + '_MESSAGE');
+                        alertService.confirm(title, message, err.params).then(function () {
+                            reject(err);
+                        }, function () {
+                            reject(err);
+                        });
+                    }
+                }
             });
         });
     };
@@ -471,12 +516,7 @@ var ServerGateway = (function () {
                 }
                 resolve(res);
             }, function (err) {
-                if (reject) {
-                    reject(err);
-                }
-                else {
-                    FlurryAgent.myLogError('ServerPost', err);
-                }
+                reject(JSON.parse(err._body));
             });
         });
     };

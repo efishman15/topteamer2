@@ -3,6 +3,8 @@ import {Http, Response, Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 import {IonicApp,Platform, NavController, Menu, MenuController, Alert, Events} from 'ionic/ionic';
+import * as facebookService from './facebook';
+import * as alertService from './alert';
 
 @Injectable()
 export class Client {
@@ -101,7 +103,6 @@ export class Client {
         Client.instance = this;
 
         resolve();
-
       }, (err) => reject(err));
     });
   }
@@ -355,12 +356,55 @@ export class Client {
 
   serverPost(path, postData ?, timeout ?, blockUserInterface ?) {
     return new Promise((resolve, reject) => {
-      this.serverGateway.post(path, postData, timeout, blockUserInterface).then ((data) => {
+      this.serverGateway.post(path, postData, timeout, blockUserInterface).then((data) => {
         if (this.nav && this.nav.length() > 0) {
           //GUI is initiated - process the events right away
           this.processInternalEvents();
         }
         resolve(data);
+      }, (err) => {
+        if (err && err.httpStatus === 401) {
+          facebookService.getLoginStatus().then((result) => {
+            if (result.connected) {
+              this.facebookServerConnect(result.response.authResponse).then(() => {
+                return this.serverPost(path, postData, timeout, blockUserInterface).then((data) => {
+                  resolve(data);
+                }, (err) => {
+                  reject(err);
+                })
+              });
+            }
+            else {
+              facebookService.login(false).then((response) => {
+                this.facebookServerConnect(result.response.authResponse).then(() => {
+                  return this.serverPost(path, postData, timeout, blockUserInterface).then((data) => {
+                    resolve(data);
+                  }, (err) => {
+                    reject(err);
+                  })
+                })
+              })
+            }
+          });
+        }
+        else {
+          //Display an alert or confirm message and continue the reject so further "catch" blocks
+          //will be invoked if any
+          if (!err.confirm) {
+            alertService.alert(err).then(() => {
+              reject(err);
+            });
+          }
+          else {
+            var title = this.translate(err.type + '_TITLE');
+            var message = this.translate(err.type + '_MESSAGE');
+            alertService.confirm(title, message, err.params).then(() => {
+              reject(err);
+            }, () => {
+              reject(err);
+            });
+          }
+        }
       });
     });
   }
@@ -477,7 +521,7 @@ export class ServerGateway {
   http:Http;
   _endPoint:string;
   _token:string;
-  _eventQueue: Array<InternalEvent>;
+  _eventQueue:Array<InternalEvent>;
 
   constructor(http:Http) {
     this.http = http;
@@ -547,12 +591,7 @@ export class ServerGateway {
             resolve(res);
           },
           (err:Object) => {
-            if (reject) {
-              reject(err);
-            }
-            else {
-              FlurryAgent.myLogError('ServerPost', err);
-            }
+            reject(JSON.parse(err._body));
           }
         );
     });
@@ -566,26 +605,26 @@ export class ServerGateway {
     return this._eventQueue;
   }
 
-  set token(value: string) {
+  set token(value:string) {
     this._token = value;
   }
 
 }
 
 export class InternalEvent {
-  _eventName: String;
-  _eventData: Object;
+  _eventName:String;
+  _eventData:Object;
 
-  constructor(eventName: String, eventData: Object) {
+  constructor(eventName:String, eventData:Object) {
     this._eventName = eventName;
     this._eventData = eventData;
   }
 
-  get eventName() : String {
+  get eventName():String {
     return this._eventName;
   }
 
-  get eventData() : Object {
+  get eventData():Object {
     return this._eventData;
   }
 

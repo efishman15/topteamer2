@@ -9,39 +9,39 @@ export let alert = (error) => new Promise((resolve, reject) => {
   var client = Client.getInstance();
 
   var alert:Alert;
-  if (error) {
-    if (error.type) {
-      if (!error.additionalInfo) {
-        error.additionalInfo = {};
-      }
+  var title;
+  var message;
 
-      alert = Alert.create(
-        {
-          'cssClass': client.currentLanguage.direction,
-          'title': client.translate(error.type + '_TITLE'),
-          'message': client.translate(error.type + '_MESSAGE', error.additionalInfo),
-        });
-    }
-    else {
-      alert = Alert.create({
-        'cssClass': client.currentLanguage.direction,
-        'message': error
-      });
+  if (error.type) {
+    if (!error.additionalInfo) {
+      error.additionalInfo = {};
     }
 
-    alert.addButton(
-      {
-        'role': 'cancel',
-        'text': client.translate('OK'),
-        'handler': () => {
-          if (resolve) {
-            resolve();
-          }
-        }
-      });
+    title = client.translate(error.type + '_TITLE');
+    message = client.translate(error.type + '_MESSAGE', error.additionalInfo);
 
-    client.nav.present(alert);
   }
+  else {
+    message = error;
+  }
+
+  alert = Alert.create({
+    cssClass: client.currentLanguage.direction,
+    message: message,
+    buttons: [
+      {
+        text: client.translate('OK'),
+        role: 'cancel',
+        handler: resolve
+      }
+    ]
+  });
+
+  if (title) {
+    alert.setTitle(title);
+  }
+
+  client.nav.present(alert);
 
 });
 

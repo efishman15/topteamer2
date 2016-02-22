@@ -44,21 +44,18 @@ var ContestPage = (function () {
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
-            //Exit from the quiz
-            _this.client.nav.pop().then(function () {
-                if (_this.lastQuizResults.data.facebookPost) {
-                    _this.animateLastResults = false;
-                    var modal = ionic_1.Modal.create(facebook_post_1.FacebookPostPage, { 'quizResults': _this.lastQuizResults });
-                    _this.client.nav.present(modal);
-                }
-                else {
-                    _this.animateLastResults = true;
-                }
-                var soundFile = _this.lastQuizResults.data.sound;
-                setTimeout(function () {
-                    soundService.play(soundFile);
-                }, 500);
-            });
+            if (_this.lastQuizResults.data.facebookPost) {
+                _this.animateLastResults = false;
+                var modal = ionic_1.Modal.create(facebook_post_1.FacebookPostPage, { 'quizResults': _this.lastQuizResults });
+                _this.client.nav.present(modal);
+            }
+            else {
+                _this.animateLastResults = true;
+            }
+            var soundFile = _this.lastQuizResults.data.sound;
+            setTimeout(function () {
+                soundService.play(soundFile);
+            }, 500);
         });
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (contest)

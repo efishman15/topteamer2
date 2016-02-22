@@ -1,9 +1,9 @@
 import {Page, NavParams,Modal} from 'ionic-framework/ionic';
-import {AnimationListener} from '../../directives/animation-listener/animation-listener'
-import {TransitionListener} from '../../directives/transition-listener/transition-listener'
-import {QuestionStatsPage} from '../../pages/question-stats/question-stats'
-import {QuestionEditorPage} from '../../pages/question-editor/question-editor'
-import {NewRankPage} from '../../pages/new-rank/new-rank'
+import {AnimationListener} from '../../directives/animation-listener/animation-listener';
+import {TransitionListener} from '../../directives/transition-listener/transition-listener';
+import {QuestionStatsPage} from '../../pages/question-stats/question-stats';
+import {QuestionEditorPage} from '../../pages/question-editor/question-editor';
+import {NewRankPage} from '../../pages/new-rank/new-rank';
 import {Client} from '../../providers/client';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
@@ -50,9 +50,9 @@ export class QuizPage {
     this.init();
   }
 
-  onPageWillEnter() {
+  onPageDidEnter() {
 
-    //onPageWillEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
+    //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
 
     if (this.modalJustClosed) {
       this.modalJustClosed = false;
@@ -95,13 +95,17 @@ export class QuizPage {
       this.drawQuizProgress();
 
       if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
-        setTimeout(() => {
-          alertService.alert(this.client.translate(this.quizData.reviewMode.reason)).then(() => {
+        alertService.alert(this.client.translate(this.quizData.reviewMode.reason)).then(() => {
             this.modalJustClosed = true;
           });
-        }, 1000);
       }
 
+    }, (err) => {
+      this.modalJustClosed = true;
+      //TODO: IonicBug - wait for the prev alert to be fully dismissed
+      setTimeout(() => {
+        this.client.nav.pop();
+      },1000);
     });
   }
 
@@ -109,10 +113,7 @@ export class QuizPage {
 
     this.quizData.currentQuestion.answered = true;
 
-    //TODO: respond to server errors by going back and restarting quiz:
-    //'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ': {'next': startQuiz},
-    //'SERVER_ERROR_GENERAL':
-    quizService.answer(answerId,this.questionHistory[this.quizData.currentQuestionIndex].hintUsed,this.questionHistory[this.quizData.currentQuestionIndex].answerUsed).then((data) => {
+    quizService.answer(answerId, this.questionHistory[this.quizData.currentQuestionIndex].hintUsed, this.questionHistory[this.quizData.currentQuestionIndex].answerUsed).then((data) => {
 
       var correctAnswerId;
 
@@ -156,6 +157,16 @@ export class QuizPage {
 
       this.correctButtonName = 'buttonAnswer' + correctAnswerId;
 
+    }, (err) => {
+        this.modalJustClosed = true;
+        switch (err.type) {
+          case 'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ':
+            this.startQuiz();
+            break;
+          case 'SERVER_ERROR_GENERAL':
+            this.client.nav.pop();
+            break;
+        }
     });
   }
 
@@ -182,7 +193,7 @@ export class QuizPage {
   buttonAnimationEnded(event:Event) {
 
     if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
-      this.client.addXp(this.quizData.xpProgress).then( () => {
+      this.client.addXp(this.quizData.xpProgress).then(() => {
         if (this.correctButtonName === event.srcElement.name) {
           if (!this.quizData.xpProgress.rankChanged) {
             this.quizProceed();
@@ -204,9 +215,9 @@ export class QuizPage {
       });
     }
     else if (this.correctButtonName === event.srcElement.name) {
-        this.quizProceed();
+      this.quizProceed();
     }
-  };
+  }
 
   quizProceed() {
     if (this.quizData.finished) {
@@ -223,7 +234,9 @@ export class QuizPage {
 
       //Give enough time to draw the circle progress of the last question
       setTimeout(() => {
-        this.client.events.publish('topTeamer:quizFinished', this.quizData.results)
+        this.client.nav.pop().then( () => {
+          this.client.events.publish('topTeamer:quizFinished', this.quizData.results)
+        });
       }, 1000);
 
     }
@@ -527,7 +540,7 @@ export class QuizPage {
         return;
       }
 
-      quizService.setQuestionByAdmin(result.question).then( () => {
+      quizService.setQuestionByAdmin(result.question).then(() => {
         this.quizData.currentQuestion.text = result.question.text;
         for (var i = 0; i < result.question.answers.length; i++) {
           this.quizData.currentQuestion.answers[i].text = result.question.answers[this.quizData.currentQuestion.answers[i].originalIndex];

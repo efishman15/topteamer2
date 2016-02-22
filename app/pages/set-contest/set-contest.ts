@@ -5,6 +5,7 @@ import {Client} from '../../providers/client';
 import {ContestPage} from '../../pages/contest/contest';
 import {QuestionEditorPage} from '../../pages/question-editor/question-editor';
 import {SearchQuestionsPage} from '../../pages/search-questions/search-questions';
+import {MobileSharePage} from '../../pages/mobile-share/mobile-share';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
@@ -427,11 +428,17 @@ export class SetContestPage {
           this.client.nav.pop(options).then(() => {
             if (!this.client.user.clientInfo.mobile) {
               //For web - no animation - the share screen will be on top with its animation
-              options = undefined;
+              this.client.nav.push(ContestPage, {'contest': contest}).then(() => {
+                shareService.share(contest);
+              });
             }
-            this.client.nav.push(ContestPage, {'contest': contest}, options).then(() => {
-              shareService.share(contest);
-            });
+            else {
+              //Mobile - open the share mobile modal - with one button - to share or skip
+              this.client.nav.push(ContestPage, {'contest': contest}).then(() => {
+                var modal = Modal.create(MobileSharePage, {'contest' : contest});
+                this.client.nav.present(modal);
+              });
+            }
           });
         }
         else {

@@ -51,24 +51,19 @@ export class ContestPage {
 
       this.lastQuizResults = eventData[0];
 
-      //Exit from the quiz
-      this.client.nav.pop().then(() => {
+      if (this.lastQuizResults.data.facebookPost) {
+        this.animateLastResults = false;
+        var modal = Modal.create(FacebookPostPage, {'quizResults': this.lastQuizResults});
+        this.client.nav.present(modal);
+      }
+      else {
+        this.animateLastResults = true;
+      }
 
-        if (this.lastQuizResults.data.facebookPost) {
-          this.animateLastResults = false;
-          var modal = Modal.create(FacebookPostPage, {'quizResults': this.lastQuizResults});
-          this.client.nav.present(modal);
-        }
-        else {
-          this.animateLastResults = true;
-        }
-
-        var soundFile = this.lastQuizResults.data.sound;
-        setTimeout(() => {
-          soundService.play(soundFile);
-        }, 500);
-
-      });
+      var soundFile = this.lastQuizResults.data.sound;
+      setTimeout(() => {
+        soundService.play(soundFile);
+      }, 500);
 
     });
 

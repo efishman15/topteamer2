@@ -143,7 +143,7 @@ module.exports.start = function (req, res, next) {
 
       //Number of questions (either entered by user or X random questions from the system
       if (data.contest.content.category.id !== 'user') {
-        quiz.clientData.totalQuestions = 2;//generalUtils.settings.client.quiz.questions.score.length;
+        quiz.clientData.totalQuestions = generalUtils.settings.client.quiz.questions.score.length;
         quiz.serverData.previousQuestions = [];
       }
       else {
@@ -240,6 +240,7 @@ module.exports.start = function (req, res, next) {
 // data: id (answerId = 0 based), hintUsed (optional), answerUsed (optional)
 //--------------------------------------------------------------------------
 module.exports.answer = function (req, res, next) {
+
   var token = req.headers.authorization;
   var data = req.body;
 

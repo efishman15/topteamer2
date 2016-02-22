@@ -34,10 +34,7 @@ class topTeamerApp {
     //TODO: Global Exception handler - to write to flurry
     //TODO: Global page change detection to report to flurry about page navigations
     //TODO: Catch resume on mobile and call initBranch again
-    //TODO: Catch http 401 errors and re-login
-    //TODO: Catch server popup messages and display a modal popup.
     //TODO: Flurry events
-    //TODO: Top bar with rank
     //TODO: Hardware back button
 
     this.client.platform.ready().then(() => {

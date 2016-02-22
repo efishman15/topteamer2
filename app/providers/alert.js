@@ -7,34 +7,33 @@ var ionic_1 = require('ionic/ionic');
 exports.alert = function (error) { return new Promise(function (resolve, reject) {
     var client = client_1.Client.getInstance();
     var alert;
-    if (error) {
-        if (error.type) {
-            if (!error.additionalInfo) {
-                error.additionalInfo = {};
-            }
-            alert = ionic_1.Alert.create({
-                'cssClass': client.currentLanguage.direction,
-                'title': client.translate(error.type + '_TITLE'),
-                'message': client.translate(error.type + '_MESSAGE', error.additionalInfo),
-            });
+    var title;
+    var message;
+    if (error.type) {
+        if (!error.additionalInfo) {
+            error.additionalInfo = {};
         }
-        else {
-            alert = ionic_1.Alert.create({
-                'cssClass': client.currentLanguage.direction,
-                'message': error
-            });
-        }
-        alert.addButton({
-            'role': 'cancel',
-            'text': client.translate('OK'),
-            'handler': function () {
-                if (resolve) {
-                    resolve();
-                }
-            }
-        });
-        client.nav.present(alert);
+        title = client.translate(error.type + '_TITLE');
+        message = client.translate(error.type + '_MESSAGE', error.additionalInfo);
     }
+    else {
+        message = error;
+    }
+    alert = ionic_1.Alert.create({
+        cssClass: client.currentLanguage.direction,
+        message: message,
+        buttons: [
+            {
+                text: client.translate('OK'),
+                role: 'cancel',
+                handler: resolve
+            }
+        ]
+    });
+    if (title) {
+        alert.setTitle(title);
+    }
+    client.nav.present(alert);
 }); };
 //------------------------------------------------------
 //-- confirm

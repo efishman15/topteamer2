@@ -46,7 +46,7 @@ export let getLoginStatus = () => new Promise((resolve, reject) => {
 //------------------------------------------------------
 //-- login
 //------------------------------------------------------
-export let login = (rerequestDeclinedPermissions) => new Promise((resolve, reject) => {
+export let login = (rerequestDeclinedPermissions?) => new Promise((resolve, reject) => {
 
   var client = Client.getInstance();
 

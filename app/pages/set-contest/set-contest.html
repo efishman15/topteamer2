@@ -31,24 +31,28 @@
 
     <ion-row>
       <ion-col width-40>
-        <ion-item no-lines>
+        <ion-item>
           <ion-input type="text"
+                     class="set-contest-team"
                      ngControl="team0"
                      [(ngModel)]="contestLocalCopy.teams[0].name"
                      placeholder="{{client.translate('TEAM0')}}"
+                     maxlength="15"
                      [disabled]="client.session.features.newContest.locked">
           </ion-input>
         </ion-item>
       </ion-col>
-      <ion-col width-20 class="contest-or-between-teams">
-        <h5 text-center>{{client.translate('AGAINST')}}</h5>
+      <ion-col width-20>
+        <div padding-top class="set-contest-against" text-center>{{client.translate('AGAINST')}}</div>
       </ion-col>
       <ion-col width-40>
-        <ion-item no-lines>
+        <ion-item>
           <ion-input type="text"
+                     class="set-contest-team"
                      ngControl="team1"
                      [(ngModel)]="contestLocalCopy.teams[1].name"
                      placeholder="{{client.translate('TEAM1')}}"
+                     maxlength="15"
                      [disabled]="client.session.features.newContest.locked">
           </ion-input>
         </ion-item>

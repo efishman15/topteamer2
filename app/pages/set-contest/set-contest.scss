@@ -7,10 +7,6 @@
   color: red;
 }
 
-.contest-or-between-teams {
-  padding-top: 0px;
-}
-
 .set-contest-label {
   font-size: 16px;
 }
@@ -53,4 +49,13 @@
 .small-horizontal-margin {
   margin-left: -5px;
   margin-right: -5px;
+}
+
+.set-contest-team {
+  font-size: 20px;
+}
+
+.set-contest-against {
+  font-size: 14px;
+  color: #c2c2c2;
 }

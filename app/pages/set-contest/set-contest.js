@@ -14,6 +14,7 @@ var client_1 = require('../../providers/client');
 var contest_1 = require('../../pages/contest/contest');
 var question_editor_1 = require('../../pages/question-editor/question-editor');
 var search_questions_1 = require('../../pages/search-questions/search-questions');
+var mobile_share_1 = require('../../pages/mobile-share/mobile-share');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
 var alertService = require('../../providers/alert');
@@ -341,11 +342,17 @@ var SetContestPage = (function () {
                     _this.client.nav.pop(options).then(function () {
                         if (!_this.client.user.clientInfo.mobile) {
                             //For web - no animation - the share screen will be on top with its animation
-                            options = undefined;
+                            _this.client.nav.push(contest_1.ContestPage, { 'contest': contest }).then(function () {
+                                shareService.share(contest);
+                            });
                         }
-                        _this.client.nav.push(contest_1.ContestPage, { 'contest': contest }, options).then(function () {
-                            shareService.share(contest);
-                        });
+                        else {
+                            //Mobile - open the share mobile modal - with one button - to share or skip
+                            _this.client.nav.push(contest_1.ContestPage, { 'contest': contest }).then(function () {
+                                var modal = ionic_1.Modal.create(mobile_share_1.MobileSharePage, { 'contest': contest });
+                                _this.client.nav.present(modal);
+                            });
+                        }
                     });
                 }
                 else {
