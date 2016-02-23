@@ -1,3 +1,5 @@
+import {provide,ExceptionHandler} from 'angular2/core';
+import {MyExceptionHandler} from './providers/exceptions';
 import {App, IonicApp, Platform, Config, Events, Modal, Alert, NavController, MenuController} from 'ionic/ionic';
 import {MainTabsPage} from './pages/main-tabs/main-tabs';
 import {LoginPage} from './pages/login/login';
@@ -12,18 +14,18 @@ import {SystemToolsPage} from './pages/system-tools/system-tools';
 @App({
   templateUrl: 'app.html',
   moduleId: 'build/app.html',
-  providers: [Client],
+  providers: [provide(ExceptionHandler, {useClass: MyExceptionHandler}), Client],
   config: {backButtonText: ''}
 })
 class topTeamerApp {
 
   client:Client;
 
-  constructor(ionicApp:IonicApp, platform:Platform, client:Client, events:Events, menuController:MenuController) {
+  constructor(ionicApp:IonicApp, platform:Platform, config: Config, client:Client, events:Events, menuController:MenuController) {
 
     this.client = client;
 
-    client.init(ionicApp, platform, menuController, events).then(() => {
+    client.init(ionicApp, platform, config, menuController, events).then(() => {
       this.initApp();
     });
 
@@ -31,11 +33,10 @@ class topTeamerApp {
 
   initApp() {
 
-    //TODO: Global Exception handler - to write to flurry
     //TODO: Global page change detection to report to flurry about page navigations
-    //TODO: Catch resume on mobile and call initBranch again
     //TODO: Flurry events
     //TODO: Hardware back button
+    //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
 
     this.client.platform.ready().then(() => {
 
@@ -76,6 +77,9 @@ class topTeamerApp {
       }
     }
 
+    //Load branch mobile script
+    loadJsFile('lib/branch/web.min.js');
+
     //init facebook javascript sdk
     window.fbAsyncInit = () => {
       FB.init({
@@ -106,7 +110,9 @@ class topTeamerApp {
     }
 
     //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
-    this.app.platform.isFullScreen = true;
+    this.client.platform.prototype.fullScreen = () => {
+      return true;
+    };
 
     //Hook into window.open
     window.open = cordova.InAppBrowser.open;
@@ -115,7 +121,7 @@ class topTeamerApp {
     loadJsFile('lib/branch/moblie.min.js');
 
     //Init android billing
-    if (this.platform.is('android') && typeof inappbilling !== 'undefined') {
+    if (this.client.platform.is('android') && typeof inappbilling !== 'undefined') {
       inappbilling.init((resultInit) => {
         },
         (errorInit) => {
@@ -126,13 +132,18 @@ class topTeamerApp {
       );
     }
 
+    document.addEventListener('resume', function (event) {
+      if (window.initBranch) {
+        window.initBranch();
+      }
+    });
+
     cordova.getAppVersion((version) => {
-      client.user.clientInfo.appVersion = version;
+      this.client.user.clientInfo.appVersion = version;
       FlurryAgent.setAppVersion('' + version);
 
       this.initFacebook();
     });
-
   }
 
   initFlurry() {
@@ -141,7 +152,6 @@ class topTeamerApp {
     FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
 
     FlurryAgent.myLogError = (errorType, message) => {
-      console.log(message);
       FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
     };
   }
@@ -157,7 +167,7 @@ class topTeamerApp {
         if (data.data_parsed && data.data_parsed.contestId) {
           //Will go to this contest
           //TODO: Deep linking
-          client.deepLinkContestId = data.data_parsed.contestId;
+          this.client.deepLinkContestId = data.data_parsed.contestId;
         }
       }
       catch (e) {
@@ -284,3 +294,4 @@ class topTeamerApp {
   }
 
 }
+

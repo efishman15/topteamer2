@@ -24,6 +24,7 @@ export class ContestPage {
   contestChart:Object = {};
   lastQuizResults:Object = null;
   animateLastResults:Boolean = false;
+  contestId:String;
 
   @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
 
@@ -33,14 +34,17 @@ export class ContestPage {
     this.params = params;
 
     if (this.params.data.contestChart) {
+      this.contestId = this.params.contestChart.contest._id;
       this.contestChart = this.params.data.contestChart;
     }
     else if (this.params.data.contest) {
       //Just created this contest - no chart
+      this.contestId = this.params.contest._id;
       this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
     }
     else {
       //Retrieve contest by id
+      this.contestId = this.params.contestId;
       contestsService.getContest(this.params.data.contestId).then((contest) => {
         this.contestChart = contestsService.prepareContestChart(contest);
       });
@@ -72,6 +76,10 @@ export class ContestPage {
       this.refreshContest(eventData[0]);
 
     });
+  }
+
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/contest',{'contestId' : this.contestId});
   }
 
   onPageWillLeave() {

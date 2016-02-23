@@ -17,6 +17,7 @@ var MyContestsPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     MyContestsPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/myContests');
         if (this.contestList) {
             this.refreshList();
         }

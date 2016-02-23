@@ -36,6 +36,9 @@ var QuizPage = (function () {
     QuizPage.prototype.ngOnInit = function () {
         this.init();
     };
+    QuizPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/quiz', { 'contestId': this.params.data.contestId });
+    };
     QuizPage.prototype.onPageDidEnter = function () {
         //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
         if (this.modalJustClosed) {

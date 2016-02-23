@@ -1,5 +1,6 @@
 import {Page,NavParams} from 'ionic/ionic';
 import {Client} from '../../providers/client';
+import {SetContestPage} from '../../pages/set-contest/set-contest';
 
 @Page({
   templateUrl: 'build/pages/purchase-sucess/purchase-success.html'
@@ -17,15 +18,18 @@ export class PurchaseSuccessPage {
   }
 
   onPageWillEnter() {
-    this.unlockText = this.client.translate(client.session.features[this.params.data.featurePurchased].unlockText);
+    FlurryAgent.logEvent('page/purchaseSuccess', {'feature' : this.params.data.featurePurchased});
+    this.unlockText = this.client.translate(this.client.session.features[this.params.data.featurePurchased].unlockText);
   }
 
   proceed() {
-    this.client.nav.pop();
-    if (!this.client.nav.canGoBack()) {
-      //This is the root view - coming from paypal purchase over the web
-      //TODO: navigate back to the app main page and from there dynamically to the 'this.params.datanextView'
-    }
+    this.client.nav.popToRoot().then( () => {
+      switch (this.client.session.features[this.params.data.featurePurchased].view.name) {
+        case 'setContest':
+          this.client.nav.push(SetContestPage, this.client.session.features[this.params.data.featurePurchased].view.params);
+          break;
+      }
+    });
   }
 
 }

@@ -39,6 +39,11 @@ var QuestionEditorPage = (function () {
         this.currentQuestions = params.data.currentQuestions;
     }
     QuestionEditorPage.prototype.onPageWillEnter = function () {
+        var eventData = { 'mode': this.mode };
+        if (this.mode === 'edit') {
+            eventData.questionId = this.question._id;
+        }
+        FlurryAgent.logEvent('page/questionEditor', eventData);
         this.submitted = false;
     };
     QuestionEditorPage.prototype.dismiss = function (applyChanges) {

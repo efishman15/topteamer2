@@ -18,6 +18,7 @@ var QuestionStatsPage = (function () {
     }
     QuestionStatsPage.prototype.onPageWillEnter = function () {
         var _this = this;
+        FlurryAgent.logEvent('page/questionStats', { 'questionId': this.question._id });
         if (this.chartDataSource) {
             FusionCharts.ready(function () {
                 var chart = new FusionCharts({

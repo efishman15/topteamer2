@@ -14,6 +14,9 @@ var ContestTypePage = (function () {
         this.client = client_1.Client.getInstance();
         this.viewController = viewController;
     }
+    ContestTypePage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/contestType');
+    };
     ContestTypePage.prototype.selectContestContent = function (content) {
         this.viewController.dismiss(content);
     };

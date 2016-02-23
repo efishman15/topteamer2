@@ -25,6 +25,15 @@ export class LoginPage {
     this.client.setPageTitle('GAME_NAME');
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/login');
+  }
+
+  onPageDidEnter() {
+    //Events here could be serverPopup just as the app loads - the page should be fully visible
+    this.client.processInternalEvents();
+  }
+
   login() {
     facebookService.login().then((response) => {
       this.client.nav.pop(LoginPage);
@@ -39,8 +48,4 @@ export class LoginPage {
     localStorage.setItem('language', language);
   }
 
-  onPageDidEnter() {
-    //Events here could be serverPopup just as the app loads - the page should be fully visible
-    this.client.processInternalEvents();
-  }
 }

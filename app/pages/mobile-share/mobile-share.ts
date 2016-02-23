@@ -17,6 +17,10 @@ export class MobileSharePage {
     this.viewController = viewController;
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/mobileShare', {'contestId' : this.contest._id});
+  }
+
   dismiss(okPressed) {
     this.viewController.dismiss(okPressed).then(() => {
       if (okPressed) {

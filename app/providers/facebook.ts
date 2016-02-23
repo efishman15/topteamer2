@@ -46,18 +46,20 @@ export let getLoginStatus = () => new Promise((resolve, reject) => {
 //------------------------------------------------------
 //-- login
 //------------------------------------------------------
-export let login = (rerequestDeclinedPermissions?) => new Promise((resolve, reject) => {
+export let login = (permissions?, rerequestDeclinedPermissions?) => new Promise((resolve, reject) => {
 
   var client = Client.getInstance();
+
+  if (!permissions) {
+    permissions = client.settings.facebook.readPermissions;
+  }
 
   if (!window.cordova) {
 
     var permissionObject = {};
-    if (client.settings.facebook.readPermissions && client.settings.facebook.readPermissions.length > 0) {
-      permissionObject.scope = client.settings.facebook.readPermissions.toString();
-      if (rerequestDeclinedPermissions) {
-        permissionObject.auth_type = 'rerequest';
-      }
+    permissionObject.scope = permissions.toString();
+    if (rerequestDeclinedPermissions) {
+      permissionObject.auth_type = 'rerequest';
     }
 
     FB.login((response) => {

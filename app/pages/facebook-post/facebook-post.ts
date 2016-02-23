@@ -17,6 +17,10 @@ export class FacebookPostPage {
     this.quizResults = params.data.quizResults;
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/facebookPost', {'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey});
+  }
+
   post() {
     facebookService.post(this.quizResults.data.facebookPost).then((response) => {
       this.close();

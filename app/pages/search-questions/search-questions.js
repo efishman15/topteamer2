@@ -18,6 +18,9 @@ var SearchQuestionsPage = (function () {
         this.currentQuestions = params.data.currentQuestions;
         this.searchText = '';
     }
+    SearchQuestionsPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/searchQuestions');
+    };
     SearchQuestionsPage.prototype.search = function (event) {
         var _this = this;
         //Clear list if empty text

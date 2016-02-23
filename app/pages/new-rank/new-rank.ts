@@ -17,6 +17,10 @@ export class NewRankPage {
     this.viewController = viewController;
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/newRank', {'rank' : this.client.session.rank});
+  }
+
   onPageDidEnter() {
     soundService.play('audio/finish_great_1');
   }

@@ -18,6 +18,14 @@ var SharePage = (function () {
         }
         this.shareVariables = shareService.getVariables(this.contest);
     }
+    SharePage.prototype.onPageWillEnter = function () {
+        if (this.contest) {
+            FlurryAgent.logEvent('page/share', { 'contestId': this.contest._id });
+        }
+        else {
+            FlurryAgent.logEvent('page/share');
+        }
+    };
     SharePage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/share/share.html'

@@ -19,6 +19,9 @@ export class QuestionStatsPage {
   }
 
   onPageWillEnter() {
+
+    FlurryAgent.logEvent('page/questionStats', {'questionId' : this.question._id});
+
     if (this.chartDataSource) {
       FusionCharts.ready(() => {
         var chart = new FusionCharts({

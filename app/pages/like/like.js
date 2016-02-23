@@ -16,6 +16,9 @@ var LikePage = (function () {
             this.contest = params.data.contest;
         }
     }
+    LikePage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/like', { 'contestId': this.contest._id });
+    };
     LikePage = __decorate([
         ionic_1.Page({
             templateUrl: 'build/pages/like/like.html'

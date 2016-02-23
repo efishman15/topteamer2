@@ -22,14 +22,17 @@ var ContestParticipantsPage = (function () {
         this.client = client_1.Client.getInstance();
         if (params.data.contest) {
             this.contest = params.data.contest;
+            this.contestId = params.data.contest._id;
         }
         else {
+            this.contestId = params.data.contestId;
             contestsService.getContest(params.data.contestId).then(function (contest) {
                 _this.contest = contest;
             });
         }
     }
     ContestParticipantsPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/contestParticipants', { 'contestId': this.contestId });
         if (this.leadersComponent) {
             this.showContestParticipants();
         }

@@ -110,6 +110,11 @@ var SetContestPage = (function () {
         this.setDateLimits();
     }
     SetContestPage.prototype.onPageWillEnter = function () {
+        var eventData = { 'mode': this.params.data.mode };
+        if (this.params.data.mode === 'edit') {
+            eventData.contestId = this.params.data.contest._id;
+        }
+        FlurryAgent.logEvent('page/setContest', eventData);
         this.submitted = false;
     };
     SetContestPage.prototype.retrieveUserQuestions = function () {

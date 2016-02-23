@@ -19,6 +19,7 @@ export class MyContestsPage {
   }
 
   onPageWillEnter() {
+    FlurryAgent.logEvent('page/myContests');
     if (this.contestList) {
       this.refreshList();
     }

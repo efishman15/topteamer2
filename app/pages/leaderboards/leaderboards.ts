@@ -35,17 +35,19 @@ export class LeaderboardsPage {
   }
 
   showRecentlyFinishedContests() {
+    FlurryAgent.logEvent('page/leaderboard/contests');
     this.mode = 'contests';
     this.contestList.refresh();
   }
 
   showFriendsLeaderboard() {
-    //TODO: friendsPermissionJustGranted
+    FlurryAgent.logEvent('page/leaderboard/friends');
     this.mode = 'leaders';
-    this.leadersComponent.showFriends()
+    this.leadersComponent.showFriends(false);
   }
 
   showWeeklyLeaderboard() {
+    FlurryAgent.logEvent('page/leaderboard/weekly');
     this.mode = 'leaders';
     this.leadersComponent.showWeekly();
   }

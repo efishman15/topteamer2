@@ -48,11 +48,12 @@ var Client = (function () {
         }
         return Client.instance;
     };
-    Client.prototype.init = function (ionicApp, platform, menuController, events) {
+    Client.prototype.init = function (ionicApp, platform, config, menuController, events) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._ionicApp = ionicApp;
             _this._platform = platform;
+            _this._config = config;
             _this.menuController = menuController;
             _this._events = events;
             _this.serverGateway.events = events;
@@ -202,6 +203,7 @@ var Client = (function () {
             playerInfo.className = 'player-info-' + this.currentLanguage.direction;
         }
         this.canvas.className = 'player-info-canvas-' + this.currentLanguage.direction;
+        this.config.set('backButtonIcon', this.currentLanguage.backButtonIcon);
     };
     Client.prototype.facebookServerConnect = function (facebookAuthResponse) {
         var _this = this;
@@ -301,15 +303,16 @@ var Client = (function () {
                 else {
                     //Display an alert or confirm message and continue the reject so further "catch" blocks
                     //will be invoked if any
-                    if (!err.confirm) {
+                    if (!err.additionalInfo || !err.additionalInfo.confirm) {
                         alertService.alert(err).then(function () {
                             reject(err);
                         });
                     }
                     else {
-                        var title = _this.translate(err.type + '_TITLE');
-                        var message = _this.translate(err.type + '_MESSAGE');
+                        var title = err.type + '_TITLE';
+                        var message = err.type + '_MESSAGE';
                         alertService.confirm(title, message, err.params).then(function () {
+                            err.additionalInfo.confirmed = true;
                             reject(err);
                         }, function () {
                             reject(err);
@@ -356,6 +359,13 @@ var Client = (function () {
     Object.defineProperty(Client.prototype, "platform", {
         get: function () {
             return this._platform;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Client.prototype, "config", {
+        get: function () {
+            return this._config;
         },
         enumerable: true,
         configurable: true

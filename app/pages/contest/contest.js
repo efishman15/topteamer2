@@ -29,14 +29,17 @@ var ContestPage = (function () {
         this.client = client_1.Client.getInstance();
         this.params = params;
         if (this.params.data.contestChart) {
+            this.contestId = this.params.contestChart.contest._id;
             this.contestChart = this.params.data.contestChart;
         }
         else if (this.params.data.contest) {
             //Just created this contest - no chart
+            this.contestId = this.params.contest._id;
             this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
         }
         else {
             //Retrieve contest by id
+            this.contestId = this.params.contestId;
             contestsService.getContest(this.params.data.contestId).then(function (contest) {
                 _this.contestChart = contestsService.prepareContestChart(contest);
             });
@@ -62,6 +65,9 @@ var ContestPage = (function () {
             _this.refreshContest(eventData[0]);
         });
     }
+    ContestPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/contest', { 'contestId': this.contestId });
+    };
     ContestPage.prototype.onPageWillLeave = function () {
         this.animateLastResults = false;
         this.lastQuizResults = null;

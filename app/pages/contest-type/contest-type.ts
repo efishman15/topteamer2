@@ -9,6 +9,10 @@ export class ContestTypePage {
   client:Client;
   viewController: ViewController;
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/contestType');
+  }
+
   constructor(viewController: ViewController) {
     this.client = Client.getInstance();
     this.viewController = viewController;

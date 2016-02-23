@@ -2,7 +2,7 @@ import {Injectable} from 'angular2/core';
 import {Http, Response, Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
-import {IonicApp,Platform, NavController, Menu, MenuController, Alert, Events} from 'ionic/ionic';
+import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Events} from 'ionic/ionic';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
 
@@ -22,6 +22,7 @@ export class Client {
 
   _ionicApp:IonicApp;
   _platform:Platform;
+  _config:Config;
   _events:Events;
   _nav:NavController;
   menuController:MenuController;
@@ -72,12 +73,13 @@ export class Client {
     return Client.instance;
   }
 
-  init(ionicApp:IonicApp, platform:Platform, menuController:MenuController, events:Events) {
+  init(ionicApp:IonicApp, platform:Platform, config:Config, menuController:MenuController, events:Events) {
 
     return new Promise((resolve, reject) => {
 
       this._ionicApp = ionicApp;
       this._platform = platform;
+      this._config = config;
       this.menuController = menuController;
       this._events = events;
       this.serverGateway.events = events;
@@ -269,6 +271,8 @@ export class Client {
     }
 
     this.canvas.className = 'player-info-canvas-' + this.currentLanguage.direction;
+    this.config.set('backButtonIcon', this.currentLanguage.backButtonIcon);
+
   }
 
   facebookServerConnect(facebookAuthResponse) {
@@ -390,15 +394,16 @@ export class Client {
         else {
           //Display an alert or confirm message and continue the reject so further "catch" blocks
           //will be invoked if any
-          if (!err.confirm) {
+          if (!err.additionalInfo || !err.additionalInfo.confirm) {
             alertService.alert(err).then(() => {
               reject(err);
             });
           }
           else {
-            var title = this.translate(err.type + '_TITLE');
-            var message = this.translate(err.type + '_MESSAGE');
+            var title = err.type + '_TITLE';
+            var message = err.type + '_MESSAGE';
             alertService.confirm(title, message, err.params).then(() => {
+              err.additionalInfo.confirmed = true;
               reject(err);
             }, () => {
               reject(err);
@@ -443,6 +448,10 @@ export class Client {
 
   get platform():Platform {
     return this._platform;
+  }
+
+  get config():Config {
+    return this._config;
   }
 
   get events():Events {
@@ -629,3 +638,4 @@ export class InternalEvent {
   }
 
 }
+

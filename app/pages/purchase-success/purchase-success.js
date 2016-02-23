@@ -9,18 +9,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_1 = require('ionic/ionic');
 var client_1 = require('../../providers/client');
+var set_contest_1 = require('../../pages/set-contest/set-contest');
 var PurchaseSuccessPage = (function () {
     function PurchaseSuccessPage(params) {
         this.client = client_1.Client.getInstance();
         this.params = params;
     }
     PurchaseSuccessPage.prototype.onPageWillEnter = function () {
-        this.unlockText = this.client.translate(client.session.features[this.params.data.featurePurchased].unlockText);
+        FlurryAgent.logEvent('page/purchaseSuccess', { 'feature': this.params.data.featurePurchased });
+        this.unlockText = this.client.translate(this.client.session.features[this.params.data.featurePurchased].unlockText);
     };
     PurchaseSuccessPage.prototype.proceed = function () {
-        this.client.nav.pop();
-        if (!this.client.nav.canGoBack()) {
-        }
+        var _this = this;
+        this.client.nav.popToRoot().then(function () {
+            switch (_this.client.session.features[_this.params.data.featurePurchased].view.name) {
+                case 'setContest':
+                    _this.client.nav.push(set_contest_1.SetContestPage, _this.client.session.features[_this.params.data.featurePurchased].view.params);
+                    break;
+            }
+        });
     };
     PurchaseSuccessPage = __decorate([
         ionic_1.Page({

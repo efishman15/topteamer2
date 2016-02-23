@@ -124,7 +124,7 @@ module.exports.getFriends = function (req, res, next) {
     function (data, callback) {
       if (data.session.friends.noPermission) {
         if (!data.friendsPermissionJustGranted) {
-          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION'));
+          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION', {'confirm' : true}));
           return;
         }
         else {
@@ -147,7 +147,7 @@ module.exports.getFriends = function (req, res, next) {
 
         //Still no luck - user gave no permission
         if (data.session.friends.noPermission) {
-          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION'));
+          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION',  {'confirm' : true}));
           return;
         }
         else {

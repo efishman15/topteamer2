@@ -18,6 +18,7 @@ export class ContestParticipantsPage {
 
   contest:Object;
   source:string;
+  contestId: String;
 
   constructor(params:NavParams) {
     // set the root pages for each tab
@@ -26,8 +27,10 @@ export class ContestParticipantsPage {
 
     if (params.data.contest) {
       this.contest = params.data.contest;
+      this.contestId = params.data.contest._id;
     }
     else {
+      this.contestId = params.data.contestId;
       contestsService.getContest(params.data.contestId).then((contest) => {
         this.contest = contest;
       });
@@ -35,6 +38,7 @@ export class ContestParticipantsPage {
   }
 
   onPageWillEnter() {
+    FlurryAgent.logEvent('page/contestParticipants',{'contestId' : this.contestId});
     if (this.leadersComponent) {
       this.showContestParticipants();
     }

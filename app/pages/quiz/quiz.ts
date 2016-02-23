@@ -50,6 +50,10 @@ export class QuizPage {
     this.init();
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/quiz', {'contestId' : this.params.data.contestId});
+  }
+
   onPageDidEnter() {
 
     //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method

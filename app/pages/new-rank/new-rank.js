@@ -16,6 +16,9 @@ var NewRankPage = (function () {
         this.xpProgress = params.data.xpProgress;
         this.viewController = viewController;
     }
+    NewRankPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/newRank', { 'rank': this.client.session.rank });
+    };
     NewRankPage.prototype.onPageDidEnter = function () {
         soundService.play('audio/finish_great_1');
     };

@@ -15,6 +15,9 @@ var SettingsPage = (function () {
     function SettingsPage() {
         this.client = client_1.Client.getInstance();
     }
+    SettingsPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/settings');
+    };
     SettingsPage.prototype.toggleSound = function () {
         this.client.toggleSound();
     };

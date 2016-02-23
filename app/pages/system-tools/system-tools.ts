@@ -15,6 +15,10 @@ export class SystemToolsPage {
     this.client = Client.getInstance();
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/systemTools');
+  }
+
   clearCache() {
     systemService.clearCache().then(() => {
       this.client.nav.pop();

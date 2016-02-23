@@ -11,6 +11,7 @@ var client_1 = require('../../providers/client');
 var core_1 = require('angular2/core');
 var ionic_1 = require('ionic/ionic');
 var leaderboardsService = require('../../providers/leaderboards');
+var facebookService = require('../../providers/facebook');
 var LeadersComponent = (function () {
     function LeadersComponent() {
         this.client = client_1.Client.getInstance();
@@ -19,6 +20,12 @@ var LeadersComponent = (function () {
         var _this = this;
         leaderboardsService.friends(friendsPermissionJustGranted).then(function (leaders) {
             _this.leaders = leaders;
+        }, function (err) {
+            if (err.type === 'SERVER_ERROR_MISSING_FRIENDS_PERMISSION' && err.additionalInfo && err.additionalInfo.confirmed) {
+                facebookService.login(_this.client.settings.facebook.friendsPermission, true).then(function (response) {
+                    _this.showFriends(true);
+                });
+            }
         });
     };
     LeadersComponent.prototype.showWeekly = function () {

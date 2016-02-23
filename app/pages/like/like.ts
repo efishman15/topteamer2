@@ -16,4 +16,7 @@ export class LikePage {
     }
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/like',{'contestId' : this.contest._id});
+  }
 }

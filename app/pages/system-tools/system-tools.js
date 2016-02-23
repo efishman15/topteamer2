@@ -15,6 +15,9 @@ var SystemToolsPage = (function () {
     function SystemToolsPage() {
         this.client = client_1.Client.getInstance();
     }
+    SystemToolsPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/systemTools');
+    };
     SystemToolsPage.prototype.clearCache = function () {
         var _this = this;
         systemService.clearCache().then(function () {

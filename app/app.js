@@ -7,6 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var core_1 = require('angular2/core');
+var exceptions_1 = require('./providers/exceptions');
 var ionic_1 = require('ionic/ionic');
 var main_tabs_1 = require('./pages/main-tabs/main-tabs');
 var login_1 = require('./pages/login/login');
@@ -18,19 +20,18 @@ var set_contest_1 = require('./pages/set-contest/set-contest');
 var settings_1 = require('./pages/settings/settings');
 var system_tools_1 = require('./pages/system-tools/system-tools');
 var topTeamerApp = (function () {
-    function topTeamerApp(ionicApp, platform, client, events, menuController) {
+    function topTeamerApp(ionicApp, platform, config, client, events, menuController) {
         var _this = this;
         this.client = client;
-        client.init(ionicApp, platform, menuController, events).then(function () {
+        client.init(ionicApp, platform, config, menuController, events).then(function () {
             _this.initApp();
         });
     }
     topTeamerApp.prototype.initApp = function () {
-        //TODO: Global Exception handler - to write to flurry
         //TODO: Global page change detection to report to flurry about page navigations
-        //TODO: Catch resume on mobile and call initBranch again
         //TODO: Flurry events
         //TODO: Hardware back button
+        //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
         var _this = this;
         this.client.platform.ready().then(function () {
             _this.expandStringPrototype();
@@ -63,6 +64,8 @@ var topTeamerApp = (function () {
                 myApp.style.marginLeft = (containerWidth - this.client.settings.general.webCanvasWidth) / 2 + 'px';
             }
         }
+        //Load branch mobile script
+        loadJsFile('lib/branch/web.min.js');
         //init facebook javascript sdk
         window.fbAsyncInit = function () {
             FB.init({
@@ -90,20 +93,27 @@ var topTeamerApp = (function () {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         }
         //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
-        this.app.platform.isFullScreen = true;
+        this.client.platform.prototype.fullScreen = function () {
+            return true;
+        };
         //Hook into window.open
         window.open = cordova.InAppBrowser.open;
         //Load branch mobile script
         loadJsFile('lib/branch/moblie.min.js');
         //Init android billing
-        if (this.platform.is('android') && typeof inappbilling !== 'undefined') {
+        if (this.client.platform.is('android') && typeof inappbilling !== 'undefined') {
             inappbilling.init(function (resultInit) {
             }, function (errorInit) {
                 FlurryAgent.myLogError('InAppBilling', errorInit);
             }, { showLog: true }, []);
         }
+        document.addEventListener('resume', function (event) {
+            if (window.initBranch) {
+                window.initBranch();
+            }
+        });
         cordova.getAppVersion(function (version) {
-            client.user.clientInfo.appVersion = version;
+            _this.client.user.clientInfo.appVersion = version;
             FlurryAgent.setAppVersion('' + version);
             _this.initFacebook();
         });
@@ -112,11 +122,11 @@ var topTeamerApp = (function () {
         //FlurryAgent.setDebugLogEnabled(true);
         FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
         FlurryAgent.myLogError = function (errorType, message) {
-            console.log(message);
             FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
         };
     };
     topTeamerApp.prototype.initBranch = function () {
+        var _this = this;
         window.myHandleBranch = function (err, data) {
             try {
                 if (err) {
@@ -126,7 +136,7 @@ var topTeamerApp = (function () {
                 if (data.data_parsed && data.data_parsed.contestId) {
                     //Will go to this contest
                     //TODO: Deep linking
-                    client.deepLinkContestId = data.data_parsed.contestId;
+                    _this.client.deepLinkContestId = data.data_parsed.contestId;
                 }
             }
             catch (e) {
@@ -239,11 +249,11 @@ var topTeamerApp = (function () {
         ionic_1.App({
             templateUrl: 'app.html',
             moduleId: 'build/app.html',
-            providers: [client_1.Client],
+            providers: [core_1.provide(core_1.ExceptionHandler, { useClass: exceptions_1.MyExceptionHandler }), client_1.Client],
             config: { backButtonText: '' }
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Platform !== 'undefined' && ionic_1.Platform) === 'function' && _b) || Object, client_1.Client, (typeof (_c = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _c) || Object, (typeof (_d = typeof ionic_1.MenuController !== 'undefined' && ionic_1.MenuController) === 'function' && _d) || Object])
+        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Platform !== 'undefined' && ionic_1.Platform) === 'function' && _b) || Object, (typeof (_c = typeof ionic_1.Config !== 'undefined' && ionic_1.Config) === 'function' && _c) || Object, client_1.Client, (typeof (_d = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _d) || Object, (typeof (_e = typeof ionic_1.MenuController !== 'undefined' && ionic_1.MenuController) === 'function' && _e) || Object])
     ], topTeamerApp);
     return topTeamerApp;
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
 })();

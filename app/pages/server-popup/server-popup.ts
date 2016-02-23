@@ -35,8 +35,11 @@ export class ServerPopupPage {
     this.viewController = viewController;
   }
 
-  buttonAction(button) {
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/serverPopup', {'title' : this.serverPopup.title, 'message' : this.serverPopup.message});
+  }
 
+  buttonAction(button) {
     switch (button.action) {
       case 'dismiss' :
         this.viewController.dismiss(button);

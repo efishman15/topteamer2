@@ -1113,10 +1113,6 @@ function prepareContestsQuery(data, callback) {
 
     var now = (new Date()).getTime();
 
-    if (generalUtils.settings.server.hostedGames.active && (!generalUtils.settings.server.hostedGames.forAdminsOnly && !data.session.isAdmin)) {
-        data.contestQuery.where['content.source'] = 'trivia';
-    }
-
     switch (data.tab) {
         case 'mine':
             data.contestQuery.where.endDate = {$gte: now}; //not finished yet

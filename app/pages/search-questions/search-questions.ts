@@ -21,6 +21,10 @@ export class SearchQuestionsPage {
     this.searchText = '';
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/searchQuestions');
+  }
+
   search(event) {
 
     //Clear list if empty text

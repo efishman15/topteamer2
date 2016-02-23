@@ -16,6 +16,9 @@ var MobileSharePage = (function () {
         this.contest = params.data.contest;
         this.viewController = viewController;
     }
+    MobileSharePage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/mobileShare', { 'contestId': this.contest._id });
+    };
     MobileSharePage.prototype.dismiss = function (okPressed) {
         var _this = this;
         this.viewController.dismiss(okPressed).then(function () {

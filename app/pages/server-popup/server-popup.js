@@ -29,6 +29,9 @@ var ServerPopupPage = (function () {
         }
         this.viewController = viewController;
     }
+    ServerPopupPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/serverPopup', { 'title': this.serverPopup.title, 'message': this.serverPopup.message });
+    };
     ServerPopupPage.prototype.buttonAction = function (button) {
         var _this = this;
         switch (button.action) {

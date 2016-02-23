@@ -15,6 +15,10 @@ export class SettingsPage {
     this.client = Client.getInstance();
   }
 
+  onPageWillEnter() {
+    FlurryAgent.logEvent('page/settings');
+  }
+
   toggleSound() {
     this.client.toggleSound();
   }

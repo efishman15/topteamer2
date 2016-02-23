@@ -21,4 +21,13 @@ export class SharePage {
     this.shareVariables = shareService.getVariables(this.contest);
   }
 
+  onPageWillEnter() {
+    if (this.contest) {
+      FlurryAgent.logEvent('page/share', {'contestId': this.contest._id});
+    }
+    else {
+      FlurryAgent.logEvent('page/share');
+    }
+  }
+
 }

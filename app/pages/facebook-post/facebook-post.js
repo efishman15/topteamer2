@@ -16,6 +16,9 @@ var FacebookPostPage = (function () {
         this.client = client_1.Client.getInstance();
         this.quizResults = params.data.quizResults;
     }
+    FacebookPostPage.prototype.onPageWillEnter = function () {
+        FlurryAgent.logEvent('page/facebookPost', { 'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey });
+    };
     FacebookPostPage.prototype.post = function () {
         var _this = this;
         facebookService.post(this.quizResults.data.facebookPost).then(function (response) {

@@ -59,6 +59,11 @@ export class QuestionEditorPage {
   }
 
   onPageWillEnter() {
+    var eventData = {'mode' : this.mode};
+    if (this.mode === 'edit') {
+        eventData.questionId = this.question._id;
+    }
+    FlurryAgent.logEvent('page/questionEditor', eventData);
     this.submitted = false;
   }
 

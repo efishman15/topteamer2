@@ -44,15 +44,16 @@ exports.getLoginStatus = function () { return new Promise(function (resolve, rej
 //------------------------------------------------------
 //-- login
 //------------------------------------------------------
-exports.login = function (rerequestDeclinedPermissions) { return new Promise(function (resolve, reject) {
+exports.login = function (permissions, rerequestDeclinedPermissions) { return new Promise(function (resolve, reject) {
     var client = client_1.Client.getInstance();
+    if (!permissions) {
+        permissions = client.settings.facebook.readPermissions;
+    }
     if (!window.cordova) {
         var permissionObject = {};
-        if (client.settings.facebook.readPermissions && client.settings.facebook.readPermissions.length > 0) {
-            permissionObject.scope = client.settings.facebook.readPermissions.toString();
-            if (rerequestDeclinedPermissions) {
-                permissionObject.auth_type = 'rerequest';
-            }
+        permissionObject.scope = permissions.toString();
+        if (rerequestDeclinedPermissions) {
+            permissionObject.auth_type = 'rerequest';
         }
         FB.login(function (response) {
             if (response.authResponse) {

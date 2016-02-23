@@ -2,6 +2,7 @@ import {Client} from '../../providers/client';
 import {Component} from 'angular2/core';
 import {List, Item} from 'ionic/ionic';
 import * as leaderboardsService from '../../providers/leaderboards';
+import * as facebookService from '../../providers/facebook';
 
 
 @Component({
@@ -19,9 +20,15 @@ export class LeadersComponent {
     this.client = Client.getInstance();
   }
 
-  showFriends(friendsPermissionJustGranted : boolean) {
+  showFriends(friendsPermissionJustGranted? : boolean) {
     leaderboardsService.friends(friendsPermissionJustGranted).then((leaders) => {
       this.leaders = leaders;
+    }, (err) => {
+      if (err.type === 'SERVER_ERROR_MISSING_FRIENDS_PERMISSION' && err.additionalInfo && err.additionalInfo.confirmed) {
+        facebookService.login(this.client.settings.facebook.friendsPermission, true).then((response) => {
+          this.showFriends(true);
+        })
+      }
     });
   }
 
