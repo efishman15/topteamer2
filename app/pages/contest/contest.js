@@ -78,7 +78,7 @@ var ContestPage = (function () {
             'team': '' + this.contestChart.contest.myTeam,
             'sourceClick': source
         });
-        this.client.nav.push(quiz_1.QuizPage, { 'contestId': this.contestChart.contest._id, 'source': source, 'typeId': this.contestChart.contest.type.id });
+        this.client.nav.push(quiz_1.QuizPage, { 'contest': this.contestChart.contest, 'source': source });
     };
     ContestPage.prototype.showParticipants = function (source) {
         this.client.nav.push(contest_participants_1.ContestParticipantsPage, { 'contest': this.contestChart.contest, 'source': source });

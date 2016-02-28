@@ -51,7 +51,7 @@ export class QuizPage {
   }
 
   onPageWillEnter() {
-    this.client.logEvent('page/quiz', {'contestId' : this.params.data.contestId});
+    this.client.logEvent('page/quiz', {'contestId' : this.params.data.contest._id});
   }
 
   onPageDidEnter() {
@@ -65,7 +65,7 @@ export class QuizPage {
     }
 
     this.init();
-    this.contestId = this.params.data.contestId;
+    this.contestId = this.params.data.contest._id;
     this.startQuiz();
   }
 
@@ -86,7 +86,7 @@ export class QuizPage {
   }
 
   startQuiz() {
-    this.client.logEvent('quiz/started', {'source' : this.params.data.source, 'typeId' : this.params.data.typeId});
+    this.client.logEvent('quiz/started', {'source' : this.params.data.source, 'typeId' : this.params.data.contest.type.id});
     quizService.start(this.contestId).then((data) => {
       this.quizData = data.quiz;
       this.quizData.currentQuestion.answered = false;

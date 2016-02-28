@@ -37,7 +37,7 @@ var QuizPage = (function () {
         this.init();
     };
     QuizPage.prototype.onPageWillEnter = function () {
-        this.client.logEvent('page/quiz', { 'contestId': this.params.data.contestId });
+        this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
     };
     QuizPage.prototype.onPageDidEnter = function () {
         //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
@@ -47,7 +47,7 @@ var QuizPage = (function () {
             return;
         }
         this.init();
-        this.contestId = this.params.data.contestId;
+        this.contestId = this.params.data.contest._id;
         this.startQuiz();
     };
     QuizPage.prototype.init = function () {
@@ -64,7 +64,7 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.startQuiz = function () {
         var _this = this;
-        this.client.logEvent('quiz/started', { 'source': this.params.data.source, 'typeId': this.params.data.typeId });
+        this.client.logEvent('quiz/started', { 'source': this.params.data.source, 'typeId': this.params.data.contest.type.id });
         quizService.start(this.contestId).then(function (data) {
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;

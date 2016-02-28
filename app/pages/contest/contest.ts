@@ -93,7 +93,7 @@ export class ContestPage {
       'team': '' + this.contestChart.contest.myTeam,
       'sourceClick': source
     });
-    this.client.nav.push(QuizPage, {'contestId': this.contestChart.contest._id, 'source': source, 'typeId': this.contestChart.contest.type.id});
+    this.client.nav.push(QuizPage, {'contest': this.contestChart.contest, 'source': source});
   }
 
   showParticipants(source) {
