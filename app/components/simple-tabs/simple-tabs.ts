@@ -33,7 +33,7 @@ export class SimpleTabsComponent {
     this.simpleTabs.push(simpleTab);
   }
 
-  switchToTab(tabId : Number) {
+  switchToTab(tabId : number) {
     if (tabId >= 0 && tabId < this.simpleTabs.length) {
       this.selectTab(this.simpleTabs[tabId]);
     }

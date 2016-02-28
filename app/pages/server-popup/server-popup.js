@@ -30,7 +30,7 @@ var ServerPopupPage = (function () {
         this.viewController = viewController;
     }
     ServerPopupPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/serverPopup', { 'title': this.serverPopup.title, 'message': this.serverPopup.message });
+        this.client.logEvent('page/serverPopup', { 'title': this.serverPopup.title, 'message': this.serverPopup.message });
     };
     ServerPopupPage.prototype.buttonAction = function (button) {
         var _this = this;
@@ -57,13 +57,13 @@ var ServerPopupPage = (function () {
                     if (button.contestId) {
                         contestsService.getContest(button.contestId).then(function (contest) {
                             _this.viewController.dismiss(button).then(function () {
-                                shareService.share(contest);
+                                shareService.share('serverPopup', contest);
                             });
                         });
                     }
                     else {
                         this.viewController.dismiss(button).then(function () {
-                            shareService.share();
+                            shareService.share('serverPopup');
                         });
                     }
                     break;

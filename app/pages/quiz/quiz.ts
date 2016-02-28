@@ -51,7 +51,7 @@ export class QuizPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/quiz', {'contestId' : this.params.data.contestId});
+    this.client.logEvent('page/quiz', {'contestId' : this.params.data.contestId});
   }
 
   onPageDidEnter() {
@@ -66,7 +66,6 @@ export class QuizPage {
 
     this.init();
     this.contestId = this.params.data.contestId;
-    this.source = this.params.data.source;
     this.startQuiz();
   }
 
@@ -87,7 +86,7 @@ export class QuizPage {
   }
 
   startQuiz() {
-    FlurryAgent.logEvent('quiz/' + this.source + '/started');
+    this.client.logEvent('quiz/started', {'source' : this.params.data.source, 'typeId' : this.params.data.typeId});
     quizService.start(this.contestId).then((data) => {
       this.quizData = data.quiz;
       this.quizData.currentQuestion.answered = false;
@@ -142,7 +141,7 @@ export class QuizPage {
 
       if (data.question.correct) {
 
-        FlurryAgent.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/correct');
+        this.client.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/correct');
 
         correctAnswerId = answerId;
         this.quizData.currentQuestion.answers[answerId].answeredCorrectly = true;
@@ -150,7 +149,7 @@ export class QuizPage {
         soundService.play('audio/click_ok');
       }
       else {
-        FlurryAgent.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
+        this.client.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
         soundService.play('audio/click_wrong');
         correctAnswerId = data.question.correctAnswerId;
         this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
@@ -184,7 +183,7 @@ export class QuizPage {
 
       this.drawQuizProgress();
 
-      FlurryAgent.logEvent('quiz/gotQuestion' + (this.quizData.currentQuestionIndex + 1));
+      this.client.logEvent('quiz/gotQuestion' + (this.quizData.currentQuestionIndex + 1));
     });
   }
 
@@ -229,7 +228,7 @@ export class QuizPage {
       this.drawQuizProgress();
       this.client.session.score += this.quizData.results.data.score;
 
-      FlurryAgent.logEvent('quiz/finished',
+      this.client.logEvent('quiz/finished',
         {
           'score': '' + this.quizData.results.data.score,
           'title': this.quizData.results.data.title,

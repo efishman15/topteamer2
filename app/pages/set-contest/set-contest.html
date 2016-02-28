@@ -9,7 +9,7 @@
 <ion-content>
 
   <h4 text-center>
-    {{client.translate(contestLocalCopy.content.category.title)}}
+    {{client.translate(contestLocalCopy.type.title)}}
   </h4>
 
   <div padding *ngIf="client.session.features.newContest.locked">
@@ -82,7 +82,9 @@
         <ion-label>{{client.translate('ENDS_IN')}}</ion-label>
         <ion-select multiple="false" no-lines [(ngModel)]="contestLocalCopy.endOption"
                     okText="{{client.translate('OK')}}"
-                    cancelText="{{client.translate('CANCEL')}}">
+                    cancelText="{{client.translate('CANCEL')}}"
+                    (change)="client.logEvent('newContest/endsIn/change')"
+                    (click)="client.logEvent('newContest/endsIn/click',{'endsIn': contestLocalCopy.endOption})">
           <ion-option *ngFor="#endOptionKey of endOptionKeys"
                       value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
                       checked="contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value">
@@ -100,7 +102,7 @@
     </div>
 
     <ion-item no-lines class="set-contest-user-questions-area"
-              *ngIf="contestLocalCopy.content.source === 'trivia' && contestLocalCopy.content.category.id === 'user'">
+              *ngIf="contestLocalCopy.type.id === 'userTrivia'">
       <ion-row class="full-width">
         <ion-col>
           <button danger
@@ -152,7 +154,7 @@
     </ion-item>
 
     <div padding-left padding-right class="invalid-input"
-         *ngIf="submitted && contestLocalCopy.content.source === 'trivia' && contestLocalCopy.content.category.id === 'user' && userQuestionsInvalid">
+         *ngIf="submitted && contestLocalCopy.type.id === 'userTrivia' && userQuestionsInvalid">
       {{userQuestionsInvalid}}
     </div>
 

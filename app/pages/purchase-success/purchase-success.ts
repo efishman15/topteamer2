@@ -18,7 +18,7 @@ export class PurchaseSuccessPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/purchaseSuccess', {'feature' : this.params.data.featurePurchased});
+    this.client.logEvent('page/purchaseSuccess', {'feature' : this.params.data.featurePurchased});
     this.unlockText = this.client.translate(this.client.session.features[this.params.data.featurePurchased].unlockText);
   }
 

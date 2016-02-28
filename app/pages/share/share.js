@@ -20,11 +20,16 @@ var SharePage = (function () {
     }
     SharePage.prototype.onPageWillEnter = function () {
         if (this.contest) {
-            FlurryAgent.logEvent('page/share', { 'contestId': this.contest._id });
+            this.client.logEvent('page/share', { 'contestId': this.contest._id });
         }
         else {
-            FlurryAgent.logEvent('page/share');
+            this.client.logEvent('page/share');
         }
+    };
+    SharePage.prototype.share = function (network) {
+        console.log('network=' + network.name + ', url=' + network.url);
+        window.open(network.url.format({ url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail }), '_blank');
+        this.client.logEvent('share/web/' + network.name);
     };
     SharePage = __decorate([
         ionic_1.Page({

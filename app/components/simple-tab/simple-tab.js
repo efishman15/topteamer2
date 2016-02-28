@@ -15,6 +15,16 @@ var SimpleTabComponent = (function () {
         this.selected = new core_1.EventEmitter();
         simpleTabs.addTab(this);
     }
+    Object.defineProperty(SimpleTabComponent.prototype, "active", {
+        get: function () {
+            return this._active;
+        },
+        set: function (value) {
+            this._active = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(SimpleTabComponent.prototype, "selectedEmitter", {
         get: function () {
             return this.selected;

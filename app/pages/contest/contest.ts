@@ -34,17 +34,17 @@ export class ContestPage {
     this.params = params;
 
     if (this.params.data.contestChart) {
-      this.contestId = this.params.contestChart.contest._id;
+      this.contestId = this.params.data.contestChart.contest._id;
       this.contestChart = this.params.data.contestChart;
     }
     else if (this.params.data.contest) {
       //Just created this contest - no chart
-      this.contestId = this.params.contest._id;
+      this.contestId = this.params.data.contest._id;
       this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
     }
     else {
       //Retrieve contest by id
-      this.contestId = this.params.contestId;
+      this.contestId = this.params.data.contestId;
       contestsService.getContest(this.params.data.contestId).then((contest) => {
         this.contestChart = contestsService.prepareContestChart(contest);
       });
@@ -79,7 +79,7 @@ export class ContestPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/contest',{'contestId' : this.contestId});
+    this.client.logEvent('page/contest',{'contestId' : this.contestId});
   }
 
   onPageWillLeave() {
@@ -88,7 +88,12 @@ export class ContestPage {
   }
 
   playContest(source) {
-    this.client.nav.push(QuizPage, {'contestId': this.contestChart.contest._id, 'source': source});
+    this.client.logEvent('contest/play', {
+      'contestId': this.contestChart.contest._id,
+      'team': '' + this.contestChart.contest.myTeam,
+      'sourceClick': source
+    });
+    this.client.nav.push(QuizPage, {'contestId': this.contestChart.contest._id, 'source': source, 'typeId': this.contestChart.contest.type.id});
   }
 
   showParticipants(source) {
@@ -99,9 +104,9 @@ export class ContestPage {
 
     contestsService.join(this.contestChart.contest._id, team).then((data) => {
 
-      FlurryAgent.logEvent('contest/' + action, {
+      this.client.logEvent('contest/' + action, {
         'contestId': this.contestChart.contest._id,
-        'team': '' + team,
+        'team': '' + this.contestChart.contest.myTeam,
         'sourceClick': source
       });
 
@@ -130,14 +135,16 @@ export class ContestPage {
   }
 
   editContest() {
+    this.client.logEvent('contest/edit/click', {'contestId' : this.contestChart.contest._id});
     this.client.nav.push(SetContestPage, {'mode': 'edit', 'contest': this.contestChart.contest});
   }
 
   share(source) {
-    shareService.share(this.contestChart.contest);
+    shareService.share(source, this.contestChart.contest);
   }
 
   like() {
+    this.client.logEvent('contest/like/click', {'contestId' : this.contestChart.contest._id});
     this.client.nav.push(LikePage, {'contest': this.contestChart.contest});
   }
 

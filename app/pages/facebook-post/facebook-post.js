@@ -17,17 +17,19 @@ var FacebookPostPage = (function () {
         this.quizResults = params.data.quizResults;
     }
     FacebookPostPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/facebookPost', { 'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey });
+        this.client.logEvent('page/facebookPost', { 'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey });
     };
     FacebookPostPage.prototype.post = function () {
         var _this = this;
+        this.client.logEvent('contest/facebook/post/click');
         facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
             _this.close();
         }, function (error) {
-            FlurryAgent.myLogError('FacebookPostError', 'Error posting: ' + error);
+            _this.client.logError('FacebookPostError', 'Error posting: ' + error);
         });
     };
     FacebookPostPage.prototype.close = function () {
+        this.client.logEvent('contest/facebook/post/cancel');
         this.viewController.dismiss();
     };
     FacebookPostPage = __decorate([

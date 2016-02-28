@@ -29,17 +29,17 @@ var LeaderboardsPage = (function () {
         this.simpleTabsComponent.switchToTab(0);
     };
     LeaderboardsPage.prototype.showRecentlyFinishedContests = function () {
-        FlurryAgent.logEvent('page/leaderboard/contests');
+        this.client.logEvent('page/leaderboard/contests');
         this.mode = 'contests';
         this.contestList.refresh();
     };
     LeaderboardsPage.prototype.showFriendsLeaderboard = function () {
-        FlurryAgent.logEvent('page/leaderboard/friends');
+        this.client.logEvent('page/leaderboard/friends');
         this.mode = 'leaders';
         this.leadersComponent.showFriends(false);
     };
     LeaderboardsPage.prototype.showWeeklyLeaderboard = function () {
-        FlurryAgent.logEvent('page/leaderboard/weekly');
+        this.client.logEvent('page/leaderboard/weekly');
         this.mode = 'leaders';
         this.leadersComponent.showWeekly();
     };

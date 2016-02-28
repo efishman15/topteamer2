@@ -17,6 +17,11 @@ export class LikePage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/like',{'contestId' : this.contest._id});
+    this.client.logEvent('page/like',{'contestId' : this.contest._id});
+  }
+
+  like() {
+    this.client.logEvent('like/click');
+    window.open(this.client.settings.general.facebookFanPage, '_new');
   }
 }

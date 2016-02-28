@@ -18,7 +18,7 @@ var QuestionStatsPage = (function () {
     }
     QuestionStatsPage.prototype.onPageWillEnter = function () {
         var _this = this;
-        FlurryAgent.logEvent('page/questionStats', { 'questionId': this.question._id });
+        this.client.logEvent('page/questionStats', { 'questionId': this.question._id });
         if (this.chartDataSource) {
             FusionCharts.ready(function () {
                 var chart = new FusionCharts({
@@ -34,6 +34,7 @@ var QuestionStatsPage = (function () {
         }
     };
     QuestionStatsPage.prototype.dismiss = function (action) {
+        this.client.logEvent('quiz/stats/' + (action ? action : 'cancel'));
         this.viewController.dismiss(action);
     };
     QuestionStatsPage = __decorate([

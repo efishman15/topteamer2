@@ -76,7 +76,7 @@ export class SetContestPage {
         this.showStartDate = true;
       }
 
-      if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
+      if (this.contestLocalCopy.type.id === 'userTrivia') {
         this.retrieveUserQuestions();
       }
     }
@@ -86,7 +86,7 @@ export class SetContestPage {
         'startDate': this.startDate,
         'endDate': this.endDate,
         'endOption': 'h24',
-        'content': this.params.data.content,
+        'type': this.params.data.type,
         'participants': 0,
         'manualParticipants': 0,
         'manualRating': 0,
@@ -130,12 +130,12 @@ export class SetContestPage {
                 }
               },
               (error) => {
-                FlurryAgent.myLogError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
+                this.client.logError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
               });
 
           },
           function (msg) {
-            FlurryAgent.myLogError('AndroidBillingError', 'Error getting product details: ' + msg);
+            this.client.logError('AndroidBillingError', 'Error getting product details: ' + msg);
           }, this.client.session.features.newContest.purchaseData.productId);
       }
     }
@@ -155,7 +155,7 @@ export class SetContestPage {
     if (this.params.data.mode === 'edit') {
       eventData.contestId = this.params.data.contest._id;
     }
-    FlurryAgent.logEvent('page/setContest', eventData);
+    this.client.logEvent('page/setContest', eventData);
     this.submitted = false;
   }
 
@@ -202,7 +202,7 @@ export class SetContestPage {
             paymentService.showPurchaseSuccess(serverPurchaseData);
           }, (error) => {
             //TODO: hide ionic loading...
-            FlurryAgent.myLogError('AndroidBilling', 'Error consuming product: ' + error);
+            this.client.logError('AndroidBilling', 'Error consuming product: ' + error);
             if (reject) {
               reject();
             }
@@ -279,7 +279,9 @@ export class SetContestPage {
   }
 
   removeContest() {
+    this.client.logEvent('contest/remove/click', {'contestId' : this.contestLocalCopy._id});
     alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.contestLocalCopy.name}).then(() => {
+      this.client.logEvent('contest/removed', {'contestId' : this.contestLocalCopy._id});
       contestsService.removeContest(this.contestLocalCopy._id).then(() => {
         this.client.events.publish('topTeamer:contestRemoved');
         setTimeout(() => {
@@ -373,12 +375,13 @@ export class SetContestPage {
 
   setContest() {
 
+    this.client.logEvent('contest/set');
     this.submitted = true;
     if (!this.contestForm.valid) {
       return;
     }
 
-    if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
+    if (this.contestLocalCopy.type.id === 'userTrivia') {
       if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
 
         if (!this.userQuestionsMinimumCheck()) {
@@ -406,7 +409,7 @@ export class SetContestPage {
       this.contestLocalCopy.name = this.client.translate('CONTEST_NAME', {
         'team0': this.contestLocalCopy.teams[0].name,
         'team1': this.contestLocalCopy.teams[1].name,
-        'category': this.client.translate(this.contestLocalCopy.content.category.name)
+        'type': this.client.translate(this.contestLocalCopy.type.name)
       });
 
       if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {
@@ -427,14 +430,14 @@ export class SetContestPage {
         };
 
         if (this.params.data.mode === 'add') {
-          FlurryAgent.logEvent('contest/created', contestParams);
+          this.client.logEvent('contest/created', contestParams);
           this.client.events.publish('topTeamer:contestCreated', contest);
           var options = {animate: false};
           this.client.nav.pop(options).then(() => {
             if (!this.client.user.clientInfo.mobile) {
               //For web - no animation - the share screen will be on top with its animation
               this.client.nav.push(ContestPage, {'contest': contest}).then(() => {
-                shareService.share(contest);
+                shareService.share('newContestWebPopup', contest);
               });
             }
             else {
@@ -447,7 +450,7 @@ export class SetContestPage {
           });
         }
         else {
-          FlurryAgent.logEvent('contest/updated', contestParams);
+          this.client.logEvent('contest/updated', contestParams);
           this.client.events.publish('topTeamer:contestUpdated', contest);
           this.client.nav.pop();
         }

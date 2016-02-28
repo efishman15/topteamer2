@@ -23,7 +23,7 @@ exports.prepareContestChart = function (contest) {
     setTimeDisplay(contest);
     if (contest.status === 'finished') {
         //Contest Finished
-        contestCaption = client.translate(contest.content.category.name);
+        contestCaption = client.translate(contest.type.name);
         if (contest.teams[0].chartValue > contest.teams[1].chartValue) {
             contestCaptionColor = client.settings.charts.captions.finished.win.caption.color;
             contestSubCaption = client.translate('CONTEST_FINISHED_TEAM_WON_CAPTION', { 'team': contest.teams[0].name });
@@ -46,7 +46,7 @@ exports.prepareContestChart = function (contest) {
     else {
         contestCaption = contest.teams[0].name + ' ' + client.translate('AGAINST') + ' ' + contest.teams[1].name;
         contestCaptionColor = client.settings.charts.captions.running.caption.color;
-        contestSubCaption = client.translate(contest.content.category.name);
+        contestSubCaption = client.translate(contest.type.name);
         contestSubCaptionColor = client.settings.charts.captions.running.subCaption.color;
     }
     var contestTimeWidth = client.canvasContext.measureText(contest.time.end.text).width;

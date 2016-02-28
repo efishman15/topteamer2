@@ -19,7 +19,7 @@ var SearchQuestionsPage = (function () {
         this.searchText = '';
     }
     SearchQuestionsPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/searchQuestions');
+        this.client.logEvent('page/searchQuestions');
     };
     SearchQuestionsPage.prototype.search = function (event) {
         var _this = this;
@@ -41,7 +41,7 @@ var SearchQuestionsPage = (function () {
         });
     };
     SearchQuestionsPage.prototype.dismiss = function (applyChanges) {
-        var result;
+        this.client.logEvent('questions/search/' + (applyChanges ? 'select' : 'cancel'));
         if (applyChanges) {
             //Find how many selected
             var selectedCount = 0;

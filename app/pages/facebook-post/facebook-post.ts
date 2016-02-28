@@ -18,18 +18,20 @@ export class FacebookPostPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/facebookPost', {'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey});
+    this.client.logEvent('page/facebookPost', {'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey});
   }
 
   post() {
+    this.client.logEvent('contest/facebook/post/click');
     facebookService.post(this.quizResults.data.facebookPost).then((response) => {
       this.close();
     }, (error) => {
-      FlurryAgent.myLogError('FacebookPostError', 'Error posting: ' + error);
+      this.client.logError('FacebookPostError', 'Error posting: ' + error);
     })
   }
 
   close() {
+    this.client.logEvent('contest/facebook/post/cancel');
     this.viewController.dismiss();
   }
 }

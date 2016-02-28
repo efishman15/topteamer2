@@ -36,7 +36,7 @@ export class ServerPopupPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/serverPopup', {'title' : this.serverPopup.title, 'message' : this.serverPopup.message});
+    this.client.logEvent('page/serverPopup', {'title' : this.serverPopup.title, 'message' : this.serverPopup.message});
   }
 
   buttonAction(button) {
@@ -66,13 +66,13 @@ export class ServerPopupPage {
         if (button.contestId) {
           contestsService.getContest(button.contestId).then ((contest) => {
             this.viewController.dismiss(button).then(() => {
-              shareService.share(contest);
+              shareService.share('serverPopup',contest);
             });
           });
         }
         else {
           this.viewController.dismiss(button).then(() => {
-            shareService.share();
+            shareService.share('serverPopup');
           });
         }
         break;

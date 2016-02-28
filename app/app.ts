@@ -33,8 +33,6 @@ class topTeamerApp {
 
   initApp() {
 
-    //TODO: Global page change detection to report to flurry about page navigations
-    //TODO: Flurry events
     //TODO: Hardware back button
     //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
 
@@ -125,7 +123,7 @@ class topTeamerApp {
       inappbilling.init((resultInit) => {
         },
         (errorInit) => {
-          FlurryAgent.myLogError('InAppBilling', errorInit);
+          this.client.logError('InAppBilling', errorInit);
         }
         ,
         {showLog: true}, []
@@ -150,17 +148,13 @@ class topTeamerApp {
 
     //FlurryAgent.setDebugLogEnabled(true);
     FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
-
-    FlurryAgent.myLogError = (errorType, message) => {
-      FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
-    };
   }
 
   initBranch() {
     window.myHandleBranch = (err, data) => {
       try {
         if (err) {
-          FlurryAgent.myLogError('BranchIoError', 'Error received during branch init: ' + err);
+          this.client.logError('BranchIoError', 'Error received during branch init: ' + err);
           return;
         }
 
@@ -171,7 +165,7 @@ class topTeamerApp {
         }
       }
       catch (e) {
-        FlurryAgent.myLogError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + parsedData + ', error: ' + e);
+        this.client.logError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
       }
 
       window.initBranch = () => {
@@ -266,11 +260,12 @@ class topTeamerApp {
   }
 
   newContest() {
+    this.client.logEvent('menu/newContest');
     var modal = Modal.create(ContestTypePage);
-    modal.onDismiss((content) => {
-      if (content) {
+    modal.onDismiss((contestType) => {
+      if (contestType) {
         setTimeout(() => {
-          this.client.nav.push(SetContestPage, {'mode': 'add', 'content': content});
+          this.client.nav.push(SetContestPage, {'mode': 'add', 'type': contestType});
         }, 500);
       }
     });
@@ -278,20 +273,18 @@ class topTeamerApp {
   }
 
   share() {
-    shareService.share();
+    this.client.logEvent('menu/share');
+    shareService.share('menu');
   }
 
   settings() {
+    this.client.logEvent('menu/settings');
     this.client.nav.push(SettingsPage);
   }
 
   systemTools() {
+    this.client.logEvent('menu/systemTools');
     this.client.nav.push(SystemToolsPage);
   }
-
-  menuOpening(event) {
-    console.log('menu opening: ' + JSON.stringify(event));
-  }
-
 }
 

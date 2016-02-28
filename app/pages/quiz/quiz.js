@@ -37,7 +37,7 @@ var QuizPage = (function () {
         this.init();
     };
     QuizPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/quiz', { 'contestId': this.params.data.contestId });
+        this.client.logEvent('page/quiz', { 'contestId': this.params.data.contestId });
     };
     QuizPage.prototype.onPageDidEnter = function () {
         //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
@@ -48,7 +48,6 @@ var QuizPage = (function () {
         }
         this.init();
         this.contestId = this.params.data.contestId;
-        this.source = this.params.data.source;
         this.startQuiz();
     };
     QuizPage.prototype.init = function () {
@@ -65,7 +64,7 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.startQuiz = function () {
         var _this = this;
-        FlurryAgent.logEvent('quiz/' + this.source + '/started');
+        this.client.logEvent('quiz/started', { 'source': this.params.data.source, 'typeId': this.params.data.typeId });
         quizService.start(this.contestId).then(function (data) {
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;
@@ -107,13 +106,13 @@ var QuizPage = (function () {
                 _this.quizData.xpProgress = null;
             }
             if (data.question.correct) {
-                FlurryAgent.logEvent('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/correct');
+                _this.client.logEvent('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/correct');
                 correctAnswerId = answerId;
                 _this.quizData.currentQuestion.answers[answerId].answeredCorrectly = true;
                 soundService.play('audio/click_ok');
             }
             else {
-                FlurryAgent.logEvent('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
+                _this.client.logEvent('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
                 soundService.play('audio/click_wrong');
                 correctAnswerId = data.question.correctAnswerId;
                 _this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
@@ -141,7 +140,7 @@ var QuizPage = (function () {
             _this.quizData.currentQuestion.answered = false;
             _this.quizData.currentQuestion.doAnimation = true; //Animation end will trigger quiz proceed
             _this.drawQuizProgress();
-            FlurryAgent.logEvent('quiz/gotQuestion' + (_this.quizData.currentQuestionIndex + 1));
+            _this.client.logEvent('quiz/gotQuestion' + (_this.quizData.currentQuestionIndex + 1));
         });
     };
     QuizPage.prototype.questionTransitionEnd = function () {
@@ -179,7 +178,7 @@ var QuizPage = (function () {
         if (this.quizData.finished) {
             this.drawQuizProgress();
             this.client.session.score += this.quizData.results.data.score;
-            FlurryAgent.logEvent('quiz/finished', {
+            this.client.logEvent('quiz/finished', {
                 'score': '' + this.quizData.results.data.score,
                 'title': this.quizData.results.data.title,
                 'message': this.quizData.results.data.message

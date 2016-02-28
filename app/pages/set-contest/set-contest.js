@@ -47,7 +47,7 @@ var SetContestPage = (function () {
             else {
                 this.showStartDate = true;
             }
-            if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
+            if (this.contestLocalCopy.type.id === 'userTrivia') {
                 this.retrieveUserQuestions();
             }
         }
@@ -57,7 +57,7 @@ var SetContestPage = (function () {
                 'startDate': this.startDate,
                 'endDate': this.endDate,
                 'endOption': 'h24',
-                'content': this.params.data.content,
+                'type': this.params.data.type,
                 'participants': 0,
                 'manualParticipants': 0,
                 'manualRating': 0,
@@ -95,10 +95,10 @@ var SetContestPage = (function () {
                             }
                         }
                     }, function (error) {
-                        FlurryAgent.myLogError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
+                        _this.client.logError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
                     });
                 }, function (msg) {
-                    FlurryAgent.myLogError('AndroidBillingError', 'Error getting product details: ' + msg);
+                    this.client.logError('AndroidBillingError', 'Error getting product details: ' + msg);
                 }, this.client.session.features.newContest.purchaseData.productId);
             }
         }
@@ -114,7 +114,7 @@ var SetContestPage = (function () {
         if (this.params.data.mode === 'edit') {
             eventData.contestId = this.params.data.contest._id;
         }
-        FlurryAgent.logEvent('page/setContest', eventData);
+        this.client.logEvent('page/setContest', eventData);
         this.submitted = false;
     };
     SetContestPage.prototype.retrieveUserQuestions = function () {
@@ -151,7 +151,7 @@ var SetContestPage = (function () {
                     paymentService.showPurchaseSuccess(serverPurchaseData);
                 }, function (error) {
                     //TODO: hide ionic loading...
-                    FlurryAgent.myLogError('AndroidBilling', 'Error consuming product: ' + error);
+                    _this.client.logError('AndroidBilling', 'Error consuming product: ' + error);
                     if (reject) {
                         reject();
                     }
@@ -220,7 +220,9 @@ var SetContestPage = (function () {
     };
     SetContestPage.prototype.removeContest = function () {
         var _this = this;
+        this.client.logEvent('contest/remove/click', { 'contestId': this.contestLocalCopy._id });
         alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.contestLocalCopy.name }).then(function () {
+            _this.client.logEvent('contest/removed', { 'contestId': _this.contestLocalCopy._id });
             contestsService.removeContest(_this.contestLocalCopy._id).then(function () {
                 _this.client.events.publish('topTeamer:contestRemoved');
                 setTimeout(function () {
@@ -300,11 +302,12 @@ var SetContestPage = (function () {
     ;
     SetContestPage.prototype.setContest = function () {
         var _this = this;
+        this.client.logEvent('contest/set');
         this.submitted = true;
         if (!this.contestForm.valid) {
             return;
         }
-        if (this.contestLocalCopy.content.source === 'trivia' && this.contestLocalCopy.content.category.id === 'user') {
+        if (this.contestLocalCopy.type.id === 'userTrivia') {
             if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
                 if (!this.userQuestionsMinimumCheck()) {
                     return;
@@ -325,7 +328,7 @@ var SetContestPage = (function () {
             this.contestLocalCopy.name = this.client.translate('CONTEST_NAME', {
                 'team0': this.contestLocalCopy.teams[0].name,
                 'team1': this.contestLocalCopy.teams[1].name,
-                'category': this.client.translate(this.contestLocalCopy.content.category.name)
+                'type': this.client.translate(this.contestLocalCopy.type.name)
             });
             if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {
                 this.contestNameChanged = true;
@@ -341,14 +344,14 @@ var SetContestPage = (function () {
                     'questionsSource': _this.contestLocalCopy.questionsSource
                 };
                 if (_this.params.data.mode === 'add') {
-                    FlurryAgent.logEvent('contest/created', contestParams);
+                    _this.client.logEvent('contest/created', contestParams);
                     _this.client.events.publish('topTeamer:contestCreated', contest);
                     var options = { animate: false };
                     _this.client.nav.pop(options).then(function () {
                         if (!_this.client.user.clientInfo.mobile) {
                             //For web - no animation - the share screen will be on top with its animation
                             _this.client.nav.push(contest_1.ContestPage, { 'contest': contest }).then(function () {
-                                shareService.share(contest);
+                                shareService.share('newContestWebPopup', contest);
                             });
                         }
                         else {
@@ -361,7 +364,7 @@ var SetContestPage = (function () {
                     });
                 }
                 else {
-                    FlurryAgent.logEvent('contest/updated', contestParams);
+                    _this.client.logEvent('contest/updated', contestParams);
                     _this.client.events.publish('topTeamer:contestUpdated', contest);
                     _this.client.nav.pop();
                 }

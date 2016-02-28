@@ -63,12 +63,13 @@ export class QuestionEditorPage {
     if (this.mode === 'edit') {
         eventData.questionId = this.question._id;
     }
-    FlurryAgent.logEvent('page/questionEditor', eventData);
+    this.client.logEvent('page/questionEditor', eventData);
     this.submitted = false;
   }
 
   dismiss(applyChanges) {
 
+    this.client.logEvent('question/' + (applyChanges ? 'set' : 'cancel'));
     var result;
     if (applyChanges) {
 

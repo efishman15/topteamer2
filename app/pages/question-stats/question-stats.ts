@@ -20,7 +20,7 @@ export class QuestionStatsPage {
 
   onPageWillEnter() {
 
-    FlurryAgent.logEvent('page/questionStats', {'questionId' : this.question._id});
+    this.client.logEvent('page/questionStats', {'questionId' : this.question._id});
 
     if (this.chartDataSource) {
       FusionCharts.ready(() => {
@@ -40,6 +40,7 @@ export class QuestionStatsPage {
   }
 
   dismiss(action) {
+    this.client.logEvent('quiz/stats/' + (action ? action : 'cancel'));
     this.viewController.dismiss(action);
   }
 }

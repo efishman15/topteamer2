@@ -26,7 +26,7 @@ export class LoginPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/login');
+    this.client.logEvent('page/login');
   }
 
   onPageDidEnter() {
@@ -35,6 +35,7 @@ export class LoginPage {
   }
 
   login() {
+    this.client.logEvent('login/facebookLogin');
     facebookService.login().then((response) => {
       this.client.nav.pop(LoginPage);
       this.client.facebookServerConnect(response.authResponse).then(() => {
@@ -46,6 +47,7 @@ export class LoginPage {
   changeLanguage(language) {
     this.client.user.settings.language = language;
     localStorage.setItem('language', language);
+    this.client.logEvent('login/changeLanguage', {language: language});
   }
 
 }

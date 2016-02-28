@@ -176,7 +176,7 @@ var Client = (function () {
             for (var i = 1; i <= addition; i++) {
                 myRequestAnimationFrame(function () {
                     var endPoint = (_this.session.xpProgress.current + i) / _this.session.xpProgress.max;
-                    _this.animateXpAddition(startPoint, endPoint, _this.quarter, _this.circle);
+                    _this.animateXpAddition(startPoint, endPoint);
                     //Last iteration should be performed after the animation frame event happened
                     if (i >= addition) {
                         //Add the actual xp to the client side
@@ -222,12 +222,12 @@ var Client = (function () {
                 _this.user.settings = data.session.settings;
                 _this._session = data.session;
                 _this.serverGateway.token = data.session.token;
-                FlurryAgent.setUserId(data.session.userId);
+                _this.setLoggedUserId(data.session.userId);
                 if (data.session.justRegistered) {
-                    FlurryAgent.logEvent('server/register');
+                    _this.logEvent('server/register');
                 }
                 else {
-                    FlurryAgent.logEvent('server/login');
+                    _this.logEvent('server/login');
                 }
                 if (_this.clientInfo.platform === 'android') {
                     var push = PushNotification.init({
@@ -251,7 +251,7 @@ var Client = (function () {
                         }
                     });
                     push.on('error', function (error) {
-                        FlurryAgent.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+                        this.logError('PushNotificationError', 'Error during push: ' + error.message);
                     });
                     var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
                     if (storedGcmRegistration && !session.gcmRegistrationId) {
@@ -463,6 +463,20 @@ var Client = (function () {
         this.serverGateway.token = null;
         this._session = null;
     };
+    Client.prototype.setLoggedUserId = function (userId) {
+        FlurryAgent.setUserId(userId);
+    };
+    Client.prototype.logEvent = function (eventName, eventParams) {
+        if (eventParams) {
+            FlurryAgent.logEvent(eventName, eventParams);
+        }
+        else {
+            FlurryAgent.logEvent(eventName);
+        }
+    };
+    Client.prototype.logError = function (errorType, message) {
+        FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
+    };
     Client = __decorate([
         core_1.Injectable(), 
         __metadata('design:paramtypes', [http_1.Http])
@@ -496,12 +510,7 @@ var ServerGateway = (function () {
                 .timeout(timeout)
                 .map(function (res) { return res.json(); })
                 .subscribe(function (res) { return resolve(res); }, function (err) {
-                if (reject) {
-                    reject(err);
-                }
-                else {
-                    FlurryAgent.myLogError('ServerPost', err);
-                }
+                reject(err);
             });
         });
     };

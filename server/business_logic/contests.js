@@ -133,8 +133,8 @@ function validateContestData(data, callback) {
     }
 
     //Required fields
-    if (!data.contest.startDate || !data.contest.endDate || !data.contest.teams || !data.contest.content) {
-        callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, content'));
+    if (!data.contest.startDate || !data.contest.endDate || !data.contest.teams || !data.contest.type) {
+        callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, type'));
         return;
     }
 
@@ -182,23 +182,27 @@ function validateContestData(data, callback) {
         return;
     }
 
-    //Illegal content source
-    if (!data.contest.content.source || (data.contest.content.source !== 'trivia' && data.contest.content.source !== 'hosted')) {
-        callback(new exceptions.ServerException('content source must be "trivia" or "hosted"', {'content': data.contest.content}));
-        return;
+    //Illegal contest type id
+    if (!data.contest.type.id) {
+      callback(new exceptions.ServerException('type.id must be supplied'));
+      return;
     }
 
-    //Illegal content category id for TRIVIA
-    if (data.contest.content.source === 'trivia' &&
-        (!data.contest.content.category ||
-        !data.contest.content.category.id ||
-        (data.contest.content.category.id !== 'system' && data.contest.content.category.id !== 'user'))) {
-        callback(new exceptions.ServerException('contest.content.category.id must be "system" or "user"', {'content': data.contest.content}));
+    var illegalContestTypeId = true;
+    for(var i=0; i<generalUtils.settings.client.newContest.contestTypes.length; i++) {
+      if (generalUtils.settings.client.newContest.contestTypes[i].id === data.contest.type.id) {
+        illegalContestTypeId = false;
+        break;
+      }
+    }
+
+    if (illegalContestTypeId) {
+        callback(new exceptions.ServerException('type.id is illegal'));
         return;
     }
 
     //User questions validations
-    if (data.contest.content.source === 'trivia' && data.contest.content.category.id === 'user') {
+    if (data.contest.type.id === 'userTrivia') {
 
         //Minimum check
         if (!data.contest.questions || data.contest.questions.visibleCount < generalUtils.settings.client.newContest.privateQuestions.min) {
@@ -274,8 +278,8 @@ function validateContestData(data, callback) {
 
         cleanContest.creator = {'id' : data.session.userId, 'avatar' : data.session.avatar, 'name' : data.session.name, 'date' : now};
 
-        cleanContest.content = data.contest.content;
-        if (cleanContest.content.source === 'trivia' && cleanContest.content.category.id === 'user') {
+        cleanContest.type = data.contest.type;
+        if (cleanContest.type.id === 'userTrivia') {
             cleanContest.questions = data.contest.questions;
         }
 
@@ -339,7 +343,7 @@ function updateContest(data, callback) {
         data.setData['link'] = data.contest.link;
     }
 
-    data.setData.content = data.contest.content;
+    data.setData.type = data.contest.type;
     if (data.contest.userQuestions) {
         data.setData.userQuestions = data.contest.userQuestions;
     }

@@ -25,7 +25,7 @@ var LoginPage = (function () {
         this.client.setPageTitle('GAME_NAME');
     };
     LoginPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/login');
+        this.client.logEvent('page/login');
     };
     LoginPage.prototype.onPageDidEnter = function () {
         //Events here could be serverPopup just as the app loads - the page should be fully visible
@@ -33,6 +33,7 @@ var LoginPage = (function () {
     };
     LoginPage.prototype.login = function () {
         var _this = this;
+        this.client.logEvent('login/facebookLogin');
         facebookService.login().then(function (response) {
             _this.client.nav.pop(LoginPage);
             _this.client.facebookServerConnect(response.authResponse).then(function () {
@@ -44,6 +45,7 @@ var LoginPage = (function () {
     LoginPage.prototype.changeLanguage = function (language) {
         this.client.user.settings.language = language;
         localStorage.setItem('language', language);
+        this.client.logEvent('login/changeLanguage', { language: language });
     };
     LoginPage = __decorate([
         ionic_1.Page({

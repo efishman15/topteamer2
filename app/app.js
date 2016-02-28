@@ -28,8 +28,6 @@ var topTeamerApp = (function () {
         });
     }
     topTeamerApp.prototype.initApp = function () {
-        //TODO: Global page change detection to report to flurry about page navigations
-        //TODO: Flurry events
         //TODO: Hardware back button
         //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
         var _this = this;
@@ -104,7 +102,7 @@ var topTeamerApp = (function () {
         if (this.client.platform.is('android') && typeof inappbilling !== 'undefined') {
             inappbilling.init(function (resultInit) {
             }, function (errorInit) {
-                FlurryAgent.myLogError('InAppBilling', errorInit);
+                _this.client.logError('InAppBilling', errorInit);
             }, { showLog: true }, []);
         }
         document.addEventListener('resume', function (event) {
@@ -121,16 +119,13 @@ var topTeamerApp = (function () {
     topTeamerApp.prototype.initFlurry = function () {
         //FlurryAgent.setDebugLogEnabled(true);
         FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
-        FlurryAgent.myLogError = function (errorType, message) {
-            FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
-        };
     };
     topTeamerApp.prototype.initBranch = function () {
         var _this = this;
         window.myHandleBranch = function (err, data) {
             try {
                 if (err) {
-                    FlurryAgent.myLogError('BranchIoError', 'Error received during branch init: ' + err);
+                    _this.client.logError('BranchIoError', 'Error received during branch init: ' + err);
                     return;
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
@@ -140,7 +135,7 @@ var topTeamerApp = (function () {
                 }
             }
             catch (e) {
-                FlurryAgent.myLogError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + parsedData + ', error: ' + e);
+                _this.client.logError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
             }
             window.initBranch = function () {
                 branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
@@ -223,27 +218,28 @@ var topTeamerApp = (function () {
     };
     topTeamerApp.prototype.newContest = function () {
         var _this = this;
+        this.client.logEvent('menu/newContest');
         var modal = ionic_1.Modal.create(contest_type_1.ContestTypePage);
-        modal.onDismiss(function (content) {
-            if (content) {
+        modal.onDismiss(function (contestType) {
+            if (contestType) {
                 setTimeout(function () {
-                    _this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'add', 'content': content });
+                    _this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'add', 'type': contestType });
                 }, 500);
             }
         });
         this.client.nav.present(modal);
     };
     topTeamerApp.prototype.share = function () {
-        shareService.share();
+        this.client.logEvent('menu/share');
+        shareService.share('menu');
     };
     topTeamerApp.prototype.settings = function () {
+        this.client.logEvent('menu/settings');
         this.client.nav.push(settings_1.SettingsPage);
     };
     topTeamerApp.prototype.systemTools = function () {
+        this.client.logEvent('menu/systemTools');
         this.client.nav.push(system_tools_1.SystemToolsPage);
-    };
-    topTeamerApp.prototype.menuOpening = function (event) {
-        console.log('menu opening: ' + JSON.stringify(event));
     };
     topTeamerApp = __decorate([
         ionic_1.App({

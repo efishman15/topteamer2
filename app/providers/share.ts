@@ -68,16 +68,21 @@ export let mobileShare = (contest) => {
   );
 }
 
-export let share = (contest?) => {
+export let share = (source, contest?) => {
 
   var client = Client.getInstance();
+
+  if (contest) {
+    client.logEvent('share/' + source, {'contestId' : contest._id});
+  }
+  else {
+    client.logEvent('share/' + source);
+  }
+
   if (client.user.clientInfo.mobile) {
     this.mobileShare(contest);
   }
   else {
     client.nav.push(SharePage, {'contest' : contest});
   }
-
-  //TODO: flurry + source
-
 }

@@ -18,13 +18,16 @@ export class MobileSharePage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/mobileShare', {'contestId' : this.contest._id});
+    this.client.logEvent('page/mobileShare', {'contestId' : this.contest._id});
   }
 
   dismiss(okPressed) {
+
+    this.client.logEvent('contest/popup/share/' + okPressed);
+
     this.viewController.dismiss(okPressed).then(() => {
       if (okPressed) {
-        shareService.share(this.contest);
+        shareService.share('mobilePopup', this.contest);
       }
     });
   }

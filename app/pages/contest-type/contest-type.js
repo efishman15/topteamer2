@@ -15,10 +15,11 @@ var ContestTypePage = (function () {
         this.viewController = viewController;
     }
     ContestTypePage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/contestType');
+        this.client.logEvent('page/contestType');
     };
-    ContestTypePage.prototype.selectContestContent = function (content) {
-        this.viewController.dismiss(content);
+    ContestTypePage.prototype.selectContestContent = function (contestType) {
+        this.client.logEvent('newContest/type/' + (contestType ? contestType.id : 'cancel'));
+        this.viewController.dismiss(contestType);
     };
     ContestTypePage = __decorate([
         ionic_1.Page({

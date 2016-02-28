@@ -51,13 +51,18 @@ exports.mobileShare = function (contest) {
     var shareVariables = _this.getVariables(contest);
     $cordovaSocialSharing.share(shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl);
 };
-exports.share = function (contest) {
+exports.share = function (source, contest) {
     var client = client_1.Client.getInstance();
+    if (contest) {
+        client.logEvent('share/' + source, { 'contestId': contest._id });
+    }
+    else {
+        client.logEvent('share/' + source);
+    }
     if (client.user.clientInfo.mobile) {
         _this.mobileShare(contest);
     }
     else {
         client.nav.push(share_1.SharePage, { 'contest': contest });
     }
-    //TODO: flurry + source
 };

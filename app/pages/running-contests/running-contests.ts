@@ -19,7 +19,7 @@ export class RunningContestsPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/runningContests');
+    this.client.logEvent('page/runningContests');
     if (this.contestList) {
       this.refreshList();
     }

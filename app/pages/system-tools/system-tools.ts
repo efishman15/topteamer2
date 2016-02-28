@@ -16,7 +16,7 @@ export class SystemToolsPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/systemTools');
+    this.client.logEvent('page/systemTools');
   }
 
   clearCache() {

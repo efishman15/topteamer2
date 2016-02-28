@@ -16,7 +16,7 @@ var PurchaseSuccessPage = (function () {
         this.params = params;
     }
     PurchaseSuccessPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/purchaseSuccess', { 'feature': this.params.data.featurePurchased });
+        this.client.logEvent('page/purchaseSuccess', { 'feature': this.params.data.featurePurchased });
         this.unlockText = this.client.translate(this.client.session.features[this.params.data.featurePurchased].unlockText);
     };
     PurchaseSuccessPage.prototype.proceed = function () {

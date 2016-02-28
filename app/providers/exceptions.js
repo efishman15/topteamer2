@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var core_1 = require("angular2/core");
+var client_1 = require('./client');
 var MyExceptionHandler = (function (_super) {
     __extends(MyExceptionHandler, _super);
     function MyExceptionHandler() {
@@ -14,7 +15,8 @@ var MyExceptionHandler = (function (_super) {
         if (exception.wrapperStack) {
             errorMessage += ', ' + exception.wrapperStack;
         }
-        FlurryAgent.myLogError('UnhandledException', errorMessage);
+        var client = client_1.Client.getInstance();
+        client.logError('UnhandledException', errorMessage);
         _super.prototype.call.call(this, exception, stackTrace, reason);
     };
     return MyExceptionHandler;

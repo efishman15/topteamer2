@@ -17,13 +17,14 @@ var MobileSharePage = (function () {
         this.viewController = viewController;
     }
     MobileSharePage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/mobileShare', { 'contestId': this.contest._id });
+        this.client.logEvent('page/mobileShare', { 'contestId': this.contest._id });
     };
     MobileSharePage.prototype.dismiss = function (okPressed) {
         var _this = this;
+        this.client.logEvent('contest/popup/share/' + okPressed);
         this.viewController.dismiss(okPressed).then(function () {
             if (okPressed) {
-                shareService.share(_this.contest);
+                shareService.share('mobilePopup', _this.contest);
             }
         });
     };

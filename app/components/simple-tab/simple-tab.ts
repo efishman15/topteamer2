@@ -12,11 +12,18 @@ export class SimpleTabComponent {
   @Input() active = this.active || false;
 
   @Output() selected = new EventEmitter();
+  _active: Boolean;
 
   constructor(simpleTabs: SimpleTabsComponent){
-
     simpleTabs.addTab(this);
+  }
 
+  get active() : Boolean {
+    return this._active;
+  }
+
+  set active(value: Boolean) {
+    this._active = value;
   }
 
   get selectedEmitter() : EventEmitter {

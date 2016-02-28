@@ -14,30 +14,11 @@
     <h5>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h5>
 
     <ion-list>
-      <div padding>
-        <a padding href="https://www.facebook.com/sharer.php?u={{shareVariables.shareUrl}}?ref=shareFacebook"
-           target="_blank"><img src="images/social/facebook.png" width="45" height="45"></a>
-        <a padding href="https://plus.google.com/share?url={{shareVariables.shareUrl}}?ref=shareGoogle"
-           target="_blank"><img src="images/social/googleplus.png" width="45" height="45"></a>
-        <a padding
-           href="https://twitter.com/share?url={{shareVariables.shareUrl}}?ref=shareTwitter&text={{shareVariables.shareSubject}}&via={{client.settings.share.twitterAccount}}"
-           target="_blank"><img src="images/social/twitter.png" width="45" height="45"></a>
-        <a padding href="mailto:?subject={{shareVariables.shareSubject}}&body={{shareVariables.shareBodyEmail}}"
-           target="_blank"><img src="images/social/email.png" width="45" height="45"></a>
-      </div>
-      <div padding>
-        <a padding
-           href="https://www.linkedin.com/shareArticle?mini=true&url={{shareVariables.shareUrl}}?ref=shareLinkedIn"
-           target="_blank"><img src="images/social/linkedin.png" width="45" height="45"></a>
-        <a padding
-           href="https://www.stumbleupon.com/submit?url={{shareVariables.shareUrl}}&title={{shareVariables.shareSubject}}"
-           target="_blank"><img src="images/social/stumbleupon.png" width="45" height="45"
-        ></a>
-        <a padding href="https://www.digg.com/submit?url={{shareVariables.shareUrl}}" target="_blank"><img
-          src="images/social/digg.png" width="45" height="45"></a>
-        <a padding
-           href="https://www.reddit.com/submit?url={{shareVariables.shareUrl}}&title={{shareVariables.shareSubject}}"
-           target="_blank"><img src="images/social/reddit.png" width="45" height="45"></a>
+      <div padding *ngFor="#row of client.settings.share.web.networks, #i=index">
+        <a padding *ngFor="#network of client.settings.share.web.networks[i]" (click)="share(network)" title="{{network.name}}">
+          <img src="{{network.image}}" width="{{client.settings.share.web.iconSize.width}}"
+               height="client.settings.share.web.iconSize.height">
+        </a>
       </div>
     </ion-list>
   </div>

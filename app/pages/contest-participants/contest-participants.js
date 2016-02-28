@@ -32,7 +32,7 @@ var ContestParticipantsPage = (function () {
         }
     }
     ContestParticipantsPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/contestParticipants', { 'contestId': this.contestId });
+        this.client.logEvent('page/contestParticipants', { 'contestId': this.contestId });
         if (this.leadersComponent) {
             this.showContestParticipants();
         }
@@ -49,11 +49,11 @@ var ContestParticipantsPage = (function () {
             }, 500);
             return;
         }
-        FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/all');
+        this.client.logEvent('contest/participants/' + this.source + '/leaderboard/all');
         this.leadersComponent.showContestParticipants(this.contest._id);
     };
     ContestParticipantsPage.prototype.showTeamParticipants = function (teamId) {
-        FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/team' + teamId);
+        this.client.logEvent('contest/participants/' + this.source + '/leaderboard/team' + teamId);
         this.leadersComponent.showContestParticipants(this.contest._id, teamId);
     };
     __decorate([

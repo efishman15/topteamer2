@@ -30,7 +30,7 @@
 </ion-menu>
 
 <!-- right menu -->
-<ion-menu *ngIf="client.loaded && client.currentLanguage.direction==='rtl'" [content]="content" side="right" (opening)="menuOpening($event)">
+<ion-menu *ngIf="client.loaded && client.currentLanguage.direction==='rtl'" [content]="content" side="right">
 
   <ion-toolbar danger *ngIf="client.loaded">
     <ion-title>{{client.translate('TOOLS')}}</ion-title>

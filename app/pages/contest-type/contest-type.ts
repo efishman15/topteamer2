@@ -10,7 +10,7 @@ export class ContestTypePage {
   viewController: ViewController;
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/contestType');
+    this.client.logEvent('page/contestType');
   }
 
   constructor(viewController: ViewController) {
@@ -18,8 +18,9 @@ export class ContestTypePage {
     this.viewController = viewController;
   }
 
-  selectContestContent(content) {
-    this.viewController.dismiss(content);
+  selectContestContent(contestType) {
+    this.client.logEvent('newContest/type/' + (contestType ? contestType.id : 'cancel'));
+    this.viewController.dismiss(contestType);
   }
 
 }

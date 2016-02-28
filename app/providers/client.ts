@@ -236,7 +236,7 @@ export class Client {
       for (var i = 1; i <= addition; i++) {
         myRequestAnimationFrame(() => {
           var endPoint = (this.session.xpProgress.current + i) / this.session.xpProgress.max;
-          this.animateXpAddition(startPoint, endPoint, this.quarter, this.circle);
+          this.animateXpAddition(startPoint, endPoint);
 
           //Last iteration should be performed after the animation frame event happened
           if (i >= addition) {
@@ -297,13 +297,13 @@ export class Client {
         this._session = data.session;
         this.serverGateway.token = data.session.token;
 
-        FlurryAgent.setUserId(data.session.userId);
+        this.setLoggedUserId(data.session.userId);
 
         if (data.session.justRegistered) {
-          FlurryAgent.logEvent('server/register');
+          this.logEvent('server/register');
         }
         else {
-          FlurryAgent.logEvent('server/login');
+          this.logEvent('server/login');
         }
 
         if (this.clientInfo.platform === 'android') {
@@ -338,7 +338,7 @@ export class Client {
           });
 
           push.on('error', function (error) {
-            FlurryAgent.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+            this.logError('PushNotificationError', 'Error during push: ' + error.message);
           });
 
           var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
@@ -523,6 +523,24 @@ export class Client {
     this.serverGateway.token = null;
     this._session = null;
   }
+
+  setLoggedUserId(userId: string) {
+    FlurryAgent.setUserId(userId);
+  }
+
+  logEvent(eventName: string, eventParams?: Object) {
+    if (eventParams) {
+      FlurryAgent.logEvent(eventName, eventParams);
+    }
+    else {
+      FlurryAgent.logEvent(eventName);
+    }
+  }
+
+  logError(errorType: string, message: string) {
+    FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
+  }
+
 }
 
 export class ServerGateway {
@@ -564,12 +582,7 @@ export class ServerGateway {
         .map((res:Response) => res.json())
         .subscribe((res:Object) => resolve(res),
           err => {
-            if (reject) {
-              reject(err);
-            }
-            else {
-              FlurryAgent.myLogError('ServerPost', err);
-            }
+            reject(err);
           });
     });
   };

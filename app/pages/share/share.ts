@@ -23,11 +23,16 @@ export class SharePage {
 
   onPageWillEnter() {
     if (this.contest) {
-      FlurryAgent.logEvent('page/share', {'contestId': this.contest._id});
+      this.client.logEvent('page/share', {'contestId': this.contest._id});
     }
     else {
-      FlurryAgent.logEvent('page/share');
+      this.client.logEvent('page/share');
     }
   }
 
+  share(network) {
+    console.log('network='+ network.name + ', url=' + network.url);
+    window.open(network.url.format({url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail}),'_blank');
+    this.client.logEvent('share/web/' + network.name);
+  }
 }

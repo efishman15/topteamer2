@@ -38,7 +38,7 @@ export class ContestParticipantsPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/contestParticipants',{'contestId' : this.contestId});
+    this.client.logEvent('page/contestParticipants',{'contestId' : this.contestId});
     if (this.leadersComponent) {
       this.showContestParticipants();
     }
@@ -58,13 +58,13 @@ export class ContestParticipantsPage {
       return;
     }
 
-    FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/all');
+    this.client.logEvent('contest/participants/' + this.source + '/leaderboard/all');
     this.leadersComponent.showContestParticipants(this.contest._id)
 
   }
 
   showTeamParticipants(teamId) {
-    FlurryAgent.logEvent('contest/participants/' + this.source + '/leaderboard/team' + teamId);
+    this.client.logEvent('contest/participants/' + this.source + '/leaderboard/team' + teamId);
     this.leadersComponent.showContestParticipants(this.contest._id, teamId);
   }
 }

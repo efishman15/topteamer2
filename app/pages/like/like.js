@@ -17,7 +17,11 @@ var LikePage = (function () {
         }
     }
     LikePage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/like', { 'contestId': this.contest._id });
+        this.client.logEvent('page/like', { 'contestId': this.contest._id });
+    };
+    LikePage.prototype.like = function () {
+        this.client.logEvent('like/click');
+        window.open(this.client.settings.general.facebookFanPage, '_new');
     };
     LikePage = __decorate([
         ionic_1.Page({

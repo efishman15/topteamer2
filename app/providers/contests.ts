@@ -33,7 +33,7 @@ export let prepareContestChart = (contest) => {
   if (contest.status === 'finished') {
     //Contest Finished
 
-    contestCaption = client.translate(contest.content.category.name);
+    contestCaption = client.translate(contest.type.name);
     if (contest.teams[0].chartValue > contest.teams[1].chartValue) {
       contestCaptionColor = client.settings.charts.captions.finished.win.caption.color;
       contestSubCaption = client.translate('CONTEST_FINISHED_TEAM_WON_CAPTION', {'team': contest.teams[0].name});
@@ -57,7 +57,7 @@ export let prepareContestChart = (contest) => {
   else {
     contestCaption = contest.teams[0].name + ' ' + client.translate('AGAINST') + ' ' + contest.teams[1].name;
     contestCaptionColor = client.settings.charts.captions.running.caption.color;
-    contestSubCaption = client.translate(contest.content.category.name);
+    contestSubCaption = client.translate(contest.type.name);
     contestSubCaptionColor = client.settings.charts.captions.running.subCaption.color;
   }
 
@@ -113,7 +113,7 @@ export let prepareContestChart = (contest) => {
 //------------------------------------------------------
 //-- list
 //------------------------------------------------------
-export let list = (tab:string) => {
+export let list = (tab:String) => {
   var postData = {'tab': tab};
   var client = Client.getInstance();
   return client.serverPost('contests/list', postData);
@@ -163,7 +163,7 @@ export let removeContest = (contestId:string) => {
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
-export let setContest = (contest:Object, mode:string, nameChanged:boolean) => {
+export let setContest = (contest:Object, mode:string, nameChanged:Boolean) => {
   var postData = {'contest': contest, 'mode': mode};
   if (nameChanged) {
     postData.nameChanged = nameChanged;

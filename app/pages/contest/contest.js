@@ -29,17 +29,17 @@ var ContestPage = (function () {
         this.client = client_1.Client.getInstance();
         this.params = params;
         if (this.params.data.contestChart) {
-            this.contestId = this.params.contestChart.contest._id;
+            this.contestId = this.params.data.contestChart.contest._id;
             this.contestChart = this.params.data.contestChart;
         }
         else if (this.params.data.contest) {
             //Just created this contest - no chart
-            this.contestId = this.params.contest._id;
+            this.contestId = this.params.data.contest._id;
             this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
         }
         else {
             //Retrieve contest by id
-            this.contestId = this.params.contestId;
+            this.contestId = this.params.data.contestId;
             contestsService.getContest(this.params.data.contestId).then(function (contest) {
                 _this.contestChart = contestsService.prepareContestChart(contest);
             });
@@ -66,14 +66,19 @@ var ContestPage = (function () {
         });
     }
     ContestPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/contest', { 'contestId': this.contestId });
+        this.client.logEvent('page/contest', { 'contestId': this.contestId });
     };
     ContestPage.prototype.onPageWillLeave = function () {
         this.animateLastResults = false;
         this.lastQuizResults = null;
     };
     ContestPage.prototype.playContest = function (source) {
-        this.client.nav.push(quiz_1.QuizPage, { 'contestId': this.contestChart.contest._id, 'source': source });
+        this.client.logEvent('contest/play', {
+            'contestId': this.contestChart.contest._id,
+            'team': '' + this.contestChart.contest.myTeam,
+            'sourceClick': source
+        });
+        this.client.nav.push(quiz_1.QuizPage, { 'contestId': this.contestChart.contest._id, 'source': source, 'typeId': this.contestChart.contest.type.id });
     };
     ContestPage.prototype.showParticipants = function (source) {
         this.client.nav.push(contest_participants_1.ContestParticipantsPage, { 'contest': this.contestChart.contest, 'source': source });
@@ -82,9 +87,9 @@ var ContestPage = (function () {
         var _this = this;
         if (action === void 0) { action = 'join'; }
         contestsService.join(this.contestChart.contest._id, team).then(function (data) {
-            FlurryAgent.logEvent('contest/' + action, {
+            _this.client.logEvent('contest/' + action, {
                 'contestId': _this.contestChart.contest._id,
-                'team': '' + team,
+                'team': '' + _this.contestChart.contest.myTeam,
                 'sourceClick': source
             });
             //Should also cause refresh internally to our contest chart as well as notifying the tabs outside
@@ -108,12 +113,14 @@ var ContestPage = (function () {
         this.joinContest(1 - this.contestChart.contest.myTeam, source, 'switchTeams');
     };
     ContestPage.prototype.editContest = function () {
+        this.client.logEvent('contest/edit/click', { 'contestId': this.contestChart.contest._id });
         this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'edit', 'contest': this.contestChart.contest });
     };
     ContestPage.prototype.share = function (source) {
-        shareService.share(this.contestChart.contest);
+        shareService.share(source, this.contestChart.contest);
     };
     ContestPage.prototype.like = function () {
+        this.client.logEvent('contest/like/click', { 'contestId': this.contestChart.contest._id });
         this.client.nav.push(like_1.LikePage, { 'contest': this.contestChart.contest });
     };
     ContestPage.prototype.onTeamSelected = function (data) {

@@ -18,7 +18,7 @@ export class NewRankPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/newRank', {'rank' : this.client.session.rank});
+    this.client.logEvent('page/newRank', {'rank' : this.client.session.rank});
   }
 
   onPageDidEnter() {

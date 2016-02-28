@@ -22,7 +22,7 @@ export class SearchQuestionsPage {
   }
 
   onPageWillEnter() {
-    FlurryAgent.logEvent('page/searchQuestions');
+    this.client.logEvent('page/searchQuestions');
   }
 
   search(event) {
@@ -49,7 +49,9 @@ export class SearchQuestionsPage {
   }
 
   dismiss(applyChanges) {
-    var result;
+
+    this.client.logEvent('questions/search/' + (applyChanges ? 'select' : 'cancel'));
+
     if (applyChanges) {
 
       //Find how many selected

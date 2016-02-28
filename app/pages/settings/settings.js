@@ -16,19 +16,22 @@ var SettingsPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     SettingsPage.prototype.onPageWillEnter = function () {
-        FlurryAgent.logEvent('page/settings');
+        this.client.logEvent('page/settings');
     };
     SettingsPage.prototype.toggleSound = function () {
+        this.client.logEvent('settings/sound/' + !this.client.session.settings.sound);
         this.client.toggleSound();
     };
     SettingsPage.prototype.switchLanguage = function () {
         var _this = this;
         this.client.switchLanguage(this.client.currentLanguage.value).then(function () {
             _this.client.session.settings.language = _this.client.user.settings.language;
+            _this.client.logEvent('settings/language/change', { language: _this.client.user.settings.language });
         });
     };
     SettingsPage.prototype.logout = function () {
         var _this = this;
+        this.client.logEvent('settings/facebookSignOut');
         facebookService.logout().then(function (response) {
             _this.client.logout();
             _this.client.nav.pop().then(function () {
