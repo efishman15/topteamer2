@@ -1,4 +1,4 @@
-import {Page,Modal} from 'ionic/ionic';
+import {Page,Modal} from 'ionic-angular';
 import {MainTabsPage} from '../main-tabs/main-tabs';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';

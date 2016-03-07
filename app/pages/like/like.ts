@@ -1,4 +1,4 @@
-import {Page,NavParams} from 'ionic/ionic';
+import {Page,NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
 
 @Page({

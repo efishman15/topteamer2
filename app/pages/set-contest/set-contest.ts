@@ -1,4 +1,4 @@
-import {Page, NavParams, Item, Input, Select, Label,Modal} from 'ionic/ionic';
+import {Page, NavParams, Item, Select, Label,Modal} from 'ionic-angular';
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
@@ -190,18 +190,19 @@ export class SetContestPage {
 
       paymentService.processPayment('android', purchaseData, extraPurchaseData).then((serverPurchaseData) => {
 
-        //TODO: ionic loading...
+        this.client.showSpinner = true;
 
         inappbilling.consumePurchase((purchaseData) => {
 
-            //TODO: hide ionic loading...
+            this.client.showSpinner = false;
 
             if (resolve) {
               resolve(purchaseData);
             }
             paymentService.showPurchaseSuccess(serverPurchaseData);
           }, (error) => {
-            //TODO: hide ionic loading...
+
+            this.client.showSpinner = false;
             this.client.logError('AndroidBilling', 'Error consuming product: ' + error);
             if (reject) {
               reject();

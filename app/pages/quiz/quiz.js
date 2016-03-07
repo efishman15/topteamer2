@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic-framework/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
 var question_stats_1 = require('../../pages/question-stats/question-stats');
@@ -64,7 +64,10 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.startQuiz = function () {
         var _this = this;
-        this.client.logEvent('quiz/started', { 'source': this.params.data.source, 'typeId': this.params.data.contest.type.id });
+        this.client.logEvent('quiz/started', {
+            'source': this.params.data.source,
+            'typeId': this.params.data.contest.type.id
+        });
         quizService.start(this.contestId).then(function (data) {
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;
@@ -79,7 +82,7 @@ var QuizPage = (function () {
             }
         }, function (err) {
             _this.modalJustClosed = true;
-            //TODO: IonicBug - wait for the prev alert to be fully dismissed
+            //IonicBug - wait for the prev alert to be fully dismissed
             setTimeout(function () {
                 _this.client.nav.pop();
             }, 1000);
@@ -118,7 +121,7 @@ var QuizPage = (function () {
                 _this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
                 setTimeout(function () {
                     _this.quizData.currentQuestion.answers[data.question.correctAnswerId].correct = true;
-                }, 3000);
+                }, _this.client.settings.quiz.question.wrongAnswerMillisecondsDelay);
             }
             _this.correctButtonName = 'buttonAnswer' + correctAnswerId;
         }, function (err) {
@@ -157,7 +160,7 @@ var QuizPage = (function () {
                         _this.quizProceed();
                     }
                     else {
-                        var modal = ionic_1.Modal.create(new_rank_1.NewRankPage, {
+                        var modal = ionic_angular_1.Modal.create(new_rank_1.NewRankPage, {
                             'xpProgress': _this.quizData.xpProgress
                         });
                         modal.onDismiss(function (okPressed) {
@@ -221,7 +224,7 @@ var QuizPage = (function () {
                         'value': (1 - this.quizData.currentQuestion.correctRatio)
                     });
                 }
-                var modal = ionic_1.Modal.create(question_stats_1.QuestionStatsPage, {
+                var modal = ionic_angular_1.Modal.create(question_stats_1.QuestionStatsPage, {
                     'question': this.quizData.currentQuestion,
                     'chartDataSource': questionChart
                 });
@@ -434,7 +437,7 @@ var QuizPage = (function () {
         for (var i = 0; i < this.quizData.currentQuestion.answers.length; i++) {
             question.answers[this.quizData.currentQuestion.answers[i].originalIndex] = this.quizData.currentQuestion.answers[i].text;
         }
-        var modal = ionic_1.Modal.create(question_editor_1.QuestionEditorPage, { 'question': question, 'mode': 'edit' });
+        var modal = ionic_angular_1.Modal.create(question_editor_1.QuestionEditorPage, { 'question': question, 'mode': 'edit' });
         modal.onDismiss(function (result) {
             _this.modalJustClosed = true;
             if (!result) {
@@ -450,11 +453,11 @@ var QuizPage = (function () {
         this.client.nav.present(modal);
     };
     QuizPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/quiz/quiz.html',
             directives: [animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
         }), 
-        __metadata('design:paramtypes', [ionic_1.NavParams])
+        __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], QuizPage);
     return QuizPage;
 })();

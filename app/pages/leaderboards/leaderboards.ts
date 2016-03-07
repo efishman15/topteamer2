@@ -1,4 +1,4 @@
-import {Page} from 'ionic/ionic';
+import {Page} from 'ionic-angular';
 import {ViewChild} from 'angular2/core';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';

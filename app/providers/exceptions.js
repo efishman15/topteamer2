@@ -16,6 +16,7 @@ var MyExceptionHandler = (function (_super) {
             errorMessage += ', ' + exception.wrapperStack;
         }
         var client = client_1.Client.getInstance();
+        console.error(errorMessage);
         client.logError('UnhandledException', errorMessage);
         _super.prototype.call.call(this, exception, stackTrace, reason);
     };

@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var core_1 = require('angular2/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
@@ -36,7 +36,7 @@ var MyContestsPage = (function () {
         __metadata('design:type', contest_list_1.ContestListComponent)
     ], MyContestsPage.prototype, "contestList", void 0);
     MyContestsPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/my-contests/my-contests.html',
             directives: [contest_list_1.ContestListComponent]
         }), 

@@ -1,4 +1,4 @@
-import {Page,NavParams} from 'ionic/ionic';
+import {Page,NavParams} from 'ionic-angular';
 import {LeadersComponent} from '../../components/leaders/leaders';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';

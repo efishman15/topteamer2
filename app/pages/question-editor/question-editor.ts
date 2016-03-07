@@ -1,5 +1,5 @@
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
-import {Page,NavParams,ViewController} from 'ionic/ionic';
+import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 
 @Page({

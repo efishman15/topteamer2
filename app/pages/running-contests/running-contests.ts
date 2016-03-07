@@ -1,4 +1,4 @@
-import {IonicApp, Page, Component, NavController} from 'ionic/ionic';
+import {IonicApp, Page, NavController} from 'ionic-angular';
 import {ViewChild} from 'angular2/core';
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Client} from '../../providers/client';

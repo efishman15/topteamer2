@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var client_1 = require('../../providers/client');
 var core_1 = require('angular2/core');
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var leaderboardsService = require('../../providers/leaderboards');
 var facebookService = require('../../providers/facebook');
 var LeadersComponent = (function () {
@@ -45,7 +45,7 @@ var LeadersComponent = (function () {
         core_1.Component({
             selector: 'leaders',
             templateUrl: 'build/components/leaders/leaders.html',
-            directives: [ionic_1.List, ionic_1.Item]
+            directives: [ionic_angular_1.List, ionic_angular_1.Item]
         }), 
         __metadata('design:paramtypes', [])
     ], LeadersComponent);

@@ -16,7 +16,7 @@ var SimpleTabsComponent = (function () {
         _deactivateAllTabs(this.simpleTabs);
         simpleTab.active = true;
         function _deactivateAllTabs(simpleTabs) {
-            simpleTabs.forEach(function (simpleTab) { return simpleTab.active = false; });
+            simpleTabs.forEach(function (simpleTab) { return simpleTab.isActive = false; });
         }
         //Bubble the event outside
         simpleTab.selected.emit();

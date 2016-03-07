@@ -18,8 +18,8 @@ export class SimpleTabsComponent {
     _deactivateAllTabs(this.simpleTabs);
     simpleTab.active = true;
 
-    function _deactivateAllTabs(simpleTabs: SimpleTabsComponent[]){
-      simpleTabs.forEach((simpleTab)=>simpleTab.active = false);
+    function _deactivateAllTabs(simpleTabs: SimpleTabComponent[]){
+      simpleTabs.forEach((simpleTab)=>simpleTab.isActive = false);
     }
 
     //Bubble the event outside

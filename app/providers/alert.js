@@ -1,6 +1,6 @@
 var _this = this;
 var client_1 = require('./client');
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
@@ -19,7 +19,7 @@ exports.alert = function (error) { return new Promise(function (resolve, reject)
     else {
         message = error;
     }
-    alert = ionic_1.Alert.create({
+    alert = ionic_angular_1.Alert.create({
         cssClass: client.currentLanguage.direction,
         message: message,
         buttons: [
@@ -40,7 +40,7 @@ exports.alert = function (error) { return new Promise(function (resolve, reject)
 //------------------------------------------------------
 exports.confirm = function (title, message, params) { return new Promise(function (resolve, reject) {
     var client = client_1.Client.getInstance();
-    var alert = ionic_1.Alert.create({
+    var alert = ionic_angular_1.Alert.create({
         title: client.translate(title, params),
         message: client.translate(message, params),
         cssClass: client.currentLanguage.direction,

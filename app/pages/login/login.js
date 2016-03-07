@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var main_tabs_1 = require('../main-tabs/main-tabs');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
@@ -17,7 +17,7 @@ var LoginPage = (function () {
         var _this = this;
         this.client = client_1.Client.getInstance();
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
-            var modal = ionic_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
+            var modal = ionic_angular_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
             _this.client.nav.present(modal);
         });
     }
@@ -48,7 +48,7 @@ var LoginPage = (function () {
         this.client.logEvent('login/changeLanguage', { language: language });
     };
     LoginPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/login/login.html'
         }), 
         __metadata('design:paramtypes', [])

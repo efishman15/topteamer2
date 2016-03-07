@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var leaders_1 = require('../../components/leaders/leaders');
 var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
@@ -61,13 +61,12 @@ var ContestParticipantsPage = (function () {
         __metadata('design:type', leaders_1.LeadersComponent)
     ], ContestParticipantsPage.prototype, "leadersComponent", void 0);
     ContestParticipantsPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/contest-participants/contest-participants.html',
             directives: [simple_tabs_1.SimpleTabsComponent, simple_tab_1.SimpleTabComponent, leaders_1.LeadersComponent]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
+        __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], ContestParticipantsPage);
     return ContestParticipantsPage;
-    var _a;
 })();
 exports.ContestParticipantsPage = ContestParticipantsPage;

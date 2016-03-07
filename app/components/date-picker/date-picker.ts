@@ -1,6 +1,6 @@
 import {Component, Input, EventEmitter, Output} from 'angular2/core';
 import {Client} from '../../providers/client';
-import {Icon} from 'ionic/ionic';
+import {Icon} from 'ionic-angular';
 
 @Component({
   selector: 'date-picker',

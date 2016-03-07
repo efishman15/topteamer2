@@ -45,7 +45,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'ionic': 'ionic-framework'
+      'ionic': 'ionic-angular'
     },
     extensions: ['', '.js']
   }

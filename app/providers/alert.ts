@@ -1,5 +1,5 @@
 import {Client} from './client';
-import {Alert, ActionSheet} from 'ionic/ionic';
+import {Alert, ActionSheet} from 'ionic-angular';
 
 //------------------------------------------------------
 //-- alert

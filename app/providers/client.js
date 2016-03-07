@@ -13,10 +13,12 @@ require('rxjs/add/operator/map');
 require('rxjs/add/operator/timeout');
 var facebookService = require('./facebook');
 var alertService = require('./alert');
+var contestsService = require('./contests');
 var Client = (function () {
     function Client(http) {
         this.circle = Math.PI * 2;
         this.quarter = Math.PI / 2;
+        this._showSpinner = true;
         this._loaded = false;
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
@@ -60,9 +62,9 @@ var Client = (function () {
             var language = localStorage.getItem('language');
             _this.getSettings(language).then(function (data) {
                 _this._settings = data.settings;
-                if (!language) {
+                if (!language || language === 'undefined') {
                     //Language was computed on the server using geoInfo or the fallback to the default language
-                    language = settings.language;
+                    language = data.language;
                     localStorage.setItem('language', language);
                 }
                 _this.initUser(language, data.geoInfo);
@@ -77,7 +79,7 @@ var Client = (function () {
     Client.prototype.getSettings = function (localStorageLanguage) {
         var postData = {};
         postData.clientInfo = this.clientInfo;
-        if (localStorageLanguage) {
+        if (localStorageLanguage && localStorageLanguage !== 'undefined') {
             //This will indicate to the server NOT to retrieve geo info - since language is already determined
             postData.language = localStorageLanguage;
         }
@@ -216,8 +218,8 @@ var Client = (function () {
             _this.user.thirdParty.accessToken = facebookAuthResponse.accessToken;
             _this.serverPost('user/facebookConnect', { 'user': _this.user }).then(function (data) {
                 if (_this.user.settings.language !== data.session.settings.language) {
-                    _this.user.settings.language = session.settings.language;
-                    localStorage.setItem('language', _this.user.settings.language);
+                    _this.user.settings.language = data.session.settings.language;
+                    _this.localSwitchLanguage(_this.user.settings.language);
                 }
                 _this.user.settings = data.session.settings;
                 _this._session = data.session;
@@ -248,13 +250,15 @@ var Client = (function () {
                     });
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData.contestId) {
+                            //TODO: QA - Check Push notification about a contest
+                            contestsService.openContest(notificationData.additionalData.contestId);
                         }
                     });
                     push.on('error', function (error) {
                         this.logError('PushNotificationError', 'Error during push: ' + error.message);
                     });
                     var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
-                    if (storedGcmRegistration && !session.gcmRegistrationId) {
+                    if (storedGcmRegistration && !_this.session.gcmRegistrationId) {
                         _this.post('user/setGcmRegistration', { 'registrationId': storedGcmRegistration });
                     }
                 }
@@ -269,13 +273,16 @@ var Client = (function () {
     Client.prototype.serverPost = function (path, postData, timeout, blockUserInterface) {
         var _this = this;
         return new Promise(function (resolve, reject) {
+            _this.showSpinner = true;
             _this.serverGateway.post(path, postData, timeout, blockUserInterface).then(function (data) {
+                _this.showSpinner = false;
                 if (_this.nav && _this.nav.length() > 0) {
                     //GUI is initiated - process the events right away
                     _this.processInternalEvents();
                 }
                 resolve(data);
             }, function (err) {
+                _this.showSpinner = false;
                 if (err && err.httpStatus === 401) {
                     facebookService.getLoginStatus().then(function (result) {
                         if (result.connected) {
@@ -331,6 +338,20 @@ var Client = (function () {
     Client.prototype.setPageTitle = function (key, params) {
         this.ionicApp.setTitle(this.translate(key, params));
     };
+    Object.defineProperty(Client.prototype, "showSpinner", {
+        get: function () {
+            return this._showSpinner;
+        },
+        set: function (value) {
+            var _this = this;
+            //Must be async - issue related to "field changed since last checked" - in angular2
+            setTimeout(function () {
+                _this._showSpinner = value;
+            }, 100);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Client.prototype.getDefaultLanguage = function () {
         //Always return a language - get the browser's language
         var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
@@ -453,9 +474,12 @@ var Client = (function () {
     Client.prototype.toggleSound = function () {
         return this.serverPost('user/toggleSound');
     };
-    Client.prototype.switchLanguage = function (language) {
+    Client.prototype.localSwitchLanguage = function (language) {
         localStorage.setItem('language', language);
         this.setDirection();
+    };
+    Client.prototype.switchLanguage = function (language) {
+        this.localSwitchLanguage(language);
         var postData = { 'language': language };
         return this.serverPost('user/switchLanguage', postData);
     };

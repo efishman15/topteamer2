@@ -1,4 +1,4 @@
-import {Page} from 'ionic/ionic';
+import {Page} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as alertService from '../../providers/alert';
 import * as systemService from '../../providers/system';

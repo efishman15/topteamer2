@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('angular2/core');
 var exceptions_1 = require('./providers/exceptions');
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var main_tabs_1 = require('./pages/main-tabs/main-tabs');
 var login_1 = require('./pages/login/login');
 var facebookService = require('./providers/facebook');
@@ -19,6 +19,7 @@ var contest_type_1 = require('./pages/contest-type/contest-type');
 var set_contest_1 = require('./pages/set-contest/set-contest');
 var settings_1 = require('./pages/settings/settings');
 var system_tools_1 = require('./pages/system-tools/system-tools');
+var contestsService = require('./providers/contests');
 var topTeamerApp = (function () {
     function topTeamerApp(ionicApp, platform, config, client, events, menuController) {
         var _this = this;
@@ -30,6 +31,7 @@ var topTeamerApp = (function () {
     topTeamerApp.prototype.initApp = function () {
         //TODO: Hardware back button
         //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
+        //TODO: Make .ts errors compile by definining classes in objects/objects.ts
         var _this = this;
         this.client.platform.ready().then(function () {
             _this.expandStringPrototype();
@@ -47,6 +49,7 @@ var topTeamerApp = (function () {
                 // org.apache.cordova.statusbar required
                 StatusBar.styleDefault();
             }
+            _this.client.showSpinner = false;
             console.log('platform ready');
         });
     };
@@ -130,28 +133,36 @@ var topTeamerApp = (function () {
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
                     //Will go to this contest
-                    //TODO: Deep linking
-                    _this.client.deepLinkContestId = data.data_parsed.contestId;
+                    //TODO: QA - Deep linking
+                    _this.deepLinkContestId = data.data_parsed.contestId;
                 }
             }
             catch (e) {
                 _this.client.logError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
             }
-            window.initBranch = function () {
-                branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
-                    if (window.myHandleBranch) {
-                        window.myHandleBranch(err, data);
-                    }
-                });
-            };
         };
+        window.initBranch = function () {
+            branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
+                if (window.myHandleBranch) {
+                    window.myHandleBranch(err, data);
+                }
+            });
+        };
+        //Give the appropriate mobile/web branch js file time to load
+        setTimeout(function () {
+            window.initBranch();
+        }, 1000);
     };
     topTeamerApp.prototype.initFacebook = function () {
         var _this = this;
         facebookService.getLoginStatus().then(function (result) {
             if (result.connected) {
                 _this.client.facebookServerConnect(result.response.authResponse).then(function () {
-                    _this.client.nav.push(main_tabs_1.MainTabsPage);
+                    _this.client.nav.push(main_tabs_1.MainTabsPage).then(function () {
+                        if (_this.deepLinkContestId) {
+                            contestsService.openContest(_this.deepLinkContestId);
+                        }
+                    });
                 });
             }
             else {
@@ -219,7 +230,7 @@ var topTeamerApp = (function () {
     topTeamerApp.prototype.newContest = function () {
         var _this = this;
         this.client.logEvent('menu/newContest');
-        var modal = ionic_1.Modal.create(contest_type_1.ContestTypePage);
+        var modal = ionic_angular_1.Modal.create(contest_type_1.ContestTypePage);
         modal.onDismiss(function (contestType) {
             if (contestType) {
                 setTimeout(function () {
@@ -242,14 +253,13 @@ var topTeamerApp = (function () {
         this.client.nav.push(system_tools_1.SystemToolsPage);
     };
     topTeamerApp = __decorate([
-        ionic_1.App({
+        ionic_angular_1.App({
             templateUrl: 'app.html',
             moduleId: 'build/app.html',
             providers: [core_1.provide(core_1.ExceptionHandler, { useClass: exceptions_1.MyExceptionHandler }), client_1.Client],
             config: { backButtonText: '' }
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.IonicApp !== 'undefined' && ionic_1.IonicApp) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.Platform !== 'undefined' && ionic_1.Platform) === 'function' && _b) || Object, (typeof (_c = typeof ionic_1.Config !== 'undefined' && ionic_1.Config) === 'function' && _c) || Object, client_1.Client, (typeof (_d = typeof ionic_1.Events !== 'undefined' && ionic_1.Events) === 'function' && _d) || Object, (typeof (_e = typeof ionic_1.MenuController !== 'undefined' && ionic_1.MenuController) === 'function' && _e) || Object])
+        __metadata('design:paramtypes', [ionic_angular_1.IonicApp, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events, ionic_angular_1.MenuController])
     ], topTeamerApp);
     return topTeamerApp;
-    var _a, _b, _c, _d, _e;
 })();

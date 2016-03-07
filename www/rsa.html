@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Eddy's RSA Calculator</title>
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <h3 style="text-align: center; padding-bottom: 2px; padding-top: 0px; margin: 0px;">Eddy's RSA Calculator</h3>
+  <script Language="JavaScript">
+
+    function mpmod(base, exponent, modulus) {
+      if ((base < 1) || (exponent < 0) || (modulus < 1)) {
+        return ("invalid");
+      }
+      result = 1;
+      while (exponent > 0) {
+        if ((exponent % 2) == 1) {
+          result = (result * base) % modulus;
+        }
+        base = (base * base) % modulus;
+        exponent = Math.floor(exponent / 2);
+      }
+      return (result);
+    }
+
+    function isPrime(n) {
+
+      var i = 1
+      while ((n > 1) && (++i < Math.sqrt(n) + 1)) {
+        if (n % i === 0) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function gcd(a, b) {
+      if (b === 0)
+        return a;
+      else {
+        return gcd(b, a % b);
+      }
+    }
+
+    function generateKCandidates() {
+
+      var k = document.getElementById('k');
+      k.options.length = 0;
+
+      var r = parseInt(document.getElementById('r').innerHTML);
+      var n = r + 1;
+
+      for (i = 0; i < 30; i++) {
+        n = n + r;
+        var option = new Option();
+        option.value = n;
+        option.text = '' + n;
+        option.checked = false;
+        k.options.add(option);
+      }
+
+      k.options.selectedIndex = -1;
+      document.getElementById('buttonK').style.display = 'none';
+      document.getElementById('k').style.display = 'block';
+    }
+
+    function checkED() {
+      var e = parseInt(document.getElementById('e').value);
+      var d = parseInt(document.getElementById('d').value);
+      var r = parseInt(document.getElementById('r').innerHTML);
+
+      document.getElementById('buttonCheckED').style.display = 'none';
+
+      if (gcd(e, r) !== 1) {
+        document.getElementById('imgError').style.display = 'block';
+        return;
+      }
+
+      if (gcd(d, r) !== 1) {
+        document.getElementById('imgError').style.display = 'block';
+        return;
+      }
+
+      if (((e * d) % r) !== 1) {
+        document.getElementById('imgError').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('imgCorrect').style.display = 'block';
+      document.getElementById('tableRSA').style.display = 'block';
+      document.getElementById('tableConversion').style.display = 'block';
+      document.getElementById('method').options.selectedIndex = 0;
+      changeMethod();
+    }
+
+    function loadPrimes() {
+      var p = document.getElementById('p');
+      var q = document.getElementById('q');
+      for (var i = 53; i <= 1000; i++) {
+        if (isPrime(i)) {
+          var optionP = new Option();
+          var optionQ = new Option();
+          optionP.value = i;
+          optionP.checked = false;
+          optionP.text = '' + i;
+          optionQ.value = i;
+          optionQ.checked = false;
+          optionQ.text = '' + i;
+          p.options.add(optionP);
+          q.options.add(optionQ);
+        }
+      }
+
+      p.options.selectedIndex = Math.floor(Math.random() * p.options.length);
+      q.options.selectedIndex = Math.floor(Math.random() * q.options.length);
+
+      zeroNR();
+    }
+
+    function computeN() {
+      document.getElementById('N').innerHTML = document.getElementById('p').value * document.getElementById('q').value;
+      refreshWorkflow();
+    }
+
+    function computeR() {
+      document.getElementById('r').innerHTML = (document.getElementById('p').value - 1) * (document.getElementById('q').value - 1);
+      refreshWorkflow();
+    }
+
+    function zeroNR() {
+      document.getElementById('N').innerHTML = '';
+      document.getElementById('r').innerHTML = '';
+      document.getElementById('k').options.length = 0;
+      document.getElementById('factorK').innerHTML = '';
+      document.getElementById('e').value = '';
+      document.getElementById('d').value = '';
+      refreshWorkflow();
+    }
+
+    function selectK() {
+      document.getElementById('k').style.backgroundColor = '#ffffff';
+      document.getElementById('factorK').innerHTML = '';
+      refreshWorkflow();
+    }
+
+    function factorizeK() {
+
+      var k = parseInt(document.getElementById('k').value);
+      var result;
+      if (isPrime(k)) {
+        document.getElementById('factorK').innerHTML = 'k is PRIME!';
+        refreshWorkflow();
+        return;
+      }
+
+      var result = '';
+      var t = k;
+      var prime = 1;
+
+      var i = 1
+      while ((t > 1) && ( ++i < Math.sqrt(k) + 1 )) {
+        while (t % i == 0) {
+          t = t / i
+          if (prime === 0) {
+            result += "*";
+          }
+          else if (prime === 1) {
+            prime = 0;
+          }
+          result += '' + i;
+        }
+      }
+
+      if (t > 1) {
+        result += "*" + t;
+      }
+
+      document.getElementById('factorK').innerHTML = result;
+
+      document.getElementById('e').value = '';
+      document.getElementById('d').value = '';
+
+      refreshWorkflow();
+
+    }
+
+    function refreshWorkflow() {
+      document.getElementById('buttonN').style.display = 'none';
+      document.getElementById('N').style.display = 'none';
+      document.getElementById('buttonR').style.display = 'none';
+      document.getElementById('r').style.display = 'none';
+      document.getElementById('tableK').style.display = 'none';
+      document.getElementById('buttonK').style.display = 'none';
+      document.getElementById('k').style.display = 'none';
+      document.getElementById('buttonFactorK').style.display = 'none';
+      document.getElementById('factorK').style.display = 'none';
+      document.getElementById('tableED').style.display = 'none';
+      document.getElementById('tableRSA').style.display = 'none';
+      document.getElementById('tableConversion').style.display = 'none';
+
+      if (!document.getElementById('N').innerHTML) {
+        document.getElementById('buttonN').style.display = 'block';
+        document.getElementById('N').style.display = 'none';
+        return;
+      }
+      else {
+        document.getElementById('buttonN').style.display = 'none';
+        document.getElementById('N').style.display = 'block';
+      }
+
+      if (!document.getElementById('r').innerHTML) {
+        document.getElementById('buttonR').style.display = 'block';
+        document.getElementById('r').style.display = 'none';
+        return;
+      }
+      else {
+        document.getElementById('buttonR').style.display = 'none';
+        document.getElementById('r').style.display = 'block';
+        document.getElementById('tableK').style.display = 'block';
+      }
+
+      if (!document.getElementById('k').value) {
+        document.getElementById('buttonK').style.display = 'block';
+        document.getElementById('k').style.display = 'none';
+        return;
+      }
+      else {
+        document.getElementById('buttonK').style.display = 'none';
+        document.getElementById('k').style.display = 'block';
+      }
+
+      if (!document.getElementById('factorK').innerHTML) {
+        document.getElementById('buttonFactorK').style.display = 'block';
+        document.getElementById('factorK').style.display = 'none';
+        return;
+      }
+      else if (document.getElementById('factorK').innerHTML === 'k is PRIME!') {
+        document.getElementById('k').style.display = 'block';
+        document.getElementById('factorK').style.display = 'block';
+        document.getElementById('k').style.backgroundColor = 'yellow';
+        return;
+      }
+      else {
+        document.getElementById('k').style.backgroundColor = 'white';
+        document.getElementById('buttonFactorK').style.display = 'none';
+        document.getElementById('factorK').style.display = 'block';
+        document.getElementById('tableED').style.display = 'block';
+        clearCheckED();
+      }
+    }
+
+    function clearCheckED() {
+      document.getElementById('buttonCheckED').style.display = 'block';
+      document.getElementById('imgCorrect').style.display = 'none';
+      document.getElementById('imgError').style.display = 'none';
+    }
+
+    function changeMethod() {
+      var method = document.getElementById('method');
+      var N = document.getElementById('N').innerHTML;
+      document.getElementById('rsaEncryptNumber').value = '';
+      document.getElementById('rsaDecryptNumber').value = '';
+      document.getElementById('NE').value = '';
+      document.getElementById('eE').value = '';
+      rsaKeyUp();
+
+      if (method.value === 'Encrypt') {
+        document.getElementById('formula').innerHTML = 'm<sup>e</sup><br/>mod N'
+        document.getElementById('divEncryptComputation').style.display = 'block';
+        document.getElementById('divDecryptComputation').style.display = 'none';
+        document.getElementById('spanDeccryptComputation').innerHTML = '<sup>' + document.getElementById('d').value + '</sup><br/>mod ' + N + '';
+      }
+      else {
+        document.getElementById('formula').innerHTML = 'c<sup>d</sup><br/>(mod N)'
+        document.getElementById('divEncryptComputation').style.display = 'none';
+        document.getElementById('divDecryptComputation').style.display = 'block';
+      }
+    }
+
+    function rsaKeyUp() {
+      document.getElementById('result').style.display = 'none';
+      buttonEncryptDecrypt = document.getElementById('buttonEncryptDecrypt');
+      var showButton = false;
+      if (document.getElementById('method').value === 'Encrypt') {
+        if (parseInt(document.getElementById('rsaEncryptNumber').value) > 0 &&
+          parseInt(document.getElementById('NE').value) > 0 &&
+          parseInt(document.getElementById('eE').value) > 0) {
+          showButton = true;
+        }
+      }
+      else {
+        if (parseInt(document.getElementById('rsaDecryptNumber').value) > 0) {
+          showButton = true;
+        }
+      }
+
+      if (showButton) {
+        buttonEncryptDecrypt.style.display = 'block';
+      }
+      else {
+        buttonEncryptDecrypt.style.display = 'none';
+      }
+    }
+
+    function encryptDecrypt() {
+      document.getElementById('buttonEncryptDecrypt').style.display = 'none';
+      var method = document.getElementById('method').value;
+      var result = document.getElementById('result');
+      var rsaNumber;
+      if (method === 'Encrypt') {
+        rsaNumber = parseInt(document.getElementById('rsaEncryptNumber').value);
+        result.innerHTML = mpmod(rsaNumber, parseInt(document.getElementById('eE').value), parseInt(document.getElementById('NE').value));
+      }
+      else {
+        rsaNumber = parseInt(document.getElementById('rsaDecryptNumber').value);
+        result.innerHTML = mpmod(rsaNumber, parseInt(document.getElementById('d').value), parseInt(document.getElementById('N').innerHTML));
+      }
+      result.style.display = 'block';
+    }
+
+    function onCharacterKeyUp() {
+      try {
+        document.getElementById('numericValue').value = document.getElementById('character').value.charCodeAt(0);
+      }
+      catch (e) {
+        document.getElementById('numericValue').value = '';
+      }
+    }
+
+    function onNumericValueKeyUp() {
+      try {
+        document.getElementById('character').value = String.fromCharCode(document.getElementById('numericValue').value);
+      }
+      catch (e) {
+        document.getElementById('character').value = '';
+      }
+    }
+
+  </script>
+</head>
+<body onload="loadPrimes()">
+<table border="1" cellpadding="5" style="width: 100%">
+  <tr>
+    <th style="text-align: center; width: 10%">
+      <strong>p</strong>
+    </th>
+    <th style="text-align: center; width: 10%">
+      <strong>q</strong>
+    </th>
+    <th style="text-align: center; width: 40%">
+      <strong>N = p*q</strong>
+    </th>
+    <th style="text-align: center; width: 40%">
+      <strong>r<br/>(p-1)*(q-1)</strong>
+    </th>
+  </tr>
+  <tr>
+    <td style="text-align: center; width: 10%">
+      <select id="p" onchange="zeroNR()">
+      </select>
+    </td>
+    <td style="text-align: center; width: 10%">
+      <select id="q" onchange="zeroNR()">
+      </select>
+    </td>
+    <td style="text-align: center; width: 40%">
+      <button style="margin: auto; background-color: yellow; cursor: pointer" id="buttonN" onclick="computeN()">Compute
+        N
+      </button>
+      <span id="N" style="font-size: 22px;">
+      </span>
+    </td>
+    <td style="text-align: center; width: 40%">
+      <button style="margin: auto; display: none; background-color: yellow;" id="buttonR" onclick="computeR()">Compute
+        r
+      </button>
+      <span id="r"></span>
+    </td>
+  </tr>
+</table>
+<div style="padding-top: 10px;"></div>
+<table id="tableK" style="display: none;" border="1" cellpadding="5" style="width: 100%">
+  <tr>
+    <th style="text-align: center; width: 20%">
+      <strong>k<br/>1 mod r</strong>
+    </th>
+    <th style="text-align: center; width: 80%">
+      <strong>k factor</strong>
+    </th>
+  </tr>
+  <tr>
+    <td style="text-align: center; width: 20%;">
+      <button style="margin: auto; background-color: yellow" id="buttonK" onclick="generateKCandidates()">Generate K
+        Candidates
+      </button>
+      <select style="text-align: center; margin: auto; display: none; background-color: yellow" id="k"
+              onchange="selectK()">
+      </select>
+    </td>
+    <td style="text-align: center; width: 80%;">
+      <button style="margin: auto; background-color: yellow; display: none;" id="buttonFactorK" onclick="factorizeK()">
+        Factorize K
+      </button>
+      <span id="factorK"></span>
+    </td>
+  </tr>
+</table>
+<div style="padding-top: 10px;"></div>
+<table id="tableED" style="display: none;" border="1" cellpadding="5" style="width: 100%">
+  <tr>
+    <th style="text-align: center;">
+      <strong>e</strong>
+    </th>
+    <th style="text-align: center;">
+      <strong>d</strong>
+    </th>
+    <th style="text-align: center;">
+      <strong>Valid?</strong>
+    </th>
+  </tr>
+  <tr>
+    <td style="text-align: center;">
+      <input id="e" type="number" min="1" max="1000000" onkeyup="clearCheckED()" style="font-size: 20px;">
+    </td>
+    <td style="text-align: center;">
+      <input id="d" type="number" min="1" max="1000000" onkeyup="clearCheckED()" style="font-size: 20px;">
+    </td>
+    <td style="text-align: center;">
+      <button style="margin: auto; background-color: yellow" id="buttonCheckED" onclick="checkED()">Check</button>
+      <img id="imgCorrect" src="images/correct.png" width="30" height="30"
+           style="text-align: center; display: none; width: 30px; height: 30px;">
+      <img id="imgError" src="images/error.png" width="30" height="30"
+           style="text-align: center; display: none; width: 30px; height: 30px;">
+    </td>
+  </tr>
+</table>
+<div style="padding-top: 10px;"></div>
+<table id="tableRSA" style="display: none;" border="1" cellpadding="5" style="width: 100%">
+  <tr>
+    <th style="text-align: center;">
+      <strong>Method</strong>
+    </th>
+    <td style="text-align: center;">
+      <strong>Computation</strong>
+    </td>
+    <td style="text-align: center;">
+      <strong>Result</strong>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">
+      <select id="method" onchange="changeMethod()">
+        <option value="Encrypt" selected="selected">Encrypt</option>
+        <option value="Decrypt">Decrypt</option>
+      </select>
+      <br/>
+      <span id="formula" style="overflow: visible">c = m<sup>e</sup>(mod N)</span>
+    </td>
+    <td style="text-align: center;">
+      <div id="divEncryptComputation">
+        <input type="number" min="1" max="999999" id="rsaEncryptNumber" onkeyup="rsaKeyUp()">
+        <input type="number" min="1" max="999999" id="eE" onkeyup="rsaKeyUp()" style="position: relative; top: -10px;">
+        <span>mod</span>
+        <input type="number" min="1" max="9999999" id="NE" onkeyup="rsaKeyUp()">
+      </div>
+      <div id="divDecryptComputation" style="display: none;">
+        <input type="number" min="1" max="65535" id="rsaDecryptNumber" onkeyup="rsaKeyUp()">
+        <span id="spanDeccryptComputation"></span>
+      </div>
+    </td>
+    <td style="text-align: center;">
+      <button style="margin: auto; display: none; background-color: yellow" id="buttonEncryptDecrypt"
+              onclick="encryptDecrypt()">Compute
+      </button>
+      <span id="result" style="display: none;"></span>
+    </td>
+  </tr>
+</table>
+<div style="padding-top: 10px;"></div>
+<table id="tableConversion" style="display: none;" border="1" cellpadding="5" style="width: 100%">
+  <tr>
+    <th style="text-align: center;">
+      <strong>Character</strong>
+    </th>
+    <td style="text-align: center;">
+    </td>
+    <td style="text-align: center;">
+      <strong>Value</strong>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align: center;">
+      <input type="text" maxlength="1" id="character" onkeyup="onCharacterKeyUp()" oninput="onCharacterKeyUp">
+    </td>
+    <td style="text-align: center;">
+      <==>
+    </td>
+    <td style="text-align: center;">
+      <input type="number" min="1" max="65535" id="numericValue" onkeyup="onNumericValueKeyUp()"
+             oninput="onNumericValueKeyUp()">
+    </td>
+  </tr>
+</table>
+</body>
+</html>
+ 
+    

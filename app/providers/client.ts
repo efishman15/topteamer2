@@ -2,9 +2,10 @@ import {Injectable} from 'angular2/core';
 import {Http, Response, Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
-import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Events} from 'ionic/ionic';
+import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Events} from 'ionic-angular';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
+import * as contestsService from './contests';
 
 @Injectable()
 export class Client {
@@ -24,6 +25,7 @@ export class Client {
   _platform:Platform;
   _config:Config;
   _events:Events;
+  _showSpinner:Boolean = true;
   _nav:NavController;
   menuController:MenuController;
   _user:Object;
@@ -89,9 +91,9 @@ export class Client {
       this.getSettings(language).then((data) => {
 
         this._settings = data.settings;
-        if (!language) {
+        if (!language || language === 'undefined') {
           //Language was computed on the server using geoInfo or the fallback to the default language
-          language = settings.language;
+          language = data.language;
           localStorage.setItem('language', language);
         }
 
@@ -114,7 +116,7 @@ export class Client {
     var postData = {};
     postData.clientInfo = this.clientInfo;
 
-    if (localStorageLanguage) {
+    if (localStorageLanguage && localStorageLanguage !== 'undefined') {
       //This will indicate to the server NOT to retrieve geo info - since language is already determined
       postData.language = localStorageLanguage;
     }
@@ -288,8 +290,8 @@ export class Client {
 
       this.serverPost('user/facebookConnect', {'user': this.user}).then((data) => {
         if (this.user.settings.language !== data.session.settings.language) {
-          this.user.settings.language = session.settings.language;
-          localStorage.setItem('language', this.user.settings.language);
+          this.user.settings.language = data.session.settings.language;
+          this.localSwitchLanguage(this.user.settings.language);
         }
 
         this.user.settings = data.session.settings;
@@ -333,7 +335,8 @@ export class Client {
 
           push.on('notification', function (notificationData) {
             if (notificationData.additionalData && notificationData.additionalData.contestId) {
-              //$rootScope.gotoView('app.contest', false, {id: data.additionalData.contestId}); TODO: Deep link to contest
+              //TODO: QA - Check Push notification about a contest
+              contestsService.openContest(notificationData.additionalData.contestId);
             }
           });
 
@@ -342,7 +345,7 @@ export class Client {
           });
 
           var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
-          if (storedGcmRegistration && !session.gcmRegistrationId) {
+          if (storedGcmRegistration && !this.session.gcmRegistrationId) {
             this.post('user/setGcmRegistration', {'registrationId': storedGcmRegistration});
           }
         }
@@ -360,13 +363,16 @@ export class Client {
 
   serverPost(path, postData ?, timeout ?, blockUserInterface ?) {
     return new Promise((resolve, reject) => {
+      this.showSpinner = true;
       this.serverGateway.post(path, postData, timeout, blockUserInterface).then((data) => {
+        this.showSpinner = false;
         if (this.nav && this.nav.length() > 0) {
           //GUI is initiated - process the events right away
           this.processInternalEvents();
         }
         resolve(data);
       }, (err) => {
+        this.showSpinner = false;
         if (err && err.httpStatus === 401) {
           facebookService.getLoginStatus().then((result) => {
             if (result.connected) {
@@ -423,6 +429,17 @@ export class Client {
 
   setPageTitle(key:string, params ?:Object) {
     this.ionicApp.setTitle(this.translate(key, params));
+  }
+
+  get showSpinner() : Boolean {
+    return this._showSpinner;
+  }
+
+  set showSpinner(value: Boolean) {
+    //Must be async - issue related to "field changed since last checked" - in angular2
+    setTimeout(() => {
+      this._showSpinner = value;
+    },100);
   }
 
   private getDefaultLanguage() {
@@ -512,9 +529,13 @@ export class Client {
     return this.serverPost('user/toggleSound');
   }
 
-  switchLanguage(language:string) {
+  localSwitchLanguage(language:string) {
     localStorage.setItem('language', language);
     this.setDirection();
+  }
+
+  switchLanguage(language:string) {
+    this.localSwitchLanguage(language);
     var postData = {'language': language};
     return this.serverPost('user/switchLanguage', postData);
   }

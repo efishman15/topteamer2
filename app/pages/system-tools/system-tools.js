@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var alertService = require('../../providers/alert');
 var systemService = require('../../providers/system');
@@ -33,7 +33,7 @@ var SystemToolsPage = (function () {
         });
     };
     SystemToolsPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/system-tools/system-tools.html'
         }), 
         __metadata('design:paramtypes', [])

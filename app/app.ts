@@ -1,6 +1,6 @@
 import {provide,ExceptionHandler} from 'angular2/core';
 import {MyExceptionHandler} from './providers/exceptions';
-import {App, IonicApp, Platform, Config, Events, Modal, Alert, NavController, MenuController} from 'ionic/ionic';
+import {App, IonicApp, Platform, Config, Events, Modal, Alert, NavController, MenuController} from 'ionic-angular';
 import {MainTabsPage} from './pages/main-tabs/main-tabs';
 import {LoginPage} from './pages/login/login';
 import * as facebookService from './providers/facebook';
@@ -10,6 +10,7 @@ import {ContestTypePage} from './pages/contest-type/contest-type';
 import {SetContestPage} from './pages/set-contest/set-contest';
 import {SettingsPage} from './pages/settings/settings';
 import {SystemToolsPage} from './pages/system-tools/system-tools';
+import * as contestsService from './providers/contests';
 
 @App({
   templateUrl: 'app.html',
@@ -20,6 +21,7 @@ import {SystemToolsPage} from './pages/system-tools/system-tools';
 class topTeamerApp {
 
   client:Client;
+  deepLinkContestId: string;
 
   constructor(ionicApp:IonicApp, platform:Platform, config: Config, client:Client, events:Events, menuController:MenuController) {
 
@@ -35,6 +37,7 @@ class topTeamerApp {
 
     //TODO: Hardware back button
     //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
+    //TODO: Make .ts errors compile by definining classes in objects/objects.ts
 
     this.client.platform.ready().then(() => {
 
@@ -58,7 +61,9 @@ class topTeamerApp {
         StatusBar.styleDefault();
       }
 
+      this.client.showSpinner = false;
       console.log('platform ready');
+
     });
   };
 
@@ -160,29 +165,38 @@ class topTeamerApp {
 
         if (data.data_parsed && data.data_parsed.contestId) {
           //Will go to this contest
-          //TODO: Deep linking
-          this.client.deepLinkContestId = data.data_parsed.contestId;
+          //TODO: QA - Deep linking
+          this.deepLinkContestId = data.data_parsed.contestId;
         }
       }
       catch (e) {
         this.client.logError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
       }
+    }
 
-      window.initBranch = () => {
+    window.initBranch = () => {
         branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', (err, data) => {
           if (window.myHandleBranch) {
             window.myHandleBranch(err, data);
           }
         });
       }
-    };
+
+    //Give the appropriate mobile/web branch js file time to load
+    setTimeout(() => {
+      window.initBranch();
+    },1000)
   }
 
   initFacebook() {
     facebookService.getLoginStatus().then((result) => {
       if (result.connected) {
         this.client.facebookServerConnect(result.response.authResponse).then(() => {
-          this.client.nav.push(MainTabsPage);
+          this.client.nav.push(MainTabsPage).then(() => {
+            if (this.deepLinkContestId) {
+              contestsService.openContest(this.deepLinkContestId);
+            }
+          });
         })
       }
       else {

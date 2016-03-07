@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var core_1 = require('angular2/core');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
@@ -49,7 +49,7 @@ var ContestPage = (function () {
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
                 _this.animateLastResults = false;
-                var modal = ionic_1.Modal.create(facebook_post_1.FacebookPostPage, { 'quizResults': _this.lastQuizResults });
+                var modal = ionic_angular_1.Modal.create(facebook_post_1.FacebookPostPage, { 'quizResults': _this.lastQuizResults });
                 _this.client.nav.present(modal);
             }
             else {
@@ -97,7 +97,7 @@ var ContestPage = (function () {
             //Should get xp if fresh join
             if (data.xpProgress && data.xpProgress.addition > 0) {
                 _this.client.addXp(data.xpProgress).then(function () {
-                    var modal = ionic_1.Modal.create(new_rank_1.NewRankPage, {
+                    var modal = ionic_angular_1.Modal.create(new_rank_1.NewRankPage, {
                         'xpProgress': data.xpProgress
                     });
                     _this.client.nav.present(modal);
@@ -146,13 +146,12 @@ var ContestPage = (function () {
         __metadata('design:type', contest_chart_1.ContestChartComponent)
     ], ContestPage.prototype, "contestChartComponent", void 0);
     ContestPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/contest/contest.html',
             directives: [contest_chart_1.ContestChartComponent]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object])
+        __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], ContestPage);
     return ContestPage;
-    var _a;
 })();
 exports.ContestPage = ContestPage;

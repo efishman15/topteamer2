@@ -52,7 +52,7 @@
     "app/providers/sound.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules/*"
   ],
   "compileOnSave": false
 }

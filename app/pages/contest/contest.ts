@@ -1,4 +1,4 @@
-import {Page, NavParams,Modal} from 'ionic/ionic';
+import {Page, NavParams,Modal} from 'ionic-angular';
 import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';

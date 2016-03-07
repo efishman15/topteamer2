@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var core_1 = require('angular2/core');
 var my_contests_1 = require('../my-contests/my-contests');
 var running_contests_1 = require('../running-contests/running-contests');
@@ -32,7 +32,7 @@ var MainTabsPage = (function () {
             _this.needToRefreshList = true;
         });
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
-            var modal = ionic_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
+            var modal = ionic_angular_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
             _this.client.nav.present(modal);
         });
     }
@@ -53,16 +53,15 @@ var MainTabsPage = (function () {
         this.client.processInternalEvents();
     };
     __decorate([
-        core_1.ViewChild(ionic_1.Tabs), 
-        __metadata('design:type', (typeof (_a = typeof ionic_1.Tabs !== 'undefined' && ionic_1.Tabs) === 'function' && _a) || Object)
+        core_1.ViewChild(ionic_angular_1.Tabs), 
+        __metadata('design:type', ionic_angular_1.Tabs)
     ], MainTabsPage.prototype, "mainTabs", void 0);
     MainTabsPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/main-tabs/main-tabs.html'
         }), 
         __metadata('design:paramtypes', [])
     ], MainTabsPage);
     return MainTabsPage;
-    var _a;
 })();
 exports.MainTabsPage = MainTabsPage;

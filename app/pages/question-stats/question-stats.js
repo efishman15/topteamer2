@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var QuestionStatsPage = (function () {
     function QuestionStatsPage(params, viewController) {
@@ -38,12 +38,11 @@ var QuestionStatsPage = (function () {
         this.viewController.dismiss(action);
     };
     QuestionStatsPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/question-stats/question-stats.html'
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, (typeof (_b = typeof ionic_1.ViewController !== 'undefined' && ionic_1.ViewController) === 'function' && _b) || Object])
+        __metadata('design:paramtypes', [ionic_angular_1.NavParams, ionic_angular_1.ViewController])
     ], QuestionStatsPage);
     return QuestionStatsPage;
-    var _a, _b;
 })();
 exports.QuestionStatsPage = QuestionStatsPage;

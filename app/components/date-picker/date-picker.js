@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('angular2/core');
 var client_1 = require('../../providers/client');
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var DatePickerComponent = (function () {
     function DatePickerComponent() {
         this.dateSelected = new core_1.EventEmitter();
@@ -156,7 +156,7 @@ var DatePickerComponent = (function () {
         core_1.Component({
             selector: 'date-picker',
             templateUrl: 'build/components/date-picker/date-picker.html',
-            directives: [ionic_1.Icon]
+            directives: [ionic_angular_1.Icon]
         }), 
         __metadata('design:paramtypes', [])
     ], DatePickerComponent);

@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_1 = require('ionic/ionic');
+var ionic_angular_1 = require('ionic-angular');
 var common_1 = require('angular2/common');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
@@ -142,15 +142,15 @@ var SetContestPage = (function () {
                 'featurePurchased': _this.client.session.features.newContest.name
             };
             paymentService.processPayment('android', purchaseData, extraPurchaseData).then(function (serverPurchaseData) {
-                //TODO: ionic loading...
+                _this.client.showSpinner = true;
                 inappbilling.consumePurchase(function (purchaseData) {
-                    //TODO: hide ionic loading...
+                    _this.client.showSpinner = false;
                     if (resolve) {
                         resolve(purchaseData);
                     }
                     paymentService.showPurchaseSuccess(serverPurchaseData);
                 }, function (error) {
-                    //TODO: hide ionic loading...
+                    _this.client.showSpinner = false;
                     _this.client.logError('AndroidBilling', 'Error consuming product: ' + error);
                     if (reject) {
                         reject();
@@ -256,7 +256,7 @@ var SetContestPage = (function () {
                 return;
             }
         }
-        var modal = ionic_1.Modal.create(question_editor_1.QuestionEditorPage, { 'question': question, 'mode': mode, 'currentQuestions': this.contestLocalCopy.questions });
+        var modal = ionic_angular_1.Modal.create(question_editor_1.QuestionEditorPage, { 'question': question, 'mode': mode, 'currentQuestions': this.contestLocalCopy.questions });
         modal.onDismiss(function (result) {
             if (!result) {
                 return;
@@ -280,7 +280,7 @@ var SetContestPage = (function () {
             alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', { max: this.client.settings.newContest.privateQuestions.max }));
             return;
         }
-        var modal = ionic_1.Modal.create(search_questions_1.SearchQuestionsPage, { 'currentQuestions': this.contestLocalCopy.questions });
+        var modal = ionic_angular_1.Modal.create(search_questions_1.SearchQuestionsPage, { 'currentQuestions': this.contestLocalCopy.questions });
         this.client.nav.present(modal);
     };
     SetContestPage.prototype.removeQuestion = function (index) {
@@ -357,7 +357,7 @@ var SetContestPage = (function () {
                         else {
                             //Mobile - open the share mobile modal - with one button - to share or skip
                             _this.client.nav.push(contest_1.ContestPage, { 'contest': contest }).then(function () {
-                                var modal = ionic_1.Modal.create(mobile_share_1.MobileSharePage, { 'contest': contest });
+                                var modal = ionic_angular_1.Modal.create(mobile_share_1.MobileSharePage, { 'contest': contest });
                                 _this.client.nav.present(modal);
                             });
                         }
@@ -433,13 +433,12 @@ var SetContestPage = (function () {
         return new Date(this.contestLocalCopy.startDate.getTime() + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier);
     };
     SetContestPage = __decorate([
-        ionic_1.Page({
+        ionic_angular_1.Page({
             templateUrl: 'build/pages/set-contest/set-contest.html',
             directives: [common_1.FORM_DIRECTIVES, date_picker_1.DatePickerComponent]
         }), 
-        __metadata('design:paramtypes', [(typeof (_a = typeof ionic_1.NavParams !== 'undefined' && ionic_1.NavParams) === 'function' && _a) || Object, common_1.FormBuilder])
+        __metadata('design:paramtypes', [ionic_angular_1.NavParams, common_1.FormBuilder])
     ], SetContestPage);
     return SetContestPage;
-    var _a;
 })();
 exports.SetContestPage = SetContestPage;

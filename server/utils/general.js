@@ -4,6 +4,7 @@ var httpUtils = require(path.resolve(__dirname, './http'));
 var util = require('util');
 var logger = require(path.resolve(__dirname, './logger'));
 var async = require('async');
+var get_ip = require('ipware')().get_ip;
 
 //-------------------------------------------------------------------------------------------------------
 // returns okResponse sent to the client
@@ -181,9 +182,15 @@ module.exports.getSettings = function (req, res, next) {
     //Check to invoke geoInfo
     function (callback) {
       if (!data.language) {
-        if (req.connection.remoteAddress) {
+        var ipInfo = get_ip(req);
+        if (ipInfo && ipInfo.clientIp) {
           data.geoLocator = 0;
-          data.ip = req.connection.remoteAddress;
+          if (ipInfo.clientIp.startsWith('::')) {
+            data.ip = ipInfo.clientIp.slice(7);
+          }
+          else {
+            data.ip = ipInfo.clientIp;
+          }
           getGeoInfo(data, callback);
         }
         else {

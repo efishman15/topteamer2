@@ -1,4 +1,4 @@
-import {Page, NavParams,Modal} from 'ionic-framework/ionic';
+import {Page, NavParams,Modal} from 'ionic-angular';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener';
 import {TransitionListener} from '../../directives/transition-listener/transition-listener';
 import {QuestionStatsPage} from '../../pages/question-stats/question-stats';
@@ -51,7 +51,7 @@ export class QuizPage {
   }
 
   onPageWillEnter() {
-    this.client.logEvent('page/quiz', {'contestId' : this.params.data.contest._id});
+    this.client.logEvent('page/quiz', {'contestId': this.params.data.contest._id});
   }
 
   onPageDidEnter() {
@@ -86,7 +86,10 @@ export class QuizPage {
   }
 
   startQuiz() {
-    this.client.logEvent('quiz/started', {'source' : this.params.data.source, 'typeId' : this.params.data.contest.type.id});
+    this.client.logEvent('quiz/started', {
+      'source': this.params.data.source,
+      'typeId': this.params.data.contest.type.id
+    });
     quizService.start(this.contestId).then((data) => {
       this.quizData = data.quiz;
       this.quizData.currentQuestion.answered = false;
@@ -99,16 +102,16 @@ export class QuizPage {
 
       if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
         alertService.alert(this.client.translate(this.quizData.reviewMode.reason)).then(() => {
-            this.modalJustClosed = true;
-          });
+          this.modalJustClosed = true;
+        });
       }
 
     }, (err) => {
       this.modalJustClosed = true;
-      //TODO: IonicBug - wait for the prev alert to be fully dismissed
+      //IonicBug - wait for the prev alert to be fully dismissed
       setTimeout(() => {
         this.client.nav.pop();
-      },1000);
+      }, 1000);
     });
   }
 
@@ -155,21 +158,21 @@ export class QuizPage {
         this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
         setTimeout(() => {
           this.quizData.currentQuestion.answers[data.question.correctAnswerId].correct = true;
-        }, 3000)
+        }, this.client.settings.quiz.question.wrongAnswerMillisecondsDelay)
       }
 
       this.correctButtonName = 'buttonAnswer' + correctAnswerId;
 
     }, (err) => {
-        this.modalJustClosed = true;
-        switch (err.type) {
-          case 'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ':
-            this.startQuiz();
-            break;
-          case 'SERVER_ERROR_GENERAL':
-            this.client.nav.pop();
-            break;
-        }
+      this.modalJustClosed = true;
+      switch (err.type) {
+        case 'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ':
+          this.startQuiz();
+          break;
+        case 'SERVER_ERROR_GENERAL':
+          this.client.nav.pop();
+          break;
+      }
     });
   }
 
@@ -237,7 +240,7 @@ export class QuizPage {
 
       //Give enough time to draw the circle progress of the last question
       setTimeout(() => {
-        this.client.nav.pop().then( () => {
+        this.client.nav.pop().then(() => {
           this.client.events.publish('topTeamer:quizFinished', this.quizData.results)
         });
       }, 1000);

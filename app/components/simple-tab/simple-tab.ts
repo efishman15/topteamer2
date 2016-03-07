@@ -18,15 +18,11 @@ export class SimpleTabComponent {
     simpleTabs.addTab(this);
   }
 
-  get active() : Boolean {
-    return this._active;
+  get isActive() : Boolean {
+    return this.active;
   }
 
-  set active(value: Boolean) {
-    this._active = value;
-  }
-
-  get selectedEmitter() : EventEmitter {
-    return this.selected;
+  set isActive(value: Boolean) {
+    this.active = value;
   }
 }
