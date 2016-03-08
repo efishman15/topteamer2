@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -23,8 +24,9 @@ var Client = (function () {
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
         }
+        this._window = window;
         this.clientInfo = {};
-        if (!window.cordova) {
+        if (!this.window.cordova) {
             this.clientInfo.mobile = false;
             if (window.self !== window.top) {
                 this.clientInfo.platform = 'facebook';
@@ -338,6 +340,13 @@ var Client = (function () {
     Client.prototype.setPageTitle = function (key, params) {
         this.ionicApp.setTitle(this.translate(key, params));
     };
+    Object.defineProperty(Client.prototype, "window", {
+        get: function () {
+            return this._window;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Client.prototype, "showSpinner", {
         get: function () {
             return this._showSpinner;
@@ -506,7 +515,7 @@ var Client = (function () {
         __metadata('design:paramtypes', [http_1.Http])
     ], Client);
     return Client;
-})();
+}());
 exports.Client = Client;
 var ServerGateway = (function () {
     function ServerGateway(http) {
@@ -586,7 +595,7 @@ var ServerGateway = (function () {
         configurable: true
     });
     return ServerGateway;
-})();
+}());
 exports.ServerGateway = ServerGateway;
 var InternalEvent = (function () {
     function InternalEvent(eventName, eventData) {
@@ -608,5 +617,5 @@ var InternalEvent = (function () {
         configurable: true
     });
     return InternalEvent;
-})();
+}());
 exports.InternalEvent = InternalEvent;

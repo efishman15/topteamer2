@@ -21,6 +21,7 @@
     "app/components/simple-tab/simple-tab.ts",
     "app/directives/animation-listener/animation-listener.ts",
     "app/directives/transition-listener/transition-listener.ts",
+    "app/interfaces/interfaces.d.ts",
     "app/pages/contest/contest.ts",
     "app/pages/contest-participants/contest-participants.ts",
     "app/pages/contest-type/contest-type.ts",

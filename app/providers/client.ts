@@ -6,6 +6,7 @@ import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Ev
 import * as facebookService from './facebook';
 import * as alertService from './alert';
 import * as contestsService from './contests';
+import * as interfaces from '../interfaces/interfaces';
 
 @Injectable()
 export class Client {
@@ -21,6 +22,7 @@ export class Client {
   canvasCenterX:number;
   canvasCenterY:number;
 
+  _window: interfaces.IWindow;
   _ionicApp:IonicApp;
   _platform:Platform;
   _config:Config;
@@ -28,9 +30,9 @@ export class Client {
   _showSpinner:Boolean = true;
   _nav:NavController;
   menuController:MenuController;
-  _user:Object;
+  _user:interfaces.User;
   _session:Object;
-  _settings:Object;
+  _settings:interfaces.Settings;
   _loaded:Boolean = false;
   clientInfo:Object;
 
@@ -42,9 +44,10 @@ export class Client {
       throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
     }
 
+    this._window = (<interfaces.IWindow>window);
     this.clientInfo = {};
 
-    if (!window.cordova) {
+    if (!this.window.cordova) {
       this.clientInfo.mobile = false;
       if (window.self !== window.top) {
         this.clientInfo.platform = 'facebook';
@@ -431,6 +434,10 @@ export class Client {
     this.ionicApp.setTitle(this.translate(key, params));
   }
 
+  get window() : interfaces.IWindow {
+    return this._window;
+  }
+
   get showSpinner() : Boolean {
     return this._showSpinner;
   }
@@ -479,7 +486,7 @@ export class Client {
     return this._nav;
   }
 
-  get user():Object {
+  get user():interfaces.User {
     return this._user;
   }
 
@@ -491,7 +498,7 @@ export class Client {
     return this.serverGateway.endPoint;
   }
 
-  get settings():Object {
+  get settings():interfaces.Settings {
     return this._settings;
   }
 

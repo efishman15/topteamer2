@@ -1,3 +1,4 @@
+"use strict";
 var _this = this;
 var client_1 = require('./client');
 var ionic_angular_1 = require('ionic-angular');

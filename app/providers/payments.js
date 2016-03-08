@@ -1,3 +1,4 @@
+"use strict";
 var client_1 = require('./client');
 var facebookService = require('./facebook');
 var purchase_success_1 = require('../pages/purchase-success/purchase-success');

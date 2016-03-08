@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -47,7 +48,7 @@ var topTeamerApp = (function () {
             _this.initBranch();
             if (window.StatusBar) {
                 // org.apache.cordova.statusbar required
-                StatusBar.styleDefault();
+                _this.client.window.StatusBar.styleDefault();
             }
             _this.client.showSpinner = false;
             console.log('platform ready');
@@ -66,10 +67,10 @@ var topTeamerApp = (function () {
             }
         }
         //Load branch mobile script
-        loadJsFile('lib/branch/web.min.js');
+        this.client.window.loadJsFile('lib/branch/web.min.js');
         //init facebook javascript sdk
-        window.fbAsyncInit = function () {
-            FB.init({
+        this.client.window.fbAsyncInit = function () {
+            _this.client.window.FB.init({
                 appId: '344342552056',
                 xfbml: true,
                 cookie: true,
@@ -90,42 +91,42 @@ var topTeamerApp = (function () {
     };
     topTeamerApp.prototype.initMobile = function () {
         var _this = this;
-        if (cordova.plugins.Keyboard) {
-            cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        if (this.client.window.cordova.plugins.Keyboard) {
+            this.client.window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         }
         //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
-        this.client.platform.prototype.fullScreen = function () {
+        ionic_angular_1.Platform.prototype.fullScreen = function () {
             return true;
         };
         //Hook into window.open
-        window.open = cordova.InAppBrowser.open;
+        this.client.window.open = this.client.window.cordova.InAppBrowser.open;
         //Load branch mobile script
-        loadJsFile('lib/branch/moblie.min.js');
+        this.client.window.loadJsFile('lib/branch/moblie.min.js');
         //Init android billing
-        if (this.client.platform.is('android') && typeof inappbilling !== 'undefined') {
-            inappbilling.init(function (resultInit) {
+        if (this.client.platform.is('android') && typeof this.client.window.inappbilling !== 'undefined') {
+            this.client.window.inappbilling.init(function (resultInit) {
             }, function (errorInit) {
                 _this.client.logError('InAppBilling', errorInit);
             }, { showLog: true }, []);
         }
         document.addEventListener('resume', function (event) {
-            if (window.initBranch) {
-                window.initBranch();
+            if (this.client.window.initBranch) {
+                this.client.window.initBranch();
             }
         });
-        cordova.getAppVersion(function (version) {
+        this.client.window.cordova.getAppVersion(function (version) {
             _this.client.user.clientInfo.appVersion = version;
-            FlurryAgent.setAppVersion('' + version);
+            _this.client.window.FlurryAgent.setAppVersion('' + version);
             _this.initFacebook();
         });
     };
     topTeamerApp.prototype.initFlurry = function () {
         //FlurryAgent.setDebugLogEnabled(true);
-        FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
+        this.client.window.FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
     };
     topTeamerApp.prototype.initBranch = function () {
         var _this = this;
-        window.myHandleBranch = function (err, data) {
+        this.client.window.myHandleBranch = function (err, data) {
             try {
                 if (err) {
                     _this.client.logError('BranchIoError', 'Error received during branch init: ' + err);
@@ -141,16 +142,16 @@ var topTeamerApp = (function () {
                 _this.client.logError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
             }
         };
-        window.initBranch = function () {
-            branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
-                if (window.myHandleBranch) {
-                    window.myHandleBranch(err, data);
+        this.client.window.initBranch = function () {
+            _this.client.window.branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
+                if (_this.client.window.myHandleBranch) {
+                    _this.client.window.myHandleBranch(err, data);
                 }
             });
         };
         //Give the appropriate mobile/web branch js file time to load
         setTimeout(function () {
-            window.initBranch();
+            _this.client.window.initBranch();
         }, 1000);
     };
     topTeamerApp.prototype.initFacebook = function () {
@@ -171,13 +172,14 @@ var topTeamerApp = (function () {
         });
     };
     topTeamerApp.prototype.declareRequestAnimationFrame = function () {
+        var _this = this;
         // Fallback where requestAnimationFrame or its equivalents are not supported in the current browser
-        window.myRequestAnimationFrame = (function () {
-            return window.requestAnimationFrame ||
-                window.webkitRequestAnimationFrame ||
-                window.mozRequestAnimationFrame ||
+        this.client.window.myRequestAnimationFrame = (function () {
+            return _this.client.window.requestAnimationFrame ||
+                _this.client.window.webkitRequestAnimationFrame ||
+                _this.client.window.mozRequestAnimationFrame ||
                 function (callback) {
-                    window.setTimeout(callback, 1000 / 60);
+                    this.client.window.setTimeout(callback, 1000 / 60);
                 };
         })();
     };
@@ -262,4 +264,4 @@ var topTeamerApp = (function () {
         __metadata('design:paramtypes', [ionic_angular_1.IonicApp, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events, ionic_angular_1.MenuController])
     ], topTeamerApp);
     return topTeamerApp;
-})();
+}());

@@ -58,7 +58,7 @@ class topTeamerApp {
 
       if (window.StatusBar) {
         // org.apache.cordova.statusbar required
-        StatusBar.styleDefault();
+        this.client.window.StatusBar.styleDefault();
       }
 
       this.client.showSpinner = false;
@@ -81,11 +81,11 @@ class topTeamerApp {
     }
 
     //Load branch mobile script
-    loadJsFile('lib/branch/web.min.js');
+    this.client.window.loadJsFile('lib/branch/web.min.js');
 
     //init facebook javascript sdk
-    window.fbAsyncInit = () => {
-      FB.init({
+    this.client.window.fbAsyncInit = () => {
+      this.client.window.FB.init({
         appId: '344342552056',
         xfbml: true,
         cookie: true,
@@ -108,24 +108,24 @@ class topTeamerApp {
   }
 
   initMobile() {
-    if (cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    if (this.client.window.cordova.plugins.Keyboard) {
+      this.client.window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
     }
 
     //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
-    this.client.platform.prototype.fullScreen = () => {
+    Platform.prototype.fullScreen = () => {
       return true;
     };
 
     //Hook into window.open
-    window.open = cordova.InAppBrowser.open;
+    this.client.window.open = this.client.window.cordova.InAppBrowser.open;
 
     //Load branch mobile script
-    loadJsFile('lib/branch/moblie.min.js');
+    this.client.window.loadJsFile('lib/branch/moblie.min.js');
 
     //Init android billing
-    if (this.client.platform.is('android') && typeof inappbilling !== 'undefined') {
-      inappbilling.init((resultInit) => {
+    if (this.client.platform.is('android') && typeof this.client.window.inappbilling !== 'undefined') {
+      this.client.window.inappbilling.init((resultInit) => {
         },
         (errorInit) => {
           this.client.logError('InAppBilling', errorInit);
@@ -136,14 +136,14 @@ class topTeamerApp {
     }
 
     document.addEventListener('resume', function (event) {
-      if (window.initBranch) {
-        window.initBranch();
+      if (this.client.window.initBranch) {
+        this.client.window.initBranch();
       }
     });
 
-    cordova.getAppVersion((version) => {
+    this.client.window.cordova.getAppVersion((version) => {
       this.client.user.clientInfo.appVersion = version;
-      FlurryAgent.setAppVersion('' + version);
+      this.client.window.FlurryAgent.setAppVersion('' + version);
 
       this.initFacebook();
     });
@@ -152,11 +152,11 @@ class topTeamerApp {
   initFlurry() {
 
     //FlurryAgent.setDebugLogEnabled(true);
-    FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
+    this.client.window.FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
   }
 
   initBranch() {
-    window.myHandleBranch = (err, data) => {
+    this.client.window.myHandleBranch = (err, data) => {
       try {
         if (err) {
           this.client.logError('BranchIoError', 'Error received during branch init: ' + err);
@@ -174,17 +174,17 @@ class topTeamerApp {
       }
     }
 
-    window.initBranch = () => {
-        branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', (err, data) => {
-          if (window.myHandleBranch) {
-            window.myHandleBranch(err, data);
+    this.client.window.initBranch = () => {
+        this.client.window.branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', (err, data) => {
+          if (this.client.window.myHandleBranch) {
+            this.client.window.myHandleBranch(err, data);
           }
         });
       }
 
     //Give the appropriate mobile/web branch js file time to load
     setTimeout(() => {
-      window.initBranch();
+      this.client.window.initBranch();
     },1000)
   }
 
@@ -208,12 +208,12 @@ class topTeamerApp {
   declareRequestAnimationFrame() {
 
     // Fallback where requestAnimationFrame or its equivalents are not supported in the current browser
-    window.myRequestAnimationFrame = (() => {
-      return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
+    this.client.window.myRequestAnimationFrame = (() => {
+      return this.client.window.requestAnimationFrame ||
+        this.client.window.webkitRequestAnimationFrame ||
+        this.client.window.mozRequestAnimationFrame ||
         function (callback) {
-          window.setTimeout(callback, 1000 / 60);
+          this.client.window.setTimeout(callback, 1000 / 60);
         };
     })();
   }
@@ -301,4 +301,3 @@ class topTeamerApp {
     this.client.nav.push(SystemToolsPage);
   }
 }
-

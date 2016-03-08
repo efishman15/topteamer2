@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -95,5 +96,5 @@ var QuestionEditorPage = (function () {
         __metadata('design:paramtypes', [ionic_angular_1.NavParams, ionic_angular_1.ViewController, common_1.FormBuilder])
     ], QuestionEditorPage);
     return QuestionEditorPage;
-})();
+}());
 exports.QuestionEditorPage = QuestionEditorPage;
