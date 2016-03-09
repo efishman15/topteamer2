@@ -6,7 +6,7 @@ import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Ev
 import * as facebookService from './facebook';
 import * as alertService from './alert';
 import * as contestsService from './contests';
-import * as interfaces from '../interfaces/interfaces';
+import {User,Session,ClientInfo,Settings,Language} from '../objects/objects';
 
 @Injectable()
 export class Client {
@@ -22,7 +22,6 @@ export class Client {
   canvasCenterX:number;
   canvasCenterY:number;
 
-  _window: interfaces.IWindow;
   _ionicApp:IonicApp;
   _platform:Platform;
   _config:Config;
@@ -30,11 +29,11 @@ export class Client {
   _showSpinner:Boolean = true;
   _nav:NavController;
   menuController:MenuController;
-  _user:interfaces.User;
-  _session:Object;
-  _settings:interfaces.Settings;
+  _user:User;
+  _session:Session;
+  _settings:Settings;
   _loaded:Boolean = false;
-  clientInfo:Object;
+  clientInfo:ClientInfo;
 
   serverGateway:ServerGateway;
 
@@ -44,10 +43,9 @@ export class Client {
       throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
     }
 
-    this._window = (<interfaces.IWindow>window);
-    this.clientInfo = {};
+    this.clientInfo = new ClientInfo();
 
-    if (!this.window.cordova) {
+    if (!window.cordova) {
       this.clientInfo.mobile = false;
       if (window.self !== window.top) {
         this.clientInfo.platform = 'facebook';
@@ -87,7 +85,6 @@ export class Client {
       this._config = config;
       this.menuController = menuController;
       this._events = events;
-      this.serverGateway.events = events;
 
       var language = localStorage.getItem('language');
 
@@ -116,16 +113,15 @@ export class Client {
 
   getSettings(localStorageLanguage) {
 
-    var postData = {};
-    postData.clientInfo = this.clientInfo;
+    var postData = {'clientInfo': this.clientInfo};
 
     if (localStorageLanguage && localStorageLanguage !== 'undefined') {
       //This will indicate to the server NOT to retrieve geo info - since language is already determined
-      postData.language = localStorageLanguage;
+      postData['language'] = localStorageLanguage;
     }
     else {
       //Server will try to retrieve geo info based on client ip - if fails - will revert to this default language
-      postData.defaultLanguage = this.getDefaultLanguage();
+      postData['defaultLanguage'] = this.getDefaultLanguage();
     }
 
     return this.serverPost('info/settings', postData);
@@ -239,7 +235,7 @@ export class Client {
       //Occurs after xp has already been added to the session
       var addition = xpProgress.addition;
       for (var i = 1; i <= addition; i++) {
-        myRequestAnimationFrame(() => {
+        window.myRequestAnimationFrame(() => {
           var endPoint = (this.session.xpProgress.current + i) / this.session.xpProgress.max;
           this.animateXpAddition(startPoint, endPoint);
 
@@ -313,7 +309,7 @@ export class Client {
 
         if (this.clientInfo.platform === 'android') {
 
-          var push = PushNotification.init(
+          var push = window.PushNotification.init(
             {
               'android': this.settings.google.gcm,
               'ios': {'alert': 'true', 'badge': 'true', 'sound': 'true'},
@@ -434,10 +430,6 @@ export class Client {
     this.ionicApp.setTitle(this.translate(key, params));
   }
 
-  get window() : interfaces.IWindow {
-    return this._window;
-  }
-
   get showSpinner() : Boolean {
     return this._showSpinner;
   }
@@ -451,7 +443,7 @@ export class Client {
 
   private getDefaultLanguage() {
     //Always return a language - get the browser's language
-    var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage)
+    var language = window.navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage)
     if (!language) {
       language = 'en';
     }
@@ -498,15 +490,15 @@ export class Client {
     return this.serverGateway.endPoint;
   }
 
-  get settings():interfaces.Settings {
+  get settings():Settings {
     return this._settings;
   }
 
-  get session():Object {
+  get session():Session {
     return this._session;
   }
 
-  get currentLanguage():Object {
+  get currentLanguage():Language {
     return this.settings.languages[this.user.settings.language];
   }
 
@@ -553,20 +545,20 @@ export class Client {
   }
 
   setLoggedUserId(userId: string) {
-    FlurryAgent.setUserId(userId);
+    window.FlurryAgent.setUserId(userId);
   }
 
   logEvent(eventName: string, eventParams?: Object) {
     if (eventParams) {
-      FlurryAgent.logEvent(eventName, eventParams);
+      window.FlurryAgent.logEvent(eventName, eventParams);
     }
     else {
-      FlurryAgent.logEvent(eventName);
+      window.FlurryAgent.logEvent(eventName);
     }
   }
 
   logError(errorType: string, message: string) {
-    FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
+    window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
   }
 
 }
@@ -635,8 +627,8 @@ export class ServerGateway {
         .map((res:Response) => res.json())
         .subscribe(
           (res:Object) => {
-            if (res.serverPopup) {
-              this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res.serverPopup));
+            if (res['serverPopup']) {
+              this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res['serverPopup']));
             }
             resolve(res);
           },

@@ -1,6 +1,7 @@
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
 import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import {Question,Questions} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/question-editor/question-editor.html'
@@ -8,11 +9,11 @@ import {Client} from '../../providers/client';
 export class QuestionEditorPage {
 
   client:Client;
-  question:Object;
+  question:Question;
   mode:String;
   viewController:ViewController;
   title:String;
-  currentQuestions: Array<Object>;
+  currentQuestions: Questions;
   questionError:String;
   answersError:String;
   submitted:Boolean;
@@ -32,7 +33,7 @@ export class QuestionEditorPage {
 
     if (this.mode === 'add') {
       this.title = this.client.translate('NEW_QUESTION');
-      this.question = {'text': null, answers: [null, null, null, null]};
+      this.question =  new Question();
     }
     else if (this.mode === 'edit') {
       this.title = this.client.translate('EDIT_QUESTION');
@@ -61,7 +62,7 @@ export class QuestionEditorPage {
   onPageWillEnter() {
     var eventData = {'mode' : this.mode};
     if (this.mode === 'edit') {
-        eventData.questionId = this.question._id;
+        eventData['questionId'] = this.question._id;
     }
     this.client.logEvent('page/questionEditor', eventData);
     this.submitted = false;

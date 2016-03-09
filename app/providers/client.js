@@ -15,6 +15,7 @@ require('rxjs/add/operator/timeout');
 var facebookService = require('./facebook');
 var alertService = require('./alert');
 var contestsService = require('./contests');
+var objects_1 = require('../objects/objects');
 var Client = (function () {
     function Client(http) {
         this.circle = Math.PI * 2;
@@ -24,9 +25,8 @@ var Client = (function () {
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
         }
-        this._window = window;
-        this.clientInfo = {};
-        if (!this.window.cordova) {
+        this.clientInfo = new objects_1.ClientInfo();
+        if (!window.cordova) {
             this.clientInfo.mobile = false;
             if (window.self !== window.top) {
                 this.clientInfo.platform = 'facebook';
@@ -60,7 +60,6 @@ var Client = (function () {
             _this._config = config;
             _this.menuController = menuController;
             _this._events = events;
-            _this.serverGateway.events = events;
             var language = localStorage.getItem('language');
             _this.getSettings(language).then(function (data) {
                 _this._settings = data.settings;
@@ -79,15 +78,14 @@ var Client = (function () {
         });
     };
     Client.prototype.getSettings = function (localStorageLanguage) {
-        var postData = {};
-        postData.clientInfo = this.clientInfo;
+        var postData = { 'clientInfo': this.clientInfo };
         if (localStorageLanguage && localStorageLanguage !== 'undefined') {
             //This will indicate to the server NOT to retrieve geo info - since language is already determined
-            postData.language = localStorageLanguage;
+            postData['language'] = localStorageLanguage;
         }
         else {
             //Server will try to retrieve geo info based on client ip - if fails - will revert to this default language
-            postData.defaultLanguage = this.getDefaultLanguage();
+            postData['defaultLanguage'] = this.getDefaultLanguage();
         }
         return this.serverPost('info/settings', postData);
     };
@@ -178,7 +176,7 @@ var Client = (function () {
             //Occurs after xp has already been added to the session
             var addition = xpProgress.addition;
             for (var i = 1; i <= addition; i++) {
-                myRequestAnimationFrame(function () {
+                window.myRequestAnimationFrame(function () {
                     var endPoint = (_this.session.xpProgress.current + i) / _this.session.xpProgress.max;
                     _this.animateXpAddition(startPoint, endPoint);
                     //Last iteration should be performed after the animation frame event happened
@@ -234,7 +232,7 @@ var Client = (function () {
                     _this.logEvent('server/login');
                 }
                 if (_this.clientInfo.platform === 'android') {
-                    var push = PushNotification.init({
+                    var push = window.PushNotification.init({
                         'android': _this.settings.google.gcm,
                         'ios': { 'alert': 'true', 'badge': 'true', 'sound': 'true' },
                         'windows': {}
@@ -340,13 +338,6 @@ var Client = (function () {
     Client.prototype.setPageTitle = function (key, params) {
         this.ionicApp.setTitle(this.translate(key, params));
     };
-    Object.defineProperty(Client.prototype, "window", {
-        get: function () {
-            return this._window;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(Client.prototype, "showSpinner", {
         get: function () {
             return this._showSpinner;
@@ -363,7 +354,7 @@ var Client = (function () {
     });
     Client.prototype.getDefaultLanguage = function () {
         //Always return a language - get the browser's language
-        var language = navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        var language = window.navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
         if (!language) {
             language = 'en';
         }
@@ -497,18 +488,18 @@ var Client = (function () {
         this._session = null;
     };
     Client.prototype.setLoggedUserId = function (userId) {
-        FlurryAgent.setUserId(userId);
+        window.FlurryAgent.setUserId(userId);
     };
     Client.prototype.logEvent = function (eventName, eventParams) {
         if (eventParams) {
-            FlurryAgent.logEvent(eventName, eventParams);
+            window.FlurryAgent.logEvent(eventName, eventParams);
         }
         else {
-            FlurryAgent.logEvent(eventName);
+            window.FlurryAgent.logEvent(eventName);
         }
     };
     Client.prototype.logError = function (errorType, message) {
-        FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
+        window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
     };
     Client = __decorate([
         core_1.Injectable(), 
@@ -563,8 +554,8 @@ var ServerGateway = (function () {
                 .timeout(timeout)
                 .map(function (res) { return res.json(); })
                 .subscribe(function (res) {
-                if (res.serverPopup) {
-                    _this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res.serverPopup));
+                if (res['serverPopup']) {
+                    _this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res['serverPopup']));
                 }
                 resolve(res);
             }, function (err) {

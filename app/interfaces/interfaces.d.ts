@@ -1,9 +1,11 @@
+export {};
+
 declare global {
   interface Window {
     cordova: any;
     StatusBar: any;
     loadJsFile(fileName:string) : void;
-    FB: any;
+    FB: IFB;
     fbAsyncInit() : void;
     inappbilling: any;
     initBranch() : void;
@@ -13,38 +15,27 @@ declare global {
     myRequestAnimationFrame(callback:any): void;
     webkitRequestAnimationFrame(): void;
     mozRequestAnimationFrame(): void;
+    FusionCharts: any;
+    facebookConnectPlugin: any;
+    PushNotification: any;
+  }
+
+  interface Navigator {
+    languages: Array<Object>;
   }
 
   interface String {
     format(): string;
-    replaceAll(search: string, replacement: string): string;
+    replaceAll(search:string, replacement:string): string;
   }
 
   interface Date {
     clearTime(): void;
   }
-}
-
-export interface Settings {
-  general: GeneralSettings;
-}
-
-export interface GeneralSettings {
-  webCanvasWidth: number;
-}
-
-export interface User {
-  clientInfo: ClientInfo;
-}
-
-export interface UserSettings {
 
 }
 
-export interface ClientInfo {
-  appVersion: string;
-}
-
-export interface String {
-  format() : string;
+interface IFB {
+  ui(data: Object, callback: any): void;
+  init(data: Object): void;
 }

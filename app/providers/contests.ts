@@ -122,7 +122,7 @@ export let list = (tab:String) => {
 //------------------------------------------------------
 //-- join
 //------------------------------------------------------
-export let join = (contestId:number, teamId:number) => {
+export let join = (contestId:string, teamId:number) => {
   var postData = {'contestId': contestId, 'teamId': teamId};
   var client = Client.getInstance();
   return client.serverPost('contests/join', postData);
@@ -166,7 +166,7 @@ export let removeContest = (contestId:string) => {
 export let setContest = (contest:Object, mode:string, nameChanged:Boolean) => {
   var postData = {'contest': contest, 'mode': mode};
   if (nameChanged) {
-    postData.nameChanged = nameChanged;
+    postData['nameChanged'] = nameChanged;
   }
 
   var client = Client.getInstance();

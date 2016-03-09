@@ -1,5 +1,6 @@
 import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import {Question} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/question-stats/question-stats.html'
@@ -7,7 +8,7 @@ import {Client} from '../../providers/client';
 export class QuestionStatsPage {
 
   client:Client;
-  question:Object;
+  question:Question;
   chartDataSource:Object;
   viewController:ViewController;
 
@@ -23,8 +24,8 @@ export class QuestionStatsPage {
     this.client.logEvent('page/questionStats', {'questionId' : this.question._id});
 
     if (this.chartDataSource) {
-      FusionCharts.ready(() => {
-        var chart = new FusionCharts({
+      window.FusionCharts.ready(() => {
+        var chart = new window.FusionCharts({
           type: 'pie2d',
           renderAt: 'questionChart',
           width: this.client.settings.charts.size.width,

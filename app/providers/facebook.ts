@@ -62,7 +62,7 @@ export let login = (permissions?, rerequestDeclinedPermissions?) => new Promise(
       permissionObject.auth_type = 'rerequest';
     }
 
-    FB.login((response) => {
+    window.FB.login((response) => {
       if (response.authResponse) {
         resolve(response);
       }
@@ -90,7 +90,7 @@ export let logout = () => new Promise((resolve, reject) => {
 
   if (!window.cordova) {
 
-    FB.logout((response) => {
+    window.FB.logout((response) => {
       resolve(response);
     });
   }
@@ -130,7 +130,7 @@ export let post = (story) => new Promise((resolve, reject) => {
     webPostObject.action_properties[story.object.name] = story.object.value;
 
     try {
-      FB.ui(webPostObject, (response) => {
+      window.FB.ui(webPostObject, (response) => {
         resolve(response);
       });
     } catch (error) {

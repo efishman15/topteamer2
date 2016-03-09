@@ -10,6 +10,7 @@ import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
 import * as shareService from '../../providers/share';
+import {Contest,Team} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html',
@@ -21,14 +22,14 @@ export class SetContestPage {
   client:Client;
   params:NavParams;
 
-  minContestStart:Date;
-  maxContestStart:Date;
-  minContestEnd:Date;
-  maxContestEnd:Date;
-  startDate:Date;
-  endDate:Date;
+  minContestStart:number;
+  maxContestStart:number;
+  minContestEnd:number;
+  maxContestEnd:number;
+  startDate:number;
+  endDate:number;
   showRemoveContest:Boolean;
-  contestLocalCopy:Object;
+  contestLocalCopy:Contest;
   showStartDate:Boolean;
   showAdminInfo:Boolean;
   buyInProgress:Boolean;
@@ -57,17 +58,15 @@ export class SetContestPage {
     }, {validator: this.matchingTeamsValidator});
 
     //Start date is today, end date is by default within 24 hours
-    this.startDate = new Date();
-    this.startDate.clearTime();
-    this.endDate = new Date(this.startDate.getTime() + 1 * 24 * 60 * 60 * 1000);
+    var now = new Date();
+    now.clearTime();
+    this.startDate = now.getTime();
+    this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
 
     this.showRemoveContest = false;
 
     if (this.params.data.mode === 'edit') {
       this.contestLocalCopy = JSON.parse(JSON.stringify(this.params.data.contest));
-      //Server stores in epoch - client uses real DATE objects
-      this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
-      this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.endDate);
 
       if (this.contestLocalCopy.participants > 0) {
         this.showStartDate = false;
@@ -82,48 +81,39 @@ export class SetContestPage {
     }
     else if (this.params.data.mode === 'add') {
       //Create new local instance of a contest
-      this.contestLocalCopy = {
-        'startDate': this.startDate,
-        'endDate': this.endDate,
-        'endOption': 'h24',
-        'type': this.params.data.type,
-        'participants': 0,
-        'manualParticipants': 0,
-        'manualRating': 0,
-        'teams': [{'name': null, 'score': 0}, {'name': null, 'score': 0}]
-      };
+      this.contestLocalCopy = new Contest(this.startDate, this.endDate, this.params.data.type);
       this.showStartDate = true;
       this.contestLocalCopy.questions = {'visibleCount': 0, 'list': []};
     }
 
-    this.client.session.features.newContest.purchaseData.retrieved = false;
+    this.client.session.features['newContest'].purchaseData.retrieved = false;
     this.showRemoveContest = (this.params.data.mode === 'edit' && this.client.session.isAdmin);
 
     //-------------------------------------------------------------------------------------------------------------
     //Android Billing
     //-------------------------------------------------------------------------------------------------------------
-    if (this.client.user.clientInfo.platform === 'android' && this.client.session.features.newContest.locked) {
-      if (!this.client.session.features.newContest.purchaseData.retrieved) {
+    if (this.client.user.clientInfo.platform === 'android' && this.client.session.features['newContest'].locked) {
+      if (!this.client.session.features['newContest'].purchaseData.retrieved) {
 
         //-------------------------------------------------------------------------------------------------------------
         //pricing - replace cost/currency with the google store pricing (local currency, etc.)
         //-------------------------------------------------------------------------------------------------------------
-        inappbilling.getProductDetails((products) => {
+        window.inappbilling.getProductDetails((products) => {
             //In android - the price already contains the symbol
-            this.client.session.features.newContest.purchaseData.formattedCost = products[0].price;
-            this.client.session.features.newContest.purchaseData.cost = products[0].price_amount_micros / 1000000;
-            this.client.session.features.newContest.purchaseData.currency = products[0].price_currency_code;
+            this.client.session.features['newContest'].purchaseData.formattedCost = products[0].price;
+            this.client.session.features['newContest'].purchaseData.cost = products[0].price_amount_micros / 1000000;
+            this.client.session.features['newContest'].purchaseData.currency = products[0].price_currency_code;
 
-            this.client.session.features.newContest.purchaseData.retrieved = true;
+            this.client.session.features['newContest'].purchaseData.retrieved = true;
 
             //-------------------------------------------------------------------------------------------------------------
             //Retrieve unconsumed items - and checking if user has an unconsumed 'new contest unlock key'
             //-------------------------------------------------------------------------------------------------------------
-            inappbilling.getPurchases((unconsumedItems) => {
+            window.inappbilling.getPurchases((unconsumedItems) => {
                 if (unconsumedItems && unconsumedItems.length > 0) {
                   for (var i = 0; i < unconsumedItems.length; i++) {
-                    if (unconsumedItems[i].productId === this.client.session.features.newContest.purchaseData.productId) {
-                      processAndroidPurchase(unconsumedItems[i]);
+                    if (unconsumedItems[i].productId === this.client.session.features['newContest'].purchaseData.productId) {
+                      this.processAndroidPurchase(unconsumedItems[i]);
                       break;
                     }
                   }
@@ -136,11 +126,11 @@ export class SetContestPage {
           },
           function (msg) {
             this.client.logError('AndroidBillingError', 'Error getting product details: ' + msg);
-          }, this.client.session.features.newContest.purchaseData.productId);
+          }, this.client.session.features['newContest'].purchaseData.productId);
       }
     }
     else {
-      this.client.session.features.newContest.purchaseData.retrieved = true;
+      this.client.session.features['newContest'].purchaseData.retrieved = true;
     }
 
     this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
@@ -153,7 +143,7 @@ export class SetContestPage {
   onPageWillEnter() {
     var eventData = {'mode' : this.params.data.mode};
     if (this.params.data.mode === 'edit') {
-      eventData.contestId = this.params.data.contest._id;
+      eventData['contestId'] = this.params.data.contest._id;
     }
     this.client.logEvent('page/setContest', eventData);
     this.submitted = false;
@@ -180,19 +170,19 @@ export class SetContestPage {
 
   processAndroidPurchase(purchaseData) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
 
       var extraPurchaseData = {
-        'actualCost': this.client.session.features.newContest.purchaseData.cost,
-        'actualCurrency': this.client.session.features.newContest.purchaseData.currency,
-        'featurePurchased': this.client.session.features.newContest.name
+        'actualCost': this.client.session.features['newContest'].purchaseData.cost,
+        'actualCurrency': this.client.session.features['newContest'].purchaseData.currency,
+        'featurePurchased': this.client.session.features['newContest'].name
       };
 
       paymentService.processPayment('android', purchaseData, extraPurchaseData).then((serverPurchaseData) => {
 
         this.client.showSpinner = true;
 
-        inappbilling.consumePurchase((purchaseData) => {
+        window.inappbilling.consumePurchase((purchaseData) => {
 
             this.client.showSpinner = false;
 
@@ -217,7 +207,7 @@ export class SetContestPage {
   buyNewContestUnlockKey(isMobile) {
 
     this.buyInProgress = true;
-    paymentService.buy(this.client.session.features.newContest, isMobile.then((result) => {
+    paymentService.buy(this.client.session.features['newContest'], isMobile.then((result) => {
         switch (result.method) {
           case 'paypal':
             location.replace(result.data.url);
@@ -400,11 +390,6 @@ export class SetContestPage {
 
     delete this.contestLocalCopy['status'];
 
-    //Server stores in epoch - client uses real DATE objects
-    //Convert back to epoch before storing to server
-    this.contestLocalCopy.startDate = this.contestLocalCopy.startDate.getTime();
-    this.contestLocalCopy.endDate = this.contestLocalCopy.endDate.getTime();
-
     if (this.params.data.mode === 'add' || (this.params.data.mode === 'edit' && JSON.stringify(this.params.data.contest) != JSON.stringify(this.contestLocalCopy))) {
 
       this.contestLocalCopy.name = this.client.translate('CONTEST_NAME', {
@@ -419,15 +404,12 @@ export class SetContestPage {
 
       contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then((contest) => {
 
-        this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
-        this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.endDate);
-
         //Report to Flurry
         var contestParams = {
           'team0': this.contestLocalCopy.teams[0].name,
           'team1': this.contestLocalCopy.teams[1].name,
           'duration': this.contestLocalCopy.endOption,
-          'questionsSource': this.contestLocalCopy.questionsSource
+          'typeId': this.contestLocalCopy.type.id
         };
 
         if (this.params.data.mode === 'add') {
@@ -455,10 +437,6 @@ export class SetContestPage {
           this.client.events.publish('topTeamer:contestUpdated', contest);
           this.client.nav.pop();
         }
-
-      }, (error) => {
-        this.contestLocalCopy.startDate = new Date(this.contestLocalCopy.startDate);
-        this.contestLocalCopy.endDate = new Date(this.contestLocalCopy.endDate);
       });
     }
     else {
@@ -519,15 +497,15 @@ export class SetContestPage {
       this.maxContestEnd = this.getMaxEndDate();
     }
     else {
-      var pastDate = new Date(1970, 0, 1, 0, 0, 0);
+      var pastDate = (new Date(1970, 0, 1, 0, 0, 0)).getTime();
       this.minContestStart = pastDate;
       this.minContestEnd = pastDate;
-      this.maxContestEnd = new Date(2100, 0, 1, 0, 0, 0);
+      this.maxContestEnd = (new Date(2100, 0, 1, 0, 0, 0)).getTime();
     }
   }
 
   getMaxEndDate() {
     //Set the maximum end date according to the last end option in the list
-    return new Date(this.contestLocalCopy.startDate.getTime() + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier);
+    return this.contestLocalCopy.startDate + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier;
   }
 }

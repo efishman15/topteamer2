@@ -122,12 +122,12 @@ var DatePickerComponent = (function () {
     };
     DatePickerComponent.prototype.setDateLimits = function () {
         if (this.minDate) {
-            var minDate = new Date(this.minDate);
+            var minDate = new Date(this.minDate.getTime());
             minDate.clearTime();
             this.minEpochLocal = minDate.getTime();
         }
         if (this.maxDate) {
-            var maxDate = new Date(this.maxDate);
+            var maxDate = new Date(this.maxDate.getTime());
             maxDate.clearTime();
             //Another 24 hours to count all the hours in the max date including up to midnight (23:59:59.999)
             this.maxEpochLocal = maxDate.getTime() + 24 * 60 * 60 * 1000;

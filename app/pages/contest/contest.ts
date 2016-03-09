@@ -11,6 +11,7 @@ import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as shareService from '../../providers/share';
 import * as soundService from '../../providers/sound';
+import {ContestChart,QuizResults} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
@@ -21,8 +22,8 @@ export class ContestPage {
 
   client:Client;
   params:NavParams;
-  contestChart:Object = {};
-  lastQuizResults:Object = null;
+  contestChart:ContestChart;
+  lastQuizResults:QuizResults = null;
   animateLastResults:Boolean = false;
   contestId:String;
 

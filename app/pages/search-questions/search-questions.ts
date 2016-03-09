@@ -2,6 +2,8 @@ import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
+import {Questions} from "../../objects/objects";
+import {Question} from "../../objects/objects";
 
 @Page({
   templateUrl: 'build/pages/search-questions/search-questions.html'
@@ -10,9 +12,9 @@ export class SearchQuestionsPage {
 
   client:Client;
   viewController: ViewController;
-  currentQuestions: Array<Object>;
+  currentQuestions: Questions;
   searchText:String;
-  questions: Array<Object>;
+  questions: Array<Question>;
 
   constructor(params:NavParams, viewController: ViewController) {
     this.client = Client.getInstance();

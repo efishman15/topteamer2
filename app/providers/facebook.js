@@ -56,7 +56,7 @@ exports.login = function (permissions, rerequestDeclinedPermissions) { return ne
         if (rerequestDeclinedPermissions) {
             permissionObject.auth_type = 'rerequest';
         }
-        FB.login(function (response) {
+        window.FB.login(function (response) {
             if (response.authResponse) {
                 resolve(response);
             }
@@ -78,7 +78,7 @@ exports.login = function (permissions, rerequestDeclinedPermissions) { return ne
 //------------------------------------------------------
 exports.logout = function () { return new Promise(function (resolve, reject) {
     if (!window.cordova) {
-        FB.logout(function (response) {
+        window.FB.logout(function (response) {
             resolve(response);
         });
     }
@@ -113,7 +113,7 @@ exports.post = function (story) { return new Promise(function (resolve, reject) 
         };
         webPostObject.action_properties[story.object.name] = story.object.value;
         try {
-            FB.ui(webPostObject, function (response) {
+            window.FB.ui(webPostObject, function (response) {
                 resolve(response);
             });
         }

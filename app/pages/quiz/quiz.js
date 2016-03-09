@@ -18,6 +18,7 @@ var client_1 = require('../../providers/client');
 var quizService = require('../../providers/quiz');
 var soundService = require('../../providers/sound');
 var alertService = require('../../providers/alert');
+var objects_1 = require("../../objects/objects");
 var QuizPage = (function () {
     function QuizPage(params) {
         this.questionHistory = [];
@@ -73,7 +74,8 @@ var QuizPage = (function () {
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;
             for (var i = 0; i < data.quiz.totalQuestions; i++) {
-                _this.questionHistory.push({ 'score': _this.client.settings.quiz.questions.score[i] });
+                var questionItemInHistory = new objects_1.QuizQuestion(_this.client.settings.quiz.questions.score[i]);
+                _this.questionHistory.push(questionItemInHistory);
             }
             _this.drawQuizProgress();
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
@@ -94,7 +96,7 @@ var QuizPage = (function () {
         this.quizData.currentQuestion.answered = true;
         quizService.answer(answerId, this.questionHistory[this.quizData.currentQuestionIndex].hintUsed, this.questionHistory[this.quizData.currentQuestionIndex].answerUsed).then(function (data) {
             var correctAnswerId;
-            _this.questionHistory[_this.quizData.currentQuestionIndex].answer = data.question.correct;
+            _this.questionHistory[_this.quizData.currentQuestionIndex].answered = data.question.correct;
             if (data.results) {
                 //Will get here when quiz is finished
                 _this.quizData.results = data.results;
@@ -156,7 +158,7 @@ var QuizPage = (function () {
         var _this = this;
         if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
             this.client.addXp(this.quizData.xpProgress).then(function () {
-                if (_this.correctButtonName === event.srcElement.name) {
+                if (_this.correctButtonName === event.srcElement['name']) {
                     if (!_this.quizData.xpProgress.rankChanged) {
                         _this.quizProceed();
                     }
@@ -173,7 +175,7 @@ var QuizPage = (function () {
                 }
             });
         }
-        else if (this.correctButtonName === event.srcElement.name) {
+        else if (this.correctButtonName === event.srcElement['name']) {
             this.quizProceed();
         }
     };
@@ -349,8 +351,8 @@ var QuizPage = (function () {
                 this.quizContext.closePath();
             }
             //Draw correct/incorrect for answered
-            if (this.questionHistory[i].answer != null) {
-                if (this.questionHistory[i].answer) {
+            if (this.questionHistory[i].answered != undefined) {
+                if (this.questionHistory[i].answered) {
                     this.drawImageAsync(this.imgCorrectSrc, currentX - this.client.settings.quiz.canvas.radius, this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius * 2, this.client.settings.quiz.canvas.radius * 2);
                 }
                 else {
@@ -402,7 +404,7 @@ var QuizPage = (function () {
             //Draw question score
             var textWidth = this.quizContext.measureText(questionScore).width;
             var scoreColor = this.client.settings.quiz.canvas.inactiveColor;
-            if (this.questionHistory[i].answer && !this.questionHistory[i].answerUsed) {
+            if (this.questionHistory[i].answered && !this.questionHistory[i].answerUsed) {
                 scoreColor = this.client.settings.quiz.canvas.correctRatioColor;
             }
             //Draw the score at the top of the circle

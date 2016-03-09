@@ -1,6 +1,7 @@
 import {Page,NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as shareService from '../../providers/share';
+import {Contest} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/share/share.html'
@@ -9,7 +10,7 @@ import * as shareService from '../../providers/share';
 export class SharePage {
 
   client:Client;
-  contest:Object;
+  contest:Contest;
   shareVariables:Object;
 
   constructor(params:NavParams) {
@@ -31,7 +32,6 @@ export class SharePage {
   }
 
   share(network) {
-    console.log('network='+ network.name + ', url=' + network.url);
     window.open(network.url.format({url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail}),'_blank');
     this.client.logEvent('share/web/' + network.name);
   }

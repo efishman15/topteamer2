@@ -10,6 +10,7 @@ import {SetContestPage} from '../set-contest/set-contest';
 import {SettingsPage} from '../settings/settings';
 
 import * as shareService from '../../providers/share';
+import {ServerPopup} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/server-popup/server-popup.html'
@@ -17,7 +18,7 @@ import * as shareService from '../../providers/share';
 export class ServerPopupPage {
 
   client:Client;
-  serverPopup:Object;
+  serverPopup:ServerPopup;
   viewController:ViewController;
 
   constructor(params:NavParams, viewController: ViewController) {

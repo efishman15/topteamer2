@@ -1,5 +1,6 @@
 import {Component, Input, EventEmitter, Output} from 'angular2/core';
 import {Client} from '../../providers/client';
+import {ContestChart} from '../../objects/objects';
 
 @Component({
   selector: 'contest-chart',
@@ -11,11 +12,11 @@ export class ContestChartComponent {
   @Input() id:Number;
   @Input() width:Number;
   @Input() height:Number;
-  @Input() contestChart:Object;
+  @Input() contestChart:ContestChart;
 
   chartTeamEventHandled:boolean;
   client:Client;
-  chart:FusionChart;
+  chart:any;
 
   @Output() contestSelected = new EventEmitter();
   @Output() teamSelected = new EventEmitter();
@@ -55,8 +56,8 @@ export class ContestChartComponent {
 
   initChart() {
     if (!this.chart) {
-      FusionCharts.ready(() => {
-        this.chart = new FusionCharts({
+      window.FusionCharts.ready(() => {
+        this.chart = new window.FusionCharts({
           type: 'column2d',
           renderAt: this.id + '-container',
           width: this.width,
@@ -72,7 +73,7 @@ export class ContestChartComponent {
     }
   }
 
-  refresh(contestChart: Object) {
+  refresh(contestChart: ContestChart) {
     if (this.chart) {
       this.chart.setJSONData(contestChart);
     }

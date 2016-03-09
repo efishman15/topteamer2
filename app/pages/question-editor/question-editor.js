@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var common_1 = require('angular2/common');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var objects_1 = require('../../objects/objects');
 var QuestionEditorPage = (function () {
     function QuestionEditorPage(params, viewController, formBuilder) {
         this.client = client_1.Client.getInstance();
@@ -18,7 +19,7 @@ var QuestionEditorPage = (function () {
         this.mode = params.data.mode;
         if (this.mode === 'add') {
             this.title = this.client.translate('NEW_QUESTION');
-            this.question = { 'text': null, answers: [null, null, null, null] };
+            this.question = new objects_1.Question();
         }
         else if (this.mode === 'edit') {
             this.title = this.client.translate('EDIT_QUESTION');
@@ -42,7 +43,7 @@ var QuestionEditorPage = (function () {
     QuestionEditorPage.prototype.onPageWillEnter = function () {
         var eventData = { 'mode': this.mode };
         if (this.mode === 'edit') {
-            eventData.questionId = this.question._id;
+            eventData['questionId'] = this.question._id;
         }
         this.client.logEvent('page/questionEditor', eventData);
         this.submitted = false;

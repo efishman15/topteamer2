@@ -1,0 +1,296 @@
+export class Settings {
+  general: GeneralSettings;
+  facebook: FacebookSettings;
+  quiz: QuizSettings;
+}
+
+export class GeneralSettings {
+  webCanvasWidth: number;
+  facebookFanPage: string;
+}
+
+export class FacebookSettings {
+  friendsPermission: Array<string>;
+}
+
+export class QuizSettings {
+  canvas: QuizCanvasSettings;
+  question: QuizQuestionSettings;
+}
+
+export class QuizCanvasSettings {
+  height : number;
+  topOffset : number;
+  radius : number;
+  inactiveColor : string;
+  activeColor : string;
+  lineWidth : number;
+  correctRatioColor : string;
+  incorrectRatioColor : string;
+  font : string;
+  scores : QuizCanvasScoresSettings;
+  pieChartRadius : number;
+  width : number;
+}
+
+export class QuizCanvasScoresSettings {
+  top: number;
+}
+
+export class QuizQuestionSettings {
+  maxLength : number;
+  answer : QuizQuestionAnswerSettings;
+  wrongAnswerMillisecondsDelay : number;
+}
+
+export class QuizQuestionAnswerSettings {
+  maxLength : number;
+}
+
+export class Question {
+  _id: string;
+  deleted: boolean;
+  checked: boolean;
+  text: string;
+  answers: Array<string>;
+  constructor() {
+    this._id = null;
+    this.text = null;
+    this.answers = [null,null,null,null];
+  }
+}
+
+export class Questions {
+  list: Array<Question>;
+  visibleCount: number;
+  constructor() {
+    this.visibleCount = 0;
+    this.list = [];
+  }
+}
+
+export class User {
+  clientInfo: ClientInfo;
+  settings: UserSettings;
+}
+
+export class UserSettings {
+  language: string;
+  timezoneOffset: number;
+}
+
+export class ClientInfo {
+  appVersion: string;
+  platform: string;
+  mobile: boolean;
+  constructor() {
+
+  }
+}
+
+export class Session {
+  rank: number;
+  features: Object;
+  score: number;
+  settings: SessionSettings;
+  isAdmin: boolean;
+  xpProgress: XpProgress;
+  gcmRegistrationId: string;
+}
+
+export class SessionSettings {
+  sound: boolean;
+  language: string;
+}
+
+export class Feature {
+  name: string;
+  lockText: string;
+  unlockText: string;
+  purchaseProductId: string;
+}
+
+export class View {
+  name: string;
+  isRoot: boolean;
+  params: Object;
+}
+
+export class Language {
+  value: string;
+  direction : string;
+  align: string;
+  oppositeAlign: string;
+  displayNames: Object;
+  wiki : string;
+  oppositeDirection : string;
+  localeDateOptions : LocaleDateOptions;
+  locale : string;
+  backButtonIcon : string;
+}
+
+export class LocaleDateOptions {
+  month: string;
+  day: string;
+  year: string;
+}
+
+export class ContestChart {
+  contest: Contest;
+}
+
+export class CalendarCell {
+  dateObject: Date;
+  date: number;
+  month: number;
+  year: number;
+  day: number;
+  dateString: string;
+  epochLocal: number;
+  epochUTC: number;
+  inMonth: boolean;
+  disabled: boolean;
+  selected: boolean;
+  today: boolean;
+}
+
+export class Contest {
+  _id: string;
+  name: string;
+  startDate: number;
+  endDate: number;
+  myTeam: number;
+  participants: number;
+  manualParticipants;
+  rating: number;
+  manualRating: number;
+  teams: Array<Team>;
+  type: ContestType;
+  endOption: string;
+  questions: Questions;
+  totalParticipants: number;
+  userQuestions: Array<string>;
+
+  constructor(startDate: number, endDate: number, type: ContestType) {
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.type = type;
+    this.rating = 0;
+    this.manualRating = 0;
+    this.participants = 0;
+    this.manualParticipants = 0;
+    this.endOption = 'h24';
+    this.teams = [new Team(), new Team()];
+    this.questions = new Questions();
+  }
+}
+
+export class Team {
+  name: string;
+  score: number;
+  constructor() {
+      this.name = null;
+    this.score = 0;
+  }
+}
+
+export class ContestType {
+  id : string;
+  icon : string;
+  title : string;
+  description : string;
+  name : string;
+}
+
+export class QuizResults {
+  data: QuizResultsData;
+  contest: Contest;
+  facebookPost: FacebookPostData;
+}
+
+export class QuizResultsData {
+  score: number;
+  sound: string;
+  clientKey: string;
+  clientValues: Object;
+  animation: string;
+  facebookPost: FacebookPostData;
+  title: string;
+  message: string;
+}
+
+export class FacebookPostData {
+  action: string;
+  object: string;
+  dialogImage: FacebookPostDialogImage;
+}
+
+export class FacebookPostDialogImage {
+  url: string;
+  width: number;
+  height: number;
+}
+
+export class QuizData {
+  currentQuestion: QuizQuestion;
+  reviewMode: QuizReviewMode;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+  results: QuizResults;
+  xpProgress: XpProgress;
+  finished: boolean;
+}
+
+export class QuizQuestion {
+  _id: string;
+  text: string;
+  answered: boolean;
+  currentQuestionIndex: number;
+  hintUsed: boolean;
+  answerUsed: boolean;
+  score: number;
+  answers: Array<QuizAnswer>;
+  doAnimation: boolean;
+  correctRatio: number;
+  wikipediaHint: string;
+  wikipediaAnswer: string;
+  hintCost: number;
+  answerCost: number;
+
+  constructor(score: number) {
+    this.score = score;
+  }
+}
+
+export class QuizAnswer {
+  answeredCorrectly: boolean;
+  text: string;
+  originalIndex: number;
+  correct: boolean;
+}
+
+export class QuizReviewMode {
+  reason: string;
+}
+
+export class XpProgress {
+  current: number;
+  max: number;
+  addition: number;
+  rankChanged: number;
+}
+
+export class ServerPopup {
+  title : string;
+  message : string;
+  preventBack : boolean;
+  image : string;
+  buttons : Array<ServerPopupButton>;
+}
+
+export class ServerPopupButton {
+  action: string;
+  link: string;
+  text: string;
+}
+

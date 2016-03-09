@@ -1,6 +1,7 @@
 import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as shareService from '../../providers/share';
+import {Contest} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/mobile-share/mobile-share.html'
@@ -8,7 +9,7 @@ import * as shareService from '../../providers/share';
 export class MobileSharePage {
 
   client:Client;
-  contest:Object;
+  contest:Contest;
   viewController:ViewController;
 
   constructor(params:NavParams, viewController: ViewController) {

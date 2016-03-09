@@ -8,6 +8,8 @@ import {Client} from '../../providers/client';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
 import * as alertService from '../../providers/alert';
+import {QuizData} from '../../objects/objects';
+import {QuizQuestion} from "../../objects/objects";
 
 @Page({
   templateUrl: 'build/pages/quiz/quiz.html',
@@ -20,8 +22,8 @@ export class QuizPage {
   params:NavParams;
   contestId:string;
   source:string;
-  quizData:Object;
-  questionHistory:Array<Object> = [];
+  quizData:QuizData;
+  questionHistory:Array<QuizQuestion> = [];
   correctButtonName:string;
 
   //Canvas vars
@@ -95,7 +97,8 @@ export class QuizPage {
       this.quizData.currentQuestion.answered = false;
 
       for (var i = 0; i < data.quiz.totalQuestions; i++) {
-        this.questionHistory.push({'score': this.client.settings.quiz.questions.score[i]});
+        var questionItemInHistory = new QuizQuestion(this.client.settings.quiz.questions.score[i]);
+        this.questionHistory.push(questionItemInHistory);
       }
 
       this.drawQuizProgress();
@@ -123,7 +126,7 @@ export class QuizPage {
 
       var correctAnswerId;
 
-      this.questionHistory[this.quizData.currentQuestionIndex].answer = data.question.correct;
+      this.questionHistory[this.quizData.currentQuestionIndex].answered = data.question.correct;
 
       if (data.results) {
         //Will get here when quiz is finished
@@ -200,7 +203,7 @@ export class QuizPage {
 
     if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
       this.client.addXp(this.quizData.xpProgress).then(() => {
-        if (this.correctButtonName === event.srcElement.name) {
+        if (this.correctButtonName === event.srcElement['name']) {
           if (!this.quizData.xpProgress.rankChanged) {
             this.quizProceed();
           }
@@ -220,7 +223,7 @@ export class QuizPage {
         }
       });
     }
-    else if (this.correctButtonName === event.srcElement.name) {
+    else if (this.correctButtonName === event.srcElement['name']) {
       this.quizProceed();
     }
   }
@@ -435,8 +438,8 @@ export class QuizPage {
       }
 
       //Draw correct/incorrect for answered
-      if (this.questionHistory[i].answer != null) {
-        if (this.questionHistory[i].answer) {
+      if (this.questionHistory[i].answered != undefined) {
+        if (this.questionHistory[i].answered) {
           this.drawImageAsync(this.imgCorrectSrc, currentX - this.client.settings.quiz.canvas.radius, this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius * 2, this.client.settings.quiz.canvas.radius * 2);
         }
         else {
@@ -499,7 +502,7 @@ export class QuizPage {
       var textWidth = this.quizContext.measureText(questionScore).width;
       var scoreColor = this.client.settings.quiz.canvas.inactiveColor;
 
-      if (this.questionHistory[i].answer && !this.questionHistory[i].answerUsed) {
+      if (this.questionHistory[i].answered && !this.questionHistory[i].answerUsed) {
         scoreColor = this.client.settings.quiz.canvas.correctRatioColor;
       }
 

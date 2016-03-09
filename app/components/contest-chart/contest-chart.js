@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('angular2/core');
 var client_1 = require('../../providers/client');
+var objects_1 = require('../../objects/objects');
 var ContestChartComponent = (function () {
     function ContestChartComponent() {
         var _this = this;
@@ -47,8 +48,8 @@ var ContestChartComponent = (function () {
     ContestChartComponent.prototype.initChart = function () {
         var _this = this;
         if (!this.chart) {
-            FusionCharts.ready(function () {
-                _this.chart = new FusionCharts({
+            window.FusionCharts.ready(function () {
+                _this.chart = new window.FusionCharts({
                     type: 'column2d',
                     renderAt: _this.id + '-container',
                     width: _this.width,
@@ -84,7 +85,7 @@ var ContestChartComponent = (function () {
     ], ContestChartComponent.prototype, "height", void 0);
     __decorate([
         core_1.Input(), 
-        __metadata('design:type', Object)
+        __metadata('design:type', objects_1.ContestChart)
     ], ContestChartComponent.prototype, "contestChart", void 0);
     __decorate([
         core_1.Output(), 

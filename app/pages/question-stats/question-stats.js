@@ -21,8 +21,8 @@ var QuestionStatsPage = (function () {
         var _this = this;
         this.client.logEvent('page/questionStats', { 'questionId': this.question._id });
         if (this.chartDataSource) {
-            FusionCharts.ready(function () {
-                var chart = new FusionCharts({
+            window.FusionCharts.ready(function () {
+                var chart = new window.FusionCharts({
                     type: 'pie2d',
                     renderAt: 'questionChart',
                     width: _this.client.settings.charts.size.width,

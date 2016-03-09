@@ -24,7 +24,6 @@ var soundService = require('../../providers/sound');
 var ContestPage = (function () {
     function ContestPage(params) {
         var _this = this;
-        this.contestChart = {};
         this.lastQuizResults = null;
         this.animateLastResults = false;
         this.client = client_1.Client.getInstance();

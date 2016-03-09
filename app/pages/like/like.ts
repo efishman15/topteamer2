@@ -1,5 +1,6 @@
 import {Page,NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import {Contest} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/like/like.html'
@@ -7,7 +8,7 @@ import {Client} from '../../providers/client';
 export class LikePage {
 
   client:Client;
-  contest:Object;
+  contest:Contest;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();

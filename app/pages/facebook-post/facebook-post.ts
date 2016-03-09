@@ -1,6 +1,8 @@
 import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
+import {QuizResults} from '../../objects/objects'
+;
 
 @Page({
   templateUrl: 'build/pages/facebook-post/facebook-post.html'
@@ -8,7 +10,7 @@ import * as facebookService from '../../providers/facebook';
 export class FacebookPostPage {
 
   client:Client;
-  quizResults:Object;
+  quizResults:QuizResults;
   viewController:ViewController;
 
   constructor(params:NavParams, viewController:ViewController) {

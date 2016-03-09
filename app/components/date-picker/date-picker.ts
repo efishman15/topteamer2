@@ -1,6 +1,8 @@
 import {Component, Input, EventEmitter, Output} from 'angular2/core';
 import {Client} from '../../providers/client';
 import {Icon} from 'ionic-angular';
+import {CalendarCell} from '../../objects/objects';
+
 
 @Component({
   selector: 'date-picker',
@@ -23,7 +25,7 @@ export class DatePickerComponent {
 
   monthsList:Array<string>;
   weekDays:Array<string>;
-  calendar:Array<Object>;
+  calendar:Array<CalendarCell>;
   rows:Array<any>;
   cols:Array<any>;
   minEpochLocal:any;
@@ -157,13 +159,13 @@ export class DatePickerComponent {
 
   setDateLimits() {
     if (this.minDate) {
-      var minDate = new Date(this.minDate);
+      var minDate = new Date(this.minDate.getTime());
       minDate.clearTime();
       this.minEpochLocal = minDate.getTime();
     }
 
     if (this.maxDate) {
-      var maxDate = new Date(this.maxDate);
+      var maxDate = new Date(this.maxDate.getTime());
       maxDate.clearTime();
       //Another 24 hours to count all the hours in the max date including up to midnight (23:59:59.999)
       this.maxEpochLocal = maxDate.getTime() + 24 * 60 * 60 * 1000;

@@ -5,6 +5,7 @@ import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ViewChild} from 'angular2/core';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
+import {Contest} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/contest-participants/contest-participants.html',
@@ -16,7 +17,7 @@ export class ContestParticipantsPage {
 
   @ViewChild(LeadersComponent) leadersComponent : LeadersComponent;
 
-  contest:Object;
+  contest:Contest;
   source:string;
   contestId: String;
 
