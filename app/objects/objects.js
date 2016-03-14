@@ -5,6 +5,30 @@ var Settings = (function () {
     return Settings;
 }());
 exports.Settings = Settings;
+var GoogleSettings = (function () {
+    function GoogleSettings() {
+    }
+    return GoogleSettings;
+}());
+exports.GoogleSettings = GoogleSettings;
+var GoogleGcmSettings = (function () {
+    function GoogleGcmSettings() {
+    }
+    return GoogleGcmSettings;
+}());
+exports.GoogleGcmSettings = GoogleGcmSettings;
+var XpControl = (function () {
+    function XpControl() {
+    }
+    return XpControl;
+}());
+exports.XpControl = XpControl;
+var XpControlFont = (function () {
+    function XpControlFont() {
+    }
+    return XpControlFont;
+}());
+exports.XpControlFont = XpControlFont;
 var GeneralSettings = (function () {
     function GeneralSettings() {
     }
@@ -23,6 +47,12 @@ var QuizSettings = (function () {
     return QuizSettings;
 }());
 exports.QuizSettings = QuizSettings;
+var QuizQuestionsSettings = (function () {
+    function QuizQuestionsSettings() {
+    }
+    return QuizQuestionsSettings;
+}());
+exports.QuizQuestionsSettings = QuizQuestionsSettings;
 var QuizCanvasSettings = (function () {
     function QuizCanvasSettings() {
     }
@@ -47,6 +77,18 @@ var QuizQuestionAnswerSettings = (function () {
     return QuizQuestionAnswerSettings;
 }());
 exports.QuizQuestionAnswerSettings = QuizQuestionAnswerSettings;
+var ChartSettings = (function () {
+    function ChartSettings() {
+    }
+    return ChartSettings;
+}());
+exports.ChartSettings = ChartSettings;
+var Size = (function () {
+    function Size() {
+    }
+    return Size;
+}());
+exports.Size = Size;
 var Question = (function () {
     function Question() {
         this._id = null;
@@ -65,11 +107,24 @@ var Questions = (function () {
 }());
 exports.Questions = Questions;
 var User = (function () {
-    function User() {
+    function User(language, clientInfo, geoInfo) {
+        this.settings = new UserSettings();
+        this.settings.language = language;
+        this.settings.timezoneOffset = (new Date).getTimezoneOffset();
+        this.clientInfo = clientInfo;
+        if (geoInfo) {
+            this.geoInfo = geoInfo;
+        }
     }
     return User;
 }());
 exports.User = User;
+var ThirdPartyInfo = (function () {
+    function ThirdPartyInfo() {
+    }
+    return ThirdPartyInfo;
+}());
+exports.ThirdPartyInfo = ThirdPartyInfo;
 var UserSettings = (function () {
     function UserSettings() {
     }
@@ -100,6 +155,12 @@ var Feature = (function () {
     return Feature;
 }());
 exports.Feature = Feature;
+var PurchaseData = (function () {
+    function PurchaseData() {
+    }
+    return PurchaseData;
+}());
+exports.PurchaseData = PurchaseData;
 var View = (function () {
     function View() {
     }
@@ -227,3 +288,9 @@ var ServerPopupButton = (function () {
     return ServerPopupButton;
 }());
 exports.ServerPopupButton = ServerPopupButton;
+var ShareVariables = (function () {
+    function ShareVariables() {
+    }
+    return ShareVariables;
+}());
+exports.ShareVariables = ShareVariables;

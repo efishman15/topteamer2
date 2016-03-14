@@ -1,5 +1,6 @@
 import {Client} from './client';
 import {SharePage} from '../pages/share/share';
+import {ShareVariables} from '../objects/objects';
 
 var emailRef = '?ref=shareEmail';
 
@@ -18,7 +19,7 @@ function adjustUrl(url) {
 export let getVariables = (contest) => {
 
   var client = Client.getInstance();
-  var shareVariables = {};
+  var shareVariables = new ShareVariables();
 
   if (contest) {
     shareVariables.shareUrl = contest.link;
@@ -61,7 +62,7 @@ export let mobileShare = (contest) => {
   var client = Client.getInstance();
   var shareVariables = this.getVariables(contest);
 
-  $cordovaSocialSharing.share(shareVariables.shareBodyNoUrl,
+  window.$cordovaSocialSharing.share(shareVariables.shareBodyNoUrl,
     shareVariables.shareSubject,
     client.settings.general.baseUrl + client.settings.general.logoUrl,
     shareVariables.shareUrl

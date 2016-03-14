@@ -26,7 +26,7 @@ var SetContestPage = (function () {
         var _this = this;
         this.client = client_1.Client.getInstance();
         this.params = params;
-        this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
+        this.endOptionKeys = Object.keys(this.client.settings['newContest'].endOptions);
         this.team0 = new common_1.Control('', common_1.Validators.required);
         this.team1 = new common_1.Control('', common_1.Validators.required);
         this.contestForm = formBuilder.group({
@@ -223,11 +223,11 @@ var SetContestPage = (function () {
         });
     };
     SetContestPage.prototype.userQuestionsMinimumCheck = function () {
-        if (this.client.settings.newContest.privateQuestions.min === 1) {
-            this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings.newContest.privateQuestions.min });
+        if (this.client.settings['newContest'].privateQuestions.min === 1) {
+            this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings['newContest'].privateQuestions.min });
         }
         else {
-            this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings.newContest.privateQuestions.min });
+            this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings['newContest'].privateQuestions.min });
         }
         if (this.userQuestionsInvalid) {
             return true;
@@ -237,13 +237,13 @@ var SetContestPage = (function () {
         }
     };
     SetContestPage.prototype.maxQuestionsReached = function () {
-        return (this.contestLocalCopy.questions && this.contestLocalCopy.questions.visibleCount === this.client.settings.newContest.privateQuestions.max);
+        return (this.contestLocalCopy.questions && this.contestLocalCopy.questions.visibleCount === this.client.settings['newContest'].privateQuestions.max);
     };
     SetContestPage.prototype.openQuestionEditor = function (mode, question) {
         var _this = this;
-        if (mode === "add") {
+        if (mode === 'add') {
             if (this.maxQuestionsReached()) {
-                alertService.alert(this.client.translate("MAX_USER_QUESTIONS_REACHED", { max: this.client.settings.newContest.privateQuestions.max }));
+                alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', { max: this.client.settings['newContest'].privateQuestions.max }));
                 return;
             }
         }
@@ -255,11 +255,11 @@ var SetContestPage = (function () {
             _this.userQuestionsInvalid = null;
             if (!result.question._id) {
                 //New questions
-                result.question._id = "new";
+                result.question._id = 'new';
                 _this.contestLocalCopy.questions.list.push(result.question);
                 _this.contestLocalCopy.questions.visibleCount++;
             }
-            else if (result.question._id !== "new") {
+            else if (result.question._id !== 'new') {
                 //Set dirty flag for the question - so server will update it in the db
                 result.question.isDirty = true;
             }
@@ -268,7 +268,7 @@ var SetContestPage = (function () {
     };
     SetContestPage.prototype.openSearchQuestions = function () {
         if (this.maxQuestionsReached()) {
-            alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', { max: this.client.settings.newContest.privateQuestions.max }));
+            alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', { max: this.client.settings['newContest'].privateQuestions.max }));
             return;
         }
         var modal = ionic_angular_1.Modal.create(search_questions_1.SearchQuestionsPage, { 'currentQuestions': this.contestLocalCopy.questions });
@@ -278,7 +278,7 @@ var SetContestPage = (function () {
         var _this = this;
         alertService.confirm('REMOVE_QUESTION', 'CONFIRM_REMOVE_QUESTION').then(function () {
             if (_this.contestLocalCopy.questions.list && index < _this.contestLocalCopy.questions.list.length) {
-                if (_this.contestLocalCopy.questions.list[index]._id && _this.contestLocalCopy.questions.list[index]._id !== "new") {
+                if (_this.contestLocalCopy.questions.list[index]._id && _this.contestLocalCopy.questions.list[index]._id !== 'new') {
                     //Question has an id in the database - logically remove
                     _this.contestLocalCopy.questions.list[index].deleted = true;
                 }
@@ -299,7 +299,7 @@ var SetContestPage = (function () {
             return;
         }
         if (this.contestLocalCopy.type.id === 'userTrivia') {
-            if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
+            if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings['newContest'].privateQuestions.min) {
                 if (!this.userQuestionsMinimumCheck()) {
                     return;
                 }
@@ -412,7 +412,7 @@ var SetContestPage = (function () {
     };
     SetContestPage.prototype.getMaxEndDate = function () {
         //Set the maximum end date according to the last end option in the list
-        return this.contestLocalCopy.startDate + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier;
+        return this.contestLocalCopy.startDate + this.client.settings['newContest'].endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier;
     };
     SetContestPage = __decorate([
         ionic_angular_1.Page({

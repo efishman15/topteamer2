@@ -190,8 +190,8 @@ class topTeamerApp {
 
   initFacebook() {
     facebookService.getLoginStatus().then((result) => {
-      if (result.connected) {
-        this.client.facebookServerConnect(result.response.authResponse).then(() => {
+      if (result['connected']) {
+        this.client.facebookServerConnect(result['response'].authResponse).then(() => {
           this.client.nav.push(MainTabsPage).then(() => {
             if (this.deepLinkContestId) {
               contestsService.openContest(this.deepLinkContestId);

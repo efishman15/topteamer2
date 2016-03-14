@@ -157,8 +157,8 @@ var topTeamerApp = (function () {
     topTeamerApp.prototype.initFacebook = function () {
         var _this = this;
         facebookService.getLoginStatus().then(function (result) {
-            if (result.connected) {
-                _this.client.facebookServerConnect(result.response.authResponse).then(function () {
+            if (result['connected']) {
+                _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
                     _this.client.nav.push(main_tabs_1.MainTabsPage).then(function () {
                         if (_this.deepLinkContestId) {
                             contestsService.openContest(_this.deepLinkContestId);

@@ -15,10 +15,10 @@ export let start = (contestId : string) => {
 export let answer = (answerId: number, hintUsed: boolean, answerUsed: boolean) => {
   var postData = {'id': answerId};
   if (hintUsed) {
-    postData.hintUsed = hintUsed;
+    postData['hintUsed'] = hintUsed;
   }
   if (answerUsed) {
-    postData.answerUsed = answerUsed;
+    postData['answerUsed'] = answerUsed;
   }
   var client = Client.getInstance();
   return client.serverPost('quiz/answer', postData);

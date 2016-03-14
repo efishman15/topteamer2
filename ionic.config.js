@@ -7,7 +7,7 @@ module.exports = {
       dest: "www/build"
     },
     sass: {
-      src: ['app/app.+(ios|md).scss'],
+      src: ['app/app.+(ios|md|wp).scss'],
       dest: 'www/build/css',
       include: [
         'node_modules/ionic-angular',

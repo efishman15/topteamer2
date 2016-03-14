@@ -1,11 +1,12 @@
 import {Client} from './client';
 import * as facebookService from './facebook';
 import {PurchaseSuccessPage} from '../pages/purchase-success/purchase-success'
+import {Feature} from '../objects/objects';
 
 //------------------------------------------------------
 //-- buy
 //------------------------------------------------------
-export let buy = (feature:Object, isMobile:Boolean) => new Promise((resolve, reject) => {
+export let buy = (feature:Feature, isMobile:Boolean) => new Promise((resolve, reject) => {
 
   var client = Client.getInstance();
 
@@ -29,7 +30,7 @@ export let buy = (feature:Object, isMobile:Boolean) => new Promise((resolve, rej
 
     case 'android' :
       method = 'android';
-      inappbilling.buy((purchaseData) => {
+      window.inappbilling.buy((purchaseData) => {
           if (resolve) {
             resolve({'method': method, 'data': purchaseData})
           }
@@ -59,7 +60,7 @@ export let buy = (feature:Object, isMobile:Boolean) => new Promise((resolve, rej
         'request_id': feature.name + '|' + client.session.thirdParty.id + '|' + (new Date()).getTime()
       };
       if (isMobile && client.session.features[feature.name].purchaseData.mobilePricepointId) {
-        facebookDialogData.pricepoint_id = client.session.features[feature.name].purchaseData.mobilePricepointId;
+        facebookDialogData['pricepoint_id'] = client.session.features[feature.name].purchaseData.mobilePricepointId;
       }
 
       facebookService.buy(facebookDialogData).then((data) => {
@@ -96,7 +97,7 @@ export let processPayment = (method, purchaseData, extraPurchaseData) => new Pro
 
   var postData = {'method': method, 'purchaseData': purchaseData};
   if (extraPurchaseData) {
-    postData.extraPurchaseData = extraPurchaseData;
+    postData['extraPurchaseData'] = extraPurchaseData;
   }
 
   client.serverPost('payments/process', postData).then((serverPuchaseData) => {

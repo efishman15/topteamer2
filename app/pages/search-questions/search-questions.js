@@ -52,8 +52,8 @@ var SearchQuestionsPage = (function () {
                 }
             }
             //Check if max reached together with the current questions in the contest
-            if (selectedCount > 0 && this.currentQuestions.visibleCount + selectedCount > this.client.settings.newContest.privateQuestions.max) {
-                alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', { max: this.client.settings.newContest.privateQuestions.max }));
+            if (selectedCount > 0 && this.currentQuestions.visibleCount + selectedCount > this.client.settings['newContest'].privateQuestions.max) {
+                alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', { max: this.client.settings['newContest'].privateQuestions.max }));
                 return;
             }
             for (var i = 0; i < this.questions.length; i++) {
@@ -62,7 +62,7 @@ var SearchQuestionsPage = (function () {
                 }
                 var questionExist = false;
                 for (var j = 0; j < this.currentQuestions.list.length; j++) {
-                    //Check if question was marked as "deleted", and now re-instated
+                    //Check if question was marked as 'deleted', and now re-instated
                     if (this.questions[i]._id === this.currentQuestions.list[j]._id && this.currentQuestions.list[j].deleted) {
                         this.currentQuestions.list[j].deleted = false;
                         this.currentQuestions.visibleCount++;

@@ -6,7 +6,7 @@ var client_1 = require('./client');
 exports.friends = function (friendsPermissionJustGranted) {
     var postData = {};
     if (friendsPermissionJustGranted) {
-        postData.friendsPermissionJustGranted = friendsPermissionJustGranted;
+        postData['friendsPermissionJustGranted'] = friendsPermissionJustGranted;
     }
     var client = client_1.Client.getInstance();
     return client.serverPost('leaderboard/friends', postData);
@@ -24,7 +24,7 @@ exports.weekly = function () {
 exports.contest = function (contestId, teamId) {
     var postData = { 'contestId': contestId };
     if (teamId === 0 || teamId === 1) {
-        postData.teamId = teamId;
+        postData['teamId'] = teamId;
     }
     var client = client_1.Client.getInstance();
     return client.serverPost('leaderboard/contest', postData);

@@ -62,13 +62,13 @@ var Client = (function () {
             _this._events = events;
             var language = localStorage.getItem('language');
             _this.getSettings(language).then(function (data) {
-                _this._settings = data.settings;
+                _this._settings = data['settings'];
                 if (!language || language === 'undefined') {
                     //Language was computed on the server using geoInfo or the fallback to the default language
-                    language = data.language;
+                    language = data['language'];
                     localStorage.setItem('language', language);
                 }
-                _this.initUser(language, data.geoInfo);
+                _this.initUser(language, data['geoInfo']);
                 _this.initXpCanvas();
                 _this.setDirection();
                 _this._loaded = true;
@@ -90,16 +90,7 @@ var Client = (function () {
         return this.serverPost('info/settings', postData);
     };
     Client.prototype.initUser = function (language, geoInfo) {
-        this._user = {
-            'settings': {
-                'language': language,
-                'timezoneOffset': (new Date).getTimezoneOffset()
-            },
-            'clientInfo': this.clientInfo
-        };
-        if (geoInfo) {
-            this.user.geoInfo = geoInfo;
-        }
+        this._user = new objects_1.User(language, this.clientInfo, geoInfo);
     };
     Client.prototype.initXpCanvas = function () {
         //Player info rank canvas
@@ -211,21 +202,21 @@ var Client = (function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
             if (!_this.user.thirdParty) {
-                _this.user.thirdParty = {};
+                _this.user.thirdParty = new objects_1.ThirdPartyInfo();
             }
             _this.user.thirdParty.type = 'facebook';
             _this.user.thirdParty.id = facebookAuthResponse.userID;
             _this.user.thirdParty.accessToken = facebookAuthResponse.accessToken;
             _this.serverPost('user/facebookConnect', { 'user': _this.user }).then(function (data) {
-                if (_this.user.settings.language !== data.session.settings.language) {
-                    _this.user.settings.language = data.session.settings.language;
+                if (_this.user.settings.language !== data['session'].settings.language) {
+                    _this.user.settings.language = data['session'].settings.language;
                     _this.localSwitchLanguage(_this.user.settings.language);
                 }
-                _this.user.settings = data.session.settings;
-                _this._session = data.session;
-                _this.serverGateway.token = data.session.token;
-                _this.setLoggedUserId(data.session.userId);
-                if (data.session.justRegistered) {
+                _this.user.settings = data['session'].settings;
+                _this._session = data['session'];
+                _this.serverGateway.token = data['session'].token;
+                _this.setLoggedUserId(data['session'].userId);
+                if (data['session'].justRegistered) {
                     _this.logEvent('server/register');
                 }
                 else {
@@ -244,7 +235,7 @@ var Client = (function () {
                         localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
                         //Update the server with the registration id - if server has no registration or it has a different reg id
                         //Just submit and forget
-                        if (!data.session.gcmRegistrationId || data.session.gcmRegistrationId !== registrationData.registrationId) {
+                        if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
                             this.post('user/setGcmRegistration', { 'registrationId': registrationData.registrationId });
                         }
                     });
@@ -259,7 +250,7 @@ var Client = (function () {
                     });
                     var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
                     if (storedGcmRegistration && !_this.session.gcmRegistrationId) {
-                        _this.post('user/setGcmRegistration', { 'registrationId': storedGcmRegistration });
+                        _this.serverPost('user/setGcmRegistration', { 'registrationId': storedGcmRegistration });
                     }
                 }
                 resolve();
@@ -285,8 +276,8 @@ var Client = (function () {
                 _this.showSpinner = false;
                 if (err && err.httpStatus === 401) {
                     facebookService.getLoginStatus().then(function (result) {
-                        if (result.connected) {
-                            _this.facebookServerConnect(result.response.authResponse).then(function () {
+                        if (result['connected']) {
+                            _this.facebookServerConnect(result['response'].authResponse).then(function () {
                                 return _this.serverPost(path, postData, timeout, blockUserInterface).then(function (data) {
                                     resolve(data);
                                 }, function (err) {
@@ -296,7 +287,7 @@ var Client = (function () {
                         }
                         else {
                             facebookService.login(false).then(function (response) {
-                                _this.facebookServerConnect(result.response.authResponse).then(function () {
+                                _this.facebookServerConnect(result['response'].authResponse).then(function () {
                                     return _this.serverPost(path, postData, timeout, blockUserInterface).then(function (data) {
                                         resolve(data);
                                     }, function (err) {
@@ -308,7 +299,7 @@ var Client = (function () {
                     });
                 }
                 else {
-                    //Display an alert or confirm message and continue the reject so further "catch" blocks
+                    //Display an alert or confirm message and continue the reject so further 'catch' blocks
                     //will be invoked if any
                     if (!err.additionalInfo || !err.additionalInfo.confirm) {
                         alertService.alert(err).then(function () {
@@ -344,7 +335,7 @@ var Client = (function () {
         },
         set: function (value) {
             var _this = this;
-            //Must be async - issue related to "field changed since last checked" - in angular2
+            //Must be async - issue related to 'field changed since last checked' - in angular2
             setTimeout(function () {
                 _this._showSpinner = value;
             }, 100);
@@ -354,7 +345,7 @@ var Client = (function () {
     });
     Client.prototype.getDefaultLanguage = function () {
         //Always return a language - get the browser's language
-        var language = window.navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        var language = window.navigator.languages ? navigator.languages[0].toString() : (navigator.language || navigator.userLanguage);
         if (!language) {
             language = 'en';
         }
@@ -414,7 +405,7 @@ var Client = (function () {
     });
     Object.defineProperty(Client.prototype, "isMenuOpen", {
         get: function () {
-            return (this.menuController._menus.length > 0 && this.menuController._menus[0].isOpen);
+            return this.menuController.isOpen();
         },
         enumerable: true,
         configurable: true
@@ -516,7 +507,8 @@ var ServerGateway = (function () {
             this._endPoint = window.location.protocol + '//' + window.location.host + '/';
         }
         else {
-            this._endPoint = 'http://www.topteamer.com/';
+            //TODO: change back to prod site
+            this._endPoint = 'http://dev.topteamer.com/';
         }
         this._eventQueue = [];
     }
@@ -559,7 +551,7 @@ var ServerGateway = (function () {
                 }
                 resolve(res);
             }, function (err) {
-                reject(JSON.parse(err._body));
+                reject(JSON.parse(err['_body']));
             });
         });
     };

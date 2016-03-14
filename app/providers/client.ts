@@ -6,14 +6,14 @@ import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Ev
 import * as facebookService from './facebook';
 import * as alertService from './alert';
 import * as contestsService from './contests';
-import {User,Session,ClientInfo,Settings,Language} from '../objects/objects';
+import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo} from '../objects/objects';
 
 @Injectable()
 export class Client {
 
-  static instance:Client;
+  static instance:any;
 
-  _languageKeys:Array<String>;
+  _languageKeys:Array<string>;
 
   canvas:any;
   _canvasContext:any;
@@ -90,14 +90,14 @@ export class Client {
 
       this.getSettings(language).then((data) => {
 
-        this._settings = data.settings;
+        this._settings = data['settings'];
         if (!language || language === 'undefined') {
           //Language was computed on the server using geoInfo or the fallback to the default language
-          language = data.language;
+          language = data['language'];
           localStorage.setItem('language', language);
         }
 
-        this.initUser(language, data.geoInfo);
+        this.initUser(language, data['geoInfo']);
 
         this.initXpCanvas();
 
@@ -129,17 +129,7 @@ export class Client {
 
   initUser(language, geoInfo) {
 
-    this._user = {
-      'settings': {
-        'language': language,
-        'timezoneOffset': (new Date).getTimezoneOffset()
-      },
-      'clientInfo': this.clientInfo
-    };
-
-    if (geoInfo) {
-      this.user.geoInfo = geoInfo;
-    }
+   this._user = new User(language, this.clientInfo, geoInfo);
   }
 
   initXpCanvas() {
@@ -281,26 +271,26 @@ export class Client {
     return new Promise((resolve, reject) => {
 
       if (!this.user.thirdParty) {
-        this.user.thirdParty = {};
+        this.user.thirdParty = new ThirdPartyInfo();
       }
       this.user.thirdParty.type = 'facebook';
       this.user.thirdParty.id = facebookAuthResponse.userID;
       this.user.thirdParty.accessToken = facebookAuthResponse.accessToken;
 
       this.serverPost('user/facebookConnect', {'user': this.user}).then((data) => {
-        if (this.user.settings.language !== data.session.settings.language) {
-          this.user.settings.language = data.session.settings.language;
+        if (this.user.settings.language !== data['session'].settings.language) {
+          this.user.settings.language = data['session'].settings.language;
           this.localSwitchLanguage(this.user.settings.language);
         }
 
-        this.user.settings = data.session.settings;
+        this.user.settings = data['session'].settings;
 
-        this._session = data.session;
-        this.serverGateway.token = data.session.token;
+        this._session = data['session'];
+        this.serverGateway.token = data['session'].token;
 
-        this.setLoggedUserId(data.session.userId);
+        this.setLoggedUserId(data['session'].userId);
 
-        if (data.session.justRegistered) {
+        if (data['session'].justRegistered) {
           this.logEvent('server/register');
         }
         else {
@@ -327,7 +317,7 @@ export class Client {
 
             //Update the server with the registration id - if server has no registration or it has a different reg id
             //Just submit and forget
-            if (!data.session.gcmRegistrationId || data.session.gcmRegistrationId !== registrationData.registrationId) {
+            if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
               this.post('user/setGcmRegistration', {'registrationId': registrationData.registrationId});
             }
           });
@@ -345,7 +335,7 @@ export class Client {
 
           var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
           if (storedGcmRegistration && !this.session.gcmRegistrationId) {
-            this.post('user/setGcmRegistration', {'registrationId': storedGcmRegistration});
+            this.serverPost('user/setGcmRegistration', {'registrationId': storedGcmRegistration});
           }
         }
 
@@ -374,8 +364,8 @@ export class Client {
         this.showSpinner = false;
         if (err && err.httpStatus === 401) {
           facebookService.getLoginStatus().then((result) => {
-            if (result.connected) {
-              this.facebookServerConnect(result.response.authResponse).then(() => {
+            if (result['connected']) {
+              this.facebookServerConnect(result['response'].authResponse).then(() => {
                 return this.serverPost(path, postData, timeout, blockUserInterface).then((data) => {
                   resolve(data);
                 }, (err) => {
@@ -385,7 +375,7 @@ export class Client {
             }
             else {
               facebookService.login(false).then((response) => {
-                this.facebookServerConnect(result.response.authResponse).then(() => {
+                this.facebookServerConnect(result['response'].authResponse).then(() => {
                   return this.serverPost(path, postData, timeout, blockUserInterface).then((data) => {
                     resolve(data);
                   }, (err) => {
@@ -397,7 +387,7 @@ export class Client {
           });
         }
         else {
-          //Display an alert or confirm message and continue the reject so further "catch" blocks
+          //Display an alert or confirm message and continue the reject so further 'catch' blocks
           //will be invoked if any
           if (!err.additionalInfo || !err.additionalInfo.confirm) {
             alertService.alert(err).then(() => {
@@ -435,7 +425,7 @@ export class Client {
   }
 
   set showSpinner(value: Boolean) {
-    //Must be async - issue related to "field changed since last checked" - in angular2
+    //Must be async - issue related to 'field changed since last checked' - in angular2
     setTimeout(() => {
       this._showSpinner = value;
     },100);
@@ -443,7 +433,7 @@ export class Client {
 
   private getDefaultLanguage() {
     //Always return a language - get the browser's language
-    var language = window.navigator.languages ? navigator.languages[0] : (navigator.language || navigator.userLanguage)
+    var language = window.navigator.languages ? navigator.languages[0].toString() : (navigator.language || navigator.userLanguage)
     if (!language) {
       language = 'en';
     }
@@ -478,12 +468,12 @@ export class Client {
     return this._nav;
   }
 
-  get user():interfaces.User {
+  get user():User {
     return this._user;
   }
 
   get isMenuOpen() {
-    return (this.menuController._menus.length > 0 && this.menuController._menus[0].isOpen);
+    return this.menuController.isOpen();
   }
 
   get endPoint():String {
@@ -515,7 +505,7 @@ export class Client {
     return this._canvasContext;
   }
 
-  translate(key:String, params ?:Object) {
+  translate(key:string, params ?:Object) {
     var translatedValue = this.settings.ui[this.user.settings.language][key];
     if (params) {
       translatedValue = translatedValue.format(params);
@@ -578,7 +568,8 @@ export class ServerGateway {
       this._endPoint = window.location.protocol + '//' + window.location.host + '/';
     }
     else {
-      this._endPoint = 'http://www.topteamer.com/'
+      //TODO: change back to prod site
+      this._endPoint = 'http://dev.topteamer.com/'
     }
 
     this._eventQueue = [];
@@ -633,7 +624,7 @@ export class ServerGateway {
             resolve(res);
           },
           (err:Object) => {
-            reject(JSON.parse(err._body));
+            reject(JSON.parse(err['_body']));
           }
         );
     });

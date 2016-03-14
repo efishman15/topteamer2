@@ -2,6 +2,7 @@
 var _this = this;
 var client_1 = require('./client');
 var share_1 = require('../pages/share/share');
+var objects_1 = require('../objects/objects');
 var emailRef = '?ref=shareEmail';
 function adjustUrl(url) {
     var client = client_1.Client.getInstance();
@@ -14,7 +15,7 @@ function adjustUrl(url) {
 }
 exports.getVariables = function (contest) {
     var client = client_1.Client.getInstance();
-    var shareVariables = {};
+    var shareVariables = new objects_1.ShareVariables();
     if (contest) {
         shareVariables.shareUrl = contest.link;
         shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', { name: contest.name });
@@ -50,7 +51,7 @@ exports.getVariables = function (contest) {
 exports.mobileShare = function (contest) {
     var client = client_1.Client.getInstance();
     var shareVariables = _this.getVariables(contest);
-    $cordovaSocialSharing.share(shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl);
+    window.$cordovaSocialSharing.share(shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl);
 };
 exports.share = function (source, contest) {
     var client = client_1.Client.getInstance();

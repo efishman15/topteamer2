@@ -12,6 +12,8 @@
     "inlineSources": false
   },
   "files": [
+    "node_modules/angular2/typings/es6-collections/es6-collections.d.ts",
+    "node_modules/angular2/typings/es6-promise/es6-promise.d.ts",
     "app/app.ts",
     "app/components/contest-chart/contest-chart.ts",
     "app/components/contest-list/contest-list.ts",
@@ -48,6 +50,7 @@
     "app/providers/alert.ts",
     "app/providers/client.ts",
     "app/providers/contests.ts",
+    "app/providers/exceptions.ts",
     "app/providers/facebook.ts",
     "app/providers/payments.ts",
     "app/providers/share.ts",

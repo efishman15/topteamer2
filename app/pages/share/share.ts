@@ -1,7 +1,7 @@
 import {Page,NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as shareService from '../../providers/share';
-import {Contest} from '../../objects/objects';
+import {Contest,ShareVariables} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/share/share.html'
@@ -11,7 +11,7 @@ export class SharePage {
 
   client:Client;
   contest:Contest;
-  shareVariables:Object;
+  shareVariables:ShareVariables;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();

@@ -8,8 +8,7 @@ import {Client} from '../../providers/client';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
 import * as alertService from '../../providers/alert';
-import {QuizData} from '../../objects/objects';
-import {QuizQuestion} from "../../objects/objects";
+import {QuizData,QuizQuestion} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/quiz/quiz.html',
@@ -58,7 +57,7 @@ export class QuizPage {
 
   onPageDidEnter() {
 
-    //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
+    //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
 
     if (this.modalJustClosed) {
       this.modalJustClosed = false;

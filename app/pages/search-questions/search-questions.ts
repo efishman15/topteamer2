@@ -2,8 +2,7 @@ import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
-import {Questions} from "../../objects/objects";
-import {Question} from "../../objects/objects";
+import {Questions,Question} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/search-questions/search-questions.html'
@@ -65,8 +64,8 @@ export class SearchQuestionsPage {
       }
 
       //Check if max reached together with the current questions in the contest
-      if (selectedCount > 0 && this.currentQuestions.visibleCount + selectedCount > this.client.settings.newContest.privateQuestions.max) {
-        alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', {max: this.client.settings.newContest.privateQuestions.max}))
+      if (selectedCount > 0 && this.currentQuestions.visibleCount + selectedCount > this.client.settings['newContest'].privateQuestions.max) {
+        alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', {max: this.client.settings['newContest'].privateQuestions.max}))
         return;
       }
 
@@ -77,7 +76,7 @@ export class SearchQuestionsPage {
 
         var questionExist = false;
         for (var j = 0; j < this.currentQuestions.list.length; j++) {
-          //Check if question was marked as "deleted", and now re-instated
+          //Check if question was marked as 'deleted', and now re-instated
           if (this.questions[i]._id === this.currentQuestions.list[j]._id && this.currentQuestions.list[j].deleted) {
             this.currentQuestions.list[j].deleted = false;
             this.currentQuestions.visibleCount++;

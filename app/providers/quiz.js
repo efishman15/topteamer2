@@ -14,10 +14,10 @@ exports.start = function (contestId) {
 exports.answer = function (answerId, hintUsed, answerUsed) {
     var postData = { 'id': answerId };
     if (hintUsed) {
-        postData.hintUsed = hintUsed;
+        postData['hintUsed'] = hintUsed;
     }
     if (answerUsed) {
-        postData.answerUsed = answerUsed;
+        postData['answerUsed'] = answerUsed;
     }
     var client = client_1.Client.getInstance();
     return client.serverPost('quiz/answer', postData);

@@ -24,7 +24,7 @@ exports.buy = function (feature, isMobile) { return new Promise(function (resolv
             break;
         case 'android':
             method = 'android';
-            inappbilling.buy(function (purchaseData) {
+            window.inappbilling.buy(function (purchaseData) {
                 if (resolve) {
                     resolve({ 'method': method, 'data': purchaseData });
                 }
@@ -50,7 +50,7 @@ exports.buy = function (feature, isMobile) { return new Promise(function (resolv
                 'request_id': feature.name + '|' + client.session.thirdParty.id + '|' + (new Date()).getTime()
             };
             if (isMobile && client.session.features[feature.name].purchaseData.mobilePricepointId) {
-                facebookDialogData.pricepoint_id = client.session.features[feature.name].purchaseData.mobilePricepointId;
+                facebookDialogData['pricepoint_id'] = client.session.features[feature.name].purchaseData.mobilePricepointId;
             }
             facebookService.buy(facebookDialogData).then(function (data) {
                 if (resolve) {
@@ -79,7 +79,7 @@ exports.processPayment = function (method, purchaseData, extraPurchaseData) { re
     var client = client_1.Client.getInstance();
     var postData = { 'method': method, 'purchaseData': purchaseData };
     if (extraPurchaseData) {
-        postData.extraPurchaseData = extraPurchaseData;
+        postData['extraPurchaseData'] = extraPurchaseData;
     }
     client.serverPost('payments/process', postData).then(function (serverPuchaseData) {
         if (resolve) {

@@ -18,7 +18,7 @@ var client_1 = require('../../providers/client');
 var quizService = require('../../providers/quiz');
 var soundService = require('../../providers/sound');
 var alertService = require('../../providers/alert');
-var objects_1 = require("../../objects/objects");
+var objects_1 = require('../../objects/objects');
 var QuizPage = (function () {
     function QuizPage(params) {
         this.questionHistory = [];
@@ -42,7 +42,7 @@ var QuizPage = (function () {
         this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
     };
     QuizPage.prototype.onPageDidEnter = function () {
-        //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single "private" init method
+        //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
         if (this.modalJustClosed) {
             this.modalJustClosed = false;
             //Quiz already started - just a modal dialog was dismissed

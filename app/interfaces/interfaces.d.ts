@@ -18,6 +18,7 @@ declare global {
     FusionCharts: any;
     facebookConnectPlugin: any;
     PushNotification: any;
+    $cordovaSocialSharing: any;
   }
 
   interface Navigator {
@@ -38,4 +39,7 @@ declare global {
 interface IFB {
   ui(data: Object, callback: any): void;
   init(data: Object): void;
+  getLoginStatus(callback: any): void;
+  login(callback: any, permissions: Object): void;
+  logout(callback: any): void;
 }

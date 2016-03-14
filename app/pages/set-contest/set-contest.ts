@@ -47,7 +47,7 @@ export class SetContestPage {
     this.client = Client.getInstance();
     this.params = params;
 
-    this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
+    this.endOptionKeys = Object.keys(this.client.settings['newContest'].endOptions);
 
     this.team0 = new Control('', Validators.required);
     this.team1 = new Control('', Validators.required);
@@ -283,11 +283,11 @@ export class SetContestPage {
   }
 
   userQuestionsMinimumCheck() {
-    if (this.client.settings.newContest.privateQuestions.min === 1) {
-      this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings.newContest.privateQuestions.min});
+    if (this.client.settings['newContest'].privateQuestions.min === 1) {
+      this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings['newContest'].privateQuestions.min});
     }
     else {
-      this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings.newContest.privateQuestions.min});
+      this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings['newContest'].privateQuestions.min});
     }
 
     if (this.userQuestionsInvalid) {
@@ -299,14 +299,14 @@ export class SetContestPage {
   }
 
   maxQuestionsReached() {
-    return (this.contestLocalCopy.questions && this.contestLocalCopy.questions.visibleCount === this.client.settings.newContest.privateQuestions.max);
+    return (this.contestLocalCopy.questions && this.contestLocalCopy.questions.visibleCount === this.client.settings['newContest'].privateQuestions.max);
   }
 
   openQuestionEditor(mode, question) {
 
-    if (mode === "add") {
+    if (mode === 'add') {
       if (this.maxQuestionsReached()) {
-        alertService.alert(this.client.translate("MAX_USER_QUESTIONS_REACHED", {max: this.client.settings.newContest.privateQuestions.max}));
+        alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', {max: this.client.settings['newContest'].privateQuestions.max}));
         return;
       }
     }
@@ -321,11 +321,11 @@ export class SetContestPage {
 
       if (!result.question._id) {
         //New questions
-        result.question._id = "new";
+        result.question._id = 'new';
         this.contestLocalCopy.questions.list.push(result.question);
         this.contestLocalCopy.questions.visibleCount++;
       }
-      else if (result.question._id !== "new") {
+      else if (result.question._id !== 'new') {
         //Set dirty flag for the question - so server will update it in the db
         result.question.isDirty = true;
       }
@@ -337,7 +337,7 @@ export class SetContestPage {
   openSearchQuestions() {
 
     if (this.maxQuestionsReached()) {
-      alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', {max: this.client.settings.newContest.privateQuestions.max}));
+      alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', {max: this.client.settings['newContest'].privateQuestions.max}));
       return;
     }
 
@@ -351,7 +351,7 @@ export class SetContestPage {
 
     alertService.confirm('REMOVE_QUESTION', 'CONFIRM_REMOVE_QUESTION').then(() => {
       if (this.contestLocalCopy.questions.list && index < this.contestLocalCopy.questions.list.length) {
-        if (this.contestLocalCopy.questions.list[index]._id && this.contestLocalCopy.questions.list[index]._id !== "new") {
+        if (this.contestLocalCopy.questions.list[index]._id && this.contestLocalCopy.questions.list[index]._id !== 'new') {
           //Question has an id in the database - logically remove
           this.contestLocalCopy.questions.list[index].deleted = true;
         }
@@ -373,7 +373,7 @@ export class SetContestPage {
     }
 
     if (this.contestLocalCopy.type.id === 'userTrivia') {
-      if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings.newContest.privateQuestions.min) {
+      if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings['newContest'].privateQuestions.min) {
 
         if (!this.userQuestionsMinimumCheck()) {
           return;
@@ -506,6 +506,6 @@ export class SetContestPage {
 
   getMaxEndDate() {
     //Set the maximum end date according to the last end option in the list
-    return this.contestLocalCopy.startDate + this.client.settings.newContest.endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier;
+    return this.contestLocalCopy.startDate + this.client.settings['newContest'].endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier;
   }
 }

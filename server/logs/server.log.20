@@ -1,1 +1,3 @@
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":18392,"level":30,"msg":"server up!","time":"2016-02-10T15:42:36.789Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6612,"level":50,"dbError":{"name":"MongoError","message":"connect ECONNREFUSED 127.0.0.1:27017"},"msg":"Error connecting to the database","time":"2016-02-14T08:21:09.837Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":4972,"level":30,"msg":"server up!","time":"2016-02-14T08:22:18.545Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":13540,"level":30,"msg":"server up!","time":"2016-02-14T18:02:56.999Z","v":0}

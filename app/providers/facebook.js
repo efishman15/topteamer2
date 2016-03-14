@@ -5,7 +5,7 @@ var client_1 = require('./client');
 //------------------------------------------------------
 exports.getLoginStatus = function () { return new Promise(function (resolve, reject) {
     if (!window.cordova) {
-        FB.getLoginStatus(function (response) {
+        window.FB.getLoginStatus(function (response) {
             if (response.status === 'connected') {
                 resolve({ 'connected': true, 'response': response });
             }
@@ -15,11 +15,11 @@ exports.getLoginStatus = function () { return new Promise(function (resolve, rej
         });
     }
     else {
-        facebookConnectPlugin.getLoginStatus(function (response) {
+        window.facebookConnectPlugin.getLoginStatus(function (response) {
             if (response && response.status === 'unknown') {
                 //Give it another try as facebook native is not yet initiated
                 setTimeout(function () {
-                    facebookConnectPlugin.getLoginStatus(function (response) {
+                    window.facebookConnectPlugin.getLoginStatus(function (response) {
                         if (response && response.status === 'connected') {
                             resolve({ 'connected': true, 'response': response });
                         }
@@ -52,9 +52,9 @@ exports.login = function (permissions, rerequestDeclinedPermissions) { return ne
     }
     if (!window.cordova) {
         var permissionObject = {};
-        permissionObject.scope = permissions.toString();
+        permissionObject['scope'] = permissions.toString();
         if (rerequestDeclinedPermissions) {
-            permissionObject.auth_type = 'rerequest';
+            permissionObject['auth_type'] = 'rerequest';
         }
         window.FB.login(function (response) {
             if (response.authResponse) {
@@ -66,7 +66,7 @@ exports.login = function (permissions, rerequestDeclinedPermissions) { return ne
         }, permissionObject);
     }
     else {
-        facebookConnectPlugin.login(client.settings.facebook.readPermissions, function (response) {
+        window.facebookConnectPlugin.login(client.settings.facebook.readPermissions, function (response) {
             resolve(response);
         }, function (err) {
             reject(err);
@@ -83,7 +83,7 @@ exports.logout = function () { return new Promise(function (resolve, reject) {
         });
     }
     else {
-        facebookConnectPlugin.logout(function (response) {
+        window.facebookConnectPlugin.logout(function (response) {
             resolve(response);
         });
     }
@@ -99,7 +99,7 @@ exports.post = function (story) { return new Promise(function (resolve, reject) 
             'previewPropertyName': story.object.name,
             'previewPropertyValue': story.object.value
         };
-        facebookConnectPlugin.showDialog(mobilePostObject, function (response) {
+        window.facebookConnectPlugin.showDialog(mobilePostObject, function (response) {
             resolve(response);
         }, function (error) {
             reject(error);
@@ -127,7 +127,7 @@ exports.post = function (story) { return new Promise(function (resolve, reject) 
 //------------------------------------------------------
 exports.buy = function (purchaseDialogData) { return new Promise(function (resolve, reject) {
     try {
-        FB.ui(purchaseDialogData, function (response) {
+        window.FB.ui(purchaseDialogData, function (response) {
             resolve(response);
         });
     }

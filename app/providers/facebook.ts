@@ -4,7 +4,7 @@ import {Client} from './client';
 //------------------------------------------------------
 export let getLoginStatus = () => new Promise((resolve, reject) => {
   if (!window.cordova) {
-    FB.getLoginStatus((response) => {
+    window.FB.getLoginStatus((response) => {
       if (response.status === 'connected') {
         resolve({'connected': true, 'response': response});
       }
@@ -14,11 +14,11 @@ export let getLoginStatus = () => new Promise((resolve, reject) => {
     });
   }
   else {
-    facebookConnectPlugin.getLoginStatus((response) => {
+    window.facebookConnectPlugin.getLoginStatus((response) => {
       if (response && response.status === 'unknown') {
         //Give it another try as facebook native is not yet initiated
         setTimeout(() => {
-          facebookConnectPlugin.getLoginStatus((response) => {
+          window.facebookConnectPlugin.getLoginStatus((response) => {
             if (response && response.status === 'connected') {
               resolve({'connected': true, 'response': response});
             }
@@ -57,9 +57,9 @@ export let login = (permissions?, rerequestDeclinedPermissions?) => new Promise(
   if (!window.cordova) {
 
     var permissionObject = {};
-    permissionObject.scope = permissions.toString();
+    permissionObject['scope'] = permissions.toString();
     if (rerequestDeclinedPermissions) {
-      permissionObject.auth_type = 'rerequest';
+      permissionObject['auth_type'] = 'rerequest';
     }
 
     window.FB.login((response) => {
@@ -72,7 +72,7 @@ export let login = (permissions?, rerequestDeclinedPermissions?) => new Promise(
     },permissionObject);
   }
   else {
-    facebookConnectPlugin.login(client.settings.facebook.readPermissions,
+    window.facebookConnectPlugin.login(client.settings.facebook.readPermissions,
       (response) => {
         resolve(response);
       },
@@ -95,7 +95,7 @@ export let logout = () => new Promise((resolve, reject) => {
     });
   }
   else {
-    facebookConnectPlugin.logout((response) => {
+    window.facebookConnectPlugin.logout((response) => {
         resolve(response);
       }
     );
@@ -115,7 +115,7 @@ export let post = (story) => new Promise((resolve, reject) => {
       'previewPropertyValue': story.object.value
     };
 
-    facebookConnectPlugin.showDialog(mobilePostObject, (response) => {
+    window.facebookConnectPlugin.showDialog(mobilePostObject, (response) => {
       resolve(response);
     }, (error) => {
       reject(error);
@@ -145,7 +145,7 @@ export let post = (story) => new Promise((resolve, reject) => {
 export let buy = (purchaseDialogData) => new Promise((resolve, reject) => {
 
   try {
-    FB.ui(purchaseDialogData, (response) => {
+    window.FB.ui(purchaseDialogData, (response) => {
       resolve(response);
     });
   } catch (error) {
