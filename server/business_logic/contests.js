@@ -108,7 +108,7 @@ function setUserQuestionIds(data, callback) {
 
 //----------------------------------------------------
 // validateContestData
-
+//
 // data:
 // input: DbHelper, contest, mode (add, edit), session
 // output: modified contest with server logic
@@ -367,6 +367,135 @@ function updateContest(data, callback) {
     dalDb.setContest(data, callback);
 }
 
+//------------------------------------------------------
+//-- setTimeDisplay
+//-- Sets the contest.time object - see as follows
+//------------------------------------------------------
+function setTimeDisplay(contest, session) {
+
+  var now = (new Date()).getTime();
+
+  contest.time = {
+    'start': {
+      'text': null,
+      'color': null
+    },
+    'end': {
+      'text': null,
+      'color': null
+    }
+  };
+
+  //Set contest status
+  if (contest.endDate < now) {
+    contest.status = 'finished';
+  }
+  else if (contest.startDate > now) {
+    contest.status = 'starting';
+  }
+  else {
+    contest.status = 'running';
+  }
+
+  var term;
+  var number;
+  var units;
+  var color;
+  var minutes;
+
+  //-------------------
+  // Start Time
+  //-------------------
+  minutes = mathjs.abs(now - contest.startDate) / 1000 / 60;
+  if (minutes >= 60 * 24) {
+    number = mathjs.ceil(minutes / 24 / 60);
+    units = 'DAYS';
+  }
+  else if (minutes >= 60) {
+    number = mathjs.ceil(minutes / 60);
+    units = 'HOURS';
+  }
+  else {
+    number = mathjs.ceil(minutes);
+    units = 'MINUTES';
+  }
+  if (now > contest.startDate) {
+    term = 'CONTEST_STARTED';
+    color = generalUtils.settings.client.charts.contest.time.running.color;
+  }
+  else {
+    term = 'CONTEST_STARTING';
+    color = generalUtils.settings.client.charts.contest.time.starting.color;
+  }
+  contest.time.start.text = generalUtils.translate(session.settings.language, term, {number: number, units: generalUtils.translate(session.settings.language,units)});
+  contest.time.start.color = color;
+
+  //-------------------
+  // End Time
+  //-------------------
+  minutes = mathjs.abs(contest.endDate - now) / 1000 / 60;
+  if (minutes >= 60 * 24) {
+    number = mathjs.ceil(minutes / 24 / 60);
+    units = 'DAYS';
+  }
+  else if (minutes >= 60) {
+    number = mathjs.ceil(minutes / 60);
+    units = 'HOURS';
+  }
+  else {
+    number = mathjs.ceil(minutes);
+    units = 'MINUTES';
+  }
+  if (now < contest.endDate) {
+    term = 'CONTEST_ENDS_IN';
+    color = generalUtils.settings.client.charts.contest.time.running.color;
+  }
+  else {
+    term = 'CONTEST_ENDED';
+    color = generalUtils.settings.client.charts.contest.time.finished.color;
+  }
+  contest.time.end.text = generalUtils.translate(session.settings.language, term, {number: number, units: generalUtils.translate(session.settings.language,units)});
+  contest.time.end.color = color;
+}
+
+//------------------------------------------------------
+//-- setChartControl
+//-- Sets the contest.chartControl object
+//------------------------------------------------------
+function setChartControl(contest, session) {
+
+  var contestChart = JSON.parse(JSON.stringify(generalUtils.settings.client.charts.contest.chartControl));
+  contest.chartControl = contestChart;
+
+  var teamsOrder;
+
+  if (generalUtils.settings.client.languages[session.settings.language].direction === 'ltr') {
+    teamsOrder = [0, 1];
+  }
+  else {
+    teamsOrder = [1, 0];
+  }
+
+  contestChart.annotations.groups[0].items[0].text = contest.teams[teamsOrder[0]].name;
+  contestChart.annotations.groups[0].items[0].x = '$dataset.0.set.' + teamsOrder[0] + '.centerX';
+  contestChart.annotations.groups[0].items[1].text = contest.teams[teamsOrder[1]].name;
+  contestChart.annotations.groups[0].items[1].x = '$dataset.0.set.' + teamsOrder[1] + '.centerX';
+
+  contestChart.categories[0].category[0].label = (contest.teams[teamsOrder[0]].chartValue * 100) + '%';
+  contestChart.categories[0].category[1].label = (contest.teams[teamsOrder[1]].chartValue * 100) + '%';
+
+  var netChartHeight = 1 - (generalUtils.settings.client.charts.contest.topMarginPercent/100);
+
+  //Scores
+  contestChart.dataset[0].data[0].value = contest.teams[teamsOrder[0]].chartValue * netChartHeight;
+  contestChart.dataset[0].data[1].value = contest.teams[teamsOrder[1]].chartValue * netChartHeight;
+
+  //Others (in grey)
+  contestChart.dataset[1].data[0].value = netChartHeight - contestChart.dataset[0].data[0].value;
+  contestChart.dataset[1].data[1].value = netChartHeight - contestChart.dataset[0].data[1].value;
+
+}
+
 //---------------------------------------------------------------------
 // prepareContestForClient
 //
@@ -380,9 +509,27 @@ function prepareContestForClient(contest, session) {
 
     if (contest.users && contest.users[session.userId]) {
         contest.myTeam = contest.users[session.userId].team;
+        if (contest.status !== 'finished') {
+          contest.state = 'play';
+        }
+        else {
+          contest.state = 'none';
+       }
+    }
+    else {
+      if (contest.status !== 'finished') {
+        contest.state = 'join';
+      }
+      else {
+        contest.state = 'none';
+      }
     }
 
     setContestScores(contest);
+
+    setTimeDisplay(contest, session);
+
+    setChartControl(contest, session);
 
     if (session.isAdmin || contest.creator.id.toString() === session.userId.toString()) {
         contest.owner = true;

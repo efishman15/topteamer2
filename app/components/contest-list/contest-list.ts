@@ -15,7 +15,6 @@ export class ContestListComponent {
   @Output() teamSelected = new EventEmitter();
 
   contests:Array<Object>;
-  contestCharts:Array<Object>;
   client:Client;
   events:Object = {
     'chartClick': (eventObj, dataObj) => {
@@ -35,10 +34,6 @@ export class ContestListComponent {
     var postData = {'tab': this.tab};
     contestsService.list(this.tab).then((contests) => {
       this.contests = contests;
-      this.contestCharts = [];
-      for (var i = 0; i < contests.length; i++) {
-        this.contestCharts.push(contestsService.prepareContestChart(contests[i]));
-      }
     });
   }
 

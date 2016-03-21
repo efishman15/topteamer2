@@ -2,6 +2,7 @@
 var client_1 = require('./client');
 var facebookService = require('./facebook');
 var purchase_success_1 = require('../pages/purchase-success/purchase-success');
+var objects_1 = require('../objects/objects');
 //------------------------------------------------------
 //-- buy
 //------------------------------------------------------
@@ -14,7 +15,7 @@ exports.buy = function (feature, isMobile) { return new Promise(function (resolv
             method = 'paypal';
             client.serverPost('payments/buy', postData).then(function (data) {
                 if (resolve) {
-                    resolve({ 'method': method, 'data': data });
+                    resolve(new objects_1.PaymentData(method, data));
                 }
             }, function (error) {
                 if (reject) {
@@ -26,7 +27,7 @@ exports.buy = function (feature, isMobile) { return new Promise(function (resolv
             method = 'android';
             window.inappbilling.buy(function (purchaseData) {
                 if (resolve) {
-                    resolve({ 'method': method, 'data': purchaseData });
+                    resolve(new objects_1.PaymentData(method, purchaseData));
                 }
             }, function (error) {
                 //Error messages will be displayed inside google
@@ -54,7 +55,7 @@ exports.buy = function (feature, isMobile) { return new Promise(function (resolv
             }
             facebookService.buy(facebookDialogData).then(function (data) {
                 if (resolve) {
-                    resolve({ 'method': method, 'data': data });
+                    resolve(new objects_1.PaymentData(method, data));
                 }
             }, function (error) {
                 if (reject) {

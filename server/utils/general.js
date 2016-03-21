@@ -9,7 +9,7 @@ var get_ip = require('ipware')().get_ip;
 //-------------------------------------------------------------------------------------------------------
 // returns okResponse sent to the client
 //-------------------------------------------------------------------------------------------------------
-module.exports.okResponse = {'status' : 0};
+module.exports.okResponse = {'status': 0};
 
 var settings;
 module.exports.injectSettings = function (dbSettings) {
@@ -52,7 +52,7 @@ function checkForEvalSettings(currentObject) {
         checkForEvalSettings(currentObject[property]);
       }
       else if (typeof currentObject[property] === 'string' && currentObject[property].indexOf('eval:') >= 0) {
-        currentObject[property] = eval(currentObject[property].replaceAll('eval:',''));
+        currentObject[property] = eval(currentObject[property].replaceAll('eval:', ''));
       }
     }
   }
@@ -238,6 +238,22 @@ function checkAppVersion(clientInfo, language) {
   }
 }
 
+//-----------------------------------------------------------------------
+// translate
+//
+// returns a translation term object to be concatenated to any server result
+//-----------------------------------------------------------------------
+module.exports.translate = translate;
+function translate(language, key, params) {
+
+  var translatedValue = settings.client.ui[language][key];
+  if (translatedValue && params) {
+    translatedValue = translatedValue.format(params);
+  }
+
+  return translatedValue;
+}
+
 //---------------------------------------------------------------------------------------------------
 // XpProgress class
 //
@@ -374,10 +390,45 @@ Array.prototype.contains = function (obj) {
 //---------------------------------------------------------------------------------------------------
 // add 'replaceAll' function to string using RegExp
 //---------------------------------------------------------------------------------------------------
-String.prototype.replaceAll = function(search, replacement) {
+String.prototype.replaceAll = function (search, replacement) {
   var target = this;
   return target.replace(new RegExp(search, 'g'), replacement);
 };
+
+//---------------------------------------------------------------------------------------------------
+// add 'format' function to replace variables
+//---------------------------------------------------------------------------------------------------
+String.prototype.format = function () {
+  var args = arguments;
+  var str = this;
+
+  function replaceByObjectProperies(obj) {
+    for (var property in obj)
+      if (obj.hasOwnProperty(property))
+      //replace all instances case-insensitive
+        str = str.replace(new RegExp(escapeRegExp('{{' + property + '}}'), 'gi'), String(obj[property]));
+  }
+
+  function escapeRegExp(string) {
+    return string.replace(/([.*+?^=!:${{}}()|\[\]\/\\])/g, '\\$1');
+  }
+
+  function replaceByArray(arrayLike) {
+    for (var i = 0, len = arrayLike.length; i < len; i++)
+      str = str.replace(new RegExp(escapeRegExp('{{' + i + '}}'), 'gi'), String(arrayLike[i]));
+  }
+
+  if (!arguments.length || arguments[0] === null || arguments[0] === undefined)
+    return str;
+  else if (arguments.length == 1 && Array.isArray(arguments[0]))
+    replaceByArray(arguments[0]);
+  else if (arguments.length == 1 && typeof arguments[0] === 'object')
+    replaceByObjectProperies(arguments[0]);
+  else
+    replaceByArray(arguments);
+
+  return str;
+}
 
 //-------------------------------------------------------------------------------------------------------
 // getWeekYear returns a string of current year and current week (e.g. 201541 - means year 2015 week 41

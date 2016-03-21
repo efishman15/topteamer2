@@ -547,10 +547,6 @@ export class Client {
     }
   }
 
-  logError(errorType: string, message: string) {
-    window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
-  }
-
 }
 
 export class ServerGateway {

@@ -23,10 +23,10 @@ var QuestionStatsPage = (function () {
         if (this.chartDataSource) {
             window.FusionCharts.ready(function () {
                 var chart = new window.FusionCharts({
-                    type: 'pie2d',
+                    type: _this.client.settings.charts.questionStats.type,
                     renderAt: 'questionChart',
-                    width: _this.client.settings.charts.size.width,
-                    height: _this.client.settings.charts.size.height,
+                    width: _this.client.settings.charts.questionStats.size.width,
+                    height: _this.client.settings.charts.questionStats.size.height,
                     dataFormat: 'json',
                     dataSource: _this.chartDataSource
                 });

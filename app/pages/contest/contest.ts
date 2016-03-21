@@ -11,7 +11,7 @@ import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as shareService from '../../providers/share';
 import * as soundService from '../../providers/sound';
-import {ContestChart,QuizResults} from '../../objects/objects';
+import {Contest,QuizResults} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
@@ -22,7 +22,7 @@ export class ContestPage {
 
   client:Client;
   params:NavParams;
-  contestChart:ContestChart;
+  contest:Contest;
   lastQuizResults:QuizResults = null;
   animateLastResults:Boolean = false;
   contestId:String;
@@ -34,20 +34,14 @@ export class ContestPage {
     this.client = Client.getInstance();
     this.params = params;
 
-    if (this.params.data.contestChart) {
-      this.contestId = this.params.data.contestChart.contest._id;
-      this.contestChart = this.params.data.contestChart;
-    }
-    else if (this.params.data.contest) {
-      //Just created this contest - no chart
+    if (this.params.data.contest) {
       this.contestId = this.params.data.contest._id;
-      this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
     }
     else {
       //Retrieve contest by id
       this.contestId = this.params.data.contestId;
       contestsService.getContest(this.params.data.contestId).then((contest) => {
-        this.contestChart = contestsService.prepareContestChart(contest);
+        this.contest = contest;
       });
     }
 
@@ -90,24 +84,24 @@ export class ContestPage {
 
   playContest(source) {
     this.client.logEvent('contest/play', {
-      'contestId': this.contestChart.contest._id,
-      'team': '' + this.contestChart.contest.myTeam,
+      'contestId': this.contest._id,
+      'team': '' + this.contest.myTeam,
       'sourceClick': source
     });
-    this.client.nav.push(QuizPage, {'contest': this.contestChart.contest, 'source': source});
+    this.client.nav.push(QuizPage, {'contest': this.contest, 'source': source});
   }
 
   showParticipants(source) {
-    this.client.nav.push(ContestParticipantsPage, {'contest': this.contestChart.contest, 'source': source});
+    this.client.nav.push(ContestParticipantsPage, {'contest': this.contest, 'source': source});
   }
 
   joinContest(team, source, action:string = 'join') {
 
-    contestsService.join(this.contestChart.contest._id, team).then((data) => {
+    contestsService.join(this.contest._id, team).then((data) => {
 
       this.client.logEvent('contest/' + action, {
-        'contestId': this.contestChart.contest._id,
-        'team': '' + this.contestChart.contest.myTeam,
+        'contestId': this.contest._id,
+        'team': '' + this.contest.myTeam,
         'sourceClick': source
       });
 
@@ -127,31 +121,30 @@ export class ContestPage {
   }
 
   refreshContest(contest) {
-    this.contestChart = contestsService.prepareContestChart(contest);
-    this.contestChartComponent.refresh(this.contestChart);
+    this.contestChartComponent.refresh(contest.chartControl);
   }
 
   switchTeams(source) {
-    this.joinContest(1 - this.contestChart.contest.myTeam, source, 'switchTeams');
+    this.joinContest(1 - this.contest.myTeam, source, 'switchTeams');
   }
 
   editContest() {
-    this.client.logEvent('contest/edit/click', {'contestId' : this.contestChart.contest._id});
-    this.client.nav.push(SetContestPage, {'mode': 'edit', 'contest': this.contestChart.contest});
+    this.client.logEvent('contest/edit/click', {'contestId' : this.contest._id});
+    this.client.nav.push(SetContestPage, {'mode': 'edit', 'contest': this.contest});
   }
 
   share(source) {
-    shareService.share(source, this.contestChart.contest);
+    shareService.share(source, this.contest);
   }
 
   like() {
-    this.client.logEvent('contest/like/click', {'contestId' : this.contestChart.contest._id});
-    this.client.nav.push(LikePage, {'contest': this.contestChart.contest});
+    this.client.logEvent('contest/like/click', {'contestId' : this.contest._id});
+    this.client.nav.push(LikePage, {'contest': this.contest});
   }
 
   onTeamSelected(data) {
-    if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
-      if (data.teamId !== this.contestChart.contest.myTeam) {
+    if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
+      if (data.teamId !== this.contest.myTeam) {
         this.switchTeams(data.source);
       }
       else {
@@ -164,7 +157,7 @@ export class ContestPage {
   }
 
   onContestSelected(data) {
-    if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
+    if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
       this.playContest('chart');
     }
   }

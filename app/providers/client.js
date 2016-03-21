@@ -489,9 +489,6 @@ var Client = (function () {
             window.FlurryAgent.logEvent(eventName);
         }
     };
-    Client.prototype.logError = function (errorType, message) {
-        window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
-    };
     Client = __decorate([
         core_1.Injectable(), 
         __metadata('design:paramtypes', [http_1.Http])

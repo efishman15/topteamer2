@@ -10,7 +10,7 @@ import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
 import * as shareService from '../../providers/share';
-import {Contest,Team} from '../../objects/objects';
+import {Contest,Team, PaymentData} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html',
@@ -120,7 +120,7 @@ export class SetContestPage {
                 }
               },
               (error) => {
-                this.client.logError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
+                window.myLogError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
               });
 
           },
@@ -193,7 +193,7 @@ export class SetContestPage {
           }, (error) => {
 
             this.client.showSpinner = false;
-            this.client.logError('AndroidBilling', 'Error consuming product: ' + error);
+            window.myLogError('AndroidBilling', 'Error consuming product: ' + error);
             if (reject) {
               reject();
             }
@@ -205,9 +205,9 @@ export class SetContestPage {
   }
 
   buyNewContestUnlockKey(isMobile) {
-
+debugger;
     this.buyInProgress = true;
-    paymentService.buy(this.client.session.features['newContest'], isMobile.then((result) => {
+    paymentService.buy(this.client.session.features['newContest'], isMobile).then((result: PaymentData) => {
         switch (result.method) {
           case 'paypal':
             location.replace(result.data.url);
@@ -246,7 +246,7 @@ export class SetContestPage {
       }, (error) => {
         this.buyInProgress = false;
       }
-    ))
+    )
   };
 
   toggleAdminInfo() {

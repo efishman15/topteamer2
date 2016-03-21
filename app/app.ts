@@ -37,7 +37,6 @@ class topTeamerApp {
 
     //TODO: Hardware back button
     //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
-    //TODO: Make .ts errors compile by definining classes in objects/objects.ts
 
     this.client.platform.ready().then(() => {
 
@@ -128,7 +127,7 @@ class topTeamerApp {
       window.inappbilling.init((resultInit) => {
         },
         (errorInit) => {
-          this.client.logError('InAppBilling', errorInit);
+          window.myLogError('InAppBilling', errorInit);
         }
         ,
         {showLog: true}, []
@@ -153,13 +152,18 @@ class topTeamerApp {
 
     //FlurryAgent.setDebugLogEnabled(true);
     window.FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
+
+    window.myLogError = (errorType: string, message: string) => {
+      window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
+    }
+
   }
 
   initBranch() {
     window.myHandleBranch = (err, data) => {
       try {
         if (err) {
-          this.client.logError('BranchIoError', 'Error received during branch init: ' + err);
+          window.myLogError('BranchIoError', 'Error received during branch init: ' + err);
           return;
         }
 
@@ -170,7 +174,7 @@ class topTeamerApp {
         }
       }
       catch (e) {
-        this.client.logError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
+        window.myLogError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
       }
     }
 

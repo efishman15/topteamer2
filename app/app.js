@@ -32,7 +32,6 @@ var topTeamerApp = (function () {
     topTeamerApp.prototype.initApp = function () {
         //TODO: Hardware back button
         //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
-        //TODO: Make .ts errors compile by definining classes in objects/objects.ts
         var _this = this;
         this.client.platform.ready().then(function () {
             _this.expandStringPrototype();
@@ -106,7 +105,7 @@ var topTeamerApp = (function () {
         if (this.client.platform.is('android') && typeof window.inappbilling !== 'undefined') {
             window.inappbilling.init(function (resultInit) {
             }, function (errorInit) {
-                _this.client.logError('InAppBilling', errorInit);
+                window.myLogError('InAppBilling', errorInit);
             }, { showLog: true }, []);
         }
         document.addEventListener('resume', function (event) {
@@ -123,13 +122,16 @@ var topTeamerApp = (function () {
     topTeamerApp.prototype.initFlurry = function () {
         //FlurryAgent.setDebugLogEnabled(true);
         window.FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
+        window.myLogError = function (errorType, message) {
+            window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
+        };
     };
     topTeamerApp.prototype.initBranch = function () {
         var _this = this;
         window.myHandleBranch = function (err, data) {
             try {
                 if (err) {
-                    _this.client.logError('BranchIoError', 'Error received during branch init: ' + err);
+                    window.myLogError('BranchIoError', 'Error received during branch init: ' + err);
                     return;
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
@@ -139,7 +141,7 @@ var topTeamerApp = (function () {
                 }
             }
             catch (e) {
-                _this.client.logError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
+                window.myLogError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
             }
         };
         window.initBranch = function () {

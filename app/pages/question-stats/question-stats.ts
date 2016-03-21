@@ -26,10 +26,10 @@ export class QuestionStatsPage {
     if (this.chartDataSource) {
       window.FusionCharts.ready(() => {
         var chart = new window.FusionCharts({
-          type: 'pie2d',
+          type: this.client.settings.charts.questionStats.type,
           renderAt: 'questionChart',
-          width: this.client.settings.charts.size.width,
-          height: this.client.settings.charts.size.height,
+          width: this.client.settings.charts.questionStats.size.width,
+          height: this.client.settings.charts.questionStats.size.height,
           dataFormat: 'json',
           dataSource: this.chartDataSource
         });

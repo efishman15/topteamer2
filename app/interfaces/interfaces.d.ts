@@ -19,6 +19,7 @@ declare global {
     facebookConnectPlugin: any;
     PushNotification: any;
     $cordovaSocialSharing: any;
+    myLogError(errorType: string, message: string): void;
   }
 
   interface Navigator {

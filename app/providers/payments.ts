@@ -1,7 +1,7 @@
 import {Client} from './client';
 import * as facebookService from './facebook';
 import {PurchaseSuccessPage} from '../pages/purchase-success/purchase-success'
-import {Feature} from '../objects/objects';
+import {Feature,PaymentData,PurchaseData} from '../objects/objects';
 
 //------------------------------------------------------
 //-- buy
@@ -18,7 +18,7 @@ export let buy = (feature:Feature, isMobile:Boolean) => new Promise((resolve, re
       method = 'paypal';
       client.serverPost('payments/buy', postData).then((data) => {
           if (resolve) {
-            resolve({'method': method, 'data': data});
+            resolve(new PaymentData(method, data));
           }
         }, (error) => {
           if (reject) {
@@ -32,7 +32,7 @@ export let buy = (feature:Feature, isMobile:Boolean) => new Promise((resolve, re
       method = 'android';
       window.inappbilling.buy((purchaseData) => {
           if (resolve) {
-            resolve({'method': method, 'data': purchaseData})
+            resolve(new PaymentData(method, purchaseData));
           }
         },
         (error) => {
@@ -63,9 +63,9 @@ export let buy = (feature:Feature, isMobile:Boolean) => new Promise((resolve, re
         facebookDialogData['pricepoint_id'] = client.session.features[feature.name].purchaseData.mobilePricepointId;
       }
 
-      facebookService.buy(facebookDialogData).then((data) => {
+      facebookService.buy(facebookDialogData).then((data:PurchaseData) => {
         if (resolve) {
-          resolve({'method': method, 'data': data})
+          resolve(new PaymentData(method, data));
         }
       }, (error) => {
         if (reject) {
@@ -85,7 +85,7 @@ export let showPurchaseSuccess = (serverPurchaseData) => {
   var client = Client.getInstance();
 
   client.session.features = serverPurchaseData.features
-  client.nav.push(PurchaseSuccessPage, {'featurePurchased' : serverPurchaseData.featurePurchased});
+  client.nav.push(PurchaseSuccessPage, {'featurePurchased': serverPurchaseData.featurePurchased});
 };
 
 //------------------------------------------------------

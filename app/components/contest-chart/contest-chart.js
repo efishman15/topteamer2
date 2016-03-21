@@ -22,7 +22,7 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected.emit({ 'teamId': teamId, 'source': 'bar', 'contest': _this.contestChart.contest });
+                _this.teamSelected.emit({ 'teamId': teamId, 'source': 'bar', 'contest': _this.contest });
                 _this.chartTeamEventHandled = true;
             },
             'dataLabelClick': function (eventObj, dataObj) {
@@ -30,12 +30,12 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected.emit({ 'teamId': teamId, 'source': 'label', 'contest': _this.contestChart.contest });
+                _this.teamSelected.emit({ 'teamId': teamId, 'source': 'label', 'contest': _this.contest });
                 _this.chartTeamEventHandled = true;
             },
             'chartClick': function (eventObj, dataObj) {
                 if (!_this.chartTeamEventHandled) {
-                    _this.contestSelected.emit({ 'contest': _this.contestChart.contest });
+                    _this.contestSelected.emit({ 'contest': _this.contest.chartControl });
                 }
                 _this.chartTeamEventHandled = false;
             }
@@ -50,24 +50,24 @@ var ContestChartComponent = (function () {
         if (!this.chart) {
             window.FusionCharts.ready(function () {
                 _this.chart = new window.FusionCharts({
-                    type: 'column2d',
+                    type: _this.client.settings.charts.contest.type,
                     renderAt: _this.id + '-container',
-                    width: _this.width,
-                    height: _this.height,
+                    width: _this.client.settings.charts.contest.size.width,
+                    height: _this.client.settings.charts.contest.size.height,
                     dataFormat: 'json',
-                    dataSource: _this.contestChart,
+                    dataSource: _this.contest.chartControl,
                     events: _this.events
                 });
                 _this.chart.render();
             });
         }
     };
-    ContestChartComponent.prototype.refresh = function (contestChart) {
+    ContestChartComponent.prototype.refresh = function (chartControl) {
         if (this.chart) {
-            this.chart.setJSONData(contestChart);
+            this.chart.setJSONData(chartControl);
         }
         else {
-            this.contestChart = contestChart;
+            this.contest.chartControl = chartControl;
             this.initChart();
         }
     };
@@ -77,16 +77,8 @@ var ContestChartComponent = (function () {
     ], ContestChartComponent.prototype, "id", void 0);
     __decorate([
         core_1.Input(), 
-        __metadata('design:type', Number)
-    ], ContestChartComponent.prototype, "width", void 0);
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', Number)
-    ], ContestChartComponent.prototype, "height", void 0);
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', objects_1.ContestChart)
-    ], ContestChartComponent.prototype, "contestChart", void 0);
+        __metadata('design:type', objects_1.Contest)
+    ], ContestChartComponent.prototype, "contest", void 0);
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)

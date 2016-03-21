@@ -32,10 +32,6 @@ var ContestListComponent = (function () {
         var postData = { 'tab': this.tab };
         contestsService.list(this.tab).then(function (contests) {
             _this.contests = contests;
-            _this.contestCharts = [];
-            for (var i = 0; i < contests.length; i++) {
-                _this.contestCharts.push(contestsService.prepareContestChart(contests[i]));
-            }
         });
     };
     ContestListComponent.prototype.onContestSelected = function (data) {

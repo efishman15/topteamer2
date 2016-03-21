@@ -77,6 +77,12 @@ var QuizQuestionAnswerSettings = (function () {
     return QuizQuestionAnswerSettings;
 }());
 exports.QuizQuestionAnswerSettings = QuizQuestionAnswerSettings;
+var ChartsSettings = (function () {
+    function ChartsSettings() {
+    }
+    return ChartsSettings;
+}());
+exports.ChartsSettings = ChartsSettings;
 var ChartSettings = (function () {
     function ChartSettings() {
     }
@@ -161,6 +167,14 @@ var PurchaseData = (function () {
     return PurchaseData;
 }());
 exports.PurchaseData = PurchaseData;
+var PaymentData = (function () {
+    function PaymentData(method, data) {
+        this.method = method;
+        this.data = data;
+    }
+    return PaymentData;
+}());
+exports.PaymentData = PaymentData;
 var View = (function () {
     function View() {
     }

@@ -28,20 +28,14 @@ var ContestPage = (function () {
         this.animateLastResults = false;
         this.client = client_1.Client.getInstance();
         this.params = params;
-        if (this.params.data.contestChart) {
-            this.contestId = this.params.data.contestChart.contest._id;
-            this.contestChart = this.params.data.contestChart;
-        }
-        else if (this.params.data.contest) {
-            //Just created this contest - no chart
+        if (this.params.data.contest) {
             this.contestId = this.params.data.contest._id;
-            this.contestChart = contestsService.prepareContestChart(this.params.data.contest);
         }
         else {
             //Retrieve contest by id
             this.contestId = this.params.data.contestId;
             contestsService.getContest(this.params.data.contestId).then(function (contest) {
-                _this.contestChart = contestsService.prepareContestChart(contest);
+                _this.contest = contest;
             });
         }
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
@@ -74,22 +68,22 @@ var ContestPage = (function () {
     };
     ContestPage.prototype.playContest = function (source) {
         this.client.logEvent('contest/play', {
-            'contestId': this.contestChart.contest._id,
-            'team': '' + this.contestChart.contest.myTeam,
+            'contestId': this.contest._id,
+            'team': '' + this.contest.myTeam,
             'sourceClick': source
         });
-        this.client.nav.push(quiz_1.QuizPage, { 'contest': this.contestChart.contest, 'source': source });
+        this.client.nav.push(quiz_1.QuizPage, { 'contest': this.contest, 'source': source });
     };
     ContestPage.prototype.showParticipants = function (source) {
-        this.client.nav.push(contest_participants_1.ContestParticipantsPage, { 'contest': this.contestChart.contest, 'source': source });
+        this.client.nav.push(contest_participants_1.ContestParticipantsPage, { 'contest': this.contest, 'source': source });
     };
     ContestPage.prototype.joinContest = function (team, source, action) {
         var _this = this;
         if (action === void 0) { action = 'join'; }
-        contestsService.join(this.contestChart.contest._id, team).then(function (data) {
+        contestsService.join(this.contest._id, team).then(function (data) {
             _this.client.logEvent('contest/' + action, {
-                'contestId': _this.contestChart.contest._id,
-                'team': '' + _this.contestChart.contest.myTeam,
+                'contestId': _this.contest._id,
+                'team': '' + _this.contest.myTeam,
                 'sourceClick': source
             });
             //Should also cause refresh internally to our contest chart as well as notifying the tabs outside
@@ -106,26 +100,25 @@ var ContestPage = (function () {
         });
     };
     ContestPage.prototype.refreshContest = function (contest) {
-        this.contestChart = contestsService.prepareContestChart(contest);
-        this.contestChartComponent.refresh(this.contestChart);
+        this.contestChartComponent.refresh(contest.chartControl);
     };
     ContestPage.prototype.switchTeams = function (source) {
-        this.joinContest(1 - this.contestChart.contest.myTeam, source, 'switchTeams');
+        this.joinContest(1 - this.contest.myTeam, source, 'switchTeams');
     };
     ContestPage.prototype.editContest = function () {
-        this.client.logEvent('contest/edit/click', { 'contestId': this.contestChart.contest._id });
-        this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'edit', 'contest': this.contestChart.contest });
+        this.client.logEvent('contest/edit/click', { 'contestId': this.contest._id });
+        this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'edit', 'contest': this.contest });
     };
     ContestPage.prototype.share = function (source) {
-        shareService.share(source, this.contestChart.contest);
+        shareService.share(source, this.contest);
     };
     ContestPage.prototype.like = function () {
-        this.client.logEvent('contest/like/click', { 'contestId': this.contestChart.contest._id });
-        this.client.nav.push(like_1.LikePage, { 'contest': this.contestChart.contest });
+        this.client.logEvent('contest/like/click', { 'contestId': this.contest._id });
+        this.client.nav.push(like_1.LikePage, { 'contest': this.contest });
     };
     ContestPage.prototype.onTeamSelected = function (data) {
-        if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
-            if (data.teamId !== this.contestChart.contest.myTeam) {
+        if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
+            if (data.teamId !== this.contest.myTeam) {
                 this.switchTeams(data.source);
             }
             else {
@@ -137,7 +130,7 @@ var ContestPage = (function () {
         }
     };
     ContestPage.prototype.onContestSelected = function (data) {
-        if (this.contestChart.contest.myTeam === 0 || this.contestChart.contest.myTeam === 1) {
+        if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
             this.playContest('chart');
         }
     };

@@ -11,7 +11,7 @@ export class MyExceptionHandler extends ExceptionHandler {
     var client = Client.getInstance();
 
     console.error(errorMessage);
-    client.logError('UnhandledException', errorMessage);
+    window.myLogError('UnhandledException', errorMessage);
     super.call(exception, stackTrace, reason);
   }
 }

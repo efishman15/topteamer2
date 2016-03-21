@@ -28,7 +28,7 @@ export class FacebookPostPage {
     facebookService.post(this.quizResults.data.facebookPost).then((response) => {
       this.close();
     }, (error) => {
-      this.client.logError('FacebookPostError', 'Error posting: ' + error);
+      window.myLogError('FacebookPostError', 'Error posting: ' + error);
     })
   }
 

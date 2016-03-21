@@ -1,9 +1,9 @@
-<ion-navbar dark1 *navbar>
+<ion-navbar app-top-bar *navbar>
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
   <ion-title *ngIf="contestChart && contestChart.contest">
-      {{contestChart.contest.name}}
+      {{contest.name}}
   </ion-title>
 </ion-navbar>
 
@@ -13,9 +13,9 @@
       <ion-avatar item-left>
         <img src="{{contestChart.contest.creator.avatar}}">
       </ion-avatar>
-      <h2 class="contest-leader-row1">{{ client.translate('CREATED_BY',{name : contestChart.contest.creator.name})
+      <h2 class="contest-leader-row1">{{ client.translate('CREATED_BY',{name : contest.creator.name})
         }}</h2>
-      <p class="contest-leader-row2">{{contestChart.contest.time.start.text}}</p>
+      <p class="contest-leader-row2">{{contest.time.start.text}}</p>
     </ion-item>
 
     <div padding-top class="contest-chart-background">
@@ -32,19 +32,19 @@
         <div *ngIf="contestChart.contest.state==='play'">
           <button danger class="button button-small no-wrap-text"
                   (click)="playContest('button')">{{client.translate('PLAY_CONTEST', {'team' :
-            contestChart.contest.teams[contestChart.contest.myTeam].name}) }}
+            contest.teams[contestChart.contest.myTeam].name}) }}
           </button>
         </div>
         <div *ngIf="contestChart.contest.state==='join'">
           <button danger [ngStyle]="{'width': (client.settings.charts.size.width / 2) + 'px'}"
                   class="button button-small join-contest no-wrap-text"
                   (click)="joinContest(0,'button')">{{ client.translate('JOIN_TEAM',
-            {team:contestChart.contest.teams[0].name}) }}
+            {team:contest.teams[0].name}) }}
           </button>
           <button danger [ngStyle]="{'width': (client.settings.charts.size.width / 2) + 'px'}"
                   class="button button-small join-contest no-wrap-text"
                   (click)="joinContest(1,'button')">{{ client.translate('JOIN_TEAM',
-            {team:contestChart.contest.teams[1].name}) }}
+            {team:contest.teams[1].name}) }}
           </button>
         </div>
       </div>
@@ -52,7 +52,7 @@
       <div padding>
         <div class="pointer contest-footer-text float-{{client.currentLanguage.align}}"
              (click)="showParticipants('leader')">
-          {{client.translate('CONTEST_LEADER')}}: {{contestChart.contest.leader.name}}
+          {{client.translate('CONTEST_LEADER')}}: {{contest.leader.name}}
         </div>
         <div class="pointer contest-footer-text float-{{client.currentLanguage.oppositeAlign}}"
              (click)="showParticipants('topLeaders')">{{client.translate('CONTEST_LEADERS_MORE')}}

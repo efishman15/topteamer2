@@ -86,7 +86,7 @@ var SetContestPage = (function () {
                             }
                         }
                     }, function (error) {
-                        _this.client.logError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
+                        window.myLogError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
                     });
                 }, function (msg) {
                     this.client.logError('AndroidBillingError', 'Error getting product details: ' + msg);
@@ -142,7 +142,7 @@ var SetContestPage = (function () {
                     paymentService.showPurchaseSuccess(serverPurchaseData);
                 }, function (error) {
                     _this.client.showSpinner = false;
-                    _this.client.logError('AndroidBilling', 'Error consuming product: ' + error);
+                    window.myLogError('AndroidBilling', 'Error consuming product: ' + error);
                     if (reject) {
                         reject();
                     }
@@ -152,8 +152,9 @@ var SetContestPage = (function () {
     };
     SetContestPage.prototype.buyNewContestUnlockKey = function (isMobile) {
         var _this = this;
+        debugger;
         this.buyInProgress = true;
-        paymentService.buy(this.client.session.features['newContest'], isMobile.then(function (result) {
+        paymentService.buy(this.client.session.features['newContest'], isMobile).then(function (result) {
             switch (result.method) {
                 case 'paypal':
                     location.replace(result.data.url);
@@ -187,7 +188,7 @@ var SetContestPage = (function () {
             }
         }, function (error) {
             _this.buyInProgress = false;
-        }));
+        });
     };
     ;
     SetContestPage.prototype.toggleAdminInfo = function () {

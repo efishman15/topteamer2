@@ -2,7 +2,7 @@ export class Settings {
   general:GeneralSettings;
   facebook:FacebookSettings;
   quiz:QuizSettings;
-  charts:ChartSettings;
+  charts:ChartsSettings;
   platforms:Array<Object>;
   xpControl:XpControl;
   google:GoogleSettings;
@@ -85,9 +85,15 @@ export class QuizQuestionAnswerSettings {
   maxLength:number;
 }
 
+export class ChartsSettings {
+  contest: ChartSettings;
+  questionStats:ChartSettings;
+}
+
 export class ChartSettings {
-  size:Size;
-  questionStats:Object;
+  type: string;
+  size: Size;
+  chartControl: any;
 }
 
 export class Size {
@@ -183,6 +189,17 @@ export class Feature {
 
 export class PurchaseData {
   productId: string;
+  status: string;
+  url: string;
+}
+
+export class PaymentData {
+  method: string;
+  data: PurchaseData;
+  constructor(method: string, data: PurchaseData) {
+    this.method = method;
+    this.data = data;
+  }
 }
 
 export class View {
@@ -245,6 +262,7 @@ export class Contest {
   questions:Questions;
   totalParticipants:number;
   userQuestions:Array<string>;
+  chartControl:any;
 
   constructor(startDate:number, endDate:number, type:ContestType) {
     this.startDate = startDate;

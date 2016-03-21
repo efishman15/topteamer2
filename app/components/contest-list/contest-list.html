@@ -1,7 +1,5 @@
-<contest-chart *ngFor="#contestChart of contestCharts, #i = index" id="{{tab}}-{{contestCharts[i].contest._id}}"
-               width="{{client.settings.charts.size.width}}"
-               height="{{client.settings.charts.size.height}}"
-               [(contestChart)]="contestCharts[i]"
+<contest-chart *ngFor="#contest of contests, #i = index" id="{{tab}}-{{contest._id}}"
+               [(contest)]="contests[i]"
                (contestSelected)="onContestSelected($event)"
                (teamSelected)="onTeamSelected($event)">
 </contest-chart>

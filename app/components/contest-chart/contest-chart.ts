@@ -1,6 +1,6 @@
 import {Component, Input, EventEmitter, Output} from 'angular2/core';
 import {Client} from '../../providers/client';
-import {ContestChart} from '../../objects/objects';
+import {Contest} from '../../objects/objects';
 
 @Component({
   selector: 'contest-chart',
@@ -10,9 +10,7 @@ import {ContestChart} from '../../objects/objects';
 export class ContestChartComponent {
 
   @Input() id:Number;
-  @Input() width:Number;
-  @Input() height:Number;
-  @Input() contestChart:ContestChart;
+  @Input() contest:Contest;
 
   chartTeamEventHandled:boolean;
   client:Client;
@@ -27,7 +25,7 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.teamSelected.emit({'teamId': teamId, 'source': 'bar', 'contest': this.contestChart.contest});
+      this.teamSelected.emit({'teamId': teamId, 'source': 'bar', 'contest': this.contest});
       this.chartTeamEventHandled = true;
     },
     'dataLabelClick': (eventObj, dataObj) => {
@@ -35,12 +33,12 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.teamSelected.emit({'teamId': teamId, 'source': 'label', 'contest': this.contestChart.contest});
+      this.teamSelected.emit({'teamId': teamId, 'source': 'label', 'contest': this.contest});
       this.chartTeamEventHandled = true;
     },
     'chartClick': (eventObj, dataObj) => {
       if (!this.chartTeamEventHandled) {
-        this.contestSelected.emit({'contest': this.contestChart.contest})
+        this.contestSelected.emit({'contest': this.contest.chartControl})
       }
       this.chartTeamEventHandled = false;
     }
@@ -58,12 +56,12 @@ export class ContestChartComponent {
     if (!this.chart) {
       window.FusionCharts.ready(() => {
         this.chart = new window.FusionCharts({
-          type: 'column2d',
+          type: this.client.settings.charts.contest.type,
           renderAt: this.id + '-container',
-          width: this.width,
-          height: this.height,
+          width: this.client.settings.charts.contest.size.width,
+          height: this.client.settings.charts.contest.size.height,
           dataFormat: 'json',
-          dataSource: this.contestChart,
+          dataSource: this.contest.chartControl,
           events: this.events
         });
 
@@ -73,12 +71,12 @@ export class ContestChartComponent {
     }
   }
 
-  refresh(contestChart: ContestChart) {
+  refresh(chartControl: any) {
     if (this.chart) {
-      this.chart.setJSONData(contestChart);
+      this.chart.setJSONData(chartControl);
     }
     else {
-      this.contestChart = contestChart;
+      this.contest.chartControl = chartControl;
       this.initChart();
     }
   }

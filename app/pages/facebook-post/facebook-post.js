@@ -26,7 +26,7 @@ var FacebookPostPage = (function () {
         facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
             _this.close();
         }, function (error) {
-            _this.client.logError('FacebookPostError', 'Error posting: ' + error);
+            window.myLogError('FacebookPostError', 'Error posting: ' + error);
         });
     };
     FacebookPostPage.prototype.close = function () {
