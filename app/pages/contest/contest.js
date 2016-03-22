@@ -30,6 +30,7 @@ var ContestPage = (function () {
         this.params = params;
         if (this.params.data.contest) {
             this.contestId = this.params.data.contest._id;
+            this.contest = this.params.data.contest;
         }
         else {
             //Retrieve contest by id

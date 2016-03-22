@@ -1,3 +1,92 @@
+.chart {
+  margin: 0px auto;
+  position: relative;
+}
+
 .chart-margin-top {
   margin-top: 10px;
+}
+
+.chart-timer {
+  position: absolute;
+  top: -2px;
+}
+
+.chart-timer-ltr {
+  right: 2px;
+}
+
+.chart-timer-rtl {
+  left: 2px;
+}
+
+.chart-top-ribbon {
+  margin: 0px auto;
+  position: relative;
+  top: 4px;
+}
+
+.chart-type-title {
+  position: absolute;
+  font-size: 20px;
+  color: #ffffff;
+  top: 3px;
+  white-space: pre;
+}
+
+.chart-type-title-ltr {
+  left: 25px;
+}
+
+.chart-type-title-rtl {
+  right: 25px;
+}
+
+.chart-end-time {
+  position: absolute;
+  color: #90a3e9;
+  font-size: 18px;
+  top: 4px;
+}
+
+.chart-end-time-ltr {
+  right: 45px;
+}
+
+.chart-end-time-rtl {
+  left: 45px;
+}
+
+.contests-play-image-container {
+  transform: translateX(50%);
+  -moz-transform: translateX(50%);
+  -webkit-transform: translateX(50%);
+}
+
+.contests-play-image {
+  float: left;
+}
+
+.chart-bottom-ribbon {
+  padding-top: 5px;
+  background-color: #ffffff;
+  margin: 0px auto;
+  position: relative;
+}
+
+.chart-bottom-ribbon-text-wrapper {
+  width: 90%;
+  border-top: 2px solid #D6D6D6;
+  margin: 0px auto;
+  position: relative;
+}
+
+.chart-bottom-ribbon-participants-text {
+  padding-top: 2px;
+  color: #828282;
+}
+
+.chart-bottom-ribbon-participants-number {
+  color: #000000;
+  font-weight: bold;
 }

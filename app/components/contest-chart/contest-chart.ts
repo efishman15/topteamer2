@@ -38,7 +38,7 @@ export class ContestChartComponent {
     },
     'chartClick': (eventObj, dataObj) => {
       if (!this.chartTeamEventHandled) {
-        this.contestSelected.emit({'contest': this.contest.chartControl})
+        this.selectContest();
       }
       this.chartTeamEventHandled = false;
     }
@@ -46,6 +46,10 @@ export class ContestChartComponent {
 
   constructor() {
     this.client = Client.getInstance();
+  }
+
+  selectContest() {
+    this.contestSelected.emit({'contest': this.contest})
   }
 
   ngOnInit() {

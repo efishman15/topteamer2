@@ -35,13 +35,16 @@ var ContestChartComponent = (function () {
             },
             'chartClick': function (eventObj, dataObj) {
                 if (!_this.chartTeamEventHandled) {
-                    _this.contestSelected.emit({ 'contest': _this.contest.chartControl });
+                    _this.selectContest();
                 }
                 _this.chartTeamEventHandled = false;
             }
         };
         this.client = client_1.Client.getInstance();
     }
+    ContestChartComponent.prototype.selectContest = function () {
+        this.contestSelected.emit({ 'contest': this.contest });
+    };
     ContestChartComponent.prototype.ngOnInit = function () {
         this.initChart();
     };

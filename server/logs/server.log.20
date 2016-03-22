@@ -1,52 +1,5 @@
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3880,"level":30,"msg":"server up!","time":"2016-02-22T09:55:22.911Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3880,"level":40,"msg":"contestId not supplied","time":"2016-02-22T13:07:05.738Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3880,"level":40,"msg":"contestId not supplied","time":"2016-02-22T13:07:08.540Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3880,"level":40,"msg":"contestId not supplied","time":"2016-02-22T13:07:35.790Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3880,"level":40,"msg":"contestId not supplied","time":"2016-02-22T13:53:50.285Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3880,"level":40,"msg":"contestId not supplied","time":"2016-02-22T14:10:35.214Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3880,"level":40,"msg":"contestId not supplied","time":"2016-02-22T14:54:09.807Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":30,"msg":"server up!","time":"2016-02-22T14:56:36.831Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T14:56:57.151Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:02:15.533Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:04:50.410Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:11:57.227Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:11:58.952Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:14:04.217Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:24:02.986Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:24:51.398Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:31:25.269Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:49:33.853Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:54:49.377Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:57:08.899Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T15:57:42.410Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:00:51.015Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:01:02.287Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:17:53.209Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:18:06.461Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:18:23.718Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12436,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:18:31.873Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9848,"level":30,"msg":"server up!","time":"2016-02-22T16:22:51.636Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9848,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:23:12.278Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9848,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:23:19.796Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9848,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:23:24.195Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9848,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:23:30.946Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9848,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:24:14.035Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9848,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:24:19.800Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9848,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:24:24.601Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":11372,"level":30,"msg":"server up!","time":"2016-02-22T16:25:24.356Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":30,"msg":"server up!","time":"2016-02-22T16:38:44.086Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:45:44.250Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:48:58.865Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:49:00.546Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:49:02.279Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:49:03.696Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:50:46.928Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:51:01.142Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:52:37.645Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:52:48.636Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:58:15.840Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:58:57.507Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T16:59:25.884Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T17:02:17.499Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12248,"level":40,"msg":"contestId not supplied","time":"2016-02-22T17:03:26.061Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10452,"level":30,"msg":"server up!","time":"2016-02-22T17:04:21.392Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":5752,"level":30,"msg":"server up!","time":"2016-02-23T07:08:25.495Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":2096,"level":30,"msg":"server up!","time":"2016-02-23T08:02:12.902Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":2096,"level":30,"options":{"url":"https://graph.facebook.com/me/friends?limit=25&offset=0&access_token=CAAAAUCxqXfgBAKxljeAormDJEOcf2qNu2DvXntgDjL3Q4thbsMZAVtbVWawtR56weZB6XBgEZAYWaT0RB2zxZBZAWgkaD3xkFrnqy33u2SCxx7MgxCz00EtdSqAdhvvWSCn1ENAtIYUk4ujgxIzXz7L6kQJtadP9ZAA3MSNP4Laxngmjc3cfu9gfmVuEZCW6tQAAX2ZA9rOmYgZDZD"},"error":{"code":"ETIMEDOUT","errno":"ETIMEDOUT","syscall":"connect","address":"179.60.192.3","port":443},"msg":"Error during request from api","time":"2016-02-23T10:59:19.899Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":2096,"level":30,"accessToken":"CAAAAUCxqXfgBAKxljeAormDJEOcf2qNu2DvXntgDjL3Q4thbsMZAVtbVWawtR56weZB6XBgEZAYWaT0RB2zxZBZAWgkaD3xkFrnqy33u2SCxx7MgxCz00EtdSqAdhvvWSCn1ENAtIYUk4ujgxIzXz7L6kQJtadP9ZAA3MSNP4Laxngmjc3cfu9gfmVuEZCW6tQAAX2ZA9rOmYgZDZD","msg":"Unable to retrieve user friends","time":"2016-02-23T10:59:20.192Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9752,"level":30,"msg":"server up!","time":"2016-02-23T15:18:58.954Z","v":0}
