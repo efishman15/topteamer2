@@ -1,13 +1,13 @@
 import {Component, Input, EventEmitter, Output} from 'angular2/core';
-import {Client} from '../../providers/client';
-import {Contest} from '../../objects/objects';
+import {Client} from '../../../providers/client';
+import {Contest} from '../../../objects/objects';
 
 @Component({
-  selector: 'contest-chart',
-  templateUrl: 'build/components/contest-chart/contest-chart.html'
+  selector: 'contest-chart-base',
+  templateUrl: 'build/components/contest-chart/base/contest-chart-base.html'
 })
 
-export class ContestChartComponent {
+export class ContestChartBaseComponent {
 
   @Input() id:Number;
   @Input() contest:Contest;
@@ -25,7 +25,7 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.teamSelected.emit({'teamId': teamId, 'source': 'bar', 'contest': this.contest});
+      this.onTeamSelected(teamId, 'bar');
       this.chartTeamEventHandled = true;
     },
     'dataLabelClick': (eventObj, dataObj) => {
@@ -33,12 +33,12 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.teamSelected.emit({'teamId': teamId, 'source': 'label', 'contest': this.contest});
+      this.onTeamSelected(teamId, 'label');
       this.chartTeamEventHandled = true;
     },
     'chartClick': (eventObj, dataObj) => {
       if (!this.chartTeamEventHandled) {
-        this.selectContest();
+        this.onContestSelected('chart');
       }
       this.chartTeamEventHandled = false;
     }
@@ -48,8 +48,12 @@ export class ContestChartComponent {
     this.client = Client.getInstance();
   }
 
-  selectContest() {
+  onContestSelected(source: string) {
     this.contestSelected.emit({'contest': this.contest})
+  }
+
+  onTeamSelected(teamId: number, source: string) {
+    this.teamSelected.emit({'teamId': teamId, 'contest': this.contest, 'source': source})
   }
 
   ngOnInit() {

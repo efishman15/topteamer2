@@ -9,43 +9,13 @@
 
 <ion-content class="app-bg" *ngIf="contest">
 
-    <ion-item class="contest-leader-background">
-      <ion-avatar item-left>
-        <img src="{{contest.creator.avatar}}">
-      </ion-avatar>
-      <h2 class="contest-leader-row1">{{ client.translate('CREATED_BY',{name : contest.creator.name})
-        }}</h2>
-      <p class="contest-leader-row2">{{contest.time.start.text}}</p>
-    </ion-item>
-
     <div padding-top>
 
-      <contest-chart id="contest-{{contest._id}}"
-                     [(contest)]="contest"
+      <contest-chart-detailed id="contest-{{contest._id}}"
+                     [(contest)]="contest">
                      (contestSelected)="onContestSelected($event)"
                      (teamSelected)="onTeamSelected($event)">
-      </contest-chart>
-
-      <div padding-top text-center>
-        <div *ngIf="contest.state==='play'">
-          <button danger class="button button-small no-wrap-text"
-                  (click)="playContest('button')">{{client.translate('PLAY_CONTEST', {'team' :
-            contest.teams[contest.myTeam].name}) }}
-          </button>
-        </div>
-        <div *ngIf="contest.state==='join'">
-          <button danger [ngStyle]="{'width': (client.settings.charts.size.width / 2) + 'px'}"
-                  class="button button-small join-contest no-wrap-text"
-                  (click)="joinContest(0,'button')">{{ client.translate('JOIN_TEAM',
-            {team:contest.teams[0].name}) }}
-          </button>
-          <button danger [ngStyle]="{'width': (client.settings.charts.size.width / 2) + 'px'}"
-                  class="button button-small join-contest no-wrap-text"
-                  (click)="joinContest(1,'button')">{{ client.translate('JOIN_TEAM',
-            {team:contest.teams[1].name}) }}
-          </button>
-        </div>
-      </div>
+      </contest-chart-detailed>
 
       <div padding>
         <div class="pointer contest-footer-text float-{{client.currentLanguage.align}}"
@@ -71,11 +41,11 @@
       <div text-center padding-top>
         <button secondary class="bar-button" (click)="share('button')">{{client.translate('SHARE')}}</button>
         <button secondary class="bar-button" (click)="like()">{{client.translate('LIKE')}}</button>
-        <button *ngIf="contest.state==='play'" secondary class="bar-button"
+        <button *ngIf="contest && contest.state==='play'" secondary class="bar-button"
                 (click)="switchTeams('button')">
           {{client.translate('SWITCH_TEAMS')}}
         </button>
-        <button *ngIf="contest.owner" secondary class="bar-button" (click)="editContest()">
+        <button *ngIf="contest && contest.owner" secondary class="bar-button" (click)="editContest()">
           {{client.translate('EDIT_CONTEST')}}
         </button>
 

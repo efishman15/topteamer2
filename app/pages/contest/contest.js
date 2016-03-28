@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_angular_1 = require('ionic-angular');
 var core_1 = require('angular2/core');
-var contest_chart_1 = require('../../components/contest-chart/contest-chart');
+var contest_chart_detailed_1 = require('../../components/contest-chart/detailed/contest-chart-detailed');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
 var quiz_1 = require('../../pages/quiz/quiz');
 var set_contest_1 = require('../../pages/set-contest/set-contest');
@@ -101,7 +101,7 @@ var ContestPage = (function () {
         });
     };
     ContestPage.prototype.refreshContest = function (contest) {
-        this.contestChartComponent.refresh(contest.chartControl);
+        this.contestChartDetailedComponent.refresh(contest.chartControl);
     };
     ContestPage.prototype.switchTeams = function (source) {
         this.joinContest(1 - this.contest.myTeam, source, 'switchTeams');
@@ -132,17 +132,20 @@ var ContestPage = (function () {
     };
     ContestPage.prototype.onContestSelected = function (data) {
         if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
-            this.playContest('chart');
+            this.playContest(data.source);
+        }
+        else {
+            alert('TBD - select team dialog');
         }
     };
     __decorate([
-        core_1.ViewChild(contest_chart_1.ContestChartComponent), 
-        __metadata('design:type', contest_chart_1.ContestChartComponent)
-    ], ContestPage.prototype, "contestChartComponent", void 0);
+        core_1.ViewChild(contest_chart_detailed_1.ContestChartDetailedComponent), 
+        __metadata('design:type', contest_chart_detailed_1.ContestChartDetailedComponent)
+    ], ContestPage.prototype, "contestChartDetailedComponent", void 0);
     ContestPage = __decorate([
         ionic_angular_1.Page({
             templateUrl: 'build/pages/contest/contest.html',
-            directives: [contest_chart_1.ContestChartComponent]
+            directives: [contest_chart_detailed_1.ContestChartDetailedComponent]
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], ContestPage);

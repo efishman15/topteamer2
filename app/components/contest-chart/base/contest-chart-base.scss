@@ -56,37 +56,3 @@
 .chart-end-time-rtl {
   left: 45px;
 }
-
-.contests-play-image-container {
-  transform: translateX(50%);
-  -moz-transform: translateX(50%);
-  -webkit-transform: translateX(50%);
-}
-
-.contests-play-image {
-  float: left;
-}
-
-.chart-bottom-ribbon {
-  padding-top: 5px;
-  background-color: #ffffff;
-  margin: 0px auto;
-  position: relative;
-}
-
-.chart-bottom-ribbon-text-wrapper {
-  width: 90%;
-  border-top: 2px solid #D6D6D6;
-  margin: 0px auto;
-  position: relative;
-}
-
-.chart-bottom-ribbon-participants-text {
-  padding-top: 2px;
-  color: #828282;
-}
-
-.chart-bottom-ribbon-participants-number {
-  color: #000000;
-  font-weight: bold;
-}

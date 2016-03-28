@@ -9,10 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('angular2/core');
-var client_1 = require('../../providers/client');
-var objects_1 = require('../../objects/objects');
-var ContestChartComponent = (function () {
-    function ContestChartComponent() {
+var client_1 = require('../../../providers/client');
+var objects_1 = require('../../../objects/objects');
+var ContestChartBaseComponent = (function () {
+    function ContestChartBaseComponent() {
         var _this = this;
         this.contestSelected = new core_1.EventEmitter();
         this.teamSelected = new core_1.EventEmitter();
@@ -22,7 +22,7 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected.emit({ 'teamId': teamId, 'source': 'bar', 'contest': _this.contest });
+                _this.onTeamSelected(teamId, 'bar');
                 _this.chartTeamEventHandled = true;
             },
             'dataLabelClick': function (eventObj, dataObj) {
@@ -30,25 +30,28 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected.emit({ 'teamId': teamId, 'source': 'label', 'contest': _this.contest });
+                _this.onTeamSelected(teamId, 'label');
                 _this.chartTeamEventHandled = true;
             },
             'chartClick': function (eventObj, dataObj) {
                 if (!_this.chartTeamEventHandled) {
-                    _this.selectContest();
+                    _this.onContestSelected('chart');
                 }
                 _this.chartTeamEventHandled = false;
             }
         };
         this.client = client_1.Client.getInstance();
     }
-    ContestChartComponent.prototype.selectContest = function () {
+    ContestChartBaseComponent.prototype.onContestSelected = function (source) {
         this.contestSelected.emit({ 'contest': this.contest });
     };
-    ContestChartComponent.prototype.ngOnInit = function () {
+    ContestChartBaseComponent.prototype.onTeamSelected = function (teamId, source) {
+        this.teamSelected.emit({ 'teamId': teamId, 'contest': this.contest, 'source': source });
+    };
+    ContestChartBaseComponent.prototype.ngOnInit = function () {
         this.initChart();
     };
-    ContestChartComponent.prototype.initChart = function () {
+    ContestChartBaseComponent.prototype.initChart = function () {
         var _this = this;
         if (!this.chart) {
             window.FusionCharts.ready(function () {
@@ -65,7 +68,7 @@ var ContestChartComponent = (function () {
             });
         }
     };
-    ContestChartComponent.prototype.refresh = function (chartControl) {
+    ContestChartBaseComponent.prototype.refresh = function (chartControl) {
         if (this.chart) {
             this.chart.setJSONData(chartControl);
         }
@@ -77,26 +80,26 @@ var ContestChartComponent = (function () {
     __decorate([
         core_1.Input(), 
         __metadata('design:type', Number)
-    ], ContestChartComponent.prototype, "id", void 0);
+    ], ContestChartBaseComponent.prototype, "id", void 0);
     __decorate([
         core_1.Input(), 
         __metadata('design:type', objects_1.Contest)
-    ], ContestChartComponent.prototype, "contest", void 0);
+    ], ContestChartBaseComponent.prototype, "contest", void 0);
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)
-    ], ContestChartComponent.prototype, "contestSelected", void 0);
+    ], ContestChartBaseComponent.prototype, "contestSelected", void 0);
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)
-    ], ContestChartComponent.prototype, "teamSelected", void 0);
-    ContestChartComponent = __decorate([
+    ], ContestChartBaseComponent.prototype, "teamSelected", void 0);
+    ContestChartBaseComponent = __decorate([
         core_1.Component({
-            selector: 'contest-chart',
-            templateUrl: 'build/components/contest-chart/contest-chart.html'
+            selector: 'contest-chart-base',
+            templateUrl: 'build/components/contest-chart/base/contest-chart-base.html'
         }), 
         __metadata('design:paramtypes', [])
-    ], ContestChartComponent);
-    return ContestChartComponent;
+    ], ContestChartBaseComponent);
+    return ContestChartBaseComponent;
 }());
-exports.ContestChartComponent = ContestChartComponent;
+exports.ContestChartBaseComponent = ContestChartBaseComponent;

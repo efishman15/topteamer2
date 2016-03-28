@@ -478,8 +478,18 @@ function setChartControl(contest, session) {
 
   contestChart.annotations.groups[0].items[0].text = contest.teams[teamsOrder[0]].name;
   contestChart.annotations.groups[0].items[0].x = '$dataset.0.set.' + teamsOrder[0] + '.centerX';
+
   contestChart.annotations.groups[0].items[1].text = contest.teams[teamsOrder[1]].name;
   contestChart.annotations.groups[0].items[1].x = '$dataset.0.set.' + teamsOrder[1] + '.centerX';
+
+  if (contest.myTeam === 0 || contest.myTeam === 1) {
+    var myTeamProperties = Object.keys(generalUtils.settings.client.charts.contest.myTeam[teamsOrder[contest.myTeam]]);
+    for(var i=0; i<myTeamProperties.length; i++)
+    {
+      //Apply all properties of "my team" to the label of my team
+      contestChart.annotations.groups[0].items[teamsOrder[contest.myTeam]][myTeamProperties[i]] = generalUtils.settings.client.charts.contest.myTeam[teamsOrder[contest.myTeam]][myTeamProperties[i]];
+    }
+  }
 
   contestChart.categories[0].category[0].label = (contest.teams[teamsOrder[0]].chartValue * 100) + '%';
   contestChart.categories[0].category[1].label = (contest.teams[teamsOrder[1]].chartValue * 100) + '%';

@@ -71,8 +71,10 @@ function getGeoInfo(data, callback) {
   }
 
   var options = {
-    'url': util.format(settings.server.geoIpLocators[data.geoLocator].url, data.ip)
+    'url': util.format(settings.server.geoIpLocators[data.geoLocator].url, data.ip),
+    'timeout': settings.server.geoIpLocators[data.geoLocator].timeout
   };
+
   httpUtils.get(options, function (err, result) {
     if (err) {
       if (data.geoLocator < settings.server.geoIpLocators.length - 1) {

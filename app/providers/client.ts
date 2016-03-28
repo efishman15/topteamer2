@@ -620,7 +620,12 @@ export class ServerGateway {
             resolve(res);
           },
           (err:Object) => {
-            reject(JSON.parse(err['_body']));
+            if (err['_body']) {
+              reject(JSON.parse(err['_body']));
+            }
+            else {
+              reject(err);
+            }
           }
         );
     });

@@ -1,6 +1,6 @@
 import {Page, NavParams,Modal} from 'ionic-angular';
 import {ViewChild} from 'angular2/core';
-import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
+import {ContestChartDetailedComponent} from '../../components/contest-chart/detailed/contest-chart-detailed';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
 import {SetContestPage} from '../../pages/set-contest/set-contest';
@@ -15,7 +15,7 @@ import {Contest,QuizResults} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [ContestChartComponent]
+  directives: [ContestChartDetailedComponent]
 })
 
 export class ContestPage {
@@ -27,7 +27,7 @@ export class ContestPage {
   animateLastResults:Boolean = false;
   contestId:String;
 
-  @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
+  @ViewChild(ContestChartDetailedComponent) contestChartDetailedComponent:ContestChartDetailedComponent;
 
   constructor(params:NavParams) {
 
@@ -122,7 +122,7 @@ export class ContestPage {
   }
 
   refreshContest(contest) {
-    this.contestChartComponent.refresh(contest.chartControl);
+    this.contestChartDetailedComponent.refresh(contest.chartControl);
   }
 
   switchTeams(source) {
@@ -159,7 +159,10 @@ export class ContestPage {
 
   onContestSelected(data) {
     if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
-      this.playContest('chart');
+      this.playContest(data.source);
+    }
+    else {
+      alert('TBD - select team dialog');
     }
   }
 }

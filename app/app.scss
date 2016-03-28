@@ -43,3 +43,41 @@
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
+
+
+.button-3d {
+  padding: 6px 20px;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -moz-transition: all .1s ease;
+  -webkit-transition: all .1s ease;
+  -o-transition: all .1s ease;
+  -ms-transition: all .1s ease;
+  transition: all .1s ease;
+  color: #ffffff !important;
+}
+
+.button-3d:hover {
+  color: #14396A !important;
+  background: #468CCF;
+  background: linear-gradient(top, #468CCF, #63B8EE);
+  background: -ms-linear-gradient(top, #468CCF, #63B8EE);
+  background: -webkit-gradient(linear, left top, left bottom, from(#468CCF), to(#63B8EE));
+  background: -moz-linear-gradient(top, #468CCF, #63B8EE);
+}
+
+.button-3d-assertive {
+  color: #FFFFFF !important;
+  box-shadow: 1px 1px 1px #BEE2F9;
+  -webkit-box-shadow: 1px 1px 1px #BEE2F9;
+  -moz-box-shadow: 1px 1px 1px #BEE2F9;
+  background: #EF473A;
+  background: linear-gradient(top, #EF473A, #A33028);
+  background: -ms-linear-gradient(top, #EF473A, #A33028);
+  background: -webkit-gradient(linear, left top, left bottom, from(#EF473A), to(#A33028));
+  background: -moz-linear-gradient(top, #EF473A, #A33028);
+  font-size: 14px;
+  font-family: "Helvetica Neue", "Roboto", "Segoe UI", sans-serif;
+}

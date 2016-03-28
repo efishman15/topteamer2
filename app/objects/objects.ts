@@ -263,6 +263,7 @@ export class Contest {
   totalParticipants:number;
   userQuestions:Array<string>;
   chartControl:any;
+  state: string;
 
   constructor(startDate:number, endDate:number, type:ContestType) {
     this.startDate = startDate;

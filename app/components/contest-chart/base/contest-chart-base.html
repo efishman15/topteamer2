@@ -1,0 +1,14 @@
+<div text-center class="chart-margin-top">
+  <div class="chart-top-ribbon" [ngStyle]="{'width': client.settings.charts.contest.topRibbonWidth + 'px'}">
+    <img src="../../images/ui/competition_top.png"
+         [ngStyle]="{'width': client.settings.charts.contest.topRibbonWidth + 'px'}">
+    <img src="../../images/ui/timer_icon.png" class="chart-timer chart-timer-{{client.currentLanguage.direction}}"
+         [ngStyle]="{'width': client.settings.charts.contest.timer.width + 'px'}">
+    <span class="chart-type-title chart-type-title-{{client.currentLanguage.direction}}">{{client.translate(contest.type.name)}}</span>
+    <span class="chart-end-time chart-end-time-{{client.currentLanguage.direction}}">{{contest.time.end.text}}</span>
+  </div>
+  <div text-center class="chart"
+    [ngStyle]="{'width': client.settings.charts.contest.size.width + 'px', 'height': client.settings.charts.contest.size.height + 'px'}"
+    id="{{id}}-container">
+  </div>
+</div>

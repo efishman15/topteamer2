@@ -9,24 +9,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('angular2/core');
-var contest_chart_1 = require('../contest-chart/contest-chart');
+var contest_chart_in_list_1 = require('../contest-chart/in-list/contest-chart-in-list');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestListComponent = (function () {
     function ContestListComponent() {
-        var _this = this;
         this.contestSelected = new core_1.EventEmitter();
         this.teamSelected = new core_1.EventEmitter();
-        this.events = {
-            'chartClick': function (eventObj, dataObj) {
-                _this.selectContest(eventObj.sender.args.dataSource.contest);
-            }
-        };
         this.client = client_1.Client.getInstance();
     }
-    ContestListComponent.prototype.selectContest = function (contest) {
-        this.contestSelected.emit(contest);
-    };
     ContestListComponent.prototype.refresh = function () {
         var _this = this;
         var postData = { 'tab': this.tab };
@@ -57,7 +48,7 @@ var ContestListComponent = (function () {
         core_1.Component({
             selector: 'contest-list',
             templateUrl: 'build/components/contest-list/contest-list.html',
-            directives: [contest_chart_1.ContestChartComponent],
+            directives: [contest_chart_in_list_1.ContestChartInListComponent],
         }), 
         __metadata('design:paramtypes', [])
     ], ContestListComponent);

@@ -548,7 +548,12 @@ var ServerGateway = (function () {
                 }
                 resolve(res);
             }, function (err) {
-                reject(JSON.parse(err['_body']));
+                if (err['_body']) {
+                    reject(JSON.parse(err['_body']));
+                }
+                else {
+                    reject(err);
+                }
             });
         });
     };

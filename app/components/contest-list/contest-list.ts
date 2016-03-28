@@ -1,12 +1,12 @@
 import {Component, Input, Output, EventEmitter} from 'angular2/core';
-import {ContestChartComponent} from '../contest-chart/contest-chart';
+import {ContestChartInListComponent} from '../contest-chart/in-list/contest-chart-in-list';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 
 @Component({
   selector: 'contest-list',
   templateUrl: 'build/components/contest-list/contest-list.html',
-  directives: [ContestChartComponent],
+  directives: [ContestChartInListComponent],
 })
 
 export class ContestListComponent {
@@ -16,18 +16,9 @@ export class ContestListComponent {
 
   contests:Array<Object>;
   client:Client;
-  events:Object = {
-    'chartClick': (eventObj, dataObj) => {
-      this.selectContest(eventObj.sender.args.dataSource.contest);
-    }
-  }
 
   constructor() {
     this.client = Client.getInstance();
-  }
-
-  selectContest(contest:Object) {
-    this.contestSelected.emit(contest);
   }
 
   refresh() {
