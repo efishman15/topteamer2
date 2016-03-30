@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_angular_1 = require('ionic-angular');
 var core_1 = require('angular2/core');
-var contest_chart_detailed_1 = require('../../components/contest-chart/detailed/contest-chart-detailed');
+var contest_chart_base_1 = require('../../components/contest-chart/base/contest-chart-base');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
 var quiz_1 = require('../../pages/quiz/quiz');
 var set_contest_1 = require('../../pages/set-contest/set-contest');
@@ -19,6 +19,7 @@ var like_1 = require('../../pages/like/like');
 var new_rank_1 = require('../../pages/new-rank/new-rank');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
+var alertService = require('../../providers/alert');
 var shareService = require('../../providers/share');
 var soundService = require('../../providers/sound');
 var ContestPage = (function () {
@@ -60,6 +61,9 @@ var ContestPage = (function () {
             _this.refreshContest(eventData[0]);
         });
     }
+    ContestPage.prototype.ngOnInit = function () {
+        this.setPlayText();
+    };
     ContestPage.prototype.onPageWillEnter = function () {
         this.client.logEvent('page/contest', { 'contestId': this.contestId });
     };
@@ -82,6 +86,9 @@ var ContestPage = (function () {
         var _this = this;
         if (action === void 0) { action = 'join'; }
         contestsService.join(this.contest._id, team).then(function (data) {
+            _this.contest = data.contest;
+            _this.refreshContest(data.contest);
+            _this.setPlayText();
             _this.client.logEvent('contest/' + action, {
                 'contestId': _this.contest._id,
                 'team': '' + _this.contest.myTeam,
@@ -92,16 +99,18 @@ var ContestPage = (function () {
             //Should get xp if fresh join
             if (data.xpProgress && data.xpProgress.addition > 0) {
                 _this.client.addXp(data.xpProgress).then(function () {
-                    var modal = ionic_angular_1.Modal.create(new_rank_1.NewRankPage, {
-                        'xpProgress': data.xpProgress
-                    });
-                    _this.client.nav.present(modal);
+                    if (data.xpProgress.rankChanged) {
+                        var modal = ionic_angular_1.Modal.create(new_rank_1.NewRankPage, {
+                            'xpProgress': data.xpProgress
+                        });
+                        _this.client.nav.present(modal);
+                    }
                 });
             }
         });
     };
     ContestPage.prototype.refreshContest = function (contest) {
-        this.contestChartDetailedComponent.refresh(contest.chartControl);
+        this.contestChartBaseComponent.refresh(contest.chartControl);
     };
     ContestPage.prototype.switchTeams = function (source) {
         this.joinContest(1 - this.contest.myTeam, source, 'switchTeams');
@@ -116,6 +125,16 @@ var ContestPage = (function () {
     ContestPage.prototype.like = function () {
         this.client.logEvent('contest/like/click', { 'contestId': this.contest._id });
         this.client.nav.push(like_1.LikePage, { 'contest': this.contest });
+    };
+    ContestPage.prototype.setPlayText = function () {
+        switch (this.contest.state) {
+            case 'play':
+                this.playText = this.client.translate('PLAY_FOR_TEAM', { 'team': this.contest.teams[this.contest.myTeam].name });
+                break;
+            case 'join':
+                this.playText = this.client.translate('PLAY_CONTEST');
+                break;
+        }
     };
     ContestPage.prototype.onTeamSelected = function (data) {
         if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
@@ -135,17 +154,17 @@ var ContestPage = (function () {
             this.playContest(data.source);
         }
         else {
-            alert('TBD - select team dialog');
+            alertService.alert({ 'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST' });
         }
     };
     __decorate([
-        core_1.ViewChild(contest_chart_detailed_1.ContestChartDetailedComponent), 
-        __metadata('design:type', contest_chart_detailed_1.ContestChartDetailedComponent)
-    ], ContestPage.prototype, "contestChartDetailedComponent", void 0);
+        core_1.ViewChild(contest_chart_base_1.ContestChartBaseComponent), 
+        __metadata('design:type', contest_chart_base_1.ContestChartBaseComponent)
+    ], ContestPage.prototype, "contestChartBaseComponent", void 0);
     ContestPage = __decorate([
         ionic_angular_1.Page({
             templateUrl: 'build/pages/contest/contest.html',
-            directives: [contest_chart_detailed_1.ContestChartDetailedComponent]
+            directives: [contest_chart_base_1.ContestChartBaseComponent]
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], ContestPage);

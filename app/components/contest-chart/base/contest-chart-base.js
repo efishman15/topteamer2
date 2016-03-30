@@ -43,7 +43,7 @@ var ContestChartBaseComponent = (function () {
         this.client = client_1.Client.getInstance();
     }
     ContestChartBaseComponent.prototype.onContestSelected = function (source) {
-        this.contestSelected.emit({ 'contest': this.contest });
+        this.contestSelected.emit({ 'contest': this.contest, 'source': source });
     };
     ContestChartBaseComponent.prototype.onTeamSelected = function (teamId, source) {
         this.teamSelected.emit({ 'teamId': teamId, 'contest': this.contest, 'source': source });

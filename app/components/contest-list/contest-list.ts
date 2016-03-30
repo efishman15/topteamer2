@@ -12,7 +12,6 @@ import * as contestsService from '../../providers/contests';
 export class ContestListComponent {
   @Input() tab:String;
   @Output() contestSelected = new EventEmitter();
-  @Output() teamSelected = new EventEmitter();
 
   contests:Array<Object>;
   client:Client;
@@ -29,11 +28,6 @@ export class ContestListComponent {
   }
 
   onContestSelected(data) {
-    this.contestSelected.emit(data);
-  }
-
-  onTeamSelected(data) {
-    //This is not a mistake - on chart lists - any click in any area should 'select' the entire contest
     this.contestSelected.emit(data);
   }
 

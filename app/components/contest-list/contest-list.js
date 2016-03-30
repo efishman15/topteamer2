@@ -15,7 +15,6 @@ var contestsService = require('../../providers/contests');
 var ContestListComponent = (function () {
     function ContestListComponent() {
         this.contestSelected = new core_1.EventEmitter();
-        this.teamSelected = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
     }
     ContestListComponent.prototype.refresh = function () {
@@ -28,10 +27,6 @@ var ContestListComponent = (function () {
     ContestListComponent.prototype.onContestSelected = function (data) {
         this.contestSelected.emit(data);
     };
-    ContestListComponent.prototype.onTeamSelected = function (data) {
-        //This is not a mistake - on chart lists - any click in any area should 'select' the entire contest
-        this.contestSelected.emit(data);
-    };
     __decorate([
         core_1.Input(), 
         __metadata('design:type', String)
@@ -40,10 +35,6 @@ var ContestListComponent = (function () {
         core_1.Output(), 
         __metadata('design:type', Object)
     ], ContestListComponent.prototype, "contestSelected", void 0);
-    __decorate([
-        core_1.Output(), 
-        __metadata('design:type', Object)
-    ], ContestListComponent.prototype, "teamSelected", void 0);
     ContestListComponent = __decorate([
         core_1.Component({
             selector: 'contest-list',

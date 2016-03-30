@@ -1,6 +1,6 @@
 import {Page, NavParams,Modal} from 'ionic-angular';
 import {ViewChild} from 'angular2/core';
-import {ContestChartDetailedComponent} from '../../components/contest-chart/detailed/contest-chart-detailed';
+import {ContestChartBaseComponent} from '../../components/contest-chart/base/contest-chart-base';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
 import {SetContestPage} from '../../pages/set-contest/set-contest';
@@ -9,13 +9,14 @@ import {LikePage} from '../../pages/like/like';
 import {NewRankPage} from '../../pages/new-rank/new-rank'
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
+import * as alertService from '../../providers/alert';
 import * as shareService from '../../providers/share';
 import * as soundService from '../../providers/sound';
 import {Contest,QuizResults} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [ContestChartDetailedComponent]
+  directives: [ContestChartBaseComponent]
 })
 
 export class ContestPage {
@@ -26,8 +27,9 @@ export class ContestPage {
   lastQuizResults:QuizResults = null;
   animateLastResults:Boolean = false;
   contestId:String;
+  playText: string;
 
-  @ViewChild(ContestChartDetailedComponent) contestChartDetailedComponent:ContestChartDetailedComponent;
+  @ViewChild(ContestChartBaseComponent) contestChartBaseComponent:ContestChartBaseComponent;
 
   constructor(params:NavParams) {
 
@@ -74,6 +76,10 @@ export class ContestPage {
     });
   }
 
+  ngOnInit() {
+    this.setPlayText();
+  }
+
   onPageWillEnter() {
     this.client.logEvent('page/contest',{'contestId' : this.contestId});
   }
@@ -100,6 +106,10 @@ export class ContestPage {
 
     contestsService.join(this.contest._id, team).then((data) => {
 
+      this.contest = data.contest;
+      this.refreshContest(data.contest);
+      this.setPlayText();
+
       this.client.logEvent('contest/' + action, {
         'contestId': this.contest._id,
         'team': '' + this.contest.myTeam,
@@ -112,17 +122,19 @@ export class ContestPage {
       //Should get xp if fresh join
       if (data.xpProgress && data.xpProgress.addition > 0) {
         this.client.addXp(data.xpProgress).then(() => {
-          var modal = Modal.create(NewRankPage, {
-            'xpProgress': data.xpProgress
-          });
-          this.client.nav.present(modal);
+          if (data.xpProgress.rankChanged) {
+            var modal = Modal.create(NewRankPage, {
+              'xpProgress': data.xpProgress
+            });
+            this.client.nav.present(modal);
+          }
         })
       }
     });
   }
 
   refreshContest(contest) {
-    this.contestChartDetailedComponent.refresh(contest.chartControl);
+    this.contestChartBaseComponent.refresh(contest.chartControl);
   }
 
   switchTeams(source) {
@@ -141,6 +153,17 @@ export class ContestPage {
   like() {
     this.client.logEvent('contest/like/click', {'contestId' : this.contest._id});
     this.client.nav.push(LikePage, {'contest': this.contest});
+  }
+
+  setPlayText() {
+    switch (this.contest.state) {
+      case 'play':
+        this.playText = this.client.translate('PLAY_FOR_TEAM',{'team': this.contest.teams[this.contest.myTeam].name});
+        break;
+      case 'join':
+        this.playText = this.client.translate('PLAY_CONTEST');
+        break;
+    }
   }
 
   onTeamSelected(data) {
@@ -162,7 +185,7 @@ export class ContestPage {
       this.playContest(data.source);
     }
     else {
-      alert('TBD - select team dialog');
+      alertService.alert({'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST'});
     }
   }
 }

@@ -49,7 +49,7 @@ export class ContestChartBaseComponent {
   }
 
   onContestSelected(source: string) {
-    this.contestSelected.emit({'contest': this.contest})
+    this.contestSelected.emit({'contest': this.contest, 'source': source});
   }
 
   onTeamSelected(teamId: number, source: string) {

@@ -1,5 +1,4 @@
 <contest-chart-in-list *ngFor="#contest of contests, #i = index" id="{{tab}}-{{contest._id}}"
                [(contest)]="contests[i]"
-               (contestSelected)="onContestSelected($event)"
-               (teamSelected)="onTeamSelected($event)">
+               (contestSelected)="onContestSelected($event)">
 </contest-chart-in-list>
