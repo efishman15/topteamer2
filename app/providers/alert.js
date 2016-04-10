@@ -68,3 +68,4 @@ exports.confirmExitApp = function () {
         client.platform.exitApp();
     });
 };
+//# sourceMappingURL=alert.js.map

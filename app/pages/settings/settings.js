@@ -49,3 +49,4 @@ var SettingsPage = (function () {
     return SettingsPage;
 }());
 exports.SettingsPage = SettingsPage;
+//# sourceMappingURL=settings.js.map

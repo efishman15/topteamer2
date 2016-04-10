@@ -40,3 +40,4 @@ var SharePage = (function () {
     return SharePage;
 }());
 exports.SharePage = SharePage;
+//# sourceMappingURL=share.js.map

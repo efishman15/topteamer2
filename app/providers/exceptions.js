@@ -24,3 +24,4 @@ var MyExceptionHandler = (function (_super) {
     return MyExceptionHandler;
 }(core_1.ExceptionHandler));
 exports.MyExceptionHandler = MyExceptionHandler;
+//# sourceMappingURL=exceptions.js.map

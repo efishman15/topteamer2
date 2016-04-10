@@ -66,3 +66,4 @@ var MainTabsPage = (function () {
     return MainTabsPage;
 }());
 exports.MainTabsPage = MainTabsPage;
+//# sourceMappingURL=main-tabs.js.map

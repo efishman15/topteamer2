@@ -29,3 +29,4 @@ exports.contest = function (contestId, teamId) {
     var client = client_1.Client.getInstance();
     return client.serverPost('leaderboard/contest', postData);
 };
+//# sourceMappingURL=leaderboards.js.map

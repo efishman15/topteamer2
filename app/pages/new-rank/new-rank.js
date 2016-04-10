@@ -35,3 +35,4 @@ var NewRankPage = (function () {
     return NewRankPage;
 }());
 exports.NewRankPage = NewRankPage;
+//# sourceMappingURL=new-rank.js.map

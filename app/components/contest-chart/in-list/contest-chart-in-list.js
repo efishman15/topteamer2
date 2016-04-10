@@ -31,3 +31,4 @@ var ContestChartInListComponent = (function (_super) {
     return ContestChartInListComponent;
 }(contest_chart_base_1.ContestChartBaseComponent));
 exports.ContestChartInListComponent = ContestChartInListComponent;
+//# sourceMappingURL=contest-chart-in-list.js.map

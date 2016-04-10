@@ -1,0 +1,66 @@
+// http://ionicframework.com/docs/v2/theming/
+
+
+// App Shared Imports
+// --------------------------------------------------
+// These are the imports which make up the design of this app.
+// By default each design mode includes these shared imports.
+// App Shared Sass variables belong in app.variables.scss.
+
+@import "app";
+
+@import "../components/contest-chart/base/contest-chart-base";
+
+@import "../components/contest-chart/in-list/contest-chart-in-list";
+
+@import "../components/contest-list/contest-list";
+
+@import "../components/date-picker/date-picker";
+
+@import "../components/leaders/leaders";
+
+@import "../components/simple-tabs/simple-tabs";
+
+@import "../components/simple-tab/simple-tab";
+
+@import "../pages/contest/contest";
+
+@import "../pages/contest-participants/contest-participants";
+
+@import "../pages/contest-type/contest-type";
+
+@import "../pages/facebook-post/facebook-post";
+
+@import "../pages/leaderboards/leaderboards";
+
+@import "../pages/like/like";
+
+@import "../pages/login/login";
+
+@import "../pages/main-tabs/main-tabs";
+
+@import "../pages/mobile-share/mobile-share";
+
+@import "../pages/my-contests/my-contests";
+
+@import "../pages/new-rank/new-rank";
+
+@import "../pages/question-editor/question-editor";
+
+@import "../pages/question-stats/question-stats";
+
+@import "../pages/quiz/quiz";
+
+@import "../pages/running-contests/running-contests";
+
+@import "../pages/server-popup/server-popup";
+
+@import "../pages/search-questions/search-questions";
+
+@import "../pages/set-contest/set-contest";
+
+@import "../pages/settings/settings";
+
+@import "../pages/share/share";
+
+@import "../pages/system-tools/system-tools";

@@ -68,3 +68,4 @@ exports.share = function (source, contest) {
         client.nav.push(share_1.SharePage, { 'contest': contest });
     }
 };
+//# sourceMappingURL=share.js.map

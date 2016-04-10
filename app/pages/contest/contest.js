@@ -171,3 +171,4 @@ var ContestPage = (function () {
     return ContestPage;
 }());
 exports.ContestPage = ContestPage;
+//# sourceMappingURL=contest.js.map

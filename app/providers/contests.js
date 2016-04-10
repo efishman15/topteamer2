@@ -70,3 +70,4 @@ exports.getQuestions = function (userQuestions) {
     var client = client_1.Client.getInstance();
     return client.serverPost('contests/getQuestions', postData);
 };
+//# sourceMappingURL=contests.js.map

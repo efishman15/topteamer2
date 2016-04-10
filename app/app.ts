@@ -189,7 +189,7 @@ class topTeamerApp {
     //Give the appropriate mobile/web branch js file time to load
     setTimeout(() => {
       window.initBranch();
-    },1000)
+    },2000)
   }
 
   initFacebook() {

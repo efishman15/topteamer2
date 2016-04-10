@@ -37,3 +37,4 @@ exports.setQuestionByAdmin = function (question) {
     var client = client_1.Client.getInstance();
     return client.serverPost('quiz/setQuestionByAdmin', postData);
 };
+//# sourceMappingURL=quiz.js.map

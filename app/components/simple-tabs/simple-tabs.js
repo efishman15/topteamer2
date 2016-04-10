@@ -43,3 +43,4 @@ var SimpleTabsComponent = (function () {
     return SimpleTabsComponent;
 }());
 exports.SimpleTabsComponent = SimpleTabsComponent;
+//# sourceMappingURL=simple-tabs.js.map

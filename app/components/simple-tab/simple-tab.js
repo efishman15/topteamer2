@@ -48,3 +48,4 @@ var SimpleTabComponent = (function () {
     return SimpleTabComponent;
 }());
 exports.SimpleTabComponent = SimpleTabComponent;
+//# sourceMappingURL=simple-tab.js.map

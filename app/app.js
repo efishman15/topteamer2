@@ -154,7 +154,7 @@ var topTeamerApp = (function () {
         //Give the appropriate mobile/web branch js file time to load
         setTimeout(function () {
             window.initBranch();
-        }, 1000);
+        }, 2000);
     };
     topTeamerApp.prototype.initFacebook = function () {
         var _this = this;
@@ -266,3 +266,4 @@ var topTeamerApp = (function () {
     ], topTeamerApp);
     return topTeamerApp;
 }());
+//# sourceMappingURL=app.js.map

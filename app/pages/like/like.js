@@ -33,3 +33,4 @@ var LikePage = (function () {
     return LikePage;
 }());
 exports.LikePage = LikePage;
+//# sourceMappingURL=like.js.map

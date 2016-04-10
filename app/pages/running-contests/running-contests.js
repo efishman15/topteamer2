@@ -46,3 +46,4 @@ var RunningContestsPage = (function () {
     return RunningContestsPage;
 }());
 exports.RunningContestsPage = RunningContestsPage;
+//# sourceMappingURL=running-contests.js.map

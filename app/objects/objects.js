@@ -308,3 +308,4 @@ var ShareVariables = (function () {
     return ShareVariables;
 }());
 exports.ShareVariables = ShareVariables;
+//# sourceMappingURL=objects.js.map

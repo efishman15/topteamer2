@@ -19,10 +19,13 @@ var DatePickerComponent = (function () {
     DatePickerComponent.prototype.ngOnInit = function () {
         this.hideCalendar = true;
         //Setting the input date for the date picker
-        if (!this.currentDate) {
-            this.currentDate = new Date();
-            this.currentDate.clearTime();
+        if (this.currentDateEpoch) {
+            this.currentDate = new Date(this.currentDateEpoch);
         }
+        else {
+            this.currentDate = new Date();
+        }
+        this.currentDate.clearTime();
         this.displayedYear = this.currentDate.getFullYear();
         this.displayedMonth = this.currentDate.getMonth();
         this.monthsList = this.client.translate('DATE_PICKER_MONTH_NAMES');
@@ -82,7 +85,6 @@ var DatePickerComponent = (function () {
         var firstDayOfTheCalendar = new Date(firstDateOfTheMonth.getFullYear(), firstDateOfTheMonth.getMonth(), firstDateOfTheMonth.getDate() - daysOffsetStart);
         var totalDays = this.rows.length * this.cols.length;
         this.calendar = [];
-        var currentEpoch = this.currentDate.getTime();
         var today = new Date();
         today.clearTime();
         var todayEpoch = today.getTime();
@@ -100,7 +102,7 @@ var DatePickerComponent = (function () {
                 epochUTC: (cellDate.getTime() + (cellDate.getTimezoneOffset() * 60 * 1000)),
                 inMonth: (epochLocal >= firstDateOfTheMonth.getTime() && epochLocal <= lastDateOfTheMonth.getTime()),
                 disabled: ((this.minEpochLocal && epochLocal < this.minEpochLocal) || (this.maxEpochLocal && epochLocal > this.maxEpochLocal)),
-                selected: (epochLocal === currentEpoch),
+                selected: (epochLocal === this.currentDateEpoch),
                 today: (epochLocal === todayEpoch)
             });
         }
@@ -112,6 +114,7 @@ var DatePickerComponent = (function () {
         var cell = this.getCell(row, col);
         if (!cell.disabled) {
             this.currentDate = cell.dateObject;
+            this.currentDateEpoch = this.currentDate.getTime();
             this.formatSelectedDate();
             this.hideCalendar = true;
             this.dateSelected.emit(cell);
@@ -122,12 +125,12 @@ var DatePickerComponent = (function () {
     };
     DatePickerComponent.prototype.setDateLimits = function () {
         if (this.minDate) {
-            var minDate = new Date(this.minDate.getTime());
+            var minDate = new Date(this.minDate);
             minDate.clearTime();
             this.minEpochLocal = minDate.getTime();
         }
         if (this.maxDate) {
-            var maxDate = new Date(this.maxDate.getTime());
+            var maxDate = new Date(this.maxDate);
             maxDate.clearTime();
             //Another 24 hours to count all the hours in the max date including up to midnight (23:59:59.999)
             this.maxEpochLocal = maxDate.getTime() + 24 * 60 * 60 * 1000;
@@ -135,15 +138,15 @@ var DatePickerComponent = (function () {
     };
     __decorate([
         core_1.Input(), 
-        __metadata('design:type', Date)
-    ], DatePickerComponent.prototype, "currentDate", void 0);
+        __metadata('design:type', Number)
+    ], DatePickerComponent.prototype, "currentDateEpoch", void 0);
     __decorate([
         core_1.Input(), 
-        __metadata('design:type', Date)
+        __metadata('design:type', Number)
     ], DatePickerComponent.prototype, "minDate", void 0);
     __decorate([
         core_1.Input(), 
-        __metadata('design:type', Date)
+        __metadata('design:type', Number)
     ], DatePickerComponent.prototype, "maxDate", void 0);
     __decorate([
         core_1.Input(), 
@@ -164,3 +167,4 @@ var DatePickerComponent = (function () {
     return DatePickerComponent;
 }());
 exports.DatePickerComponent = DatePickerComponent;
+//# sourceMappingURL=date-picker.js.map

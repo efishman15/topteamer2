@@ -6,14 +6,16 @@
     "rootDir": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": false,
     "sourceRoot": "",
     "inlineSourceMap": false,
-    "inlineSources": false
+    "inlineSources": false,
+    "noImplicitAny": false,
+    "sourceMap": true
+
   },
   "files": [
-    "node_modules/angular2/typings/es6-collections/es6-collections.d.ts",
-    "node_modules/angular2/typings/es6-promise/es6-promise.d.ts",
+    "app/interfaces/interfaces.d.ts",
+    "app/objects/objects.ts",
     "app/app.ts",
     "app/components/contest-chart/base/contest-chart-base.ts",
     "app/components/contest-chart/in-list/contest-chart-in-list.ts",
@@ -24,8 +26,6 @@
     "app/components/simple-tab/simple-tab.ts",
     "app/directives/animation-listener/animation-listener.ts",
     "app/directives/transition-listener/transition-listener.ts",
-    "app/interfaces/interfaces.d.ts",
-    "app/objects/objects.ts",
     "app/pages/contest/contest.ts",
     "app/pages/contest-participants/contest-participants.ts",
     "app/pages/contest-type/contest-type.ts",
@@ -55,10 +55,12 @@
     "app/providers/facebook.ts",
     "app/providers/payments.ts",
     "app/providers/share.ts",
-    "app/providers/sound.ts"
+    "app/providers/sound.ts",
+    "typings/main.d.ts"
   ],
   "exclude": [
-    "node_modules/*"
+    "node_modules/*",
+    "typings/browser.d.ts"
   ],
   "compileOnSave": false
 }

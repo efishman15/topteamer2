@@ -475,18 +475,18 @@ debugger;
 
   //TODO: validate startDate<endDate
   startDateSelected(dateSelection) {
-    if (dateSelection.dateObject > this.contestLocalCopy.endDate) {
+    if (dateSelection.epochLocal > this.contestLocalCopy.endDate) {
       return false;
     }
-    this.contestLocalCopy.startDate = dateSelection.dateObject;
+    this.contestLocalCopy.startDate = dateSelection.epochLocal;
     return true;
   }
 
   endDateSelected(dateSelection) {
-    if (dateSelection.dateObject < this.contestLocalCopy.startDate) {
+    if (dateSelection.epochLocal < this.contestLocalCopy.startDate) {
       return false;
     }
-    this.contestLocalCopy.endDate = dateSelection.dateObject;
+    this.contestLocalCopy.endDate = dateSelection.epochLocal;
     return true;
   }
 

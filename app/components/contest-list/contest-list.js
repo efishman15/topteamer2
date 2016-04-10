@@ -46,3 +46,4 @@ var ContestListComponent = (function () {
     return ContestListComponent;
 }());
 exports.ContestListComponent = ContestListComponent;
+//# sourceMappingURL=contest-list.js.map

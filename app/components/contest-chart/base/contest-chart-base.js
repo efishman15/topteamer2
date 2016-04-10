@@ -103,3 +103,4 @@ var ContestChartBaseComponent = (function () {
     return ContestChartBaseComponent;
 }());
 exports.ContestChartBaseComponent = ContestChartBaseComponent;
+//# sourceMappingURL=contest-chart-base.js.map

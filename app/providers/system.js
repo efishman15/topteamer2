@@ -14,3 +14,4 @@ exports.restart = function () {
     var client = client_1.Client.getInstance();
     return client.serverPost('system/restart');
 };
+//# sourceMappingURL=system.js.map

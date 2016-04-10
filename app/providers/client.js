@@ -604,3 +604,4 @@ var InternalEvent = (function () {
     return InternalEvent;
 }());
 exports.InternalEvent = InternalEvent;
+//# sourceMappingURL=client.js.map

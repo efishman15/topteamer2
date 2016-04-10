@@ -123,3 +123,13 @@
 .contest-leader-more {
   padding-top: 16px;
 }
+
+.bottom-like {
+  width: 54px;
+  height: 40px;
+  background: url('../../images/ui/bottom_bar_like_default.png') bottom;
+}
+
+.bottom-like:hover {
+  background: url('../../images/ui/bottom_bar_like_clicked.png') bottom;
+}

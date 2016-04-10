@@ -31,3 +31,4 @@ var ContestTypePage = (function () {
     return ContestTypePage;
 }());
 exports.ContestTypePage = ContestTypePage;
+//# sourceMappingURL=contest-type.js.map

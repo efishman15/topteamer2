@@ -71,3 +71,4 @@ var ContestParticipantsPage = (function () {
     return ContestParticipantsPage;
 }());
 exports.ContestParticipantsPage = ContestParticipantsPage;
+//# sourceMappingURL=contest-participants.js.map

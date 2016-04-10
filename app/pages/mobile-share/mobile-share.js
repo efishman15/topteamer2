@@ -38,3 +38,4 @@ var MobileSharePage = (function () {
     return MobileSharePage;
 }());
 exports.MobileSharePage = MobileSharePage;
+//# sourceMappingURL=mobile-share.js.map

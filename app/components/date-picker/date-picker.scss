@@ -11,7 +11,12 @@
 }
 
 .calendar-month-year {
-  width: 120px;
+  white-space: nowrap;
+  width: 110px;
+}
+
+.calendar-button {
+  width: 24px !important;
 }
 
 .calendar-week-days {

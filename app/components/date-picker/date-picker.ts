@@ -12,13 +12,14 @@ import {CalendarCell} from '../../objects/objects';
 
 export class DatePickerComponent {
 
-  @Input() currentDate:Date;
-  @Input() minDate:Date;
-  @Input() maxDate:Date;
+  @Input() currentDateEpoch:number;
+  @Input() minDate:number;
+  @Input() maxDate:number;
   @Input() currentDateClass:String;
   @Output() dateSelected = new EventEmitter();
 
   client:Client;
+  currentDate:Date;
   hideCalendar:boolean;
   displayedYear:number;
   displayedMonth:number;
@@ -40,10 +41,13 @@ export class DatePickerComponent {
     this.hideCalendar = true;
 
     //Setting the input date for the date picker
-    if (!this.currentDate) {
-      this.currentDate = new Date();
-      this.currentDate.clearTime();
+    if (this.currentDateEpoch) {
+      this.currentDate = new Date(this.currentDateEpoch);
     }
+    else {
+      this.currentDate = new Date();
+    }
+    this.currentDate.clearTime();
 
     this.displayedYear = this.currentDate.getFullYear();
     this.displayedMonth = this.currentDate.getMonth();
@@ -113,7 +117,6 @@ export class DatePickerComponent {
 
     this.calendar = [];
 
-    var currentEpoch = this.currentDate.getTime();
     var today = new Date();
     today.clearTime();
     var todayEpoch = today.getTime();
@@ -133,7 +136,7 @@ export class DatePickerComponent {
         epochUTC: (cellDate.getTime() + (cellDate.getTimezoneOffset() * 60 * 1000)),
         inMonth: (epochLocal >= firstDateOfTheMonth.getTime() && epochLocal <= lastDateOfTheMonth.getTime()),
         disabled: ( (this.minEpochLocal && epochLocal < this.minEpochLocal) || (this.maxEpochLocal && epochLocal > this.maxEpochLocal) ),
-        selected: (epochLocal === currentEpoch),
+        selected: (epochLocal === this.currentDateEpoch),
         today: (epochLocal === todayEpoch)
       });
     }
@@ -147,6 +150,7 @@ export class DatePickerComponent {
     var cell = this.getCell(row, col);
     if (!cell.disabled) {
       this.currentDate = cell.dateObject;
+      this.currentDateEpoch = this.currentDate.getTime();
       this.formatSelectedDate();
       this.hideCalendar = true;
       this.dateSelected.emit(cell);
@@ -159,13 +163,13 @@ export class DatePickerComponent {
 
   setDateLimits() {
     if (this.minDate) {
-      var minDate = new Date(this.minDate.getTime());
+      var minDate = new Date(this.minDate);
       minDate.clearTime();
       this.minEpochLocal = minDate.getTime();
     }
 
     if (this.maxDate) {
-      var maxDate = new Date(this.maxDate.getTime());
+      var maxDate = new Date(this.maxDate);
       maxDate.clearTime();
       //Another 24 hours to count all the hours in the max date including up to midnight (23:59:59.999)
       this.maxEpochLocal = maxDate.getTime() + 24 * 60 * 60 * 1000;

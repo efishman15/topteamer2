@@ -92,3 +92,4 @@ exports.processPayment = function (method, purchaseData, extraPurchaseData) { re
         }
     });
 }); };
+//# sourceMappingURL=payments.js.map

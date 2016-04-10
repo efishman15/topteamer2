@@ -42,3 +42,4 @@ var FacebookPostPage = (function () {
     return FacebookPostPage;
 }());
 exports.FacebookPostPage = FacebookPostPage;
+//# sourceMappingURL=facebook-post.js.map
