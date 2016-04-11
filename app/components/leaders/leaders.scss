@@ -1,20 +1,46 @@
+.leaders-item-wrapper {
+  background-color: white;
+  border-radius: 15px;
+  width: 90%;
+  margin: 10px auto;
+}
+
 .full-width {
   width: 100%;
 }
 
 .contest-leader-background {
   border-color: #28a54c;
-  background-color: #2a5a7c;
-  background: linear-gradient(top, #2a5a7c, #bcd9ef);
-  background: -ms-linear-gradient(top, #2a5a7c, #bcd9ef);
-  background: -webkit-gradient(linear, left top, left bottom, from(#2a5a7c), to(#bcd9ef));
-  background: -moz-linear-gradient(top, #2a5a7c, #bcd9ef);
+  background-color: #ffffff;
 }
 
 .leader-row1 {
-  color: #e0e3e5 !important;
+  color: #00698b !important;
+  font-weight: bolder !important;
 }
 
 .leader-row2 {
-  color: #383838 !important;
+  color: #000000 !important;
+  font-weight: bolder !important;
+}
+
+.leader-rank {
+  margin-top: 15px;
+  font-weight: bolder !important;
+}
+
+.leader-rank-1 {
+  color: #2eabe1;
+}
+
+.leader-rank-2 {
+  color: #1795be;
+}
+
+.leader-rank-3 {
+  color: #0f759b;
+}
+
+.leader-rank-4-and-above {
+  color: #666666
 }

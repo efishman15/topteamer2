@@ -188,10 +188,16 @@ function validateContestData(data, callback) {
       return;
     }
 
+    //Contest types are organized in rows and cols (for ui display) - array of arrays
     var illegalContestTypeId = true;
     for(var i=0; i<generalUtils.settings.client.newContest.contestTypes.length; i++) {
-      if (generalUtils.settings.client.newContest.contestTypes[i].id === data.contest.type.id) {
-        illegalContestTypeId = false;
+      for(var j=0; j<generalUtils.settings.client.newContest.contestTypes[i].length; j++) {
+        if (generalUtils.settings.client.newContest.contestTypes[i][j].id === data.contest.type.id) {
+          illegalContestTypeId = false;
+          break;
+        }
+      }
+      if (!illegalContestTypeId) {
         break;
       }
     }
@@ -491,8 +497,8 @@ function setChartControl(contest, session) {
     }
   }
 
-  contestChart.categories[0].category[0].label = (contest.teams[teamsOrder[0]].chartValue * 100) + '%';
-  contestChart.categories[0].category[1].label = (contest.teams[teamsOrder[1]].chartValue * 100) + '%';
+  contestChart.categories[0].category[0].label = mathjs.round(contest.teams[teamsOrder[0]].chartValue * 100,0) + '%';
+  contestChart.categories[0].category[1].label = mathjs.round(contest.teams[teamsOrder[1]].chartValue * 100,0) + '%';
 
   var netChartHeight = 1 - (generalUtils.settings.client.charts.contest.topMarginPercent/100);
 

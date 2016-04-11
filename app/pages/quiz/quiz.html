@@ -6,7 +6,7 @@
 
 </ion-navbar>
 
-<ion-content>
+<ion-content class="app-bg">
 
   <canvas id="quizCanvas" height="{{client.settings.quiz.canvas.height}}" class="quiz-canvas"
           (click)="canvasClick($event)" [ngStyle]="{'height': client.settings.quiz.canvas.height + 'px'}">
@@ -19,7 +19,7 @@
                         'bounceInRight' : quizData.currentQuestion.doAnimation && client.currentLanguage.direction==='rtl'}"
        (transitionEnd)="questionTransitionEnd($event)">
 
-    <div class="question-text"
+    <div class="question-text" padding text-center
          [ngClass]="{'pointer' : client.session.isAdmin}"
          (click)="client.session.isAdmin && openQuestionEditor()"
          [innerHtml]="quizData.currentQuestion.text">

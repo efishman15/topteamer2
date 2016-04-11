@@ -158,7 +158,7 @@ export class SetContestPage {
   getTitle() {
     switch (this.params.data.mode) {
       case 'add':
-        return this.client.translate('NEW_CONTEST');
+        return this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.params.data.type.text.name);
 
       case 'edit':
         return this.client.translate('EDIT_CONTEST');

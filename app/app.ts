@@ -179,17 +179,26 @@ class topTeamerApp {
     }
 
     window.initBranch = () => {
+      if (window.branch) {
         window.branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', (err, data) => {
           if (window.myHandleBranch) {
             window.myHandleBranch(err, data);
           }
         });
       }
+      else {
+        console.log('branch script not loaded - retrying in 2000 ms.');
+        setTimeout(() => {
+          window.initBranch();
+        },2000)
+      }
+    }
 
     //Give the appropriate mobile/web branch js file time to load
     setTimeout(() => {
       window.initBranch();
     },2000)
+
   }
 
   initFacebook() {

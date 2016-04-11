@@ -145,11 +145,19 @@ var topTeamerApp = (function () {
             }
         };
         window.initBranch = function () {
-            window.branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
-                if (window.myHandleBranch) {
-                    window.myHandleBranch(err, data);
-                }
-            });
+            if (window.branch) {
+                window.branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
+                    if (window.myHandleBranch) {
+                        window.myHandleBranch(err, data);
+                    }
+                });
+            }
+            else {
+                console.log('branch script not loaded - retrying in 2000 ms.');
+                setTimeout(function () {
+                    window.initBranch();
+                }, 2000);
+            }
         };
         //Give the appropriate mobile/web branch js file time to load
         setTimeout(function () {

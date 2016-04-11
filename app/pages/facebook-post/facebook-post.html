@@ -12,29 +12,28 @@
 
 </ion-toolbar>
 
-<ion-content dir="{{client.currentLanguage.direction}}">
+<ion-content class="app-bg" dir="{{client.currentLanguage.direction}}">
 
-  <div text-center>
+  <div padding-top text-center>
+
+    <div padding-top class="long-animated {{quizResults.data.animation}}">
+      <div class="post-story-row-1">{{client.translate(quizResults.data.clientKey + '_TITLE')}}</div>
+      <div padding-top padding-bottom class="post-story-row-2">{{client.translate(quizResults.data.clientKey + '_MESSAGE', quizResults.data.clientValues) }}</div>
+    </div>
+
     <img *ngIf="quizResults.data.facebookPost.dialogImage"
          src="{{quizResults.data.facebookPost.dialogImage.url}}"
          width="{{quizResults.data.facebookPost.dialogImage.width}}"
          height="{{quizResults.data.facebookPost.dialogImage.height}}">
 
-    <div class="center long-animated {{quizResults.data.animation}}">
-      <h4>{{client.translate(quizResults.data.clientKey + '_TITLE')}}</h4>
-      <h5>{{client.translate(quizResults.data.clientKey + '_MESSAGE', quizResults.data.clientValues) }}</h5>
+    <div padding-top padding-bottom text-center>
+      <button class="button-facebook-share" (click)="post()">{{client.translate('FACEBOOK_POST_TITLE')}}
+      </button>
     </div>
-  </div>
 
-  <div padding>
-  </div>
+    <div padding-top text-center class="pointer button-not-now" (click)="close()">{{client.translate('NOT_NOW')}}
+    </div>
 
-  <div text-center padding class="button-bar">
-    <button padding class="button button-bar button-facebook" (click)="post()">{{client.translate('SHARE')}}
-    </button>
-    <button padding class="button button-bar button-clear"
-            (click)="close()">{{client.translate('NOT_NOW')}}
-    </button>
   </div>
 
 </ion-content>

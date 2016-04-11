@@ -1,7 +1,31 @@
+.simple-tabs-wrapper {
+  width: 90%;
+  border-bottom: 5px solid #0288d8;
+  margin: 0px auto;
+}
+
 .active-tab {
-  background-color: red;
+  background-color: #0288d8;
+  color: #f1f8fc;
 }
 
 .passive-tab {
-  background-color: transparent;
+  background-color: #d9edf9;
+  color: #4d89af;
+}
+
+.simple-tab-common {
+  height: 40px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  margin: 0px auto;
+  cursor: pointer;
+}
+
+.simple-tab-common-text {
+  font-weight: bold;
+  font-size: 18px;
+  transform: translateY(50%);
+  -moz-transform: translateY(50%);
+  -webkit-transform: translateY(50%);
 }

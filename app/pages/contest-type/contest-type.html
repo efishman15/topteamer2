@@ -7,21 +7,30 @@
   </ion-buttons>
 
   <ion-title>
-    {{client.translate('SELECT_CONTEST_TYPE')}}
+    {{client.translate('NEW_CONTEST')}}
   </ion-title>
 
 </ion-toolbar>
 
-  <ion-content dir="{{client.currentLanguage.direction}}">
+<ion-content class="app-bg" dir="{{client.currentLanguage.direction}}">
 
-    <ion-list>
+  <div class="choose-contest-type-title" text-center padding-top padding-bottom>
+    {{client.translate('SELECT_CONTEST_TYPE')}}
+  </div>
 
-      <ion-item *ngFor="#contestType of client.settings.newContest.contestTypes" divider class="pointer" (click)="selectContestContent(contestType)">
-        <ion-thumbnail item-left>
-          <img src="{{contestType.icon}}">
-        </ion-thumbnail>
-          <h2>{{client.translate(contestType.title)}}</h2>
-          <p class="white-space-pre-line">{{client.translate(contestType.description)}}</p>
-      </ion-item>
-    </ion-list>
-  </ion-content>
+  <div no-margin text-center>
+    <ion-row *ngFor="#row of client.settings.newContest.contestTypes, #i=index">
+      <ion-col class="pointer" (click)="selectContestContent(contestType)" *ngFor="#contestType of client.settings.newContest.contestTypes[i]">
+        <div class="contest-type-title" [ngStyle]="{'color': contestType.text.titleColor}">
+          {{client.translate(contestType.text.title)}}
+          <img [ngStyle]="{'width': contestType.image.width + 'px', 'height': contestType.image.height + 'px'}"
+               src="{{contestType.image.url}}">
+          <div class="contest-type-description" text-center [ngStyle]="{'width': contestType.image.width + 'px'}">
+            {{client.translate(contestType.text.description)}}
+          </div>
+        </div>
+      </ion-col>
+    </ion-row>
+  </div>
+
+</ion-content>
