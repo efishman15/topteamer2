@@ -220,9 +220,9 @@
           "facebookPost" : {
             "action" : "topteamer:lead",
             "dialogImage" : {
-              "url" : "http://www.topteamer.com/images/facebook/winner1.jpg",
-              "width" : 400,
-              "height" : 210
+              "url" : "../../images/ui/competition_won_graphic.png",
+              "width" : 350,
+              "height" : 350
             },
             "object" : {
               "name" : "team"
@@ -236,9 +236,9 @@
           "facebookPost" : {
             "action" : "topteamer:empower",
             "dialogImage" : {
-              "url" : "http://www.topteamer.com/images/facebook/winner2.jpg",
-              "width" : 400,
-              "height" : 210
+              "url" : "../../images/ui/competition_won_graphic.png",
+              "width" : 350,
+              "height" : 350
             },
             "object" : {
               "name" : "team"
@@ -252,9 +252,9 @@
           "facebookPost" : {
             "action" : "topteamer:become",
             "dialogImage" : {
-              "url" : "http://www.topteamer.com/images/facebook/winner2.jpg",
-              "width" : 400,
-              "height" : 210
+              "url" : "../../images/ui/competition_won_graphic.png",
+              "width" : 350,
+              "height" : 350
             },
             "object" : {
               "name" : "contestLeader"
@@ -268,9 +268,9 @@
           "facebookPost" : {
             "action" : "topteamer:become",
             "dialogImage" : {
-              "url" : "http://www.topteamer.com/images/facebook/winner2.jpg",
-              "width" : 400,
-              "height" : 210
+              "url" : "../../images/ui/competition_won_graphic.png",
+              "width" : 350,
+              "height" : 350
             },
             "object" : {
               "name" : "teamLeader"
@@ -284,9 +284,9 @@
           "facebookPost" : {
             "action" : "topteamer:promote",
             "dialogImage" : {
-              "url" : "http://www.topteamer.com/images/facebook/winner2.jpg",
-              "width" : 400,
-              "height" : 210
+              "url" : "../../images/ui/competition_won_graphic.png",
+              "width" : 350,
+              "height" : 350
             },
             "object" : {
               "name" : "team"
@@ -310,8 +310,8 @@
           "facebookPost" : {
             "action" : "topteamer:beat",
             "dialogImage" : {
-              "width" : 400,
-              "height" : 210,
+              "width" : 350,
+              "height" : 350,
               "url" : "https://graph.facebook.com/%s/picture?width=%d&height=%d"
             },
             "object" : {
@@ -614,20 +614,66 @@
     },
     "quiz" : {
       "canvas" : {
-        "height" : 52,
-        "topOffset" : 12,
-        "radius" : 20,
-        "inactiveColor" : "#5f5f5f",
-        "activeColor" : "#5f5f5f",
-        "lineWidth" : 7,
-        "correctRatioColor" : "#2ecc71",
-        "incorrectRatioColor" : "#e74c3c",
-        "font" : "bold 10px Helvetica",
         "scores" : {
-          "top" : 10
+          "size" : {
+            "top" : 10
+          },
+          "colors" : {
+            "correct" : "#0fe783",
+            "default" : "#ffffff"
+          }
         },
-        "pieChartRadius" : 15,
-        "width" : 576
+        "circle" : {
+          "radius" : {
+            "inner" : 15,
+            "outer" : 20
+          },
+          "states" : {
+            "previous" : {
+              "correct" : {
+                "innerColor" : "#37b37d",
+                "outerColor" : "#0fe783",
+                "textFillStyle" : "#ffffff",
+                "text" : "✔"
+              },
+              "incorrect" : {
+                "innerColor" : "#f35e4a",
+                "outerColor" : "#f87765",
+                "textFillStyle" : "#ffffff",
+                "text" : "✖"
+              }
+            },
+            "current" : {
+              "stats" : {
+                "outerColor" : "#4c59a2"
+              },
+              "noStats" : {
+                "text" : "\u2754",
+                "outerColor" : "#4c59a2",
+                "innerColor" : "#bf0045",
+                "textFillStyle" : "#ffffff"
+              }
+            },
+            "next" : {
+              "outerColor" : "#4c59a2",
+              "innerColor" : "#333267"
+            }
+          }
+        },
+        "size" : {
+          "width" : 576,
+          "height" : 52,
+          "topOffset" : 12,
+          "topSignOffset" : 39
+        },
+        "line" : {
+          "color" : "#4c59a2",
+          "width" : 3
+        },
+        "font" : {
+          "scores" : "bold 10px Helvetica",
+          "signs" : "bold 20px Helvetica"
+        }
       },
       "question" : {
         "maxLength" : 90,
@@ -731,19 +777,33 @@
           "msecMultiplier" : 86400000
         }
       },
-      "contestTypes" : [{
-          "id" : "systemTrivia",
-          "icon" : "images/facebook/contest.png",
-          "title" : "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE",
-          "description" : "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION",
-          "name" : "CONTEST_TYPE_TRIVIA_SYSTEM_NAME"
-        }, {
-          "id" : "userTrivia",
-          "icon" : "images/facebook/winner2.jpg",
-          "title" : "CONTEST_TYPE_TRIVIA_USER_TITLE",
-          "description" : "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION",
-          "name" : "CONTEST_TYPE_TRIVIA_USER_NAME"
-        }]
+      "contestTypes" : [[{
+            "id" : "systemTrivia",
+            "image" : {
+              "url" : "images/ui/new_our-questions_default.png",
+              "width" : 200,
+              "height" : 200
+            },
+            "text" : {
+              "title" : "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE",
+              "description" : "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION",
+              "name" : "CONTEST_TYPE_TRIVIA_SYSTEM_NAME",
+              "titleColor" : "#f895bd"
+            }
+          }, {
+            "id" : "userTrivia",
+            "image" : {
+              "url" : "images/ui/new_your-questions_default.png",
+              "width" : 200,
+              "height" : 200
+            },
+            "text" : {
+              "title" : "CONTEST_TYPE_TRIVIA_USER_TITLE",
+              "description" : "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION",
+              "name" : "CONTEST_TYPE_TRIVIA_USER_NAME",
+              "titleColor" : "#73d9ff"
+            }
+          }]]
     },
     "ui" : {
       "en" : {
@@ -936,7 +996,7 @@
         "DATE_PICKER_WEEK_DAYS" : ["S", "M", "T", "W", "T", "F", "S"],
         "DATE_PICKER_MONTH_NAMES" : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
         "TRIVIA" : "Trivia",
-        "GAME_NAME" : "Play Monkey",
+        "GAME_NAME" : "Top Teamer",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} won",
         "AGAINST" : "vs.",
         "TIE" : "Tie",
@@ -1115,9 +1175,9 @@
         "REVIEW_MODE_OWNER" : "על מנת לשמור על משחק הוגן, יוצרי התחרות לא יכולים לזכות את קבוצתם בנקודות",
         "REVIEW_MODE_PLAY_AGAIN" : "על מנת לשמור על משחק הוגן, רק תוצאות המשחק הראשון יזכו את קבוצתכם בנקודות",
         "SELECT_CONTEST_TYPE" : "בחרו את סוג התחרות",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "טריוויה: שאלות ממאגר המערכת",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "שאלות שלנו",
         "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.levels.length + ' שאלות מתחלפות מתוך מאגר המערכת'",
-        "CONTEST_TYPE_TRIVIA_USER_TITLE" : "טריוויה: תחרות ידע",
+        "CONTEST_TYPE_TRIVIA_USER_TITLE" : "שאלות שלכם",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'הזינו אתם את השאלות. עד ' + eval:settings.client.newContest.privateQuestions.max + ' שאלות לתחרות'",
         "SEARCH" : "חיפוש",
         "SEARCH_MY_QUESTIONS" : "חיפוש שאלות שהוספתי",
@@ -1131,7 +1191,7 @@
         "DATE_PICKER_MONTH_NAMES" : ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"],
         "CONTEST_NAME" : "{{team0}} נגד {{team1}}: {{type}}",
         "TRIVIA" : "ידע כללי",
-        "GAME_NAME" : "Play Monkey",
+        "GAME_NAME" : "Top Teamer",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ניצחו",
         "AGAINST" : "נגד",
         "TIE" : "תיקו",
@@ -1331,7 +1391,7 @@
         "DATE_PICKER_WEEK_DAYS" : ["D", "L", "M", "M", "J", "V", "S"],
         "DATE_PICKER_MONTH_NAMES" : ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
         "TRIVIA" : "Trivialidades",
-        "GAME_NAME" : "Play Monkey",
+        "GAME_NAME" : "Top Teamer",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ganadas",
         "AGAINST" : "frente a",
         "TIE" : "Corbata",
