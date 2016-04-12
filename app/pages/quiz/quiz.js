@@ -358,7 +358,7 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.clearQuizScores = function () {
         this.quizContext.beginPath();
-        this.quizContext.clearRect(0, 0, this.quizCanvas.width, this.client.settings.quiz.canvas.scores.top);
+        this.quizContext.clearRect(0, 0, this.quizCanvas.width, this.client.settings.quiz.canvas.scores.size.top);
         this.quizContext.closePath();
     };
     QuizPage.prototype.drawQuizScores = function () {

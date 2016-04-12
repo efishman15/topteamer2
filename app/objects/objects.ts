@@ -78,12 +78,10 @@ export class QuizCanvasSizeSettings {
 export class QuizCanvasScoresSettings {
   size: QuizCanvasScoresSizeSettings;
   colors: QuizCanvasScoresColorsSettings;
-  top:number;
 }
 
 export  class QuizCanvasScoresSizeSettings {
   top: number;
-  colors: QuizCanvasScoresColorsSettings;
 }
 
 export class QuizCanvasScoresColorsSettings {
