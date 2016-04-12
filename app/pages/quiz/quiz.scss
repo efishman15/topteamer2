@@ -46,3 +46,44 @@
     visibility: visible;
   }
 }
+
+.button-answer-default {
+  background-color: #333267 !important;
+  border: 2px solid #5f5c98 !important;
+  border-radius: 50px !important;
+  color: #ffffff !important;;
+  display: inline-block;
+  padding: 8px 20px !important;
+  text-align: center;
+}
+
+.button-answer-clicked {
+  background-color: #333267 !important;;
+  border: 2px solid #5f5c98 !important;;
+  border-radius: 50px !important;
+  color: #000000 !important;
+  display: inline-block;
+  padding: 8px 20px !important;
+  text-align: center;
+}
+
+.button-answer-correct {
+  background-color: #31bf81 !important;
+  border: 2px solid #0fe783 !important;
+  border-radius: 50px !important;
+  color: #000000 !important;
+  display: inline-block;
+  padding: 8px 20px !important;
+  text-align: center;
+}
+
+.button-answer-wrong {
+  background-color: #f35e4a !important;
+  border: 2px solid #f87765 !important;
+  border-radius: 50px !important;
+  color: #000000 !important;
+  display: inline-block;
+  padding: 8px 20px !important;
+  text-align: center;
+}
+

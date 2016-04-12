@@ -22,16 +22,8 @@ var objects_1 = require('../../objects/objects');
 var QuizPage = (function () {
     function QuizPage(params) {
         this.questionHistory = [];
-        this.imgCorrectSrc = 'images/correct.png';
-        this.imgErrorSrc = 'images/error.png';
-        this.imgQuestionInfoSrc = 'images/info_question.png';
         this.pageInitiated = false;
-        this.modalJustClosed = false;
-        //Hash map - each item's key is the img.src and the value is an object like this:
-        // loaded: true/false
-        // drawRequests: array of drawRequest objects that each contain:
-        //img, x, y, width, height
-        this.drawImageQueue = {};
+        this.quizStarted = false;
         this.client = client_1.Client.getInstance();
         this.params = params;
     }
@@ -43,9 +35,7 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.onPageDidEnter = function () {
         //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
-        if (this.modalJustClosed) {
-            this.modalJustClosed = false;
-            //Quiz already started - just a modal dialog was dismissed
+        if (this.quizStarted) {
             return;
         }
         this.init();
@@ -58,10 +48,6 @@ var QuizPage = (function () {
         }
         this.quizCanvas = document.getElementById('quizCanvas');
         this.quizContext = this.quizCanvas.getContext('2d');
-        this.quizContext.font = this.client.settings.quiz.canvas.font;
-        this.initDrawImageQueue(this.imgCorrectSrc);
-        this.initDrawImageQueue(this.imgErrorSrc);
-        this.initDrawImageQueue(this.imgQuestionInfoSrc);
         this.pageInitiated = true;
     };
     QuizPage.prototype.startQuiz = function () {
@@ -71,6 +57,7 @@ var QuizPage = (function () {
             'typeId': this.params.data.contest.type.id
         });
         quizService.start(this.contestId).then(function (data) {
+            _this.quizStarted = true;
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;
             for (var i = 0; i < data.quiz.totalQuestions; i++) {
@@ -79,12 +66,9 @@ var QuizPage = (function () {
             }
             _this.drawQuizProgress();
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
-                alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason)).then(function () {
-                    _this.modalJustClosed = true;
-                });
+                alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason));
             }
         }, function (err) {
-            _this.modalJustClosed = true;
             //IonicBug - wait for the prev alert to be fully dismissed
             setTimeout(function () {
                 _this.client.nav.pop();
@@ -128,7 +112,6 @@ var QuizPage = (function () {
             }
             _this.correctButtonName = 'buttonAnswer' + correctAnswerId;
         }, function (err) {
-            _this.modalJustClosed = true;
             switch (err.type) {
                 case 'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ':
                     _this.startQuiz();
@@ -167,7 +150,6 @@ var QuizPage = (function () {
                             'xpProgress': _this.quizData.xpProgress
                         });
                         modal.onDismiss(function (okPressed) {
-                            _this.modalJustClosed = true;
                             _this.quizProceed();
                         });
                         _this.client.nav.present(modal);
@@ -193,6 +175,8 @@ var QuizPage = (function () {
             setTimeout(function () {
                 _this.client.nav.pop().then(function () {
                     _this.client.events.publish('topTeamer:quizFinished', _this.quizData.results);
+                    //For next time if view remains cached
+                    _this.quizStarted = false;
                 });
             }, 1000);
         }
@@ -214,9 +198,9 @@ var QuizPage = (function () {
                 var questionChart;
                 if (this.quizData.currentQuestion.correctRatio ||
                     this.quizData.currentQuestion.correctRatio === 0) {
-                    questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
+                    questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats.chartControl));
                     questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
-                    questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+                    questionChart.chart.paletteColors = this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor + ',' + this.client.settings.quiz.canvas.circle.states.previous.incorrect.innerColor;
                     questionChart.data = [];
                     questionChart.data.push({
                         'label': this.client.translate('ANSWERED_CORRECT'),
@@ -232,7 +216,6 @@ var QuizPage = (function () {
                     'chartDataSource': questionChart
                 });
                 modal.onDismiss(function (action) {
-                    _this.modalJustClosed = true;
                     switch (action) {
                         case 'hint':
                             _this.questionHistory[_this.quizData.currentQuestionIndex].hintUsed = true;
@@ -252,131 +235,126 @@ var QuizPage = (function () {
             }
         }
     };
-    QuizPage.prototype.processDrawImageRequests = function (imgSrc) {
-        this.drawImageQueue[imgSrc].loaded = true;
-        while (this.drawImageQueue[imgSrc].drawRequests.length > 0) {
-            var drawRequest = this.drawImageQueue[imgSrc].drawRequests.pop();
-            this.quizContext.drawImage(this.drawImageQueue[imgSrc].img, drawRequest.x, drawRequest.y, drawRequest.width, drawRequest.height);
-        }
-    };
-    QuizPage.prototype.initDrawImageQueue = function (src) {
-        var _this = this;
-        var img = document.createElement('img');
-        this.drawImageQueue[src] = { 'img': img, 'loaded': false, 'drawRequests': [] };
-        img.onload = function () {
-            _this.processDrawImageRequests(src);
-        };
-        img.src = src;
-    };
-    QuizPage.prototype.drawImageAsync = function (imgSrc, x, y, width, height) {
-        //If image loaded - draw right away
-        if (this.drawImageQueue[imgSrc].loaded) {
-            this.quizContext.drawImage(this.drawImageQueue[imgSrc].img, x, y, width, height);
-            return;
-        }
-        var drawRequest = {
-            'x': x,
-            'y': y,
-            'width': width,
-            'height': height
-        };
-        //Add request to queue
-        this.drawImageQueue[imgSrc].drawRequests.push(drawRequest);
-    };
     QuizPage.prototype.drawQuizProgress = function () {
         this.quizCanvas.width = this.quizCanvas.clientWidth;
+        //Draw connecting line
         this.quizContext.beginPath();
-        this.quizContext.moveTo(0, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
-        this.quizContext.lineTo(this.quizCanvas.width, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
-        this.quizContext.lineWidth = this.client.settings.quiz.canvas.lineWidth;
-        // set line color
-        this.quizContext.strokeStyle = this.client.settings.quiz.canvas.inactiveColor;
+        this.quizContext.moveTo(0, this.client.settings.quiz.canvas.circle.radius.outer + this.client.settings.quiz.canvas.size.topOffset);
+        this.quizContext.lineTo(this.quizCanvas.width, this.client.settings.quiz.canvas.circle.radius.outer + this.client.settings.quiz.canvas.size.topOffset);
+        this.quizContext.lineWidth = this.client.settings.quiz.canvas.line.width;
+        this.quizContext.strokeStyle = this.client.settings.quiz.canvas.line.color;
         this.quizContext.stroke();
         this.quizContext.fill();
         this.quizContext.closePath();
+        //Set the initial X to draw
         var currentX;
         if (this.client.currentLanguage.direction === 'ltr') {
-            currentX = this.client.settings.quiz.canvas.radius;
+            currentX = this.client.settings.quiz.canvas.circle.radius.outer;
         }
         else {
-            currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+            currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.circle.radius.outer;
         }
         this.currentQuestionCircle = null;
-        var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.radius * 2) / (this.quizData.totalQuestions - 1);
+        //Calculate the space between the circles depending on the number of questions
+        var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.circle.radius.outer * 2) / (this.quizData.totalQuestions - 1);
         for (var i = 0; i < this.quizData.totalQuestions; i++) {
             if (i === this.quizData.currentQuestionIndex) {
-                //Question has no statistics about success ratio
-                this.quizContext.beginPath();
-                this.quizContext.fillStyle = this.client.settings.quiz.canvas.activeColor;
-                this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius, 0, Math.PI * 2, false);
-                this.quizContext.fill();
-                this.quizContext.closePath();
+                //--------------------------------------------------------------------//
+                // Current question (to be answered)
+                //--------------------------------------------------------------------//
+                //Current circle is clickable to get question stats
                 this.currentQuestionCircle = {
-                    'top': this.client.settings.quiz.canvas.topOffset,
-                    'left': currentX - this.client.settings.quiz.canvas.radius,
-                    'bottom': this.client.settings.quiz.canvas.topOffset + 2 * this.client.settings.quiz.canvas.radius,
-                    'right': currentX + this.client.settings.quiz.canvas.radius
+                    'top': this.client.settings.quiz.canvas.size.topOffset,
+                    'left': currentX - this.client.settings.quiz.canvas.circle.radius.outer,
+                    'bottom': this.client.settings.quiz.canvas.size.topOffset + 2 * this.client.settings.quiz.canvas.circle.radius.outer,
+                    'right': currentX + this.client.settings.quiz.canvas.circle.radius.outer
                 };
                 //Current question has statistics about success ratio
-                if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio == 0) {
-                    //Draw the correct ratio
-                    if (this.quizData.currentQuestion.correctRatio > 0) {
-                        this.quizContext.beginPath();
-                        this.quizContext.moveTo(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
-                        this.quizContext.fillStyle = this.client.settings.quiz.canvas.correctRatioColor;
-                        this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.pieChartRadius, 0, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, true);
-                        this.quizContext.fill();
-                        this.quizContext.closePath();
-                    }
+                if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio === 0) {
+                    //Draw the outer circle
+                    this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.outer, this.client.settings.quiz.canvas.circle.states.current.stats.outerColor);
+                    //Draw the correct ratio (in the inner circle - partial arc)
+                    this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, 0, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, true);
                     //Draw the incorrect ratio
-                    if (this.quizData.currentQuestion.correctRatio < 1) {
-                        this.quizContext.beginPath();
-                        this.quizContext.moveTo(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
-                        this.quizContext.fillStyle = this.client.settings.quiz.canvas.incorrectRatioColor;
-                        this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.pieChartRadius, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, Math.PI * 2, true);
-                        this.quizContext.fill();
-                        this.quizContext.closePath();
-                    }
+                    this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, Math.PI * 2, true);
                 }
                 else {
-                    //Question has no stats - draw an info icon inside to make user press
-                    this.drawImageAsync(this.imgQuestionInfoSrc, currentX - this.client.settings.quiz.canvas.pieChartRadius, this.client.settings.quiz.canvas.topOffset + this.client.settings.quiz.canvas.radius - this.client.settings.quiz.canvas.pieChartRadius, this.client.settings.quiz.canvas.pieChartRadius * 2, this.client.settings.quiz.canvas.pieChartRadius * 2);
+                    //Draw the "current" circle using the "noStats" state
+                    this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.current.noStats);
                 }
+            }
+            else if (i > this.quizData.currentQuestionIndex) {
+                //--------------------------------------------------------------------//
+                // Next Question - not reached yet
+                //--------------------------------------------------------------------//
+                this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.next);
             }
             else {
-                this.quizContext.beginPath();
-                this.quizContext.fillStyle = this.client.settings.quiz.canvas.inactiveColor;
-                this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius, 0, Math.PI * 2, false);
-                this.quizContext.fill();
-                this.quizContext.closePath();
-            }
-            //Draw correct/incorrect for answered
-            if (this.questionHistory[i].answered != undefined) {
-                if (this.questionHistory[i].answered) {
-                    this.drawImageAsync(this.imgCorrectSrc, currentX - this.client.settings.quiz.canvas.radius, this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius * 2, this.client.settings.quiz.canvas.radius * 2);
-                }
-                else {
-                    this.drawImageAsync(this.imgErrorSrc, currentX - this.client.settings.quiz.canvas.radius, this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius * 2, this.client.settings.quiz.canvas.radius * 2);
+                //--------------------------------------------------------------------//
+                // Previous Question - already answered
+                //--------------------------------------------------------------------//
+                //Draw correct/incorrect for answered
+                if (this.questionHistory[i].answered != undefined) {
+                    if (this.questionHistory[i].answered) {
+                        this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.previous.correct);
+                    }
+                    else {
+                        this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.previous.incorrect);
+                    }
                 }
             }
+            //--------------------------------------------------------------------//
+            // Move the X offset to the next circle
+            //--------------------------------------------------------------------//
             if (this.client.currentLanguage.direction === 'ltr') {
                 if (i < this.quizData.totalQuestions - 1) {
-                    currentX += circleOffsets + this.client.settings.quiz.canvas.radius * 2;
+                    currentX += circleOffsets + this.client.settings.quiz.canvas.circle.radius.outer * 2;
                 }
                 else {
-                    currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+                    currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.circle.radius.outer;
                 }
             }
             else {
                 if (i < this.quizData.totalQuestions - 1) {
-                    currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.radius * 2);
+                    currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.circle.radius.outer * 2);
                 }
                 else {
-                    currentX = this.client.settings.quiz.canvas.radius;
+                    currentX = this.client.settings.quiz.canvas.circle.radius.outer;
                 }
             }
         }
         this.drawQuizScores();
+    };
+    QuizPage.prototype.drawQuestionCircle = function (x, radius, color, startAngle, endAngle, counterClockwise) {
+        if (startAngle == undefined) {
+            startAngle = 0;
+        }
+        if (endAngle == undefined) {
+            endAngle = Math.PI * 2;
+        }
+        if (counterClockwise == undefined) {
+            counterClockwise = false;
+        }
+        this.quizContext.beginPath();
+        this.quizContext.fillStyle = color;
+        this.quizContext.moveTo(x, this.client.settings.quiz.canvas.circle.radius.outer + this.client.settings.quiz.canvas.size.topOffset);
+        this.quizContext.arc(x, this.client.settings.quiz.canvas.circle.radius.outer + this.client.settings.quiz.canvas.size.topOffset, radius, startAngle, endAngle, counterClockwise);
+        this.quizContext.fill();
+        this.quizContext.closePath();
+    };
+    QuizPage.prototype.drawQuestionState = function (x, state) {
+        this.drawQuestionCircle(x, this.client.settings.quiz.canvas.circle.radius.outer, state.outerColor);
+        if (state.innerColor) {
+            this.drawQuestionCircle(x, this.client.settings.quiz.canvas.circle.radius.inner, state.innerColor);
+        }
+        if (state.text) {
+            this.quizContext.beginPath();
+            this.quizContext.fillStyle = state.textFillStyle;
+            this.quizContext.font = this.client.settings.quiz.canvas.font.signs;
+            var textWidth = this.quizContext.measureText(state.text).width;
+            this.quizContext.fillText(state.text, x + (textWidth / 2), this.client.settings.quiz.canvas.size.topSignOffset);
+            this.quizContext.closePath();
+        }
     };
     QuizPage.prototype.clearQuizScores = function () {
         this.quizContext.beginPath();
@@ -387,12 +365,12 @@ var QuizPage = (function () {
         this.clearQuizScores();
         var currentX;
         if (this.client.currentLanguage.direction === 'ltr') {
-            currentX = this.client.settings.quiz.canvas.radius;
+            currentX = this.client.settings.quiz.canvas.circle.radius.outer;
         }
         else {
-            currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+            currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.circle.radius.outer;
         }
-        var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.radius * 2) / (this.quizData.totalQuestions - 1);
+        var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.circle.radius.outer * 2) / (this.quizData.totalQuestions - 1);
         for (var i = 0; i < this.quizData.totalQuestions; i++) {
             var questionScore;
             if (!this.quizData.reviewMode) {
@@ -403,29 +381,30 @@ var QuizPage = (function () {
             }
             //Draw question score
             var textWidth = this.quizContext.measureText(questionScore).width;
-            var scoreColor = this.client.settings.quiz.canvas.inactiveColor;
+            var scoreColor = this.client.settings.quiz.canvas.scores.colors.default;
             if (this.questionHistory[i].answered && !this.questionHistory[i].answerUsed) {
-                scoreColor = this.client.settings.quiz.canvas.correctRatioColor;
+                scoreColor = this.client.settings.quiz.canvas.scores.colors.correct;
             }
             //Draw the score at the top of the circle
             this.quizContext.beginPath();
             this.quizContext.fillStyle = scoreColor;
-            this.quizContext.fillText(questionScore, currentX + textWidth / 2, this.client.settings.quiz.canvas.scores.top);
+            this.quizContext.font = this.client.settings.quiz.canvas.font.scores;
+            this.quizContext.fillText(questionScore, currentX + textWidth / 2, this.client.settings.quiz.canvas.scores.size.top);
             this.quizContext.closePath();
             if (this.client.currentLanguage.direction === 'ltr') {
                 if (i < this.quizData.totalQuestions - 1) {
-                    currentX += circleOffsets + this.client.settings.quiz.canvas.radius * 2;
+                    currentX += circleOffsets + this.client.settings.quiz.canvas.circle.radius.outer * 2;
                 }
                 else {
-                    currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+                    currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.circle.radius.outer;
                 }
             }
             else {
                 if (i < this.quizData.totalQuestions - 1) {
-                    currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.radius * 2);
+                    currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.circle.radius.outer * 2);
                 }
                 else {
-                    currentX = this.client.settings.quiz.canvas.radius;
+                    currentX = this.client.settings.quiz.canvas.circle.radius.outer;
                 }
             }
         }
@@ -442,7 +421,6 @@ var QuizPage = (function () {
         }
         var modal = ionic_angular_1.Modal.create(question_editor_1.QuestionEditorPage, { 'question': question, 'mode': 'edit' });
         modal.onDismiss(function (result) {
-            _this.modalJustClosed = true;
             if (!result) {
                 return;
             }

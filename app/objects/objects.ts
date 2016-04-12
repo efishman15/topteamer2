@@ -57,22 +57,76 @@ export class QuizQuestionsSettings {
 }
 
 export class QuizCanvasSettings {
-  height:number;
-  topOffset:number;
-  radius:number;
-  inactiveColor:string;
-  activeColor:string;
-  lineWidth:number;
-  correctRatioColor:string;
-  incorrectRatioColor:string;
-  font:string;
+  font: QuizCanvasFontSettings;
   scores:QuizCanvasScoresSettings;
-  pieChartRadius:number;
-  width:number;
+  circle:QuizCanvasCircleSettings;
+  size:QuizCanvasSizeSettings;
+  line:QuizCanvasLineSettings;
+}
+
+export class QuizCanvasFontSettings {
+  scores: string;
+  signs: string;
+}
+export class QuizCanvasSizeSettings {
+  width: number;
+  height: number;
+  topOffset: number;
+  topSignOffset: number;
 }
 
 export class QuizCanvasScoresSettings {
+  size: QuizCanvasScoresSizeSettings;
+  colors: QuizCanvasScoresColorsSettings;
   top:number;
+}
+
+export  class QuizCanvasScoresSizeSettings {
+  top: number;
+  colors: QuizCanvasScoresColorsSettings;
+}
+
+export class QuizCanvasScoresColorsSettings {
+  default: string;
+  correct: string;
+}
+
+export class QuizCanvasCircleSettings {
+  radius: QuizCanvasCircleRadiusSettings;
+  states: QuizCanvasCircleStatesSettings;
+}
+
+export class QuizCanvasCircleRadiusSettings {
+  inner: number;
+  outer: number;
+}
+
+export class QuizCanvasCircleStateSettings {
+  innerColor: string;
+  outerColor: string;
+  text: string;
+  textFillStyle: string;
+}
+
+export class QuizCanvasLineSettings {
+  color: string;
+  width: number;
+}
+
+export class QuizCanvasCircleStatesSettings {
+  previous: QuizCanvasCircleStatePreviousSettings;
+  current: QuizCanvasCircleStateCurrentSettings;
+  next: QuizCanvasCircleStateSettings;
+}
+
+export class QuizCanvasCircleStatePreviousSettings {
+  correct: QuizCanvasCircleStateSettings;
+  incorrect: QuizCanvasCircleStateSettings;
+}
+
+export class QuizCanvasCircleStateCurrentSettings {
+  stats: QuizCanvasCircleStateSettings;
+  noStats: QuizCanvasCircleStateSettings;
 }
 
 export class QuizQuestionSettings {

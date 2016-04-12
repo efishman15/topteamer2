@@ -8,8 +8,8 @@
 
 <ion-content class="app-bg">
 
-  <canvas id="quizCanvas" height="{{client.settings.quiz.canvas.height}}" class="quiz-canvas"
-          (click)="canvasClick($event)" [ngStyle]="{'height': client.settings.quiz.canvas.height + 'px'}">
+  <canvas id="quizCanvas" height="{{client.settings.quiz.canvas.size.height}}" class="quiz-canvas"
+          (click)="canvasClick($event)" [ngStyle]="{'height': client.settings.quiz.canvas.size.height + 'px'}">
   </canvas>
 
   <div *ngIf="quizData" dir="{{quizData.currentQuestion.direction}}"
@@ -31,11 +31,13 @@
               id="buttonAnswer{{i}}"
               name="buttonAnswer{{i}}"
               [disabled]="quizData.currentQuestion.answered && answer.correct==null && answer.answeredCorrectly==null"
-              class="button button-full item-text-wrap quiz-answer pointer"
-              [ngClass]="{'button-light' : quizData.currentQuestion.answered && answer.answeredCorrectly == null && answer.correct == null,
+              class="button-full item-text-wrap quiz-answer pointer"
+              [ngClass]="{
+                            'button-answer-default': !quizData.currentQuestion.answered,
+                            'button-answer-clicked' : quizData.currentQuestion.answered && answer.answeredCorrectly == null && answer.correct == null,
                             'blink' : answer.answeredCorrectly == true || answer.correct == true || (answer.answeredCorrectly == false && answer.correct == null),
-                            'button-favorite' : answer.answeredCorrectly == true || answer.correct == true,
-                            'button-danger' : answer.answeredCorrectly == false && answer.correct == null}"
+                            'button-answer-correct' : answer.answeredCorrectly == true || answer.correct == true,
+                            'button-answer-wrong' : answer.answeredCorrectly == false && answer.correct == null}"
               (click)="!quizData.currentQuestion.answered && submitAnswer(i)"
               (animationEnd)="buttonAnimationEnded($event)"
               [innerHtml]="answer.text">

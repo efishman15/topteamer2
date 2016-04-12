@@ -8,7 +8,7 @@ import {Client} from '../../providers/client';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
 import * as alertService from '../../providers/alert';
-import {QuizData,QuizQuestion} from '../../objects/objects';
+import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/quiz/quiz.html',
@@ -30,17 +30,8 @@ export class QuizPage {
   quizContext:any;
   currentQuestionCircle:any;
   questionChart:Object;
-  imgCorrectSrc:String = 'images/correct.png';
-  imgErrorSrc:String = 'images/error.png';
-  imgQuestionInfoSrc:String = 'images/info_question.png';
   pageInitiated:Boolean = false;
-  modalJustClosed:Boolean = false;
-
-  //Hash map - each item's key is the img.src and the value is an object like this:
-  // loaded: true/false
-  // drawRequests: array of drawRequest objects that each contain:
-  //img, x, y, width, height
-  drawImageQueue = {};
+  quizStarted:Boolean = false;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
@@ -58,10 +49,7 @@ export class QuizPage {
   onPageDidEnter() {
 
     //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
-
-    if (this.modalJustClosed) {
-      this.modalJustClosed = false;
-      //Quiz already started - just a modal dialog was dismissed
+    if (this.quizStarted) {
       return;
     }
 
@@ -77,11 +65,6 @@ export class QuizPage {
 
     this.quizCanvas = document.getElementById('quizCanvas');
     this.quizContext = this.quizCanvas.getContext('2d');
-    this.quizContext.font = this.client.settings.quiz.canvas.font;
-
-    this.initDrawImageQueue(this.imgCorrectSrc);
-    this.initDrawImageQueue(this.imgErrorSrc);
-    this.initDrawImageQueue(this.imgQuestionInfoSrc);
 
     this.pageInitiated = true;
   }
@@ -92,6 +75,7 @@ export class QuizPage {
       'typeId': this.params.data.contest.type.id
     });
     quizService.start(this.contestId).then((data) => {
+      this.quizStarted = true;
       this.quizData = data.quiz;
       this.quizData.currentQuestion.answered = false;
 
@@ -103,13 +87,10 @@ export class QuizPage {
       this.drawQuizProgress();
 
       if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
-        alertService.alert(this.client.translate(this.quizData.reviewMode.reason)).then(() => {
-          this.modalJustClosed = true;
-        });
+        alertService.alert(this.client.translate(this.quizData.reviewMode.reason));
       }
 
     }, (err) => {
-      this.modalJustClosed = true;
       //IonicBug - wait for the prev alert to be fully dismissed
       setTimeout(() => {
         this.client.nav.pop();
@@ -166,7 +147,6 @@ export class QuizPage {
       this.correctButtonName = 'buttonAnswer' + correctAnswerId;
 
     }, (err) => {
-      this.modalJustClosed = true;
       switch (err.type) {
         case 'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ':
           this.startQuiz();
@@ -212,7 +192,6 @@ export class QuizPage {
             });
 
             modal.onDismiss((okPressed) => {
-              this.modalJustClosed = true;
               this.quizProceed();
             });
 
@@ -243,7 +222,9 @@ export class QuizPage {
       //Give enough time to draw the circle progress of the last question
       setTimeout(() => {
         this.client.nav.pop().then(() => {
-          this.client.events.publish('topTeamer:quizFinished', this.quizData.results)
+          this.client.events.publish('topTeamer:quizFinished', this.quizData.results);
+          //For next time if view remains cached
+          this.quizStarted = false;
         });
       }, 1000);
 
@@ -271,11 +252,11 @@ export class QuizPage {
         if (this.quizData.currentQuestion.correctRatio ||
           this.quizData.currentQuestion.correctRatio === 0) {
 
-          questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats));
+          questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats.chartControl));
 
           questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
 
-          questionChart.chart.paletteColors = this.client.settings.quiz.canvas.correctRatioColor + ',' + this.client.settings.quiz.canvas.incorrectRatioColor;
+          questionChart.chart.paletteColors = this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor + ',' + this.client.settings.quiz.canvas.circle.states.previous.incorrect.innerColor;
 
           questionChart.data = [];
           questionChart.data.push({
@@ -294,7 +275,6 @@ export class QuizPage {
         });
 
         modal.onDismiss((action) => {
-          this.modalJustClosed = true;
           switch (action) {
             case 'hint':
               this.questionHistory[this.quizData.currentQuestionIndex].hintUsed = true;
@@ -317,154 +297,153 @@ export class QuizPage {
     }
   }
 
-  processDrawImageRequests(imgSrc) {
-
-    this.drawImageQueue[imgSrc].loaded = true;
-    while (this.drawImageQueue[imgSrc].drawRequests.length > 0) {
-      var drawRequest = this.drawImageQueue[imgSrc].drawRequests.pop();
-      this.quizContext.drawImage(this.drawImageQueue[imgSrc].img, drawRequest.x, drawRequest.y, drawRequest.width, drawRequest.height);
-    }
-  }
-
-  initDrawImageQueue(src) {
-
-    var img = document.createElement('img');
-    this.drawImageQueue[src] = {'img': img, 'loaded': false, 'drawRequests': []};
-
-    img.onload = () => {
-      this.processDrawImageRequests(src);
-    }
-    img.src = src;
-  }
-
-  drawImageAsync(imgSrc, x, y, width, height) {
-
-    //If image loaded - draw right away
-    if (this.drawImageQueue[imgSrc].loaded) {
-      this.quizContext.drawImage(this.drawImageQueue[imgSrc].img, x, y, width, height);
-      return;
-    }
-
-    var drawRequest = {
-      'x': x,
-      'y': y,
-      'width': width,
-      'height': height
-    }
-
-    //Add request to queue
-    this.drawImageQueue[imgSrc].drawRequests.push(drawRequest);
-  }
-
   drawQuizProgress() {
 
     this.quizCanvas.width = this.quizCanvas.clientWidth;
 
+    //Draw connecting line
     this.quizContext.beginPath();
-    this.quizContext.moveTo(0, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
-    this.quizContext.lineTo(this.quizCanvas.width, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
-    this.quizContext.lineWidth = this.client.settings.quiz.canvas.lineWidth;
+    this.quizContext.moveTo(0, this.client.settings.quiz.canvas.circle.radius.outer + this.client.settings.quiz.canvas.size.topOffset);
+    this.quizContext.lineTo(this.quizCanvas.width, this.client.settings.quiz.canvas.circle.radius.outer + this.client.settings.quiz.canvas.size.topOffset);
+    this.quizContext.lineWidth = this.client.settings.quiz.canvas.line.width;
 
-    // set line color
-    this.quizContext.strokeStyle = this.client.settings.quiz.canvas.inactiveColor;
+    this.quizContext.strokeStyle = this.client.settings.quiz.canvas.line.color;
     this.quizContext.stroke();
     this.quizContext.fill();
     this.quizContext.closePath();
 
+    //Set the initial X to draw
     var currentX;
     if (this.client.currentLanguage.direction === 'ltr') {
-      currentX = this.client.settings.quiz.canvas.radius;
+      currentX = this.client.settings.quiz.canvas.circle.radius.outer;
     }
     else {
-      currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+      currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.circle.radius.outer;
     }
 
     this.currentQuestionCircle = null;
-    var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.radius * 2) / (this.quizData.totalQuestions - 1);
+
+    //Calculate the space between the circles depending on the number of questions
+    var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.circle.radius.outer * 2) / (this.quizData.totalQuestions - 1);
 
     for (var i = 0; i < this.quizData.totalQuestions; i++) {
 
       if (i === this.quizData.currentQuestionIndex) {
 
-        //Question has no statistics about success ratio
-        this.quizContext.beginPath();
-        this.quizContext.fillStyle = this.client.settings.quiz.canvas.activeColor;
-        this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius, 0, Math.PI * 2, false);
-        this.quizContext.fill();
-        this.quizContext.closePath();
+        //--------------------------------------------------------------------//
+        // Current question (to be answered)
+        //--------------------------------------------------------------------//
 
+        //Current circle is clickable to get question stats
         this.currentQuestionCircle = {
-          'top': this.client.settings.quiz.canvas.topOffset,
-          'left': currentX - this.client.settings.quiz.canvas.radius,
-          'bottom': this.client.settings.quiz.canvas.topOffset + 2 * this.client.settings.quiz.canvas.radius,
-          'right': currentX + this.client.settings.quiz.canvas.radius
+          'top': this.client.settings.quiz.canvas.size.topOffset,
+          'left': currentX - this.client.settings.quiz.canvas.circle.radius.outer,
+          'bottom': this.client.settings.quiz.canvas.size.topOffset + 2 * this.client.settings.quiz.canvas.circle.radius.outer,
+          'right': currentX + this.client.settings.quiz.canvas.circle.radius.outer
         };
 
         //Current question has statistics about success ratio
-        if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio == 0) {
+        if (this.quizData.currentQuestion.correctRatio || this.quizData.currentQuestion.correctRatio === 0) {
 
-          //Draw the correct ratio
-          if (this.quizData.currentQuestion.correctRatio > 0) {
-            this.quizContext.beginPath();
-            this.quizContext.moveTo(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
-            this.quizContext.fillStyle = this.client.settings.quiz.canvas.correctRatioColor;
-            this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.pieChartRadius, 0, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, true);
-            this.quizContext.fill();
-            this.quizContext.closePath();
-          }
+          //Draw the outer circle
+          this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.outer, this.client.settings.quiz.canvas.circle.states.current.stats.outerColor);
+
+          //Draw the correct ratio (in the inner circle - partial arc)
+          this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, 0, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, true);
 
           //Draw the incorrect ratio
-          if (this.quizData.currentQuestion.correctRatio < 1) {
-            this.quizContext.beginPath();
-            this.quizContext.moveTo(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset);
-            this.quizContext.fillStyle = this.client.settings.quiz.canvas.incorrectRatioColor;
-            this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.pieChartRadius, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, Math.PI * 2, true);
-            this.quizContext.fill();
-            this.quizContext.closePath();
+          this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, Math.PI * 2, true);
+
+        }
+        else {
+          //Draw the "current" circle using the "noStats" state
+          this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.current.noStats);
+        }
+      }
+      else if (i > this.quizData.currentQuestionIndex) {
+        //--------------------------------------------------------------------//
+        // Next Question - not reached yet
+        //--------------------------------------------------------------------//
+        this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.next);
+      }
+      else {
+        //--------------------------------------------------------------------//
+        // Previous Question - already answered
+        //--------------------------------------------------------------------//
+        //Draw correct/incorrect for answered
+        if (this.questionHistory[i].answered != undefined) {
+          if (this.questionHistory[i].answered) {
+            this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.previous.correct);
+          }
+          else {
+            this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.previous.incorrect);
           }
         }
-        else {
-          //Question has no stats - draw an info icon inside to make user press
-          this.drawImageAsync(this.imgQuestionInfoSrc, currentX - this.client.settings.quiz.canvas.pieChartRadius, this.client.settings.quiz.canvas.topOffset + this.client.settings.quiz.canvas.radius - this.client.settings.quiz.canvas.pieChartRadius, this.client.settings.quiz.canvas.pieChartRadius * 2, this.client.settings.quiz.canvas.pieChartRadius * 2);
-        }
-      }
-      else {
-        this.quizContext.beginPath();
-        this.quizContext.fillStyle = this.client.settings.quiz.canvas.inactiveColor;
-        this.quizContext.arc(currentX, this.client.settings.quiz.canvas.radius + this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius, 0, Math.PI * 2, false);
-        this.quizContext.fill();
-        this.quizContext.closePath();
       }
 
-      //Draw correct/incorrect for answered
-      if (this.questionHistory[i].answered != undefined) {
-        if (this.questionHistory[i].answered) {
-          this.drawImageAsync(this.imgCorrectSrc, currentX - this.client.settings.quiz.canvas.radius, this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius * 2, this.client.settings.quiz.canvas.radius * 2);
-        }
-        else {
-          this.drawImageAsync(this.imgErrorSrc, currentX - this.client.settings.quiz.canvas.radius, this.client.settings.quiz.canvas.topOffset, this.client.settings.quiz.canvas.radius * 2, this.client.settings.quiz.canvas.radius * 2);
-        }
-      }
-
+      //--------------------------------------------------------------------//
+      // Move the X offset to the next circle
+      //--------------------------------------------------------------------//
       if (this.client.currentLanguage.direction === 'ltr') {
         if (i < this.quizData.totalQuestions - 1) {
-          currentX += circleOffsets + this.client.settings.quiz.canvas.radius * 2;
+          currentX += circleOffsets + this.client.settings.quiz.canvas.circle.radius.outer * 2;
         }
         else {
-          currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+          currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.circle.radius.outer;
         }
       }
       else {
         if (i < this.quizData.totalQuestions - 1) {
-          currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.radius * 2);
+          currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.circle.radius.outer * 2);
         }
         else {
-          currentX = this.client.settings.quiz.canvas.radius;
+          currentX = this.client.settings.quiz.canvas.circle.radius.outer;
         }
       }
     }
 
     this.drawQuizScores();
+
+  }
+
+  drawQuestionCircle(x:number, radius:number, color:string, startAngle?:any, endAngle?:any, counterClockwise?:any) {
+
+    if (startAngle == undefined) {
+      startAngle = 0;
+    }
+    if (endAngle == undefined) {
+      endAngle = Math.PI * 2;
+    }
+
+    if (counterClockwise == undefined) {
+      counterClockwise = false;
+    }
+
+    this.quizContext.beginPath();
+    this.quizContext.fillStyle = color;
+    this.quizContext.moveTo(x, this.client.settings.quiz.canvas.circle.radius.outer + this.client.settings.quiz.canvas.size.topOffset);
+    this.quizContext.arc(x, this.client.settings.quiz.canvas.circle.radius.outer + this.client.settings.quiz.canvas.size.topOffset, radius, startAngle, endAngle, counterClockwise);
+    this.quizContext.fill();
+    this.quizContext.closePath();
+
+  }
+
+  drawQuestionState(x:number, state:QuizCanvasCircleStateSettings) {
+
+    this.drawQuestionCircle(x, this.client.settings.quiz.canvas.circle.radius.outer, state.outerColor);
+
+    if (state.innerColor) {
+      this.drawQuestionCircle(x, this.client.settings.quiz.canvas.circle.radius.inner, state.innerColor);
+    }
+
+    if (state.text) {
+      this.quizContext.beginPath();
+      this.quizContext.fillStyle = state.textFillStyle;
+      this.quizContext.font = this.client.settings.quiz.canvas.font.signs;
+      var textWidth = this.quizContext.measureText(state.text).width;
+      this.quizContext.fillText(state.text, x + (textWidth / 2), this.client.settings.quiz.canvas.size.topSignOffset);
+      this.quizContext.closePath();
+    }
 
   }
 
@@ -480,13 +459,13 @@ export class QuizPage {
 
     var currentX;
     if (this.client.currentLanguage.direction === 'ltr') {
-      currentX = this.client.settings.quiz.canvas.radius;
+      currentX = this.client.settings.quiz.canvas.circle.radius.outer;
     }
     else {
-      currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+      currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.circle.radius.outer;
     }
 
-    var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.radius * 2) / (this.quizData.totalQuestions - 1);
+    var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.circle.radius.outer * 2) / (this.quizData.totalQuestions - 1);
     for (var i = 0; i < this.quizData.totalQuestions; i++) {
 
       var questionScore;
@@ -499,32 +478,33 @@ export class QuizPage {
 
       //Draw question score
       var textWidth = this.quizContext.measureText(questionScore).width;
-      var scoreColor = this.client.settings.quiz.canvas.inactiveColor;
+      var scoreColor = this.client.settings.quiz.canvas.scores.colors.default;
 
       if (this.questionHistory[i].answered && !this.questionHistory[i].answerUsed) {
-        scoreColor = this.client.settings.quiz.canvas.correctRatioColor;
+        scoreColor = this.client.settings.quiz.canvas.scores.colors.correct;
       }
 
       //Draw the score at the top of the circle
       this.quizContext.beginPath();
       this.quizContext.fillStyle = scoreColor;
-      this.quizContext.fillText(questionScore, currentX + textWidth / 2, this.client.settings.quiz.canvas.scores.top);
+      this.quizContext.font = this.client.settings.quiz.canvas.font.scores;
+      this.quizContext.fillText(questionScore, currentX + textWidth / 2, this.client.settings.quiz.canvas.scores.size.top);
       this.quizContext.closePath();
 
       if (this.client.currentLanguage.direction === 'ltr') {
         if (i < this.quizData.totalQuestions - 1) {
-          currentX += circleOffsets + this.client.settings.quiz.canvas.radius * 2;
+          currentX += circleOffsets + this.client.settings.quiz.canvas.circle.radius.outer * 2;
         }
         else {
-          currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.radius;
+          currentX = this.quizCanvas.width - this.client.settings.quiz.canvas.circle.radius.outer;
         }
       }
       else {
         if (i < this.quizData.totalQuestions - 1) {
-          currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.radius * 2);
+          currentX = currentX - circleOffsets - (this.client.settings.quiz.canvas.circle.radius.outer * 2);
         }
         else {
-          currentX = this.client.settings.quiz.canvas.radius;
+          currentX = this.client.settings.quiz.canvas.circle.radius.outer;
         }
       }
     }
@@ -543,7 +523,6 @@ export class QuizPage {
     }
     var modal = Modal.create(QuestionEditorPage, {'question': question, 'mode': 'edit'});
     modal.onDismiss((result) => {
-      this.modalJustClosed = true;
       if (!result) {
         return;
       }

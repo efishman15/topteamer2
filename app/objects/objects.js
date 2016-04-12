@@ -59,12 +59,78 @@ var QuizCanvasSettings = (function () {
     return QuizCanvasSettings;
 }());
 exports.QuizCanvasSettings = QuizCanvasSettings;
+var QuizCanvasFontSettings = (function () {
+    function QuizCanvasFontSettings() {
+    }
+    return QuizCanvasFontSettings;
+}());
+exports.QuizCanvasFontSettings = QuizCanvasFontSettings;
+var QuizCanvasSizeSettings = (function () {
+    function QuizCanvasSizeSettings() {
+    }
+    return QuizCanvasSizeSettings;
+}());
+exports.QuizCanvasSizeSettings = QuizCanvasSizeSettings;
 var QuizCanvasScoresSettings = (function () {
     function QuizCanvasScoresSettings() {
     }
     return QuizCanvasScoresSettings;
 }());
 exports.QuizCanvasScoresSettings = QuizCanvasScoresSettings;
+var QuizCanvasScoresSizeSettings = (function () {
+    function QuizCanvasScoresSizeSettings() {
+    }
+    return QuizCanvasScoresSizeSettings;
+}());
+exports.QuizCanvasScoresSizeSettings = QuizCanvasScoresSizeSettings;
+var QuizCanvasScoresColorsSettings = (function () {
+    function QuizCanvasScoresColorsSettings() {
+    }
+    return QuizCanvasScoresColorsSettings;
+}());
+exports.QuizCanvasScoresColorsSettings = QuizCanvasScoresColorsSettings;
+var QuizCanvasCircleSettings = (function () {
+    function QuizCanvasCircleSettings() {
+    }
+    return QuizCanvasCircleSettings;
+}());
+exports.QuizCanvasCircleSettings = QuizCanvasCircleSettings;
+var QuizCanvasCircleRadiusSettings = (function () {
+    function QuizCanvasCircleRadiusSettings() {
+    }
+    return QuizCanvasCircleRadiusSettings;
+}());
+exports.QuizCanvasCircleRadiusSettings = QuizCanvasCircleRadiusSettings;
+var QuizCanvasCircleStateSettings = (function () {
+    function QuizCanvasCircleStateSettings() {
+    }
+    return QuizCanvasCircleStateSettings;
+}());
+exports.QuizCanvasCircleStateSettings = QuizCanvasCircleStateSettings;
+var QuizCanvasLineSettings = (function () {
+    function QuizCanvasLineSettings() {
+    }
+    return QuizCanvasLineSettings;
+}());
+exports.QuizCanvasLineSettings = QuizCanvasLineSettings;
+var QuizCanvasCircleStatesSettings = (function () {
+    function QuizCanvasCircleStatesSettings() {
+    }
+    return QuizCanvasCircleStatesSettings;
+}());
+exports.QuizCanvasCircleStatesSettings = QuizCanvasCircleStatesSettings;
+var QuizCanvasCircleStatePreviousSettings = (function () {
+    function QuizCanvasCircleStatePreviousSettings() {
+    }
+    return QuizCanvasCircleStatePreviousSettings;
+}());
+exports.QuizCanvasCircleStatePreviousSettings = QuizCanvasCircleStatePreviousSettings;
+var QuizCanvasCircleStateCurrentSettings = (function () {
+    function QuizCanvasCircleStateCurrentSettings() {
+    }
+    return QuizCanvasCircleStateCurrentSettings;
+}());
+exports.QuizCanvasCircleStateCurrentSettings = QuizCanvasCircleStateCurrentSettings;
 var QuizQuestionSettings = (function () {
     function QuizQuestionSettings() {
     }
