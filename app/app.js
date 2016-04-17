@@ -20,6 +20,7 @@ var contest_type_1 = require('./pages/contest-type/contest-type');
 var set_contest_1 = require('./pages/set-contest/set-contest');
 var settings_1 = require('./pages/settings/settings');
 var system_tools_1 = require('./pages/system-tools/system-tools');
+var loading_modal_1 = require('./components/loading-modal/loading-modal');
 var contestsService = require('./providers/contests');
 var topTeamerApp = (function () {
     function topTeamerApp(ionicApp, platform, config, client, events, menuController) {
@@ -34,6 +35,7 @@ var topTeamerApp = (function () {
         //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
         var _this = this;
         this.client.platform.ready().then(function () {
+            _this.client.initLoader();
             _this.expandStringPrototype();
             _this.declareRequestAnimationFrame();
             _this.expandDatePrototype();
@@ -49,7 +51,7 @@ var topTeamerApp = (function () {
                 // org.apache.cordova.statusbar required
                 window.StatusBar.styleDefault();
             }
-            _this.client.showSpinner = false;
+            _this.client.hideLoader();
             console.log('platform ready');
         });
     };
@@ -268,7 +270,8 @@ var topTeamerApp = (function () {
             templateUrl: 'app.html',
             moduleId: 'build/app.html',
             providers: [core_1.provide(core_1.ExceptionHandler, { useClass: exceptions_1.MyExceptionHandler }), client_1.Client],
-            config: { backButtonText: '' }
+            config: { backButtonText: '' },
+            directives: [loading_modal_1.LoadingModalComponent]
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.IonicApp, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events, ionic_angular_1.MenuController])
     ], topTeamerApp);

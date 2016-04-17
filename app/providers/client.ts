@@ -7,6 +7,7 @@ import * as facebookService from './facebook';
 import * as alertService from './alert';
 import * as contestsService from './contests';
 import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo} from '../objects/objects';
+import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
 
 @Injectable()
 export class Client {
@@ -26,8 +27,8 @@ export class Client {
   _platform:Platform;
   _config:Config;
   _events:Events;
-  _showSpinner:Boolean = true;
   _nav:NavController;
+  loadingModalComponent: LoadingModalComponent;
   menuController:MenuController;
   _user:User;
   _session:Session;
@@ -352,16 +353,16 @@ export class Client {
 
   serverPost(path, postData ?, timeout ?, blockUserInterface ?) {
     return new Promise((resolve, reject) => {
-      this.showSpinner = true;
+      this.showLoader();
       this.serverGateway.post(path, postData, timeout, blockUserInterface).then((data) => {
-        this.showSpinner = false;
+        this.hideLoader();
         if (this.nav && this.nav.length() > 0) {
           //GUI is initiated - process the events right away
           this.processInternalEvents();
         }
         resolve(data);
       }, (err) => {
-        this.showSpinner = false;
+        this.hideLoader();
         if (err && err.httpStatus === 401) {
           facebookService.getLoginStatus().then((result) => {
             if (result['connected']) {
@@ -420,16 +421,26 @@ export class Client {
     this.ionicApp.setTitle(this.translate(key, params));
   }
 
-  get showSpinner() : Boolean {
-    return this._showSpinner;
+  initLoader() {
+    this.loadingModalComponent = this._ionicApp.getComponent('loading');
   }
 
-  set showSpinner(value: Boolean) {
-    //Must be async - issue related to 'field changed since last checked' - in angular2
-    setTimeout(() => {
-      this._showSpinner = value;
-    },100);
+  showLoader() {
+    if (this.loadingModalComponent) {
+      setTimeout(() => {
+        this.loadingModalComponent.show();
+      },100);
+    }
   }
+
+  hideLoader() {
+    if (this.loadingModalComponent) {
+      setTimeout(() => {
+        this.loadingModalComponent.hide();
+      },100);
+    }
+  }
+
 
   private getDefaultLanguage() {
     //Always return a language - get the browser's language

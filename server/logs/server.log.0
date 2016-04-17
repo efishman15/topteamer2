@@ -1,16 +1,4 @@
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9524,"level":30,"options":{"url":"http://freegeoip.net/json/5.29.242.54","timeout":3000},"error":{"code":"ETIMEDOUT","connect":true},"msg":"Error during request from api","time":"2016-04-11T10:28:21.092Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":11376,"level":30,"msg":"server up!","time":"2016-04-11T10:36:59.683Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":13948,"level":30,"msg":"server up!","time":"2016-04-11T10:37:54.128Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":1208,"level":30,"msg":"server up!","time":"2016-04-11T10:39:58.732Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10944,"level":30,"msg":"server up!","time":"2016-04-11T10:42:05.066Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":18280,"level":30,"msg":"server up!","time":"2016-04-11T11:02:42.123Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":18280,"level":30,"options":{"url":"http://freegeoip.net/json/","timeout":3000},"error":{"code":"ETIMEDOUT","connect":true},"msg":"Error during request from api","time":"2016-04-11T11:04:18.955Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":18280,"level":30,"options":{"url":"http://freegeoip.net/json/5.29.242.54","timeout":3000},"error":{"code":"ETIMEDOUT","connect":true},"msg":"Error during request from api","time":"2016-04-11T11:07:01.224Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":18280,"level":30,"options":{"url":"http://freegeoip.net/json/5.29.242.54","timeout":3000},"error":{"code":"ETIMEDOUT","connect":true},"msg":"Error during request from api","time":"2016-04-11T11:09:11.165Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":20196,"level":30,"msg":"server up!","time":"2016-04-11T11:41:27.749Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":20196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-11T12:33:04.222Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":20196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-11T12:39:17.400Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":20196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-11T14:08:12.183Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":20196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-11T14:13:04.588Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":20196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-11T14:38:20.783Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":20196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-11T14:38:56.214Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3292,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-13T13:39:06.879Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3292,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-13T13:40:44.869Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":3292,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-04-13T13:42:34.197Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":4312,"level":30,"msg":"server up!","time":"2016-04-13T13:43:53.061Z","v":0}

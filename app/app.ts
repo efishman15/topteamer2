@@ -10,13 +10,15 @@ import {ContestTypePage} from './pages/contest-type/contest-type';
 import {SetContestPage} from './pages/set-contest/set-contest';
 import {SettingsPage} from './pages/settings/settings';
 import {SystemToolsPage} from './pages/system-tools/system-tools';
+import {LoadingModalComponent} from './components/loading-modal/loading-modal';
 import * as contestsService from './providers/contests';
 
 @App({
   templateUrl: 'app.html',
   moduleId: 'build/app.html',
   providers: [provide(ExceptionHandler, {useClass: MyExceptionHandler}), Client],
-  config: {backButtonText: ''}
+  config: {backButtonText: ''},
+  directives: [LoadingModalComponent]
 })
 class topTeamerApp {
 
@@ -40,6 +42,8 @@ class topTeamerApp {
 
     this.client.platform.ready().then(() => {
 
+      this.client.initLoader();
+
       this.expandStringPrototype();
       this.declareRequestAnimationFrame();
       this.expandDatePrototype();
@@ -60,7 +64,7 @@ class topTeamerApp {
         window.StatusBar.styleDefault();
       }
 
-      this.client.showSpinner = false;
+      this.client.hideLoader();
       console.log('platform ready');
 
     });

@@ -20,7 +20,6 @@ var Client = (function () {
     function Client(http) {
         this.circle = Math.PI * 2;
         this.quarter = Math.PI / 2;
-        this._showSpinner = true;
         this._loaded = false;
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
@@ -264,16 +263,16 @@ var Client = (function () {
     Client.prototype.serverPost = function (path, postData, timeout, blockUserInterface) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.showSpinner = true;
+            _this.showLoader();
             _this.serverGateway.post(path, postData, timeout, blockUserInterface).then(function (data) {
-                _this.showSpinner = false;
+                _this.hideLoader();
                 if (_this.nav && _this.nav.length() > 0) {
                     //GUI is initiated - process the events right away
                     _this.processInternalEvents();
                 }
                 resolve(data);
             }, function (err) {
-                _this.showSpinner = false;
+                _this.hideLoader();
                 if (err && err.httpStatus === 401) {
                     facebookService.getLoginStatus().then(function (result) {
                         if (result['connected']) {
@@ -329,20 +328,25 @@ var Client = (function () {
     Client.prototype.setPageTitle = function (key, params) {
         this.ionicApp.setTitle(this.translate(key, params));
     };
-    Object.defineProperty(Client.prototype, "showSpinner", {
-        get: function () {
-            return this._showSpinner;
-        },
-        set: function (value) {
-            var _this = this;
-            //Must be async - issue related to 'field changed since last checked' - in angular2
+    Client.prototype.initLoader = function () {
+        this.loadingModalComponent = this._ionicApp.getComponent('loading');
+    };
+    Client.prototype.showLoader = function () {
+        var _this = this;
+        if (this.loadingModalComponent) {
             setTimeout(function () {
-                _this._showSpinner = value;
+                _this.loadingModalComponent.show();
             }, 100);
-        },
-        enumerable: true,
-        configurable: true
-    });
+        }
+    };
+    Client.prototype.hideLoader = function () {
+        var _this = this;
+        if (this.loadingModalComponent) {
+            setTimeout(function () {
+                _this.loadingModalComponent.hide();
+            }, 100);
+        }
+    };
     Client.prototype.getDefaultLanguage = function () {
         //Always return a language - get the browser's language
         var language = window.navigator.languages ? navigator.languages[0].toString() : (navigator.language || navigator.userLanguage);

@@ -133,15 +133,15 @@ var SetContestPage = (function () {
                 'featurePurchased': _this.client.session.features['newContest'].name
             };
             paymentService.processPayment('android', purchaseData, extraPurchaseData).then(function (serverPurchaseData) {
-                _this.client.showSpinner = true;
+                _this.client.showLoader();
                 window.inappbilling.consumePurchase(function (purchaseData) {
-                    _this.client.showSpinner = false;
+                    _this.client.hideLoader();
                     if (resolve) {
                         resolve(purchaseData);
                     }
                     paymentService.showPurchaseSuccess(serverPurchaseData);
                 }, function (error) {
-                    _this.client.showSpinner = false;
+                    _this.client.hideLoader();
                     window.myLogError('AndroidBilling', 'Error consuming product: ' + error);
                     if (reject) {
                         reject();

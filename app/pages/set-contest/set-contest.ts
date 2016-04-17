@@ -180,11 +180,11 @@ export class SetContestPage {
 
       paymentService.processPayment('android', purchaseData, extraPurchaseData).then((serverPurchaseData) => {
 
-        this.client.showSpinner = true;
+        this.client.showLoader();
 
         window.inappbilling.consumePurchase((purchaseData) => {
 
-            this.client.showSpinner = false;
+            this.client.hideLoader();
 
             if (resolve) {
               resolve(purchaseData);
@@ -192,7 +192,7 @@ export class SetContestPage {
             paymentService.showPurchaseSuccess(serverPurchaseData);
           }, (error) => {
 
-            this.client.showSpinner = false;
+            this.client.hideLoader();
             window.myLogError('AndroidBilling', 'Error consuming product: ' + error);
             if (reject) {
               reject();

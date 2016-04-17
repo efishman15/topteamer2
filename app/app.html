@@ -65,6 +65,8 @@
 <ion-nav id="nav" [root]="root" #content swipe-back-enabled="false">
 </ion-nav>
 
+<loading-modal id="loading"></loading-modal>
+
 <div id="playerInfo" [hidden]="client.isMenuOpen">
   <img *ngIf="client.session" src="{{client.session.avatar}}"
        class="player-info-avatar">
@@ -72,4 +74,3 @@
   <canvas id="playerInfoRankCanvas">
   </canvas>
 </div>
-<ion-spinner *ngIf="client && client.showSpinner" style="position: absolute; top: 50%; left: 50%;"></ion-spinner>
