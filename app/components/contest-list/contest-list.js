@@ -19,9 +19,13 @@ var ContestListComponent = (function () {
     }
     ContestListComponent.prototype.refresh = function () {
         var _this = this;
-        var postData = { 'tab': this.tab };
-        contestsService.list(this.tab).then(function (contests) {
-            _this.contests = contests;
+        return new Promise(function (resolve, reject) {
+            contestsService.list(_this.tab).then(function (contests) {
+                _this.contests = contests;
+                resolve();
+            }), function () {
+                reject();
+            };
         });
     };
     ContestListComponent.prototype.onContestSelected = function (data) {

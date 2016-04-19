@@ -44,6 +44,10 @@ export class MainTabsPage {
       this.client.nav.present(modal);
     });
 
+    this.client.events.subscribe('topTeamer:noPersonalContests', (eventData) => {
+      this.mainTabs.select(1); //Switch to "Running contests"
+    });
+
   }
 
   ngAfterViewInit() {

@@ -441,6 +441,11 @@ export class Client {
     }
   }
 
+  popToRoot() {
+    if (this.nav.canGoBack()) {
+      this.nav.popToRoot();
+    }
+  }
 
   private getDefaultLanguage() {
     //Always return a language - get the browser's language

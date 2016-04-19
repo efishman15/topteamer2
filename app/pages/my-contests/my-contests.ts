@@ -13,6 +13,7 @@ export class MyContestsPage {
 
   @ViewChild(ContestListComponent) contestList:ContestListComponent;
   client:Client;
+  pageLoaded:boolean;
 
   constructor() {
     this.client = Client.getInstance();
@@ -21,12 +22,19 @@ export class MyContestsPage {
   onPageWillEnter() {
     this.client.logEvent('page/myContests');
     if (this.contestList) {
-      this.refreshList();
+      this.refreshList().then( () => {
+        this.pageLoaded = true;
+      });
     }
   }
 
   ngAfterViewInit() {
-    this.refreshList();
+    this.refreshList().then( () => {
+      if (this.contestList.contests.length === 0) {
+        //On load only - switch to "running contests" if no personal contests
+        this.client.events.publish('topTeamer:noPersonalContests');
+      }
+    });
   }
 
   onContestSelected(data) {
@@ -34,6 +42,6 @@ export class MyContestsPage {
   }
 
   refreshList() {
-    this.contestList.refresh();
+    return this.contestList.refresh();
   }
 }

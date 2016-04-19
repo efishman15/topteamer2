@@ -18,19 +18,19 @@
     <h5 class="center question-text" [innerHtml]="question.text"></h5>
   </div>
 
-  <div padding text-center *ngIf="chartDataSource" id="questionChart">
+  <div padding-top text-center class="question-chart-container" *ngIf="chartDataSource" id="questionChart" [ngStyle]="{'width': client.settings.charts.questionStats.size.width + 30 + 'px'}">
   </div>
 
-  <div text-center>
+  <div padding-top text-center>
 
     <ion-buttons>
-      <button padding secondary *ngIf="question.wikipediaHint"
-              class="button button-small"
+      <button padding *ngIf="question.wikipediaHint"
+              class="button-small button-use-hint"
               (click)="dismiss('hint')">
         {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
       </button>
-      <button padding secondary *ngIf="question.wikipediaAnswer"
-              class="button button-small"
+      <button padding *ngIf="question.wikipediaAnswer"
+              class="button-small button-use-answer"
               (click)="dismiss('answer')">
         {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
       </button>

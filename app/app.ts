@@ -12,6 +12,7 @@ import {SettingsPage} from './pages/settings/settings';
 import {SystemToolsPage} from './pages/system-tools/system-tools';
 import {LoadingModalComponent} from './components/loading-modal/loading-modal';
 import * as contestsService from './providers/contests';
+import {} from './interfaces/interfaces'
 
 @App({
   templateUrl: 'app.html',

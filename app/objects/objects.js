@@ -1,4 +1,9 @@
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Settings = (function () {
     function Settings() {
     }
@@ -155,6 +160,20 @@ var ChartSettings = (function () {
     return ChartSettings;
 }());
 exports.ChartSettings = ChartSettings;
+var QuestionStatsChartSettings = (function (_super) {
+    __extends(QuestionStatsChartSettings, _super);
+    function QuestionStatsChartSettings() {
+        _super.apply(this, arguments);
+    }
+    return QuestionStatsChartSettings;
+}(ChartSettings));
+exports.QuestionStatsChartSettings = QuestionStatsChartSettings;
+var QuestionStatsChartSettingsColors = (function () {
+    function QuestionStatsChartSettingsColors() {
+    }
+    return QuestionStatsChartSettingsColors;
+}());
+exports.QuestionStatsChartSettingsColors = QuestionStatsChartSettingsColors;
 var Size = (function () {
     function Size() {
     }

@@ -199,17 +199,28 @@ var QuizPage = (function () {
                 if (this.quizData.currentQuestion.correctRatio ||
                     this.quizData.currentQuestion.correctRatio === 0) {
                     questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats.chartControl));
-                    questionChart.chart.caption = this.client.translate('QUESTION_STATS_CHART_CAPTION');
-                    questionChart.chart.paletteColors = this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor + ',' + this.client.settings.quiz.canvas.circle.states.previous.incorrect.innerColor;
                     questionChart.data = [];
-                    questionChart.data.push({
-                        'label': this.client.translate('ANSWERED_CORRECT'),
-                        'value': this.quizData.currentQuestion.correctRatio
-                    });
-                    questionChart.data.push({
-                        'label': this.client.translate('ANSWERED_INCORRECT'),
-                        'value': (1 - this.quizData.currentQuestion.correctRatio)
-                    });
+                    var roundedCorrectRatio = Math.round(this.quizData.currentQuestion.correctRatio * 100) / 100;
+                    var chartData = [
+                        {
+                            'label': this.client.translate('ANSWERED_CORRECT'),
+                            'value': roundedCorrectRatio
+                        },
+                        {
+                            'label': this.client.translate('ANSWERED_INCORRECT'),
+                            'value': 1 - roundedCorrectRatio
+                        },
+                    ];
+                    if (this.client.currentLanguage.direction === 'ltr') {
+                        questionChart.data.push(chartData[0]);
+                        questionChart.data.push(chartData[1]);
+                        questionChart.chart.paletteColors = this.client.settings.charts.questionStats.colors.correct + ',' + this.client.settings.charts.questionStats.colors.incorrect;
+                    }
+                    else {
+                        questionChart.data.push(chartData[1]);
+                        questionChart.data.push(chartData[0]);
+                        questionChart.chart.paletteColors = this.client.settings.charts.questionStats.colors.incorrect + ',' + this.client.settings.charts.questionStats.colors.correct;
+                    }
                 }
                 var modal = ionic_angular_1.Modal.create(question_stats_1.QuestionStatsPage, {
                     'question': this.quizData.currentQuestion,
@@ -258,7 +269,7 @@ var QuizPage = (function () {
         //Calculate the space between the circles depending on the number of questions
         var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.client.settings.quiz.canvas.circle.radius.outer * 2) / (this.quizData.totalQuestions - 1);
         for (var i = 0; i < this.quizData.totalQuestions; i++) {
-            if (i === this.quizData.currentQuestionIndex) {
+            if (i === this.quizData.currentQuestionIndex && this.questionHistory[i].answered == undefined) {
                 //--------------------------------------------------------------------//
                 // Current question (to be answered)
                 //--------------------------------------------------------------------//
@@ -274,16 +285,16 @@ var QuizPage = (function () {
                     //Draw the outer circle
                     this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.outer, this.client.settings.quiz.canvas.circle.states.current.stats.outerColor);
                     //Draw the correct ratio (in the inner circle - partial arc)
-                    this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, 0, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, true);
+                    this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, -Math.PI / 2, this.quizData.currentQuestion.correctRatio * Math.PI * 2 - Math.PI / 2, false);
                     //Draw the incorrect ratio
-                    this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, -this.quizData.currentQuestion.correctRatio * Math.PI * 2, Math.PI * 2, true);
+                    this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.incorrect.innerColor, this.quizData.currentQuestion.correctRatio * Math.PI * 2 - Math.PI / 2, -Math.PI / 2, false);
                 }
                 else {
                     //Draw the "current" circle using the "noStats" state
                     this.drawQuestionState(currentX, this.client.settings.quiz.canvas.circle.states.current.noStats);
                 }
             }
-            else if (i > this.quizData.currentQuestionIndex) {
+            else if (i > this.quizData.currentQuestionIndex && this.questionHistory[i].answered == undefined) {
                 //--------------------------------------------------------------------//
                 // Next Question - not reached yet
                 //--------------------------------------------------------------------//

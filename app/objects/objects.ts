@@ -139,13 +139,23 @@ export class QuizQuestionAnswerSettings {
 
 export class ChartsSettings {
   contest: ChartSettings;
-  questionStats:ChartSettings;
+  questionStats:QuestionStatsChartSettings;
 }
 
 export class ChartSettings {
   type: string;
   size: Size;
   chartControl: any;
+}
+
+export class QuestionStatsChartSettings extends ChartSettings{
+  colors: QuestionStatsChartSettingsColors;
+}
+
+export class QuestionStatsChartSettingsColors
+{
+  correct: string;
+  incorrect: string;
 }
 
 export class Size {

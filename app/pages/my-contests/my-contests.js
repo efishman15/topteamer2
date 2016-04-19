@@ -18,19 +18,28 @@ var MyContestsPage = (function () {
         this.client = client_1.Client.getInstance();
     }
     MyContestsPage.prototype.onPageWillEnter = function () {
+        var _this = this;
         this.client.logEvent('page/myContests');
         if (this.contestList) {
-            this.refreshList();
+            this.refreshList().then(function () {
+                _this.pageLoaded = true;
+            });
         }
     };
     MyContestsPage.prototype.ngAfterViewInit = function () {
-        this.refreshList();
+        var _this = this;
+        this.refreshList().then(function () {
+            if (_this.contestList.contests.length === 0) {
+                //On load only - switch to "running contests" if no personal contests
+                _this.client.events.publish('topTeamer:noPersonalContests');
+            }
+        });
     };
     MyContestsPage.prototype.onContestSelected = function (data) {
         contestsService.openContest(data.contest._id);
     };
     MyContestsPage.prototype.refreshList = function () {
-        this.contestList.refresh();
+        return this.contestList.refresh();
     };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 

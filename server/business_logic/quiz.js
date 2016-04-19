@@ -303,12 +303,7 @@ module.exports.answer = function (req, res, next) {
         }
       }
 
-      if (!data.session.quiz.clientData.reviewMode) {
-        dalDb.updateQuestionStatistics(data, callback);
-      }
-      else {
-        callback(null, data);
-      }
+      dalDb.updateQuestionStatistics(data, callback);
     },
 
     //Store session

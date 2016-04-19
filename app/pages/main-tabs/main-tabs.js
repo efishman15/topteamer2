@@ -36,6 +36,9 @@ var MainTabsPage = (function () {
             var modal = ionic_angular_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
             _this.client.nav.present(modal);
         });
+        this.client.events.subscribe('topTeamer:noPersonalContests', function (eventData) {
+            _this.mainTabs.select(1); //Switch to "Running contests"
+        });
     }
     MainTabsPage.prototype.ngAfterViewInit = function () {
         this.client.initXp();

@@ -347,6 +347,11 @@ var Client = (function () {
             }, 100);
         }
     };
+    Client.prototype.popToRoot = function () {
+        if (this.nav.canGoBack()) {
+            this.nav.popToRoot();
+        }
+    };
     Client.prototype.getDefaultLanguage = function () {
         //Always return a language - get the browser's language
         var language = window.navigator.languages ? navigator.languages[0].toString() : (navigator.language || navigator.userLanguage);

@@ -21,9 +21,13 @@ export class ContestListComponent {
   }
 
   refresh() {
-    var postData = {'tab': this.tab};
-    contestsService.list(this.tab).then((contests) => {
-      this.contests = contests;
+    return new Promise( (resolve, reject) => {
+      contestsService.list(this.tab).then((contests) => {
+        this.contests = contests;
+        resolve();
+      }), () => {
+        reject();
+      };
     });
   }
 
