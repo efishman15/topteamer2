@@ -25,12 +25,12 @@
 
     <ion-buttons>
       <button padding *ngIf="question.wikipediaHint"
-              class="button-small button-light-blue"
+              class="button-small app-button-light-blue"
               (click)="dismiss('hint')">
         {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
       </button>
       <button padding *ngIf="question.wikipediaAnswer"
-              class="button-small button-light-purple"
+              class="button-small app-button-light-purple"
               (click)="dismiss('answer')">
         {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
       </button>

@@ -7,6 +7,7 @@ import {NewRankPage} from '../../pages/new-rank/new-rank';
 import {Client} from '../../providers/client';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
+import * as shareService from '../../providers/share';
 import * as alertService from '../../providers/alert';
 import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings} from '../../objects/objects';
 import {ChartSettings} from "../../objects/objects";
@@ -359,12 +360,19 @@ export class QuizPage {
           //Draw the outer circle
           this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.outer, this.client.settings.quiz.canvas.circle.states.current.stats.outerColor);
 
-          //Draw the correct ratio (in the inner circle - partial arc)
-          this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, -Math.PI/2, this.quizData.currentQuestion.correctRatio * Math.PI * 2 - Math.PI/2, false);
+          if (this.quizData.currentQuestion.correctRatio === 1) {
+            //Draw full correct ratio (in the inner circle - partial arc)
+            this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, -Math.PI / 2, Math.PI * 2 - Math.PI / 2, false);
+          }
+          else if (this.quizData.currentQuestion.correctRatio === 0) {
+            //Draw full incorrect ratio (in the inner circle - partial arc)
+            this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.incorrect.innerColor, -Math.PI / 2, Math.PI * 2 - Math.PI / 2, false);
 
-          //Draw the incorrect ratio
-          this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.incorrect.innerColor, this.quizData.currentQuestion.correctRatio * Math.PI * 2 - Math.PI/2, -Math.PI / 2, false);
-
+          }
+          else {
+            this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.correct.innerColor, -Math.PI / 2, this.quizData.currentQuestion.correctRatio * Math.PI * 2 - Math.PI / 2, false);
+            this.drawQuestionCircle(currentX, this.client.settings.quiz.canvas.circle.radius.inner, this.client.settings.quiz.canvas.circle.states.previous.incorrect.innerColor, this.quizData.currentQuestion.correctRatio * Math.PI * 2 - Math.PI / 2, -Math.PI / 2, false);
+          }
         }
         else {
           //Draw the "current" circle using the "noStats" state
@@ -546,5 +554,9 @@ export class QuizPage {
       })
     })
     this.client.nav.present(modal);
+  }
+
+  share() {
+    shareService.share('quiz-fab', this.params.data.contest);
   }
 }
