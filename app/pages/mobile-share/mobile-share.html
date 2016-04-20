@@ -12,20 +12,19 @@
 
 </ion-toolbar>
 
-<ion-content>
+<ion-content class="app-bg">
 
-  <div text-center>
-    <img padding src="images/logo.png">
+  <div text-center class="base-font">
+    <img padding-top src="images/share_image.png" width="350" height="350">
+    <h3>{{contest.name}}</h3>
+    <h4 padding-bottom>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h4>
 
-    <h3 padding-top>{{contest.name}}</h3>
-    <h4>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h4>
+    <button padding-top class="button-small button-facebook" (click)="dismiss(true)">
+      {{client.translate('SHARE')}}
+    </button>
 
-    <ion-buttons>
-      <button padding class="button-stable" (click)="dismiss(true)">{{client.translate('SHARE')}}
-      </button>
-      <button padding class="button-stable" (click)="dismiss(false)">{{client.translate('NOT_NOW')}}
-      </button>
-    </ion-buttons>
+    <div padding-top text-center class="pointer button-not-now" (click)="dismiss(false)">{{client.translate('NOT_NOW')}}
+    </div>
 
   </div>
 

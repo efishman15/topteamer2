@@ -353,10 +353,21 @@ export class Team {
 
 export class ContestType {
   id:string;
-  icon:string;
+  image: ContestTypeImage;
+  text: ContestTypeText;
+}
+
+export class ContestTypeImage {
+  url: string;
+  width: number;
+  height: number;
+}
+
+export class ContestTypeText {
   title:string;
   description:string;
   name:string;
+  titleColor: string;
 }
 
 export class QuizResults {

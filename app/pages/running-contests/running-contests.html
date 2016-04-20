@@ -2,6 +2,9 @@
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
+  <button app-top-bar class="bar-button" (click)="client.openNewContest()">
+    <ion-icon name="add-circle"></ion-icon>
+  </button>
   <ion-title>{{client.translate('RUNNING_CONTESTS')}}</ion-title>
 
 </ion-navbar>

@@ -395,7 +395,7 @@ debugger;
       this.contestLocalCopy.name = this.client.translate('CONTEST_NAME', {
         'team0': this.contestLocalCopy.teams[0].name,
         'team1': this.contestLocalCopy.teams[1].name,
-        'type': this.client.translate(this.contestLocalCopy.type.name)
+        'type': this.client.translate(this.contestLocalCopy.type.text.name)
       });
 
       if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {

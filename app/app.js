@@ -16,8 +16,6 @@ var login_1 = require('./pages/login/login');
 var facebookService = require('./providers/facebook');
 var shareService = require('./providers/share');
 var client_1 = require('./providers/client');
-var contest_type_1 = require('./pages/contest-type/contest-type');
-var set_contest_1 = require('./pages/set-contest/set-contest');
 var settings_1 = require('./pages/settings/settings');
 var system_tools_1 = require('./pages/system-tools/system-tools');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
@@ -239,19 +237,6 @@ var topTeamerApp = (function () {
                 this.setMilliseconds(0);
             };
         }
-    };
-    topTeamerApp.prototype.newContest = function () {
-        var _this = this;
-        this.client.logEvent('menu/newContest');
-        var modal = ionic_angular_1.Modal.create(contest_type_1.ContestTypePage);
-        modal.onDismiss(function (contestType) {
-            if (contestType) {
-                setTimeout(function () {
-                    _this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'add', 'type': contestType });
-                }, 500);
-            }
-        });
-        this.client.nav.present(modal);
     };
     topTeamerApp.prototype.share = function () {
         this.client.logEvent('menu/share');

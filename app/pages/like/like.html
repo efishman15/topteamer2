@@ -6,16 +6,18 @@
 
 </ion-navbar>
 
-<ion-content>
+<ion-content class="app-bg">
 
-  <h4 text-center *ngIf="!contest">{{client.translate('CLICK_LIKE')}}</h4>
-  <div text-center *ngIf="contest">
-    <h4>{{client.translate('CLICK_LIKE_WITH_CONTEST')}}</h4>
-    <h3 padding>{{contest.name}}</h3>
+  <div text-center class="base-font">
+    <h4 text-center *ngIf="!contest">{{client.translate('CLICK_LIKE')}}</h4>
+    <div text-center *ngIf="contest">
+      <h4>{{client.translate('CLICK_LIKE_WITH_CONTEST')}}</h4>
+      <h2 padding>{{contest.name}}</h2>
+    </div>
+
+    <button class="button-facebook" (click)="like()">{{client.translate('FACEBOOK_GAME_PAGE')}}
+    </button>
+
   </div>
-
-  <h4 text-center>
-    <a class="pointer" (click)="like()">{{client.translate('FACEBOOK_GAME_PAGE')}}</a>
-  </h4>
 
 </ion-content>

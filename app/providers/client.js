@@ -12,10 +12,13 @@ var core_1 = require('angular2/core');
 var http_1 = require('angular2/http');
 require('rxjs/add/operator/map');
 require('rxjs/add/operator/timeout');
+var ionic_angular_1 = require('ionic-angular');
 var facebookService = require('./facebook');
 var alertService = require('./alert');
 var contestsService = require('./contests');
 var objects_1 = require('../objects/objects');
+var contest_type_1 = require('../pages/contest-type/contest-type');
+var set_contest_1 = require('../pages/set-contest/set-contest');
 var Client = (function () {
     function Client(http) {
         this.circle = Math.PI * 2;
@@ -327,6 +330,19 @@ var Client = (function () {
     };
     Client.prototype.setPageTitle = function (key, params) {
         this.ionicApp.setTitle(this.translate(key, params));
+    };
+    Client.prototype.openNewContest = function () {
+        var _this = this;
+        this.logEvent('menu/newContest');
+        var modal = ionic_angular_1.Modal.create(contest_type_1.ContestTypePage);
+        modal.onDismiss(function (contestType) {
+            if (contestType) {
+                setTimeout(function () {
+                    _this.nav.push(set_contest_1.SetContestPage, { 'mode': 'add', 'type': contestType });
+                }, 500);
+            }
+        });
+        this.nav.present(modal);
     };
     Client.prototype.initLoader = function () {
         this.loadingModalComponent = this._ionicApp.getComponent('loading');

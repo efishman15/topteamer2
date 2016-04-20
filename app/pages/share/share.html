@@ -6,9 +6,9 @@
 
 </ion-navbar>
 
-<ion-content>
+<ion-content class="app-bg">
 
-  <div padding text-center>
+  <div class="base-font" padding text-center>
     <h3 padding *ngIf="contest">{{contest.name}}</h3>
     <h3 padding *ngIf="!contest">{{client.translate('GAME_NAME')}}</h3>
     <h5>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h5>

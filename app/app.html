@@ -1,26 +1,26 @@
 <!-- left menu -->
 <ion-menu *ngIf="client.loaded && client.currentLanguage.direction==='ltr'" [content]="content" side="left">
 
-  <ion-toolbar danger *ngIf="client.loaded">
+  <ion-toolbar light-blue *ngIf="client.loaded">
     <ion-title>{{client.translate('TOOLS')}}</ion-title>
   </ion-toolbar>
 
-  <ion-content>
+  <ion-content class="app-bg">
 
     <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
-      <button menuClose ion-item (click)="newContest()">
+      <button class="app-menu-item" menuClose ion-item (click)="client.openNewContest()">
         <ion-icon name="add"></ion-icon>
         {{client.translate('NEW_CONTEST')}}
       </button>
-      <button menuClose ion-item (click)="share()">
+      <button class="app-menu-item" menuClose ion-item (click)="share()">
         <ion-icon name="share-alt"></ion-icon>
         {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
       </button>
-      <button menuClose ion-item (click)="settings()">
+      <button class="app-menu-item" menuClose ion-item (click)="settings()">
         <ion-icon name="settings"></ion-icon>
         {{client.translate('SETTINGS')}}
       </button>
-      <button *ngIf="client.session && client.session.isAdmin" menuClose ion-item (click)="systemTools()">
+      <button class="app-menu-item" *ngIf="client.session && client.session.isAdmin" menuClose ion-item (click)="systemTools()">
         <ion-icon name="hammer"></ion-icon>
         {{client.translate('SYSTEM_TOOLS')}}
       </button>
@@ -32,26 +32,26 @@
 <!-- right menu -->
 <ion-menu *ngIf="client.loaded && client.currentLanguage.direction==='rtl'" [content]="content" side="right">
 
-  <ion-toolbar danger *ngIf="client.loaded">
+  <ion-toolbar light-blue *ngIf="client.loaded">
     <ion-title>{{client.translate('TOOLS')}}</ion-title>
   </ion-toolbar>
 
-  <ion-content>
+  <ion-content class="app-bg">
 
     <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
-      <button menuClose ion-item (click)="newContest()">
+      <button class="app-menu-item" menuClose ion-item (click)="client.openNewContest()">
         <ion-icon name="add"></ion-icon>
         {{client.translate('NEW_CONTEST')}}
       </button>
-      <button menuClose ion-item (click)="share()">
+      <button class="app-menu-item" menuClose ion-item (click)="share()">
         <ion-icon name="share-alt"></ion-icon>
         {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
       </button>
-      <button menuClose ion-item (click)="settings()">
+      <button class="app-menu-item" menuClose ion-item (click)="settings()">
         <ion-icon name="settings"></ion-icon>
         {{client.translate('SETTINGS')}}
       </button>
-      <button *ngIf="client.session && client.session.isAdmin" menuClose ion-item (click)="systemTools()">
+      <button class="app-menu-item" *ngIf="client.session && client.session.isAdmin" menuClose ion-item (click)="systemTools()">
         <ion-icon name="hammer"></ion-icon>
         {{client.translate('SYSTEM_TOOLS')}}
       </button>

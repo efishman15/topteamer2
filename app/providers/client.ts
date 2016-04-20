@@ -2,12 +2,14 @@ import {Injectable} from 'angular2/core';
 import {Http, Response, Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
-import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Events} from 'ionic-angular';
+import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Modal, Events} from 'ionic-angular';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
 import * as contestsService from './contests';
 import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo} from '../objects/objects';
 import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
+import {ContestTypePage} from '../pages/contest-type/contest-type';
+import {SetContestPage} from '../pages/set-contest/set-contest';
 
 @Injectable()
 export class Client {
@@ -420,6 +422,20 @@ export class Client {
   setPageTitle(key:string, params ?:Object) {
     this.ionicApp.setTitle(this.translate(key, params));
   }
+
+  openNewContest() {
+    this.logEvent('menu/newContest');
+    var modal = Modal.create(ContestTypePage);
+    modal.onDismiss((contestType) => {
+      if (contestType) {
+        setTimeout(() => {
+          this.nav.push(SetContestPage, {'mode': 'add', 'type': contestType});
+        }, 500);
+      }
+    });
+    this.nav.present(modal);
+  }
+
 
   initLoader() {
     this.loadingModalComponent = this._ionicApp.getComponent('loading');

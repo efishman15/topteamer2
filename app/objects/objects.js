@@ -320,6 +320,18 @@ var ContestType = (function () {
     return ContestType;
 }());
 exports.ContestType = ContestType;
+var ContestTypeImage = (function () {
+    function ContestTypeImage() {
+    }
+    return ContestTypeImage;
+}());
+exports.ContestTypeImage = ContestTypeImage;
+var ContestTypeText = (function () {
+    function ContestTypeText() {
+    }
+    return ContestTypeText;
+}());
+exports.ContestTypeText = ContestTypeText;
 var QuizResults = (function () {
     function QuizResults() {
     }

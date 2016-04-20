@@ -5,14 +5,14 @@
   <ion-title>{{client.translate('SYSTEM_TOOLS')}}</ion-title>
 </ion-navbar>
 
-<ion-content>
+<ion-content class="app-bg">
 
   <div text-center padding>
-    <button class="button-full" (click)="clearCache()">{{client.translate('SYSTEM_CLEAR_CACHE')}}
+    <button class="button-full button-light-blue" (click)="clearCache()">{{client.translate('SYSTEM_CLEAR_CACHE')}}
     </button>
   </div>
   <div text-center padding>
-    <button danger class="button-full" (click)="restart()">{{client.translate('SYSTEM_RESTART_SERVER')}}
+    <button danger class="button-full button-light-purple" (click)="restart()">{{client.translate('SYSTEM_RESTART_SERVER')}}
     </button>
   </div>
 

@@ -291,19 +291,6 @@ class topTeamerApp {
     }
   }
 
-  newContest() {
-    this.client.logEvent('menu/newContest');
-    var modal = Modal.create(ContestTypePage);
-    modal.onDismiss((contestType) => {
-      if (contestType) {
-        setTimeout(() => {
-          this.client.nav.push(SetContestPage, {'mode': 'add', 'type': contestType});
-        }, 500);
-      }
-    });
-    this.client.nav.present(modal);
-  }
-
   share() {
     this.client.logEvent('menu/share');
     shareService.share('menu');
