@@ -34,7 +34,7 @@ function renderContest(viewName, req, res, next) {
             res.render(viewName,
                 {
                     'appId': generalUtils.settings.server.facebook.appId,
-                    'title': data.contest.name,
+                    'title': data.contest.name.long,
                     'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
                     'contestId' : req.params.contestId
                 });
@@ -74,7 +74,7 @@ function renderTeam(viewName, req, res, next) {
             res.render(viewName,
                 {
                     'appId': generalUtils.settings.server.facebook.appId,
-                    'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, data.contest.name),
+                    'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, data.contest.name.long),
                     'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
                     'contestId' : req.params.contestId,
                     'teamId' : req.params.teamId

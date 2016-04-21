@@ -10,6 +10,18 @@ var Settings = (function () {
     return Settings;
 }());
 exports.Settings = Settings;
+var NewContestSettings = (function () {
+    function NewContestSettings() {
+    }
+    return NewContestSettings;
+}());
+exports.NewContestSettings = NewContestSettings;
+var NewContestPrivateQuestionsSettings = (function () {
+    function NewContestPrivateQuestionsSettings() {
+    }
+    return NewContestPrivateQuestionsSettings;
+}());
+exports.NewContestPrivateQuestionsSettings = NewContestPrivateQuestionsSettings;
 var GoogleSettings = (function () {
     function GoogleSettings() {
     }
@@ -291,10 +303,10 @@ var CalendarCell = (function () {
 }());
 exports.CalendarCell = CalendarCell;
 var Contest = (function () {
-    function Contest(startDate, endDate, type) {
+    function Contest(startDate, endDate, typeId) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.type = type;
+        this.type = new ContestType(typeId);
         this.rating = 0;
         this.manualRating = 0;
         this.participants = 0;
@@ -306,6 +318,12 @@ var Contest = (function () {
     return Contest;
 }());
 exports.Contest = Contest;
+var ContestName = (function () {
+    function ContestName() {
+    }
+    return ContestName;
+}());
+exports.ContestName = ContestName;
 var Team = (function () {
     function Team() {
         this.name = null;
@@ -315,7 +333,8 @@ var Team = (function () {
 }());
 exports.Team = Team;
 var ContestType = (function () {
-    function ContestType() {
+    function ContestType(typeId) {
+        this.id = typeId;
     }
     return ContestType;
 }());

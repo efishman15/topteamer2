@@ -23,7 +23,7 @@ export let getVariables = (contest) => {
 
   if (contest) {
     shareVariables.shareUrl = contest.link;
-    shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', {name: contest.name});
+    shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', {name: contest.name.long});
 
     if (contest.myTeam === 0 || contest.myTeam === 1) {
       shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST', {
@@ -36,7 +36,7 @@ export let getVariables = (contest) => {
       });
       shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST', {
         team: contest.teams[contest.myTeam].name,
-        name: contest.name
+        name: contest.name.long
       });
     }
     else {

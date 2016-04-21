@@ -10,7 +10,7 @@ import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
 import * as shareService from '../../providers/share';
-import {Contest,Team, PaymentData} from '../../objects/objects';
+import {Contest,ContestName, Team, PaymentData} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html',
@@ -47,7 +47,7 @@ export class SetContestPage {
     this.client = Client.getInstance();
     this.params = params;
 
-    this.endOptionKeys = Object.keys(this.client.settings['newContest'].endOptions);
+    this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
 
     this.team0 = new Control('', Validators.required);
     this.team1 = new Control('', Validators.required);
@@ -81,9 +81,9 @@ export class SetContestPage {
     }
     else if (this.params.data.mode === 'add') {
       //Create new local instance of a contest
-      this.contestLocalCopy = new Contest(this.startDate, this.endDate, this.params.data.type);
+      this.contestLocalCopy = new Contest(this.startDate, this.endDate, this.params.data.typeId);
       this.showStartDate = true;
-      this.contestLocalCopy.questions = {'visibleCount': 0, 'list': []};
+      this.contestLocalCopy.type.questions = {'visibleCount': 0, 'list': []};
     }
 
     this.client.session.features['newContest'].purchaseData.retrieved = false;
@@ -141,7 +141,7 @@ export class SetContestPage {
   }
 
   onPageWillEnter() {
-    var eventData = {'mode' : this.params.data.mode};
+    var eventData = {'mode': this.params.data.mode};
     if (this.params.data.mode === 'edit') {
       eventData['contestId'] = this.params.data.contest._id;
     }
@@ -150,18 +150,18 @@ export class SetContestPage {
   }
 
   retrieveUserQuestions() {
-    contestsService.getQuestions(this.contestLocalCopy.userQuestions).then((questions) => {
-      this.contestLocalCopy.questions = {'visibleCount': questions.length, 'list': questions};
+    contestsService.getQuestions(this.contestLocalCopy.type.userQuestions).then((questions) => {
+      this.contestLocalCopy.type.questions = {'visibleCount': questions.length, 'list': questions};
     });
   }
 
   getTitle() {
     switch (this.params.data.mode) {
       case 'add':
-        return this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.params.data.type.text.name);
+        return this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.params.data.typeId].text.name);
 
       case 'edit':
-        return this.client.translate('EDIT_CONTEST');
+        return this.client.translate('EDIT_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name);
 
       default:
         return this.client.translate('GAME_NAME');
@@ -205,9 +205,9 @@ export class SetContestPage {
   }
 
   buyNewContestUnlockKey(isMobile) {
-debugger;
+    debugger;
     this.buyInProgress = true;
-    paymentService.buy(this.client.session.features['newContest'], isMobile).then((result: PaymentData) => {
+    paymentService.buy(this.client.session.features['newContest'], isMobile).then((result:PaymentData) => {
         switch (result.method) {
           case 'paypal':
             location.replace(result.data.url);
@@ -270,9 +270,9 @@ debugger;
   }
 
   removeContest() {
-    this.client.logEvent('contest/remove/click', {'contestId' : this.contestLocalCopy._id});
+    this.client.logEvent('contest/remove/click', {'contestId': this.contestLocalCopy._id});
     alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.contestLocalCopy.name}).then(() => {
-      this.client.logEvent('contest/removed', {'contestId' : this.contestLocalCopy._id});
+      this.client.logEvent('contest/removed', {'contestId': this.contestLocalCopy._id});
       contestsService.removeContest(this.contestLocalCopy._id).then(() => {
         this.client.events.publish('topTeamer:contestRemoved');
         setTimeout(() => {
@@ -299,7 +299,7 @@ debugger;
   }
 
   maxQuestionsReached() {
-    return (this.contestLocalCopy.questions && this.contestLocalCopy.questions.visibleCount === this.client.settings['newContest'].privateQuestions.max);
+    return (this.contestLocalCopy.type.questions && this.contestLocalCopy.type.questions.visibleCount === this.client.settings['newContest'].privateQuestions.max);
   }
 
   openQuestionEditor(mode, question) {
@@ -311,7 +311,11 @@ debugger;
       }
     }
 
-    var modal = Modal.create(QuestionEditorPage, {'question': question, 'mode': mode, 'currentQuestions' : this.contestLocalCopy.questions});
+    var modal = Modal.create(QuestionEditorPage, {
+      'question': question,
+      'mode': mode,
+      'currentQuestions': this.contestLocalCopy.type.questions
+    });
     modal.onDismiss((result) => {
       if (!result) {
         return;
@@ -322,8 +326,8 @@ debugger;
       if (!result.question._id) {
         //New questions
         result.question._id = 'new';
-        this.contestLocalCopy.questions.list.push(result.question);
-        this.contestLocalCopy.questions.visibleCount++;
+        this.contestLocalCopy.type.questions.list.push(result.question);
+        this.contestLocalCopy.type.questions.visibleCount++;
       }
       else if (result.question._id !== 'new') {
         //Set dirty flag for the question - so server will update it in the db
@@ -341,7 +345,7 @@ debugger;
       return;
     }
 
-    var modal = Modal.create(SearchQuestionsPage, {'currentQuestions': this.contestLocalCopy.questions});
+    var modal = Modal.create(SearchQuestionsPage, {'currentQuestions': this.contestLocalCopy.type.questions});
 
     this.client.nav.present(modal);
 
@@ -350,16 +354,16 @@ debugger;
   removeQuestion(index) {
 
     alertService.confirm('REMOVE_QUESTION', 'CONFIRM_REMOVE_QUESTION').then(() => {
-      if (this.contestLocalCopy.questions.list && index < this.contestLocalCopy.questions.list.length) {
-        if (this.contestLocalCopy.questions.list[index]._id && this.contestLocalCopy.questions.list[index]._id !== 'new') {
+      if (this.contestLocalCopy.type.questions.list && index < this.contestLocalCopy.type.questions.list.length) {
+        if (this.contestLocalCopy.type.questions.list[index]._id && this.contestLocalCopy.type.questions.list[index]._id !== 'new') {
           //Question has an id in the database - logically remove
-          this.contestLocalCopy.questions.list[index].deleted = true;
+          this.contestLocalCopy.type.questions.list[index].deleted = true;
         }
         else {
           //Question does not have an actual id in the database - physically remove
-          this.contestLocalCopy.questions.list.splice(index, 1);
+          this.contestLocalCopy.type.questions.list.splice(index, 1);
         }
-        this.contestLocalCopy.questions.visibleCount--;
+        this.contestLocalCopy.type.questions.visibleCount--;
       }
     });
   };
@@ -373,7 +377,7 @@ debugger;
     }
 
     if (this.contestLocalCopy.type.id === 'userTrivia') {
-      if (!this.contestLocalCopy.questions || this.contestLocalCopy.questions.visibleCount < this.client.settings['newContest'].privateQuestions.min) {
+      if (!this.contestLocalCopy.type.questions || this.contestLocalCopy.type.questions.visibleCount < this.client.settings['newContest'].privateQuestions.min) {
 
         if (!this.userQuestionsMinimumCheck()) {
           return;
@@ -392,13 +396,18 @@ debugger;
 
     if (this.params.data.mode === 'add' || (this.params.data.mode === 'edit' && JSON.stringify(this.params.data.contest) != JSON.stringify(this.contestLocalCopy))) {
 
-      this.contestLocalCopy.name = this.client.translate('CONTEST_NAME', {
+      this.contestLocalCopy.name = new ContestName();
+      this.contestLocalCopy.name.long = this.client.translate('CONTEST_NAME_LONG', {
         'team0': this.contestLocalCopy.teams[0].name,
         'team1': this.contestLocalCopy.teams[1].name,
-        'type': this.client.translate(this.contestLocalCopy.type.text.name)
+        'type': this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name)
+      });
+      this.contestLocalCopy.name.short = this.client.translate('CONTEST_NAME_SHORT', {
+        'team0': this.contestLocalCopy.teams[0].name,
+        'team1': this.contestLocalCopy.teams[1].name
       });
 
-      if (this.params.data.mode === 'edit' && this.contestLocalCopy.name !== this.params.data.contest.name) {
+      if (this.params.data.mode === 'edit' && (this.contestLocalCopy.name.short !== this.params.data.contest.name.short || this.contestLocalCopy.name.long !== this.params.data.contest.name.long)) {
         this.contestNameChanged = true;
       }
 
@@ -426,7 +435,7 @@ debugger;
             else {
               //Mobile - open the share mobile modal - with one button - to share or skip
               this.client.nav.push(ContestPage, {'contest': contest}).then(() => {
-                var modal = Modal.create(MobileSharePage, {'contest' : contest});
+                var modal = Modal.create(MobileSharePage, {'contest': contest});
                 this.client.nav.present(modal);
               });
             }

@@ -426,10 +426,10 @@ export class Client {
   openNewContest() {
     this.logEvent('menu/newContest');
     var modal = Modal.create(ContestTypePage);
-    modal.onDismiss((contestType) => {
-      if (contestType) {
+    modal.onDismiss((contestTypeId) => {
+      if (contestTypeId) {
         setTimeout(() => {
-          this.nav.push(SetContestPage, {'mode': 'add', 'type': contestType});
+          this.nav.push(SetContestPage, {'mode': 'add', 'typeId': contestTypeId});
         }, 500);
       }
     });

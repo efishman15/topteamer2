@@ -8,6 +8,19 @@ export class Settings {
   google:GoogleSettings;
   languages:Array<Language>;
   ui:Array<Array<Object>>;
+  newContest: NewContestSettings;
+}
+
+export class NewContestSettings {
+  privateQuestions: NewContestPrivateQuestionsSettings;
+  contestTypes: any;
+  endOptions: any;
+  selectableContestTypes: Array<Array<string>>;
+}
+
+export class NewContestPrivateQuestionsSettings {
+  min: number;
+  max: number;
 }
 
 export class GoogleSettings {
@@ -310,7 +323,7 @@ export class CalendarCell {
 
 export class Contest {
   _id:string;
-  name:string;
+  name:ContestName;
   startDate:number;
   endDate:number;
   myTeam:number;
@@ -323,14 +336,13 @@ export class Contest {
   endOption:string;
   questions:Questions;
   totalParticipants:number;
-  userQuestions:Array<string>;
   chartControl:any;
   state: string;
 
-  constructor(startDate:number, endDate:number, type:ContestType) {
+  constructor(startDate:number, endDate:number, typeId:string) {
     this.startDate = startDate;
     this.endDate = endDate;
-    this.type = type;
+    this.type = new ContestType(typeId);
     this.rating = 0;
     this.manualRating = 0;
     this.participants = 0;
@@ -339,6 +351,11 @@ export class Contest {
     this.teams = [new Team(), new Team()];
     this.questions = new Questions();
   }
+}
+
+export class ContestName {
+  short: string;
+  long: string;
 }
 
 export class Team {
@@ -353,8 +370,12 @@ export class Team {
 
 export class ContestType {
   id:string;
-  image: ContestTypeImage;
-  text: ContestTypeText;
+  questions: Questions;
+  userQuestions:Array<string>;
+
+  constructor(typeId: string) {
+    this.id = typeId;
+  }
 }
 
 export class ContestTypeImage {

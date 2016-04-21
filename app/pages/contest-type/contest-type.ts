@@ -19,9 +19,9 @@ export class ContestTypePage {
     this.viewController = viewController;
   }
 
-  selectContestContent(contestType) {
-    this.client.logEvent('newContest/type/' + (contestType ? contestType.id : 'cancel'));
-    this.viewController.dismiss(contestType);
+  selectContestContent(contestTypeId) {
+    this.client.logEvent('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
+    this.viewController.dismiss(contestTypeId);
   }
 
 }

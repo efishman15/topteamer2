@@ -335,10 +335,10 @@ var Client = (function () {
         var _this = this;
         this.logEvent('menu/newContest');
         var modal = ionic_angular_1.Modal.create(contest_type_1.ContestTypePage);
-        modal.onDismiss(function (contestType) {
-            if (contestType) {
+        modal.onDismiss(function (contestTypeId) {
+            if (contestTypeId) {
                 setTimeout(function () {
-                    _this.nav.push(set_contest_1.SetContestPage, { 'mode': 'add', 'type': contestType });
+                    _this.nav.push(set_contest_1.SetContestPage, { 'mode': 'add', 'typeId': contestTypeId });
                 }, 500);
             }
         });

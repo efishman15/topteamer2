@@ -147,8 +147,8 @@ module.exports.start = function (req, res, next) {
         quiz.serverData.previousQuestions = [];
       }
       else {
-        quiz.clientData.totalQuestions = data.contest.userQuestions.length;
-        quiz.serverData.userQuestions = data.contest.userQuestions;
+        quiz.clientData.totalQuestions = data.contest.type.userQuestions.length;
+        quiz.serverData.userQuestions = data.contest.type.userQuestions;
       }
 
       var myTeam = data.contest.users[data.session.userId].team;

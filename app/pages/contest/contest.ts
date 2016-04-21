@@ -71,7 +71,8 @@ export class ContestPage {
 
     this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
       //Event data comes as an array of data objects - we expect only one (contest)
-      this.refreshContest(eventData[0]);
+      this.contest = eventData[0];
+      this.refreshContestChart(eventData[0]);
 
     });
   }
@@ -107,7 +108,7 @@ export class ContestPage {
     contestsService.join(this.contest._id, team).then((data) => {
 
       this.contest = data.contest;
-      this.refreshContest(data.contest);
+      this.refreshContestChart(data.contest);
       this.setPlayText();
 
       this.client.logEvent('contest/' + action, {
@@ -133,7 +134,7 @@ export class ContestPage {
     });
   }
 
-  refreshContest(contest) {
+  refreshContestChart(contest) {
     this.contestChartBaseComponent.refresh(contest.chartControl);
   }
 

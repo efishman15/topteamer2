@@ -18,9 +18,9 @@ var ContestTypePage = (function () {
     ContestTypePage.prototype.onPageWillEnter = function () {
         this.client.logEvent('page/contestType');
     };
-    ContestTypePage.prototype.selectContestContent = function (contestType) {
-        this.client.logEvent('newContest/type/' + (contestType ? contestType.id : 'cancel'));
-        this.viewController.dismiss(contestType);
+    ContestTypePage.prototype.selectContestContent = function (contestTypeId) {
+        this.client.logEvent('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
+        this.viewController.dismiss(contestTypeId);
     };
     ContestTypePage = __decorate([
         ionic_angular_1.Page({

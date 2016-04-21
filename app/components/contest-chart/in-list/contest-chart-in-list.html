@@ -16,6 +16,6 @@
        [ngStyle]="{'margin-left': -(client.settings.contestList.playButton.size/2) + 'px', 'margin-top': -(client.settings.charts.contest.size.height+client.settings.contestList.playButton.size+30)/2 + 'px'}"
        src="../images/go.png"
        width="{{client.settings.contestList.playButton.size}}"
-       title="{{contest.name}}"
+       title="{{contest.name.long}}"
        (click)="onContestSelected($event)">
 </div>

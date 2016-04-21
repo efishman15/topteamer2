@@ -15,14 +15,14 @@ var ObjectId = require('mongodb').ObjectID;
 //setUserQuestions
 function setUserQuestions(questionIndex, data, callback) {
     //Check if finished recursion cycle
-    if (questionIndex === data.contest.questions.list.length) {
+    if (questionIndex === data.contest.type.questions.list.length) {
         setUserQuestionIds(data, callback);
         return;
     }
 
     if (data.mode === 'add' &&
-        data.contest.questions.list[questionIndex]._id !== 'new' &&
-        data.contest.questions.list[questionIndex].deleted
+        data.contest.type.questions.list[questionIndex]._id !== 'new' &&
+        data.contest.type.questions.list[questionIndex].deleted
     ) {
         //Proceed to next question - when adding a new contest, and a physical question
         //Has been added and deleted, this question also belongs to another existing contest
@@ -31,16 +31,16 @@ function setUserQuestions(questionIndex, data, callback) {
         return;
     }
 
-    if (data.contest.questions.list[questionIndex]._id === 'new') {
+    if (data.contest.type.questions.list[questionIndex]._id === 'new') {
 
         //Add question text
         data.newQuestion = {};
-        data.newQuestion.text = data.contest.questions.list[questionIndex].text;
+        data.newQuestion.text = data.contest.type.questions.list[questionIndex].text;
 
         //Add Answers
         data.newQuestion.answers = [];
-        for (var j = 0; j < data.contest.questions.list[questionIndex].answers.length; j++) {
-            var answer = {'text': data.contest.questions.list[questionIndex].answers[j]};
+        for (var j = 0; j < data.contest.type.questions.list[questionIndex].answers.length; j++) {
+            var answer = {'text': data.contest.type.questions.list[questionIndex].answers[j]};
             if (j === 0) {
                 answer.correct = true;
             }
@@ -54,24 +54,24 @@ function setUserQuestions(questionIndex, data, callback) {
                 return;
             }
 
-            data.contest.questions.list[questionIndex]._id = data.newQuestion._id;
+            data.contest.type.questions.list[questionIndex]._id = data.newQuestion._id;
 
             setUserQuestions(questionIndex + 1, data, callback);
         });
     }
-    else if (data.contest.questions.list[questionIndex].isDirty) {
+    else if (data.contest.type.questions.list[questionIndex].isDirty) {
         //Set question - update text/answers and/or associate to the current contest
-        data.questionId = data.contest.questions.list[questionIndex]._id;
+        data.questionId = data.contest.type.questions.list[questionIndex]._id;
 
         data.unsetData = null;
         data.setData = {};
 
-        if (data.contest.questions.list[questionIndex].isDirty) {
+        if (data.contest.type.questions.list[questionIndex].isDirty) {
 
             //Question text or answers text has been modified
-            data.setData.text = data.contest.questions.list[questionIndex].text;
-            for (j = 0; j < data.contest.questions.list[questionIndex].answers.length; j++) {
-                data.setData['answers.' + j + '.text'] = data.contest.questions.list[questionIndex].answers[j];
+            data.setData.text = data.contest.type.questions.list[questionIndex].text;
+            for (j = 0; j < data.contest.type.questions.list[questionIndex].answers.length; j++) {
+                data.setData['answers.' + j + '.text'] = data.contest.type.questions.list[questionIndex].answers[j];
             }
 
             dalDb.setQuestion(data, function(err, result) {
@@ -93,14 +93,14 @@ function setUserQuestions(questionIndex, data, callback) {
 
 //setUserQuestionIds
 function setUserQuestionIds(data, callback) {
-    data.contest.userQuestions = [];
-    for (var i = 0; i < data.contest.questions.list.length; i++) {
-        if (!data.contest.questions.list[i].deleted) {
-            data.contest.userQuestions.push(data.contest.questions.list[i]._id);
+    data.contest.type.userQuestions = [];
+    for (var i = 0; i < data.contest.type.questions.list.length; i++) {
+        if (!data.contest.type.questions.list[i].deleted) {
+            data.contest.type.userQuestions.push(data.contest.type.questions.list[i]._id);
         }
     }
 
-    delete data.contest.questions;
+    delete data.contest.type.questions;
 
     callback(null, data);
 }
@@ -182,28 +182,14 @@ function validateContestData(data, callback) {
         return;
     }
 
-    //Illegal contest type id
-    if (!data.contest.type.id) {
-      callback(new exceptions.ServerException('type.id must be supplied'));
+    //Illegal contest type
+    if (!data.contest.type || !data.contest.type.id) {
+      callback(new exceptions.ServerException('type/type.id must be supplied'));
       return;
     }
 
-    //Contest types are organized in rows and cols (for ui display) - array of arrays
-    var illegalContestTypeId = true;
-    for(var i=0; i<generalUtils.settings.client.newContest.contestTypes.length; i++) {
-      for(var j=0; j<generalUtils.settings.client.newContest.contestTypes[i].length; j++) {
-        if (generalUtils.settings.client.newContest.contestTypes[i][j].id === data.contest.type.id) {
-          illegalContestTypeId = false;
-          break;
-        }
-      }
-      if (!illegalContestTypeId) {
-        break;
-      }
-    }
-
-    if (illegalContestTypeId) {
-        callback(new exceptions.ServerException('type.id is illegal'));
+    if (!generalUtils.settings.client.newContest.contestTypes[data.contest.type.id]) {
+        callback(new exceptions.ServerException('type id"' + data.contest.type.id + '" is illegal'));
         return;
     }
 
@@ -211,7 +197,7 @@ function validateContestData(data, callback) {
     if (data.contest.type.id === 'userTrivia') {
 
         //Minimum check
-        if (!data.contest.questions || data.contest.questions.visibleCount < generalUtils.settings.client.newContest.privateQuestions.min) {
+        if (!data.contest.type.questions || data.contest.type.questions.visibleCount < generalUtils.settings.client.newContest.privateQuestions.min) {
             if (generalUtils.settings.client.newContest.privateQuestions.min === 1) {
                 callback(new exceptions.ServerMessageException('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE', {'minimum': generalUtils.settings.client.newContest.privateQuestions.min}));
             }
@@ -222,48 +208,48 @@ function validateContestData(data, callback) {
         }
 
         //Maximum check
-        if (data.contest.questions && data.contest.questions.visibleCount > generalUtils.settings.client.newContest.privateQuestions.max) {
+        if (data.contest.type.questions && data.contest.type.questions.visibleCount > generalUtils.settings.client.newContest.privateQuestions.max) {
             callback(new exceptions.ServerMessageException('SERVER_ERROR_MAXIMUM_USER_QUESTIONS', {'maximum': generalUtils.settings.client.newContest.privateQuestions.max}));
             return;
         }
 
         //Question list not supplied
-        if (!data.contest.questions.list || !data.contest.questions.list.length) {
+        if (!data.contest.type.questions.list || !data.contest.type.questions.list.length) {
             callback(new exceptions.ServerException('questions.list must contain the array of questions'));
             return;
         }
 
         var questionHash = {};
-        for (var i = 0; i < data.contest.questions.list.length; i++) {
+        for (var i = 0; i < data.contest.type.questions.list.length; i++) {
 
             //Question must contain text
-            if (!data.contest.questions.list[i].text) {
+            if (!data.contest.type.questions.list[i].text) {
                 callback(new exceptions.ServerException('Question must contain text'));
                 return;
             }
 
             //Question must contain answers
-            if (!data.contest.questions.list[i].answers || !data.contest.questions.list[i].answers.length || data.contest.questions.list[i].answers.length !== 4) {
+            if (!data.contest.type.questions.list[i].answers || !data.contest.type.questions.list[i].answers.length || data.contest.type.questions.list[i].answers.length !== 4) {
                 callback(new exceptions.ServerException('Question must contain 4 answers'));
                 return;
             }
 
             //Count duplicate questions
-            if (!data.contest.questions.list[i].deleted) {
-                if (questionHash[data.contest.questions.list[i].text.trim()]) {
-                    callback(new exceptions.ServerMessageException('SERVER_ERROR_QUESTION_ALREADY_EXISTS', {'question': data.contest.questions.list[i]}));
+            if (!data.contest.type.questions.list[i].deleted) {
+                if (questionHash[data.contest.type.questions.list[i].text.trim()]) {
+                    callback(new exceptions.ServerMessageException('SERVER_ERROR_QUESTION_ALREADY_EXISTS', {'question': data.contest.type.questions.list[i]}));
                 }
-                questionHash[data.contest.questions.list[i].text.trim()] = true;
+                questionHash[data.contest.type.questions.list[i].text.trim()] = true;
             }
 
             //Count duplicate answers inside a question
             var answersHash = {};
-            for (var j = 0; j < data.contest.questions.list[i].answers[j]; j++) {
-                if (answersHash[data.contest.questions.list[i].answers[j].trim()]) {
-                    callback(new exceptions.ServerMessageException('SERVER_ERROR_ENTER_DIFFERENT_ANSWERS', {'question': data.contest.questions.list[i]}));
+            for (var j = 0; j < data.contest.type.questions.list[i].answers[j]; j++) {
+                if (answersHash[data.contest.type.questions.list[i].answers[j].trim()]) {
+                    callback(new exceptions.ServerMessageException('SERVER_ERROR_ENTER_DIFFERENT_ANSWERS', {'question': data.contest.typ.questions.list[i]}));
                     return;
                 }
-                answersHash[data.contest.questions.list[i].answers[j].trim()] = true;
+                answersHash[data.contest.type.questions.list[i].answers[j].trim()] = true;
             }
         }
     }
@@ -284,9 +270,10 @@ function validateContestData(data, callback) {
 
         cleanContest.creator = {'id' : data.session.userId, 'avatar' : data.session.avatar, 'name' : data.session.name, 'date' : now};
 
-        cleanContest.type = data.contest.type;
+        cleanContest.type = {};
+        cleanContest.type.id = cleanContest.type.id;
         if (cleanContest.type.id === 'userTrivia') {
-            cleanContest.questions = data.contest.questions;
+            cleanContest.type.questions = data.contest.type.questions;
         }
 
         if (!cleanContest.teams[0].score) {
@@ -349,10 +336,7 @@ function updateContest(data, callback) {
         data.setData['link'] = data.contest.link;
     }
 
-    data.setData.type = data.contest.type;
-    if (data.contest.userQuestions) {
-        data.setData.userQuestions = data.contest.userQuestions;
-    }
+    data.setData.type = data.contest.type; //Including user question if type.id is 'userTrivia'
 
     //Admin fields
     if (data.session.isAdmin) {
@@ -769,7 +753,7 @@ module.exports.setContest = function (req, res, next) {
 
         //Add/set the contest questions (if we have)
         function (data, callback) {
-            if (data.contest.questions) {
+            if (data.contest.type.questions) {
                 setUserQuestions(0, data, callback);
             }
             else {

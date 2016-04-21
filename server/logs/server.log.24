@@ -1,8 +1,21 @@
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":14144,"level":30,"msg":"server up!","time":"2016-03-20T07:46:28.883Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9064,"level":30,"msg":"server up!","time":"2016-03-20T07:58:58.795Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":7464,"level":30,"msg":"server up!","time":"2016-03-20T08:00:21.658Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":8552,"level":30,"msg":"server up!","time":"2016-03-20T08:05:29.763Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":7824,"level":30,"msg":"server up!","time":"2016-03-20T08:06:50.103Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6872,"level":30,"msg":"server up!","time":"2016-03-20T08:07:17.269Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6928,"level":30,"msg":"server up!","time":"2016-03-20T08:08:26.989Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":11180,"level":30,"msg":"server up!","time":"2016-03-20T08:21:43.834Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6788,"level":30,"msg":"server up!","time":"2016-03-21T07:45:45.437Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9020,"level":30,"msg":"server up!","time":"2016-03-21T11:47:29.683Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6452,"level":30,"msg":"server up!","time":"2016-03-21T11:50:22.537Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6452,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T11:54:25.338Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6452,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T12:25:19.501Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6452,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T12:43:01.412Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6452,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T12:51:56.016Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":6452,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T12:52:42.555Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9124,"level":30,"msg":"server up!","time":"2016-03-21T15:12:58.932Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9124,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T15:40:35.171Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9124,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T16:00:16.913Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9124,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T16:01:59.099Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":9124,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T16:04:09.225Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":8604,"level":30,"msg":"server up!","time":"2016-03-21T16:37:26.019Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":8604,"level":60,"err":{"message":"Cannot read property 'time' of undefined","name":"TypeError","stack":"TypeError: Cannot read property 'time' of undefined\n    at setTimeDisplay (C:\\Dev\\topTeamer2\\server\\business_logic\\contests.js:424:67)\n    at prepareContestForClient (C:\\Dev\\topTeamer2\\server\\business_logic\\contests.js:530:5)\n    at operations (C:\\Dev\\topTeamer2\\server\\business_logic\\contests.js:910:17)\n    at fn (C:\\Dev\\topTeamer2\\server\\node_modules\\async\\lib\\async.js:712:34)\n    at C:\\Dev\\topTeamer2\\server\\node_modules\\async\\lib\\async.js:1165:16\n    at C:\\Dev\\topTeamer2\\server\\node_modules\\async\\lib\\async.js:657:43\n    at C:\\Dev\\topTeamer2\\server\\node_modules\\async\\lib\\async.js:1161:30\n    at C:\\Dev\\topTeamer2\\server\\dal\\dalDb.js:1181:17\n    at handleCallback (C:\\Dev\\topTeamer2\\server\\node_modules\\mongodb\\lib\\utils.js:95:12)\n    at C:\\Dev\\topTeamer2\\server\\node_modules\\mongodb\\lib\\cursor.js:590:16"},"msg":"Cannot read property 'time' of undefined","time":"2016-03-21T16:53:24.458Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":196,"level":30,"msg":"server up!","time":"2016-03-21T16:58:38.331Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T17:05:19.913Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T17:41:56.014Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T17:42:40.813Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":196,"level":30,"user":"Eddy Fishman","msg":"cache cleared!","time":"2016-03-21T17:43:24.200Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":196,"level":40,"msg":"contestId not supplied","time":"2016-03-21T17:43:56.888Z","v":0}

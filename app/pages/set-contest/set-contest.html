@@ -6,20 +6,20 @@
 
 </ion-navbar>
 
-<ion-content>
+<ion-content class="app-bg">
 
   <h4 text-center>
-    {{client.translate(contestLocalCopy.type.title)}}
+    {{client.translate(client.settings.newContest.contestTypes[contestLocalCopy.type.id].title)}}
   </h4>
 
   <div padding *ngIf="client.session.features.newContest.locked">
     <span class="feature-locked-text">{{client.translate('FEATURE_LOCKED_NEW_CONTEST', {rank : client.session.features.newContest.unlockRank}) }}</span>
-    <button class="button button-full button-small button-favorite"
+    <button class="button button-full button-small app-button-light-blue"
             (click)="buyNewContestUnlockKey(false)" [disabled]="buyInProgress">
       {{client.translate('UNLOCK_FEATURE', {formattedCost :
       client.session.features.newContest.purchaseData.formattedCost}) }}
     </button>
-    <button class="button button-full button-small button-favorite"
+    <button class="button button-full button-small app-button-light-purple"
             *ngIf="client.user.clientInfo.platform ==='facebook' && client.session.features.newContest.purchaseData.mobilePricepointId"
             (click)="buyNewContestUnlockKey(true)" [disabled]="buyInProgress">
       {{client.translate('UNLOCK_FEATURE_MOBILE', {cost : client.session.features.newContest.purchaseData.cost, currency
@@ -78,9 +78,9 @@
     </ion-row>
 
     <div *ngIf="params.data.mode==='add'">
-      <ion-item no-lines>
-        <ion-label>{{client.translate('ENDS_IN')}}</ion-label>
-        <ion-select multiple="false" no-lines [(ngModel)]="contestLocalCopy.endOption"
+      <ion-item no-lines class="transparent-background">
+        <ion-label class="base-font">{{client.translate('ENDS_IN')}}</ion-label>
+        <ion-select class="base-font" multiple="false" no-lines [(ngModel)]="contestLocalCopy.endOption"
                     okText="{{client.translate('OK')}}"
                     cancelText="{{client.translate('CANCEL')}}"
                     (change)="client.logEvent('newContest/endsIn/change')"
@@ -96,7 +96,7 @@
     <div padding *ngIf="params.data.mode==='edit'">
       <span class="set-contest-label">{{client.translate('CONTEST_END')}}</span>
       <date-picker [(currentDateEpoch)]="contestLocalCopy.endDate" [(minDate)]="minContestEnd" [(maxDate)]="maxContestEnd"
-                   currentDateClass="date-picker-button"
+                   [currentDateClass]="'date-picker-button'"
                    (dateSelected)="endDateSelected($event)">
       </date-picker>
     </div>
@@ -116,7 +116,7 @@
         <ion-col>
           <div padding-left padding-right>
               <span class="set-contest-user-questions-title">
-                  {{client.translate('MY_CONTEST_QUESTIONS',{count : (contestLocalCopy.questions ? contestLocalCopy.questions.visibleCount : 0)}) }}
+                  {{client.translate('MY_CONTEST_QUESTIONS',{count : (contestLocalCopy.type.questions ? contestLocalCopy.type.questions.visibleCount : 0)}) }}
               </span>
           </div>
         </ion-col>
@@ -132,9 +132,9 @@
       </ion-row>
 
       <div class="set-contest-user-questions-list small-horizontal-margin"
-           *ngIf="contestLocalCopy.questions && contestLocalCopy.questions.visibleCount > 0">
+           *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0">
         <ion-list>
-          <ion-row *ngFor="#question of contestLocalCopy.questions.list, #i=index" [hidden]="question.deleted">
+          <ion-row *ngFor="#question of contestLocalCopy.type.questions.list, #i=index" [hidden]="question.deleted">
             <ion-col width-90>
               <div title="{{client.translate('EDIT_QUESTION')}}" class="pointer"
                    (click)="openQuestionEditor('edit', question)">
@@ -158,7 +158,7 @@
       {{userQuestionsInvalid}}
     </div>
 
-    <div padding class="set-contest-label" *ngIf="client.session.isAdmin">
+    <div padding class="set-contest-label base-font" *ngIf="client.session.isAdmin">
       <span class="pointer" (click)="toggleAdminInfo()">{{client.translate('CONTEST_ADMIN_INFO')}} {{getArrowDirection(!showAdminInfo)}}</span>
       <div *ngIf="showAdminInfo && contestForm.valid">
 
@@ -225,6 +225,3 @@
     </div>
   </form>
 </ion-content>
-            
-                                    
-                                                                                 
