@@ -10,7 +10,8 @@
 
 .set-contest-label {
   font-size: 16px;
-  color: #ffffff;
+  color: #ffffff !important;
+  background-color: transparent;
 }
 
 .date-picker-button {
@@ -29,6 +30,7 @@
 .set-contest-range-input {
   margin-left: 10px;
   margin-right: 10px;
+  color: #ffffff;
 }
 
 .set-contest-user-questions-area {

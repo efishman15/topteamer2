@@ -172,10 +172,11 @@
 
         <ion-row>
           <ion-col width-40>
-            <ion-item no-lines>
-              <ion-label stacked>{{client.translate('TEAM_SCORE',{team: contestLocalCopy.teams[0].name} ) }}
+            <ion-item no-lines class="transparent-background">
+              <ion-label class="set-contest-label" stacked>{{client.translate('TEAM_SCORE',{team: contestLocalCopy.teams[0].name} ) }}
               </ion-label>
-              <ion-input type="number"
+              <ion-input class="base-font"
+                         type="number"
                          [(ngModel)]="contestLocalCopy.teams[0].score"
                          min="1"
                          max="1000000000000">
@@ -185,10 +186,11 @@
           <ion-col width-20>
           </ion-col>
           <ion-col width-40>
-            <ion-item no-lines>
-              <ion-label stacked>{{client.translate('TEAM_SCORE',{team: contestLocalCopy.teams[1].name} ) }}
+            <ion-item no-lines class="transparent-background">
+              <ion-label class="set-contest-label" stacked>{{client.translate('TEAM_SCORE',{team: contestLocalCopy.teams[1].name} ) }}
               </ion-label>
-              <ion-input input type="number"
+              <ion-input class="base-font"
+                         input type="number"
                          [(ngModel)]="contestLocalCopy.teams[1].score"
                          min="1"
                          max="1000000000000">
@@ -198,22 +200,22 @@
         </ion-row>
 
         <div padding-left padding-right>
-          <ion-item no-lines>
-            <ion-label stacked>{{client.translate('RATING')}} (0-100): {{contestLocalCopy.manualRating}}</ion-label>
+          <ion-item no-lines class="transparent-background">
+            <ion-label class="set-contest-label" stacked>{{client.translate('RATING')}} (0-100): {{contestLocalCopy.manualRating}}</ion-label>
           </ion-item>
           <input class="set-contest-range-input" type="range" min="0" max="100"
                  [(ngModel)]="contestLocalCopy.manualRating" value="{{contestLocalCopy.manualRating}}">
         </div>
 
-        <div padding-left padding-right>
-          <ion-item no-lines>
-            <ion-label stacked>{{client.translate('PARTICIPANTS')}}: {{contestLocalCopy.totalParticipants}}</ion-label>
+        <div padding-left padding-right padding-bottom>
+          <ion-item no-lines class="transparent-background">
+            <ion-label class="set-contest-label" stacked>{{client.translate('PARTICIPANTS')}}: {{contestLocalCopy.totalParticipants}}</ion-label>
           </ion-item>
           <input class="set-contest-range-input" type="range" min="{{contestLocalCopy.participants}}" max="10000"
                  [(ngModel)]="contestLocalCopy.totalParticipants" value="{{contestLocalCopy.totalParticipants}}">
         </div>
 
-        <button padding danger class="button-small" (click)="removeContest()"
+        <button padding-top class="button-small app-button-light-purple" (click)="removeContest()"
                 *ngIf="showRemoveContest">{{client.translate('REMOVE_CONTEST')}}
         </button>
 
@@ -221,7 +223,7 @@
     </div>
 
     <div padding>
-      <button (click)="setContest()" block>{{client.translate('OK')}}</button>
+      <button (click)="setContest()" class="app-button-light-blue" block>{{client.translate('OK')}}</button>
     </div>
   </form>
 </ion-content>
