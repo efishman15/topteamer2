@@ -60,18 +60,21 @@
     </ion-row>
     <ion-row>
       <ion-col width-40>
-        <div text-center *ngIf="(team0.dirty || submitted) && team0.errors && team0.errors.required" class="invalid-input">
+        <div text-center *ngIf="(team0.dirty || submitted) && team0.errors && team0.errors.required"
+             class="invalid-input">
           {{client.translate('FIELD_REQUIRED')}}
         </div>
       </ion-col>
       <ion-col>
-        <div text-center *ngIf="(contestForm.dirty || submitted) && contestForm.errors && contestForm.errors.matchingTeams"
+        <div text-center
+             *ngIf="(contestForm.dirty || submitted) && contestForm.errors && contestForm.errors.matchingTeams"
              class="invalid-input">
           {{client.translate('SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES_MESSAGE')}}
         </div>
       </ion-col>
       <ion-col width-40>
-        <div text-center *ngIf="(team1.dirty || submitted) && team1.errors && team1.errors.required" class="invalid-input">
+        <div text-center *ngIf="(team1.dirty || submitted) && team1.errors && team1.errors.required"
+             class="invalid-input">
           {{client.translate('FIELD_REQUIRED')}}
         </div>
       </ion-col>
@@ -88,70 +91,73 @@
           <ion-option *ngFor="#endOptionKey of endOptionKeys"
                       value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
                       checked="contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value">
-            {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number: client.settings.newContest.endOptions[endOptionKey].number}) }}
+            {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number:
+            client.settings.newContest.endOptions[endOptionKey].number}) }}
           </ion-option>
         </ion-select>
       </ion-item>
     </div>
     <div padding *ngIf="params.data.mode==='edit'">
       <span class="set-contest-label">{{client.translate('CONTEST_END')}}</span>
-      <date-picker [(currentDateEpoch)]="contestLocalCopy.endDate" [(minDate)]="minContestEnd" [(maxDate)]="maxContestEnd"
+      <date-picker [(currentDateEpoch)]="contestLocalCopy.endDate" [(minDate)]="minContestEnd"
+                   [(maxDate)]="maxContestEnd"
                    [currentDateClass]="'date-picker-button'"
                    (dateSelected)="endDateSelected($event)">
       </date-picker>
     </div>
 
-    <ion-item no-lines class="set-contest-user-questions-area"
-              *ngIf="contestLocalCopy.type.id === 'userTrivia'">
-      <ion-row class="full-width">
-        <ion-col>
-          <button danger
-                  class="set-contest-question-buttons button-small"
-                  [ngStyle]="{'float' : client.currentLanguage.align}"
-                  (click)="openQuestionEditor('add')">
-            {{client.translate('ADD')}}
-            <ion-icon name="add-circle"></ion-icon>
-          </button>
-        </ion-col>
-        <ion-col>
-          <div padding-left padding-right>
+    <div padding-left padding-right *ngIf="contestLocalCopy.type.id === 'userTrivia'">
+      <ion-item no-lines class="set-contest-user-questions-area">
+        <ion-row>
+          <ion-col>
+            <button
+                    [ngStyle]="{'float' : client.currentLanguage.align}"
+                    (click)="openQuestionEditor('add')"
+                    class="set-contest-question-buttons"
+                    title="{{client.translate('ADD')}}">
+              <ion-icon name="add-circle"></ion-icon>
+            </button>
+          </ion-col>
+          <ion-col>
+            <div padding-left padding-right>
               <span class="set-contest-user-questions-title">
                   {{client.translate('MY_CONTEST_QUESTIONS',{count : (contestLocalCopy.type.questions ? contestLocalCopy.type.questions.visibleCount : 0)}) }}
               </span>
-          </div>
-        </ion-col>
-        <ion-col>
-          <button danger
-                  class="set-contest-question-buttons button-small"
-                  [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
-                  (click)="openSearchQuestions()">
-            {{client.translate('SEARCH')}}
-            <ion-icon name="search"></ion-icon>
-          </button>
-        </ion-col>
-      </ion-row>
+            </div>
+          </ion-col>
+          <ion-col>
+            <button
+                    [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
+                    class="set-contest-question-buttons"
+                    (click)="openSearchQuestions()"
+                    title="{{client.translate('SEARCH')}}">
+              <ion-icon name="search"></ion-icon>
+            </button>
+          </ion-col>
+        </ion-row>
 
-      <div class="set-contest-user-questions-list small-horizontal-margin"
-           *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0">
-        <ion-list>
-          <ion-row *ngFor="#question of contestLocalCopy.type.questions.list, #i=index" [hidden]="question.deleted">
-            <ion-col width-90>
-              <div title="{{client.translate('EDIT_QUESTION')}}" class="pointer"
-                   (click)="openQuestionEditor('edit', question)">
-                {{question.text}}
-              </div>
-            </ion-col>
-            <ion-col width-10>
-              <button (click)="removeQuestion(i)">
-                <ion-icon title="{{client.translate('REMOVE_QUESTION')}}" name="close-circle">
-                </ion-icon>
-              </button>
-            </ion-col>
-          </ion-row>
-        </ion-list>
-      </div>
+        <div class="set-contest-user-questions-list small-horizontal-margin"
+             *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0">
+          <ion-list>
+            <ion-row *ngFor="#question of contestLocalCopy.type.questions.list, #i=index" [hidden]="question.deleted">
+              <ion-col width-90>
+                <div title="{{client.translate('EDIT_QUESTION')}}" class="base-font pointer"
+                     (click)="openQuestionEditor('edit', question)">
+                  {{question.text}}
+                </div>
+              </ion-col>
+              <ion-col width-10>
+                <button class="set-contest-question-buttons" (click)="removeQuestion(i)">
+                  <ion-icon title="{{client.translate('REMOVE_QUESTION')}}" name="close-circle">
+                  </ion-icon>
+                </button>
+              </ion-col>
+            </ion-row>
+          </ion-list>
+        </div>
 
-    </ion-item>
+      </ion-item>
+    </div>
 
     <div padding-left padding-right class="invalid-input"
          *ngIf="submitted && contestLocalCopy.type.id === 'userTrivia' && userQuestionsInvalid">
@@ -173,7 +179,8 @@
         <ion-row>
           <ion-col width-40>
             <ion-item no-lines class="transparent-background">
-              <ion-label class="set-contest-label" stacked>{{client.translate('TEAM_SCORE',{team: contestLocalCopy.teams[0].name} ) }}
+              <ion-label class="set-contest-label" stacked>{{client.translate('TEAM_SCORE',{team:
+                contestLocalCopy.teams[0].name} ) }}
               </ion-label>
               <ion-input class="base-font"
                          type="number"
@@ -187,7 +194,8 @@
           </ion-col>
           <ion-col width-40>
             <ion-item no-lines class="transparent-background">
-              <ion-label class="set-contest-label" stacked>{{client.translate('TEAM_SCORE',{team: contestLocalCopy.teams[1].name} ) }}
+              <ion-label class="set-contest-label" stacked>{{client.translate('TEAM_SCORE',{team:
+                contestLocalCopy.teams[1].name} ) }}
               </ion-label>
               <ion-input class="base-font"
                          input type="number"
@@ -201,7 +209,9 @@
 
         <div padding-left padding-right>
           <ion-item no-lines class="transparent-background">
-            <ion-label class="set-contest-label" stacked>{{client.translate('RATING')}} (0-100): {{contestLocalCopy.manualRating}}</ion-label>
+            <ion-label class="set-contest-label" stacked>{{client.translate('RATING')}} (0-100):
+              {{contestLocalCopy.manualRating}}
+            </ion-label>
           </ion-item>
           <input class="set-contest-range-input" type="range" min="0" max="100"
                  [(ngModel)]="contestLocalCopy.manualRating" value="{{contestLocalCopy.manualRating}}">
@@ -209,7 +219,9 @@
 
         <div padding-left padding-right padding-bottom>
           <ion-item no-lines class="transparent-background">
-            <ion-label class="set-contest-label" stacked>{{client.translate('PARTICIPANTS')}}: {{contestLocalCopy.totalParticipants}}</ion-label>
+            <ion-label class="set-contest-label" stacked>{{client.translate('PARTICIPANTS')}}:
+              {{contestLocalCopy.totalParticipants}}
+            </ion-label>
           </ion-item>
           <input class="set-contest-range-input" type="range" min="{{contestLocalCopy.participants}}" max="10000"
                  [(ngModel)]="contestLocalCopy.totalParticipants" value="{{contestLocalCopy.totalParticipants}}">

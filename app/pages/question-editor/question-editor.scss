@@ -10,6 +10,7 @@
   font-size: 12px;
   margin-right: 5px;
   margin-left: 5px;
+  color: #ffffff;
 }
 
 .question-editor-set-button {
@@ -20,18 +21,21 @@
   border-width: 1px;
   border-style: solid;
   border-color: #c2c2c2;
+  color: #ffffff;
 }
 
 .question-editor-correct-answer {
   border-width: 2px;
   border-style: solid;
   border-color: #9ACD32;
+  color: #ffffff;
 }
 
 .question-editor-wrong-answer {
   border-width: 2px;
   border-style: solid;
   border-color: #FF6347;
+  color: #ffffff;
 }
 
 ion-col[width-5] {

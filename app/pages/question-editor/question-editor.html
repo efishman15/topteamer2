@@ -12,7 +12,7 @@
 
 </ion-toolbar>
 
-<ion-content>
+<ion-content class="app-bg">
 
   <form [ngFormModel]="questionEditorForm" name="questionEditorForm" novalidate="novalidate">
 
@@ -159,7 +159,7 @@
     </div>
 
     <div padding class="question-editor-set-button">
-      <button class="button-full"
+      <button block class="app-button-light-purple"
               (click)="dismiss(true)">{{client.translate('OK')}}
       </button>
     </div>
