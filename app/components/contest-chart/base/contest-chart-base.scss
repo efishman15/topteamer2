@@ -1,10 +1,6 @@
 .chart {
   margin: 0px auto;
-  position: relative;
-}
-
-.chart-margin-top {
-  margin-top: 10px;
+  background-color: #ffffff;
 }
 
 .chart-timer {
@@ -28,7 +24,7 @@
 
 .chart-type-title {
   position: absolute;
-  font-size: 20px;
+  font-size: 18px;
   color: #ffffff;
   top: 3px;
   white-space: pre;
@@ -55,4 +51,8 @@
 
 .chart-end-time-rtl {
   left: 45px;
+}
+
+.chart-margin-top {
+  margin-top: 20px;
 }

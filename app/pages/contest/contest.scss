@@ -41,17 +41,18 @@
 
 .button-play-contest {
   background: #0dc9f9;
-  background: -webkit-linear-gradient(#0dc9f9, #00fff0);
-  background: linear-gradient(#0dc9f9, #00fff0);
-  border: 1px solid #569;
+  background: -webkit-linear-gradient(#01cefd, #01a1f9);
+  background: linear-gradient(#01cefd, #01a1f9);
+  border: 1px solid #8dfffc;
   border-radius: 999px;
   box-shadow: 0 2px 0 0 #0a70a0;
-  color: #fff;
+  color: #f7ffff;
   display: inline-block;
   padding: 8px 20px;
-  font: normal 700 24px/1 "Calibri", sans-serif;
+  font-size: 20px;
   text-align: center;
-  text-shadow: 1px 1px 0 #000;
+  text-shadow: 1px 1px 0 #032c30;
+  height: 40px;
 }
 
 .small-top-margin {
@@ -89,19 +90,21 @@
 
 .contest-users {
   font-size: 12px;
+  color: #303030;
 }
 
 .contest-creator {
-  color: #387ef5;
+  color: #00457f;
+  font-size: 12px !important;
 }
 
 .contest-started {
-  font-size: 12px;
-  font-weight: bolder;
+  font-size: 12px !important;
+  color: #303030 !important;
 }
 
 .contest-participants-area {
-  padding-top: 8px;
+  padding-top: 12px;
 }
 
 .contest-leader-area {
@@ -136,17 +139,13 @@
   width: 18%;
   height: 18%;
   cursor: pointer;
-  margin-left: 15px;
-  margin-right: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .contest-footer-toolbar {
   left: 0px;
   height: 50px;
-}
-
-.small-top-padding {
-  padding-top: 10px;
 }
 
 .contest-result-animation {
@@ -162,4 +161,23 @@
 .contest-result-text2 {
   font-size: 20px;
   color: #303030;
+}
+
+.contest-creator-wrapper {
+  padding-left: 10px;
+}
+
+.contest-leader-wrapper {
+  padding-left: 10px;
+}
+
+.contest-chart-bottom-ribbon-participants-text {
+  color: #303030;
+  font-size: 12px;
+}
+
+.contest-chart-bottom-ribbon-participants-number {
+  color: #303030;
+  font-weight: bold;
+  font-size: 12px;
 }

@@ -11,7 +11,12 @@ export class MyExceptionHandler extends ExceptionHandler {
     var client = Client.getInstance();
 
     console.error(errorMessage);
-    window.myLogError('UnhandledException', errorMessage);
+
+    if (window.myLogError) {
+      //might not be initialized yet during app load
+      window.myLogError('UnhandledException', errorMessage);
+    }
+
     super.call(exception, stackTrace, reason);
   }
 }

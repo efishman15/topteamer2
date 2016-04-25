@@ -15,7 +15,6 @@ var contest_participants_1 = require('../../pages/contest-participants/contest-p
 var quiz_1 = require('../../pages/quiz/quiz');
 var set_contest_1 = require('../../pages/set-contest/set-contest');
 var facebook_post_1 = require('../../pages/facebook-post/facebook-post');
-var like_1 = require('../../pages/like/like');
 var new_rank_1 = require('../../pages/new-rank/new-rank');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
@@ -50,6 +49,9 @@ var ContestPage = (function () {
             }
             else {
                 _this.animateLastResults = true;
+                setTimeout(function () {
+                    _this.animateLastResults = false;
+                }, _this.client.settings.quiz.finish.animateResultsTimeout);
             }
             var soundFile = _this.lastQuizResults.data.sound;
             setTimeout(function () {
@@ -124,8 +126,8 @@ var ContestPage = (function () {
         shareService.share(source, this.contest);
     };
     ContestPage.prototype.like = function () {
-        this.client.logEvent('contest/like/click', { 'contestId': this.contest._id });
-        this.client.nav.push(like_1.LikePage, { 'contest': this.contest });
+        this.client.logEvent('like/click');
+        window.open(this.client.settings.general.facebookFanPage, '_new');
     };
     ContestPage.prototype.setPlayText = function () {
         switch (this.contest.state) {

@@ -58,7 +58,7 @@ var ContestChartBaseComponent = (function () {
                 _this.chart = new window.FusionCharts({
                     type: _this.client.settings.charts.contest.type,
                     renderAt: _this.id + '-container',
-                    width: _this.client.settings.charts.contest.size.width,
+                    width: _this.client.settings.charts.contest.size.width - 2,
                     height: _this.client.settings.charts.contest.size.height,
                     dataFormat: 'json',
                     dataSource: _this.contest.chartControl,

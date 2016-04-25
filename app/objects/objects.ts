@@ -63,6 +63,11 @@ export class QuizSettings {
   canvas:QuizCanvasSettings;
   question:QuizQuestionSettings;
   questions:QuizQuestionsSettings;
+  finish: FinishQuizSettings;
+}
+
+export class FinishQuizSettings {
+  animateResultsTimeout: number;
 }
 
 export class QuizQuestionsSettings {

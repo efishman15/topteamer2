@@ -32,6 +32,9 @@ var MainTabsPage = (function () {
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
             _this.needToRefreshList = true;
         });
+        this.client.events.subscribe('topTeamer:languageChanged', function (eventData) {
+            _this.needToRefreshList = true;
+        });
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
             var modal = ionic_angular_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
             _this.client.nav.present(modal);

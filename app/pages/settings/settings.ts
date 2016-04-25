@@ -10,6 +10,7 @@ import * as facebookService from '../../providers/facebook';
 export class SettingsPage {
 
   client:Client;
+  originalLanguage: string;
 
   constructor() {
     this.client = Client.getInstance();
@@ -17,6 +18,13 @@ export class SettingsPage {
 
   onPageWillEnter() {
     this.client.logEvent('page/settings');
+    this.originalLanguage = this.client.session.settings.language;
+  }
+
+  onPageDidLeave() {
+    if (this.client.session.settings.language != this.originalLanguage) {
+      this.client.events.publish('topTeamer:languageChanged');
+    }
   }
 
   toggleSound() {

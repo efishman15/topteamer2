@@ -18,6 +18,12 @@ var SettingsPage = (function () {
     }
     SettingsPage.prototype.onPageWillEnter = function () {
         this.client.logEvent('page/settings');
+        this.originalLanguage = this.client.session.settings.language;
+    };
+    SettingsPage.prototype.onPageDidLeave = function () {
+        if (this.client.session.settings.language != this.originalLanguage) {
+            this.client.events.publish('topTeamer:languageChanged');
+        }
     };
     SettingsPage.prototype.toggleSound = function () {
         this.client.logEvent('settings/sound/' + !this.client.session.settings.sound);

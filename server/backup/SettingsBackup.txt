@@ -36,8 +36,7 @@
         "rank" : 4
       }, {
         "xp" : 20000000,
-        "rank" : 5,
-        "unlockFeature" : "newContest"
+        "rank" : 5
       }],
     "xpCredits" : {
       "login" : 5,
@@ -95,10 +94,10 @@
         "minVersion" : "0.0.31",
         "popup" : {
           "en" : {
-            "title" : "<h2>New version</h2>",
-            "message" : "<h2>New version</h2>",
+            "title" : "New version",
+            "message" : "<h3>New version</h3>",
             "preventBack" : true,
-            "image" : "http://www.topteamer.com/images/info.png",
+            "image" : "images/info.png",
             "buttons" : [{
                 "action" : "linkExit",
                 "link" : "#storeLink",
@@ -106,10 +105,10 @@
               }]
           },
           "he" : {
-            "title" : "<h2>גרסה חדשה</h2>",
+            "title" : "גרסה חדשה",
             "message" : "<h3>אנא עדכנו לגירסה החדשה שלנו - חשבונכם ורמתכם במשחק יישמרו</h3>",
             "preventBack" : true,
-            "image" : "http://www.topteamer.com/images/info.png",
+            "image" : "images/info.png",
             "buttons" : [{
                 "action" : "linkExit",
                 "link" : "#storeLink",
@@ -117,10 +116,10 @@
               }]
           },
           "es" : {
-            "title" : "<h2>Nueva versión</h2>",
+            "title" : "Nueva versión",
             "message" : "<h3>Por favor, actualice a nuestra nueva versión - su cuenta y el rango será preservado</h3>",
             "preventBack" : true,
-            "image" : "http://www.topteamer.com/images/info.png",
+            "image" : "images/info.png",
             "buttons" : [{
                 "action" : "linkExit",
                 "link" : "#storeLink",
@@ -220,7 +219,7 @@
           "facebookPost" : {
             "action" : "topteamer:lead",
             "dialogImage" : {
-              "url" : "../../images/ui/competition_won_graphic.png",
+              "url" : "../../images/share_image.png",
               "width" : 350,
               "height" : 350
             },
@@ -236,7 +235,7 @@
           "facebookPost" : {
             "action" : "topteamer:empower",
             "dialogImage" : {
-              "url" : "../../images/ui/competition_won_graphic.png",
+              "url" : "../../images/share_image.png",
               "width" : 350,
               "height" : 350
             },
@@ -252,7 +251,7 @@
           "facebookPost" : {
             "action" : "topteamer:become",
             "dialogImage" : {
-              "url" : "../../images/ui/competition_won_graphic.png",
+              "url" : "../../images/share_image.png",
               "width" : 350,
               "height" : 350
             },
@@ -268,7 +267,7 @@
           "facebookPost" : {
             "action" : "topteamer:become",
             "dialogImage" : {
-              "url" : "../../images/ui/competition_won_graphic.png",
+              "url" : "../../images/share_image.png",
               "width" : 350,
               "height" : 350
             },
@@ -284,7 +283,7 @@
           "facebookPost" : {
             "action" : "topteamer:promote",
             "dialogImage" : {
-              "url" : "../../images/ui/competition_won_graphic.png",
+              "url" : "../../images/share_image.png",
               "width" : 350,
               "height" : 350
             },
@@ -469,14 +468,16 @@
             "showYAxisValues" : 0,
             "chartBottomMargin" : 0,
             "usePlotGradientColor" : 0,
-            "labelFontSize" : 28,
+            "labelFontSize" : 20,
             "showValues" : 0,
             "showLegend" : 0,
             "showPlotBorder" : 1,
             "plotBorderThickness" : "1",
             "plotBorderAlpha" : 10,
             "showTooltip" : 0,
-            "chartTopMargin" : 0
+            "chartTopMargin" : 0,
+            "chartLeftMargin" : 0,
+            "chartRightMargin" : 0
           },
           "annotations" : {
             "groups" : [{
@@ -499,10 +500,10 @@
           "categories" : [{
               "category" : [{
                   "fontColor" : "#2888AC",
-                  "fontSize" : 28
+                  "fontSize" : 24
                 }, {
                   "fontColor" : "#BF0045",
-                  "fontSize" : 28
+                  "fontSize" : 24
                 }]
             }],
           "dataset" : [{
@@ -523,7 +524,7 @@
         },
         "type" : "stackedcolumn2d",
         "size" : {
-          "width" : 342,
+          "width" : 340,
           "height" : 160
         },
         "topMarginPercent" : 20,
@@ -538,7 +539,7 @@
             "color" : "#000000"
           }
         },
-        "topRibbonWidth" : 348,
+        "topRibbonWidth" : 340,
         "timer" : {
           "width" : 30
         },
@@ -547,44 +548,44 @@
           "detailed" : 140
         },
         "myTeam" : [{
-            "bgColor" : "#d33f79",
-            "fontColor" : "#ffffff",
             "bold" : 1,
             "y" : "$dataset.1.set.1.startY - 18"
           }, {
-            "bgColor" : "#0bc3f9",
-            "fontColor" : "#ffffff",
             "bold" : 1,
-            "y" : "$dataset.1.set.1.startY - 18"
+            "y" : "$dataset.1.set.1.startY - 18",
+            "bgAlpha" : 1
           }]
       },
       "questionStats" : {
         "chartControl" : {
           "chart" : {
-            "showBorder" : 0,
-            "use3DLighting" : 1,
-            "showShadow" : 0,
-            "enableSmartLabels" : 0,
-            "startingAngle" : 0,
-            "showPercentValues" : 1,
-            "decimals" : 0,
-            "captionFontSize" : 16,
-            "showHoverEffect" : 1,
+            "baseFont" : "Arial",
+            "paletteColors" : "#f35e4a,#37b37d",
+            "startingAngle" : 90,
+            "bgColor" : "#ffffff",
+            "showBorder" : "0",
+            "use3DLighting" : "0",
+            "showLabels" : "0",
             "showLegend" : "1",
-            "legendBgColor" : "#ffffff",
-            "legendBorderAlpha" : 0,
-            "legendShadow" : 0,
-            "legendItemFontSize" : 14,
-            "legendItemFontColor" : "#666666",
-            "legendItemFontBold" : 1,
-            "labelFontSize" : 14,
-            "labelFontBold" : 1
+            "legendItemFontSize" : 22,
+            "legendShadow" : "0",
+            "legendBorderAlpha" : "0",
+            "showPercentValues" : "1",
+            "labelFontSize" : 18,
+            "labelFontBold" : 1,
+            "chartTopMargin" : 0,
+            "chartBottomMargin" : 0,
+            "showTooltip" : 0
           }
         },
-        "type" : "pie2d",
+        "type" : "doughnut2d",
         "size" : {
-          "width" : 420,
-          "height" : 210
+          "width" : 500,
+          "height" : 350
+        },
+        "colors" : {
+          "correct" : "#37b37d",
+          "incorrect" : "#f35e4a"
         }
       }
     },
@@ -599,9 +600,9 @@
         "height" : 44
       },
       "radius" : 15,
-      "fillColor" : "#2d8fbc",
+      "fillColor" : "#54b0d2",
       "lineWidth" : 4,
-      "fullLineColor" : "#1e74a3",
+      "fullLineColor" : "#1c74a2",
       "progressLineColor" : "#ffffff",
       "font" : {
         "bold" : true,
@@ -681,6 +682,9 @@
           "maxLength" : 45
         },
         "wrongAnswerMillisecondsDelay" : 3000
+      },
+      "finish" : {
+        "animateResultsTimeout" : 6000
       }
     },
     "general" : {
@@ -739,7 +743,10 @@
     },
     "facebook" : {
       "readPermissions" : ["public_profile", "email", "user_friends"],
-      "friendsPermissions" : ["user_friends"]
+      "friendsPermissions" : ["user_friends"],
+      "contest" : {
+        "showLike" : true
+      }
     },
     "google" : {
       "gcm" : {
@@ -777,39 +784,42 @@
           "msecMultiplier" : 86400000
         }
       },
-      "contestTypes" : [[{
-            "id" : "systemTrivia",
-            "image" : {
-              "url" : "images/ui/new_our-questions_default.png",
-              "width" : 200,
-              "height" : 200
-            },
-            "text" : {
-              "title" : "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE",
-              "description" : "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION",
-              "name" : "CONTEST_TYPE_TRIVIA_SYSTEM_NAME",
-              "titleColor" : "#f895bd"
-            }
-          }, {
-            "id" : "userTrivia",
-            "image" : {
-              "url" : "images/ui/new_your-questions_default.png",
-              "width" : 200,
-              "height" : 200
-            },
-            "text" : {
-              "title" : "CONTEST_TYPE_TRIVIA_USER_TITLE",
-              "description" : "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION",
-              "name" : "CONTEST_TYPE_TRIVIA_USER_NAME",
-              "titleColor" : "#73d9ff"
-            }
-          }]]
+      "contestTypes" : {
+        "systemTrivia" : {
+          "id" : "systemTrivia",
+          "image" : {
+            "url" : "images/new_contest_system_trivia.png",
+            "width" : 200,
+            "height" : 200
+          },
+          "text" : {
+            "title" : "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE",
+            "description" : "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION",
+            "name" : "CONTEST_TYPE_TRIVIA_SYSTEM_NAME",
+            "titleColor" : "#f895bd"
+          }
+        },
+        "userTrivia" : {
+          "id" : "userTrivia",
+          "image" : {
+            "url" : "images/new_contest_user_trivia.png",
+            "width" : 200,
+            "height" : 200
+          },
+          "text" : {
+            "title" : "CONTEST_TYPE_TRIVIA_USER_TITLE",
+            "description" : "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION",
+            "name" : "CONTEST_TYPE_TRIVIA_USER_NAME",
+            "titleColor" : "#73d9ff"
+          }
+        }
+      },
+      "selectableContestTypes" : [["systemTrivia", "userTrivia"]]
     },
     "ui" : {
       "en" : {
         "HOME_WELCOME" : "Play for your team",
         "FACEBOOK_CONNECT" : "Connect with Facebook",
-        "CONTEST_NAME" : "{{team0}} vs. {{team1}}: {{type}}",
         "CONTEST_ENDS_IN" : "{{number}} {{units}}",
         "CONTEST_ENDED" : "Contest ended {{number}} {{units}} ago",
         "CONTEST_STARTED" : "Started {{number}} {{units}} ago",
@@ -889,7 +899,7 @@
         "SERVER_ERROR_GAME_IS_REQUIRED_MESSAGE" : "Please select a game",
         "MY_CONTESTS" : "My Contests",
         "RUNNING_CONTESTS" : "Top contests",
-        "RECENTLY_FINISHED_CONTESTS" : "Finished contests",
+        "RECENTLY_FINISHED_CONTESTS" : "Finished",
         "SUCCESS_RATIO" : "({{correctRatio}}% succeeded)",
         "NEW_RANK_TITLE" : "Congratulations!",
         "NEW_RANK_MESSAGE" : "You have reached level: {{rank}}",
@@ -916,8 +926,8 @@
         "CONTEST_LEADER" : "Contest Leader",
         "SHARE" : "Share",
         "SHARE_WITH_FRIENDS_TITLE" : "Share with friends",
-        "CLICK_LIKE" : "Click like to the facebook game page and get the results of contests you participate in",
-        "CLICK_LIKE_WITH_CONTEST" : "Click like to the facebook game page and get the results of contests you participate in, including:",
+        "CLICK_LIKE" : "Click LIKE to our facebook game page to get the results of contests you participate in",
+        "CLICK_LIKE_WITH_CONTEST" : "Click LIKE to our facebook game page to get the results of:",
         "FACEBOOK_GAME_PAGE" : "Facebook game page",
         "SHARE_WITH_FRIENDS_MESSAGE" : "Invite friends to assist",
         "SHARE_SUBJECT" : "'Come play with me ' + eval:settings.client.ui.en.GAME_NAME",
@@ -926,12 +936,12 @@
         "SHARE_BODY_NO_URL" : "I want you to see this cool game",
         "SHARE_BODY_WITH_CONTEST" : "I am playing for {{team}} team. Please help: {{url}}",
         "SHARE_BODY_NO_URL_WITH_CONTEST" : "I am playing for {{team}} team in the contest '{{name}}' - please help",
-        "JOIN_A_CONTEST_MESSAGE" : "Please join one of the running contests so it will appear in my contests list",
+        "JOIN_A_CONTEST_MESSAGE" : "Please join one of the leading contests so it will appear in my contests list",
         "LEADERBOARDS" : "Leaderboards",
         "FRIENDS" : "Friends",
         "WEEKLY" : "This week",
-        "CONTEST_LEADERS" : "Contest Leaders",
-        "CONTEST_LEADERS_MORE" : "Contest Leaders...",
+        "CONTEST_LEADERS" : "Top 10",
+        "CONTEST_LEADERS_MORE" : "Top 10...",
         "CONTEST_LEADERS_GENERAL_SCORING" : "Overall Ranking",
         "MY_POSITION" : "My position: {{position}}",
         "JOIN_TEAM" : "Join {{team}}",
@@ -1000,9 +1010,12 @@
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} won",
         "AGAINST" : "vs.",
         "TIE" : "Tie",
+        "PLAY_FOR_TEAM" : "Play for {{team}}",
+        "CONTEST_NAME_LONG" : "{{team0}} vs. {{team1}}: {{type}}",
+        "CONTEST_NAME_SHORT" : "{{team0}} vs. {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivia",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "Knowledge Contest",
-        "PLAY_FOR_TEAM" : "Play for {{team}}"
+        "CONTEST_VIEW_TITLE" : "Who's the best?"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1086,7 +1099,7 @@
         "SERVER_ERROR_GAME_IS_REQUIRED_MESSAGE" : "אנא בחרו את המשחק",
         "MY_CONTESTS" : "התחרויות שלי",
         "RUNNING_CONTESTS" : "התחרויות המובילות",
-        "RECENTLY_FINISHED_CONTESTS" : "תחרויות שהסתיימו",
+        "RECENTLY_FINISHED_CONTESTS" : "הסתיימו",
         "SUCCESS_RATIO" : "({{correctRatio}}% הצליחו)",
         "NEW_RANK_TITLE" : "מזל טוב!",
         "NEW_RANK_MESSAGE" : "עליתם לרמה: {{rank}}",
@@ -1112,7 +1125,7 @@
         "SHARE" : "שיתוף",
         "SHARE_WITH_FRIENDS_TITLE" : "שתפו חברים",
         "CLICK_LIKE" : "לחצו לייק לדף המשחק בפייסבוק לקבלת תוצאות התחרויות בהשתתפותכם",
-        "CLICK_LIKE_WITH_CONTEST" : "לחצו לייק לדף המשחק בפייסבוק לקבלת תוצאות התחרויות בהשתתפותכם, כולל התחרות:",
+        "CLICK_LIKE_WITH_CONTEST" : "לחצו לייק לדף המשחק בפייסבוק לקבלת תוצאות התחרות:",
         "FACEBOOK_GAME_PAGE" : "דף המשחק בפייסבוק",
         "SHARE_WITH_FRIENDS_MESSAGE" : "הזמינו חברים לסייע",
         "SHARE_SUBJECT" : "'בואו לשחק איתי: ' + eval:settings.client.ui.he.GAME_NAME",
@@ -1121,7 +1134,7 @@
         "SHARE_BODY_NO_URL" : "אתם חייבים להסתכל על המשחק המגניב הזה",
         "SHARE_BODY_WITH_CONTEST" : "הצטרפתי לשחק עבור קבוצת {{team}}. בואו לעזור: {{url}}",
         "SHARE_BODY_NO_URL_WITH_CONTEST" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות: '{{name}}' - בואו לעזור",
-        "JOIN_A_CONTEST_MESSAGE" : "אנא הצטרפו לאחת התחרויות הרצות על מנת שתופיע בתחרויות שלי",
+        "JOIN_A_CONTEST_MESSAGE" : "אנא הצטרפו לאחת התחרויות המובילות על מנת שתופיע בתחרויות שלי",
         "LEADERBOARDS" : "היכל התהילה",
         "FRIENDS" : "חברים",
         "WEEKLY" : "השבוע",
@@ -1189,7 +1202,6 @@
         "CONTEST_CREATED_ON" : "ב {{day}} ל {{month}}, {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["א", "ב", "ג", "ד", "ה", "ו", "ש"],
         "DATE_PICKER_MONTH_NAMES" : ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"],
-        "CONTEST_NAME" : "{{team0}} נגד {{team1}}: {{type}}",
         "TRIVIA" : "ידע כללי",
         "GAME_NAME" : "Top Teamer",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ניצחו",
@@ -1197,12 +1209,14 @@
         "TIE" : "תיקו",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "ידע כללי",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "תחרות ידע",
-        "PLAY_FOR_TEAM" : "שחקו עבור {{team}}"
+        "PLAY_FOR_TEAM" : "שחקו עבור {{team}}",
+        "CONTEST_NAME_LONG" : "{{team0}} נגד {{team1}}: {{type}}",
+        "CONTEST_NAME_SHORT" : "{{team0}} נגד {{team1}}",
+        "CONTEST_VIEW_TITLE" : "מי יותר שווה?"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
         "FACEBOOK_CONNECT" : "Conectarse con Facebook",
-        "CONTEST_NAME" : "{{team0}} frente a {{team1}}: {{type}}",
         "CONTEST_ENDS_IN" : "{{number}} {{units}}",
         "CONTEST_ENDED" : "Concurso terminó hace {{number}} {{units}}",
         "CONTEST_STARTED" : "Inició Hace {{number}} {{units}}",
@@ -1282,7 +1296,7 @@
         "SERVER_ERROR_GAME_IS_REQUIRED_MESSAGE" : "Por favor, seleccione un juego",
         "MY_CONTESTS" : "Mis Concursos",
         "RUNNING_CONTESTS" : "Top concursos",
-        "RECENTLY_FINISHED_CONTESTS" : "Concursos Terminado",
+        "RECENTLY_FINISHED_CONTESTS" : "Terminado",
         "SUCCESS_RATIO" : "({{correctRatio}}% logrado)",
         "NEW_RANK_TITLE" : "¡Felicidades",
         "NEW_RANK_MESSAGE" : "Has alcanzado el nivel : {{rank}}",
@@ -1309,8 +1323,8 @@
         "CONTEST_LEADER" : "líder del Concurso",
         "SHARE" : "Compartir",
         "SHARE_WITH_FRIENDS_TITLE" : "Compartir con amigos",
-        "CLICK_LIKE" : "Haga clic como a la página de facebook del juego y obtener los resultados de los concursos que participas",
-        "CLICK_LIKE_WITH_CONTEST" : "Haga clic como a la página de facebook del juego y obtener los resultados de los concursos que participas, incluyendo:",
+        "CLICK_LIKE" : "Haga clic LIKE para nuestra página de facebook juego para obtener los resultados de los concursos a que pertenece",
+        "CLICK_LIKE_WITH_CONTEST" : "Haga clic LIKE para nuestra página de facebook juego para obtener los resultados de:",
         "FACEBOOK_GAME_PAGE" : "Facebook la página de juegos",
         "SHARE_WITH_FRIENDS_MESSAGE" : "Invita a tus amigos para ayudar",
         "SHARE_SUBJECT" : "'Ven a jugar conmigo: ' + eval:settings.client.ui.es.GAME_NAME",
@@ -1319,12 +1333,12 @@
         "SHARE_BODY_NO_URL" : "Quiero que vea este juego fresco",
         "SHARE_BODY_WITH_CONTEST" : "Estoy jugando para el equipo {{team}}. Por favor ayuda: {{url}}",
         "SHARE_BODY_NO_URL_WITH_CONTEST" : "Estoy jugando para el equipo {{team}} en el concurso de '{{name}}' - por favor ayuda",
-        "JOIN_A_CONTEST_MESSAGE" : "Por favor únase a uno de los concursos que se ejecutan por lo que aparecerá en mi lista de los concursos",
+        "JOIN_A_CONTEST_MESSAGE" : "Por favor unirse a uno de los principales concursos por lo que aparecerá en mi lista de los concursos",
         "LEADERBOARDS" : "tablas de clasificación",
         "FRIENDS" : "Amigos",
         "WEEKLY" : "Esta semana",
-        "CONTEST_LEADERS" : "Líderes del Concurso",
-        "CONTEST_LEADERS_MORE" : "Líderes del Concurso...",
+        "CONTEST_LEADERS" : "Top 10",
+        "CONTEST_LEADERS_MORE" : "Top 10...",
         "CONTEST_LEADERS_GENERAL_SCORING" : "clasificación general",
         "MY_POSITION" : "Mi posición: {{position}}",
         "JOIN_TEAM" : "Únete {{team}}",
@@ -1395,9 +1409,12 @@
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ganadas",
         "AGAINST" : "frente a",
         "TIE" : "Corbata",
+        "PLAY_FOR_TEAM" : "Jugar para {{team}}",
+        "CONTEST_NAME_LONG" : "{{team0}} frente a {{team1}}: {{type}}",
+        "CONTEST_NAME_SHORT" : "{{team0}} frente a {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivialidades",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "Concurso de conocimiento",
-        "PLAY_FOR_TEAM" : "Jugar para {{team}}"
+        "CONTEST_VIEW_TITLE" : "¿Quién es el mejor?"
       }
     },
     "platforms" : {

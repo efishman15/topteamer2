@@ -39,6 +39,10 @@ export class MainTabsPage {
       this.needToRefreshList = true;
     });
 
+    this.client.events.subscribe('topTeamer:languageChanged', (eventData) => {
+      this.needToRefreshList = true;
+    });
+
     this.client.events.subscribe('topTeamer:serverPopup', (eventData) => {
       var modal = Modal.create(ServerPopupPage, {'serverPopup': eventData[0]});
       this.client.nav.present(modal);

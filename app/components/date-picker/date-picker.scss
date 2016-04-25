@@ -18,7 +18,8 @@
 
 .calendar-button {
   width: 24px !important;
-  background-color: #61c2ec;
+  background-color: transparent;
+  color: #ffffff;
 }
 
 .calendar-week-days {
@@ -27,7 +28,7 @@
 }
 
 .date-today {
-  border: solid 1px #ffff00;
+  border: solid 1px #c2c2c2;
   cursor: pointer;
 }
 

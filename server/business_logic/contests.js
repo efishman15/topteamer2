@@ -271,7 +271,7 @@ function validateContestData(data, callback) {
         cleanContest.creator = {'id' : data.session.userId, 'avatar' : data.session.avatar, 'name' : data.session.name, 'date' : now};
 
         cleanContest.type = {};
-        cleanContest.type.id = cleanContest.type.id;
+        cleanContest.type.id = data.contest.type.id;
         if (cleanContest.type.id === 'userTrivia') {
             cleanContest.type.questions = data.contest.type.questions;
         }
@@ -466,10 +466,10 @@ function setChartControl(contest, session) {
     teamsOrder = [1, 0];
   }
 
-  contestChart.annotations.groups[0].items[0].text = contest.teams[teamsOrder[0]].name;
+  contestChart.annotations.groups[0].items[teamsOrder[0]].text = contest.teams[0].name;
   contestChart.annotations.groups[0].items[0].x = '$dataset.0.set.0.centerX';
 
-  contestChart.annotations.groups[0].items[1].text = contest.teams[teamsOrder[1]].name;
+  contestChart.annotations.groups[0].items[teamsOrder[1]].text = contest.teams[1].name;
   contestChart.annotations.groups[0].items[1].x = '$dataset.0.set.1.centerX';
 
   if (contest.myTeam === 0 || contest.myTeam === 1) {

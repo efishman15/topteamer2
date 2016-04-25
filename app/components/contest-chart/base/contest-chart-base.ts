@@ -66,7 +66,7 @@ export class ContestChartBaseComponent {
         this.chart = new window.FusionCharts({
           type: this.client.settings.charts.contest.type,
           renderAt: this.id + '-container',
-          width: this.client.settings.charts.contest.size.width,
+          width: this.client.settings.charts.contest.size.width - 2, //To solve pixel issue in pc/smartphone
           height: this.client.settings.charts.contest.size.height,
           dataFormat: 'json',
           dataSource: this.contest.chartControl,

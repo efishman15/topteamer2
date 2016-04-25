@@ -64,6 +64,12 @@ var QuizSettings = (function () {
     return QuizSettings;
 }());
 exports.QuizSettings = QuizSettings;
+var FinishQuizSettings = (function () {
+    function FinishQuizSettings() {
+    }
+    return FinishQuizSettings;
+}());
+exports.FinishQuizSettings = FinishQuizSettings;
 var QuizQuestionsSettings = (function () {
     function QuizQuestionsSettings() {
     }

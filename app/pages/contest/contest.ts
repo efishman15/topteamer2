@@ -60,6 +60,9 @@ export class ContestPage {
       }
       else {
         this.animateLastResults = true;
+        setTimeout(() => {
+          this.animateLastResults = false;
+        }, this.client.settings.quiz.finish.animateResultsTimeout);
       }
 
       var soundFile = this.lastQuizResults.data.sound;
@@ -152,8 +155,8 @@ export class ContestPage {
   }
 
   like() {
-    this.client.logEvent('contest/like/click', {'contestId' : this.contest._id});
-    this.client.nav.push(LikePage, {'contest': this.contest});
+    this.client.logEvent('like/click');
+    window.open(this.client.settings.general.facebookFanPage, '_new');
   }
 
   setPlayText() {
