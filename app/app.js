@@ -252,8 +252,7 @@ var topTeamerApp = (function () {
     };
     topTeamerApp = __decorate([
         ionic_angular_1.App({
-            templateUrl: 'app.html',
-            moduleId: 'build/app.html',
+            templateUrl: 'build/app.html',
             providers: [core_1.provide(core_1.ExceptionHandler, { useClass: exceptions_1.MyExceptionHandler }), client_1.Client],
             config: { backButtonText: '' },
             directives: [loading_modal_1.LoadingModalComponent]

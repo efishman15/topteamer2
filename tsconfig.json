@@ -32,7 +32,6 @@
     "app/pages/contest-type/contest-type.ts",
     "app/pages/facebook-post/facebook-post.ts",
     "app/pages/leaderboards/leaderboards.ts",
-    "app/pages/like/like.ts",
     "app/pages/login/login.ts",
     "app/pages/main-tabs/main-tabs.ts",
     "app/pages/mobile-share/mobile-share.ts",

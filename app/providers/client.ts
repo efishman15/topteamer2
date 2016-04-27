@@ -59,12 +59,6 @@ export class Client {
     }
     else {
       this.clientInfo.mobile = true;
-      if (this.platform.is('android')) {
-        this.clientInfo.platform = 'android';
-      }
-      else if (this.platform.is('ios')) {
-        this.clientInfo.platform = 'ios';
-      }
     }
 
     this.serverGateway = new ServerGateway(http);
@@ -88,6 +82,15 @@ export class Client {
       this._config = config;
       this.menuController = menuController;
       this._events = events;
+
+      if (this.clientInfo.mobile) {
+        if (platform.is('android')) {
+          this.clientInfo.platform = 'android';
+        }
+        else if (platform.is('ios')) {
+          this.clientInfo.platform = 'ios';
+        }
+      }
 
       var language = localStorage.getItem('language');
 

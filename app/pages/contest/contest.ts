@@ -5,7 +5,6 @@ import {ContestParticipantsPage} from '../../pages/contest-participants/contest-
 import {QuizPage} from '../../pages/quiz/quiz';
 import {SetContestPage} from '../../pages/set-contest/set-contest';
 import {FacebookPostPage} from '../../pages/facebook-post/facebook-post';
-import {LikePage} from '../../pages/like/like';
 import {NewRankPage} from '../../pages/new-rank/new-rank'
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';

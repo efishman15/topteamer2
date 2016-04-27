@@ -5,7 +5,6 @@ import * as contestsService from '../../providers/contests';
 //Pages the server might want to redirect to
 import {ContestPage} from '../contest/contest';
 import {ContestParticipantsPage} from '../contest-participants/contest-participants';
-import {LikePage} from '../like/like';
 import {SetContestPage} from '../set-contest/set-contest';
 import {SettingsPage} from '../settings/settings';
 
@@ -88,9 +87,6 @@ export class ServerPopupPage {
             break;
           case 'ContestParticipantsPage':
             screen = ContestParticipantsPage;
-            break;
-          case 'LikePage':
-            screen = LikePage;
             break;
           case 'SetContestPage':
             screen = SetContestPage;

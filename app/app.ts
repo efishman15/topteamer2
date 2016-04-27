@@ -15,8 +15,7 @@ import * as contestsService from './providers/contests';
 import {} from './interfaces/interfaces'
 
 @App({
-  templateUrl: 'app.html',
-  moduleId: 'build/app.html',
+  templateUrl: 'build/app.html',
   providers: [provide(ExceptionHandler, {useClass: MyExceptionHandler}), Client],
   config: {backButtonText: ''},
   directives: [LoadingModalComponent]

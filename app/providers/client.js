@@ -39,12 +39,6 @@ var Client = (function () {
         }
         else {
             this.clientInfo.mobile = true;
-            if (this.platform.is('android')) {
-                this.clientInfo.platform = 'android';
-            }
-            else if (this.platform.is('ios')) {
-                this.clientInfo.platform = 'ios';
-            }
         }
         this.serverGateway = new ServerGateway(http);
     }
@@ -62,6 +56,14 @@ var Client = (function () {
             _this._config = config;
             _this.menuController = menuController;
             _this._events = events;
+            if (_this.clientInfo.mobile) {
+                if (platform.is('android')) {
+                    _this.clientInfo.platform = 'android';
+                }
+                else if (platform.is('ios')) {
+                    _this.clientInfo.platform = 'ios';
+                }
+            }
             var language = localStorage.getItem('language');
             _this.getSettings(language).then(function (data) {
                 _this._settings = data['settings'];

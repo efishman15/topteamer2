@@ -14,7 +14,6 @@ var contestsService = require('../../providers/contests');
 //Pages the server might want to redirect to
 var contest_1 = require('../contest/contest');
 var contest_participants_1 = require('../contest-participants/contest-participants');
-var like_1 = require('../like/like');
 var set_contest_1 = require('../set-contest/set-contest');
 var settings_1 = require('../settings/settings');
 var shareService = require('../../providers/share');
@@ -78,9 +77,6 @@ var ServerPopupPage = (function () {
                             break;
                         case 'ContestParticipantsPage':
                             screen = contest_participants_1.ContestParticipantsPage;
-                            break;
-                        case 'LikePage':
-                            screen = like_1.LikePage;
                             break;
                         case 'SetContestPage':
                             screen = set_contest_1.SetContestPage;
