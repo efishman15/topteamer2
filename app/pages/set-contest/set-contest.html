@@ -106,40 +106,32 @@
       </date-picker>
     </div>
 
-    <div padding-left padding-right *ngIf="contestLocalCopy.type.id === 'userTrivia'">
-      <ion-item no-lines class="set-contest-user-questions-area">
-        <ion-row>
-          <ion-col>
+    <div class="set-contest-user-questions-label-{{client.currentLanguage.direction}}" *ngIf="contestLocalCopy.type.id === 'userTrivia'">
+      <ion-row>
+        <ion-col>
+          <div padding-top padding-bottom class="set-contest-user-questions-title">{{client.translate('MY_CONTEST_QUESTIONS',{count : (contestLocalCopy.type.questions ? contestLocalCopy.type.questions.visibleCount : 0)}) }}</div>
+        </ion-col>
+        <ion-col>
+          <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}">
             <button
-                    [ngStyle]="{'float' : client.currentLanguage.align}"
-                    (click)="openQuestionEditor('add')"
-                    class="set-contest-question-buttons"
-                    title="{{client.translate('ADD')}}">
-              <ion-icon name="add-circle"></ion-icon>
+              (click)="openQuestionEditor('add')"
+              class="set-contest-question-buttons">
+              <ion-icon class="set-contest-add-icon" name="add-circle"></ion-icon>
+              {{client.translate('ADD')}}
             </button>
-          </ion-col>
-          <ion-col>
-            <div padding-left padding-right>
-              <span class="set-contest-user-questions-title">
-                  {{client.translate('MY_CONTEST_QUESTIONS',{count : (contestLocalCopy.type.questions ? contestLocalCopy.type.questions.visibleCount : 0)}) }}
-              </span>
-            </div>
-          </ion-col>
-          <ion-col>
             <button
-                    [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
-                    class="set-contest-question-buttons"
-                    (click)="openSearchQuestions()"
-                    title="{{client.translate('SEARCH')}}">
+              class="set-contest-question-buttons"
+              (click)="openSearchQuestions()"
+              title="{{client.translate('SEARCH')}}">
               <ion-icon name="search"></ion-icon>
             </button>
-          </ion-col>
-        </ion-row>
-
-        <div class="set-contest-user-questions-list small-horizontal-margin"
-             *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0">
+          </div>
+        </ion-col>
+      </ion-row>
+      <div padding-left padding-right *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0" class="set-contest-user-questions-area">
+        <div class="set-contest-user-questions-list small-horizontal-margin">
           <ion-list>
-            <ion-row *ngFor="#question of contestLocalCopy.type.questions.list, #i=index" [hidden]="question.deleted">
+            <ion-row style="height: 40px" *ngFor="#question of contestLocalCopy.type.questions.list, #i=index" [hidden]="question.deleted">
               <ion-col width-90>
                 <div title="{{client.translate('EDIT_QUESTION')}}" class="base-font pointer"
                      (click)="openQuestionEditor('edit', question)">
@@ -155,8 +147,7 @@
             </ion-row>
           </ion-list>
         </div>
-
-      </ion-item>
+      </div>
     </div>
 
     <div padding-left padding-right class="invalid-input"

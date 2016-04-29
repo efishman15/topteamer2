@@ -24,15 +24,15 @@
                   (click)="client.logEvent('settings/language/click')">
         <ion-option *ngFor="#languageKey of client.languageKeys"
                     value="{{languageKey}}"
-                    checked="languageKey===client.user.settings.language"                    >
+                    checked="languageKey===client.user.settings.language">
           {{client.settings.languages[languageKey].displayNames[languageKey]}}
         </ion-option>
       </ion-select>
     </ion-item>
 
     <ion-item class="app-menu-item">
-      <button class="app-menu-item" *ngIf="client.session" ion-item (click)="logout()">
-        <ion-icon name="log-out"></ion-icon>
+      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" *ngIf="client.session" (click)="logout()">
+        <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="log-out"></ion-icon>
         {{client.translate('SIGN_OUT')}}
       </button>
     </ion-item>
