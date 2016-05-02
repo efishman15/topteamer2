@@ -1,4 +1,3 @@
-"use strict";
 var client_1 = require('./client');
 //------------------------------------------------------
 //-- getLoginStatus

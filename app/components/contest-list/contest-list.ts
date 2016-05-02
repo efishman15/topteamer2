@@ -1,19 +1,20 @@
 import {Component, Input, Output, EventEmitter} from 'angular2/core';
-import {ContestChartInListComponent} from '../contest-chart/in-list/contest-chart-in-list';
+import {ContestChartComponent} from '../contest-chart/contest-chart';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
+import {Contest} from "../../objects/objects";
 
 @Component({
   selector: 'contest-list',
   templateUrl: 'build/components/contest-list/contest-list.html',
-  directives: [ContestChartInListComponent],
+  directives: [ContestChartComponent],
 })
 
 export class ContestListComponent {
   @Input() tab:String;
   @Output() contestSelected = new EventEmitter();
 
-  contests:Array<Object>;
+  contests:Array<Contest>;
   client:Client;
 
   constructor() {
@@ -35,6 +36,13 @@ export class ContestListComponent {
     this.contestSelected.emit(data);
   }
 
+  onResize() {
+    if (this.contests && this.contests.length > 0) {
+      for(var i=0; i<this.contests.length; i++) {
+        this.contests[i].chartComponent.onResize();
+      }
+    }
+  }
 }
 
 

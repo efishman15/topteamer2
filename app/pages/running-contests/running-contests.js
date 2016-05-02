@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -32,6 +31,9 @@ var RunningContestsPage = (function () {
     RunningContestsPage.prototype.refreshList = function () {
         this.contestList.refresh();
     };
+    RunningContestsPage.prototype.onResize = function () {
+        this.contestList.onResize();
+    };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 
         __metadata('design:type', contest_list_1.ContestListComponent)
@@ -44,6 +46,6 @@ var RunningContestsPage = (function () {
         __metadata('design:paramtypes', [])
     ], RunningContestsPage);
     return RunningContestsPage;
-}());
+})();
 exports.RunningContestsPage = RunningContestsPage;
 //# sourceMappingURL=running-contests.js.map

@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,10 +8,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('angular2/core');
-var client_1 = require('../../../providers/client');
-var objects_1 = require('../../../objects/objects');
-var ContestChartBaseComponent = (function () {
-    function ContestChartBaseComponent() {
+var client_1 = require('../../providers/client');
+var objects_1 = require('../../objects/objects');
+var ContestChartComponent = (function () {
+    function ContestChartComponent() {
         var _this = this;
         this.contestSelected = new core_1.EventEmitter();
         this.teamSelected = new core_1.EventEmitter();
@@ -42,65 +41,78 @@ var ContestChartBaseComponent = (function () {
         };
         this.client = client_1.Client.getInstance();
     }
-    ContestChartBaseComponent.prototype.onContestSelected = function (source) {
+    ContestChartComponent.prototype.onContestSelected = function (source) {
         this.contestSelected.emit({ 'contest': this.contest, 'source': source });
     };
-    ContestChartBaseComponent.prototype.onTeamSelected = function (teamId, source) {
+    ContestChartComponent.prototype.onTeamSelected = function (teamId, source) {
         this.teamSelected.emit({ 'teamId': teamId, 'contest': this.contest, 'source': source });
     };
-    ContestChartBaseComponent.prototype.ngOnInit = function () {
+    ContestChartComponent.prototype.ngOnInit = function () {
         this.initChart();
     };
-    ContestChartBaseComponent.prototype.initChart = function () {
+    ContestChartComponent.prototype.initChart = function () {
         var _this = this;
-        if (!this.chart) {
+        if (!this.contest.chartControl) {
+            this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
+            this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
+            var chartComponent = this;
             window.FusionCharts.ready(function () {
-                _this.chart = new window.FusionCharts({
+                _this.contest.chartControl = new window.FusionCharts({
                     type: _this.client.settings.charts.contest.type,
                     renderAt: _this.id + '-container',
-                    width: _this.client.settings.charts.contest.size.width - 2,
-                    height: _this.client.settings.charts.contest.size.height,
+                    width: _this.width - 2,
+                    height: _this.height,
                     dataFormat: 'json',
-                    dataSource: _this.contest.chartControl,
+                    dataSource: _this.contest.dataSource,
                     events: _this.events
                 });
-                _this.chart.render();
+                _this.contest.chartComponent = chartComponent;
+                _this.contest.chartControl.render();
             });
         }
     };
-    ContestChartBaseComponent.prototype.refresh = function (chartControl) {
-        if (this.chart) {
-            this.chart.setJSONData(chartControl);
+    ContestChartComponent.prototype.refresh = function (dataSource) {
+        if (this.contest.chartControl) {
+            this.contest.chartControl.setJSONData(dataSource);
         }
         else {
-            this.contest.chartControl = chartControl;
+            this.contest.dataSource = dataSource;
             this.initChart();
         }
+    };
+    ContestChartComponent.prototype.onResize = function () {
+        this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
+        this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
+        this.contest.chartControl.resizeTo(this.width - 2, this.height);
     };
     __decorate([
         core_1.Input(), 
         __metadata('design:type', Number)
-    ], ContestChartBaseComponent.prototype, "id", void 0);
+    ], ContestChartComponent.prototype, "id", void 0);
+    __decorate([
+        core_1.Input(), 
+        __metadata('design:type', String)
+    ], ContestChartComponent.prototype, "mode", void 0);
     __decorate([
         core_1.Input(), 
         __metadata('design:type', objects_1.Contest)
-    ], ContestChartBaseComponent.prototype, "contest", void 0);
+    ], ContestChartComponent.prototype, "contest", void 0);
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)
-    ], ContestChartBaseComponent.prototype, "contestSelected", void 0);
+    ], ContestChartComponent.prototype, "contestSelected", void 0);
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)
-    ], ContestChartBaseComponent.prototype, "teamSelected", void 0);
-    ContestChartBaseComponent = __decorate([
+    ], ContestChartComponent.prototype, "teamSelected", void 0);
+    ContestChartComponent = __decorate([
         core_1.Component({
-            selector: 'contest-chart-base',
-            templateUrl: 'build/components/contest-chart/base/contest-chart-base.html'
+            selector: 'contest-chart',
+            templateUrl: 'build/components/contest-chart/contest-chart.html'
         }), 
         __metadata('design:paramtypes', [])
-    ], ContestChartBaseComponent);
-    return ContestChartBaseComponent;
-}());
-exports.ContestChartBaseComponent = ContestChartBaseComponent;
-//# sourceMappingURL=contest-chart-base.js.map
+    ], ContestChartComponent);
+    return ContestChartComponent;
+})();
+exports.ContestChartComponent = ContestChartComponent;
+//# sourceMappingURL=contest-chart.js.map

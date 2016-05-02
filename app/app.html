@@ -1,26 +1,25 @@
-<!-- left menu -->
-<ion-menu *ngIf="client.loaded && client.currentLanguage.direction==='ltr'" [content]="content" side="left">
+<ion-menu *ngIf="client.loaded" [content]="content" side="{{client.currentLanguage.align}}">
 
-  <ion-toolbar light-blue *ngIf="client.loaded">
+  <ion-toolbar light-blue>
     <ion-title><div text-center>{{client.translate('TOOLS')}}</div></ion-title>
   </ion-toolbar>
 
-  <ion-content class="app-bg">
+  <ion-content class="app-bg" dir="{{client.currentLanguage.direction}}">
 
-    <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" menuClose (click)="client.openNewContest()">
+    <ion-list>
+      <button ion-item class="app-menu-item app-menu-button" menuClose (click)="client.openNewContest()">
         <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="add"></ion-icon>
         {{client.translate('NEW_CONTEST')}}
       </button>
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" menuClose (click)="share()">
+      <button ion-item class="app-menu-item app-menu-button" menuClose (click)="share()">
         <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="share-alt"></ion-icon>
         {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
       </button>
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" menuClose (click)="settings()">
+      <button ion-item class="app-menu-item app-menu-button" menuClose (click)="settings()">
         <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="settings"></ion-icon>
         {{client.translate('SETTINGS')}}
       </button>
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" *ngIf="client.session && client.session.isAdmin" menuClose (click)="systemTools()">
+      <button ion-item class="app-menu-item app-menu-button" *ngIf="client.session && client.session.isAdmin" menuClose (click)="systemTools()">
         <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="hammer"></ion-icon>
         {{client.translate('SYSTEM_TOOLS')}}
       </button>
@@ -28,38 +27,6 @@
   </ion-content>
 
 </ion-menu>
-
-<!-- right menu -->
-<ion-menu *ngIf="client.loaded && client.currentLanguage.direction==='rtl'" [content]="content" side="right">
-
-  <ion-toolbar light-blue *ngIf="client.loaded">
-    <ion-title><div text-center>{{client.translate('TOOLS')}}</div></ion-title>
-  </ion-toolbar>
-
-  <ion-content class="app-bg">
-
-    <ion-list *ngIf="client.loaded" dir="{{client.currentLanguage.direction}}">
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" menuClose (click)="client.openNewContest()">
-        <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="add"></ion-icon>
-        {{client.translate('NEW_CONTEST')}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </button>
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" menuClose (click)="share()">
-        <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="share-alt"></ion-icon>
-        {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </button>
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" menuClose (click)="settings()">
-        <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="settings"></ion-icon>
-        {{client.translate('SETTINGS')}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </button>
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" *ngIf="client.session && client.session.isAdmin" menuClose (click)="systemTools()">
-        <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="hammer"></ion-icon>
-        {{client.translate('SYSTEM_TOOLS')}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </button>
-    </ion-list>
-  </ion-content>
-
-</ion-menu>
-
 
 <!-- main navigation -->
 <ion-nav id="nav" [root]="root" #content swipe-back-enabled="false">

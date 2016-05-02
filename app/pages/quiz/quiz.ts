@@ -254,7 +254,7 @@ export class QuizPage {
         if (this.quizData.currentQuestion.correctRatio ||
           this.quizData.currentQuestion.correctRatio === 0) {
 
-          questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats.chartControl));
+          questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats.dataSource));
 
           questionChart.data = [];
           var roundedCorrectRatio = Math.round(this.quizData.currentQuestion.correctRatio * 100) / 100;

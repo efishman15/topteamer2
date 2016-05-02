@@ -61,8 +61,8 @@ export class MainTabsPage {
   onPageWillEnter() {
     if (this.needToRefreshList) {
       var selectedPage = this.mainTabs.getSelected().getActive();
-      if (selectedPage.willEnter) {
-        selectedPage.willEnter();
+      if (selectedPage.instance.willEnter) {
+        selectedPage.instance.willEnter();
       }
       this.needToRefreshList = false;
     }
@@ -71,5 +71,12 @@ export class MainTabsPage {
   onPageDidEnter() {
     //Events here could be serverPopup just as the app loads - the page should be fully visible
     this.client.processInternalEvents();
+  }
+
+  onResize() {
+    var selectedPage = this.mainTabs.getSelected().getActive();
+    if (selectedPage.instance && selectedPage.instance.onResize) {
+      selectedPage.instance.onResize();
+    }
   }
 }

@@ -36,4 +36,9 @@ export class RunningContestsPage {
   refreshList() {
     this.contestList.refresh();
   }
+
+  onResize() {
+    this.contestList.onResize();
+  }
+
 }

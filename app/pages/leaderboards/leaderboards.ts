@@ -61,4 +61,11 @@ export class LeaderboardsPage {
       this.contestList.refresh();
     }
   }
+
+  onResize() {
+    if (this.mode === 'contests') {
+      this.contestList.onResize();
+    }
+  }
+
 }

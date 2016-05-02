@@ -1,4 +1,3 @@
-"use strict";
 var client_1 = require('./client');
 var audio = new Audio();
 var playOgg = !!(audio.canPlayType && audio.canPlayType("audio/ogg; codecs='vorbis'").replace(/no/, ''));

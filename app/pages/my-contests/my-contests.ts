@@ -44,4 +44,8 @@ export class MyContestsPage {
   refreshList() {
     return this.contestList.refresh();
   }
+
+  onResize() {
+    this.contestList.onResize();
+  }
 }

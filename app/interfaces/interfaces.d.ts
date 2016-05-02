@@ -1,7 +1,7 @@
 export {};
 
 declare global {
-  interface Window {
+    interface Window {
     cordova: any;
     StatusBar: any;
     loadJsFile(fileName:string) : void;
@@ -19,7 +19,7 @@ declare global {
     facebookConnectPlugin: any;
     PushNotification: any;
     $cordovaSocialSharing: any;
-    myLogError(errorType: string, message: string): void;
+    myLogError(errorType:string, message:string): void;
   }
 
   interface Navigator {
@@ -34,13 +34,12 @@ declare global {
   interface Date {
     clearTime(): void;
   }
-
 }
 
 interface IFB {
-  ui(data: Object, callback: any): void;
-  init(data: Object): void;
-  getLoginStatus(callback: any): void;
-  login(callback: any, permissions: Object): void;
-  logout(callback: any): void;
+  ui(data:Object, callback:any): void;
+  init(data:Object): void;
+  getLoginStatus(callback:any): void;
+  login(callback:any, permissions:Object): void;
+  logout(callback:any): void;
 }

@@ -1,6 +1,6 @@
 import {Page, NavParams,Modal} from 'ionic-angular';
 import {ViewChild} from 'angular2/core';
-import {ContestChartBaseComponent} from '../../components/contest-chart/base/contest-chart-base';
+import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
 import {SetContestPage} from '../../pages/set-contest/set-contest';
@@ -15,7 +15,7 @@ import {Contest,QuizResults} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [ContestChartBaseComponent]
+  directives: [ContestChartComponent]
 })
 
 export class ContestPage {
@@ -28,7 +28,7 @@ export class ContestPage {
   contestId:String;
   playText: string;
 
-  @ViewChild(ContestChartBaseComponent) contestChartBaseComponent:ContestChartBaseComponent;
+  @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
 
   constructor(params:NavParams) {
 
@@ -137,7 +137,7 @@ export class ContestPage {
   }
 
   refreshContestChart(contest) {
-    this.contestChartBaseComponent.refresh(contest.chartControl);
+    this.contestChartComponent.refresh(contest.dataSource);
   }
 
   switchTeams(source) {

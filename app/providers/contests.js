@@ -1,4 +1,3 @@
-"use strict";
 var client_1 = require('./client');
 var contest_1 = require('../pages/contest/contest');
 //------------------------------------------------------

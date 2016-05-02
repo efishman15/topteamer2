@@ -449,13 +449,13 @@ function setTimeDisplay(contest, session) {
 }
 
 //------------------------------------------------------
-//-- setChartControl
-//-- Sets the contest.chartControl object
+//-- setDataSource
+//-- Sets the contest.setDataSource object
 //------------------------------------------------------
-function setChartControl(contest, session) {
+function setDataSource(contest, session) {
 
-  var contestChart = JSON.parse(JSON.stringify(generalUtils.settings.client.charts.contest.chartControl));
-  contest.chartControl = contestChart;
+  var dataSource = JSON.parse(JSON.stringify(generalUtils.settings.client.charts.contest.dataSource));
+  contest.dataSource = dataSource;
 
   var teamsOrder;
 
@@ -466,33 +466,33 @@ function setChartControl(contest, session) {
     teamsOrder = [1, 0];
   }
 
-  contestChart.annotations.groups[0].items[teamsOrder[0]].text = contest.teams[0].name;
-  contestChart.annotations.groups[0].items[0].x = '$dataset.0.set.0.centerX';
+  dataSource.annotations.groups[0].items[teamsOrder[0]].text = contest.teams[0].name;
+  dataSource.annotations.groups[0].items[0].x = '$dataset.0.set.0.centerX';
 
-  contestChart.annotations.groups[0].items[teamsOrder[1]].text = contest.teams[1].name;
-  contestChart.annotations.groups[0].items[1].x = '$dataset.0.set.1.centerX';
+  dataSource.annotations.groups[0].items[teamsOrder[1]].text = contest.teams[1].name;
+  dataSource.annotations.groups[0].items[1].x = '$dataset.0.set.1.centerX';
 
   if (contest.myTeam === 0 || contest.myTeam === 1) {
     var myTeamProperties = Object.keys(generalUtils.settings.client.charts.contest.myTeam[teamsOrder[contest.myTeam]]);
     for(var i=0; i<myTeamProperties.length; i++)
     {
       //Apply all properties of "my team" to the label of my team
-      contestChart.annotations.groups[0].items[teamsOrder[contest.myTeam]][myTeamProperties[i]] = generalUtils.settings.client.charts.contest.myTeam[contest.myTeam][myTeamProperties[i]];
+      dataSource.annotations.groups[0].items[teamsOrder[contest.myTeam]][myTeamProperties[i]] = generalUtils.settings.client.charts.contest.myTeam[contest.myTeam][myTeamProperties[i]];
     }
   }
 
-  contestChart.categories[0].category[0].label = mathjs.round(contest.teams[teamsOrder[0]].chartValue * 100,0) + '%';
-  contestChart.categories[0].category[1].label = mathjs.round(contest.teams[teamsOrder[1]].chartValue * 100,0) + '%';
+  dataSource.categories[0].category[0].label = mathjs.round(contest.teams[teamsOrder[0]].chartValue * 100,0) + '%';
+  dataSource.categories[0].category[1].label = mathjs.round(contest.teams[teamsOrder[1]].chartValue * 100,0) + '%';
 
   var netChartHeight = 1 - (generalUtils.settings.client.charts.contest.topMarginPercent/100);
 
   //Scores
-  contestChart.dataset[0].data[0].value = contest.teams[teamsOrder[0]].chartValue * netChartHeight;
-  contestChart.dataset[0].data[1].value = contest.teams[teamsOrder[1]].chartValue * netChartHeight;
+  dataSource.dataset[0].data[0].value = contest.teams[teamsOrder[0]].chartValue * netChartHeight;
+  dataSource.dataset[0].data[1].value = contest.teams[teamsOrder[1]].chartValue * netChartHeight;
 
   //Others (in grey)
-  contestChart.dataset[1].data[0].value = netChartHeight - contestChart.dataset[0].data[0].value;
-  contestChart.dataset[1].data[1].value = netChartHeight - contestChart.dataset[0].data[1].value;
+  dataSource.dataset[1].data[0].value = netChartHeight - dataSource.dataset[0].data[0].value;
+  dataSource.dataset[1].data[1].value = netChartHeight - dataSource.dataset[0].data[1].value;
 
 }
 
@@ -529,7 +529,7 @@ function prepareContestForClient(contest, session) {
 
     setTimeDisplay(contest, session);
 
-    setChartControl(contest, session);
+    setDataSource(contest, session);
 
     if (session.isAdmin || contest.creator.id.toString() === session.userId.toString()) {
         contest.owner = true;

@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -49,8 +48,8 @@ var MainTabsPage = (function () {
     MainTabsPage.prototype.onPageWillEnter = function () {
         if (this.needToRefreshList) {
             var selectedPage = this.mainTabs.getSelected().getActive();
-            if (selectedPage.willEnter) {
-                selectedPage.willEnter();
+            if (selectedPage.instance.willEnter) {
+                selectedPage.instance.willEnter();
             }
             this.needToRefreshList = false;
         }
@@ -58,6 +57,12 @@ var MainTabsPage = (function () {
     MainTabsPage.prototype.onPageDidEnter = function () {
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
+    };
+    MainTabsPage.prototype.onResize = function () {
+        var selectedPage = this.mainTabs.getSelected().getActive();
+        if (selectedPage.instance && selectedPage.instance.onResize) {
+            selectedPage.instance.onResize();
+        }
     };
     __decorate([
         core_1.ViewChild(ionic_angular_1.Tabs), 
@@ -70,6 +75,6 @@ var MainTabsPage = (function () {
         __metadata('design:paramtypes', [])
     ], MainTabsPage);
     return MainTabsPage;
-}());
+})();
 exports.MainTabsPage = MainTabsPage;
 //# sourceMappingURL=main-tabs.js.map

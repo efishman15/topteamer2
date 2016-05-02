@@ -13,6 +13,7 @@ import {SystemToolsPage} from './pages/system-tools/system-tools';
 import {LoadingModalComponent} from './components/loading-modal/loading-modal';
 import * as contestsService from './providers/contests';
 import {} from './interfaces/interfaces'
+import {AppVersion} from 'ionic-native';
 
 @App({
   templateUrl: 'build/app.html',
@@ -72,16 +73,12 @@ class topTeamerApp {
 
   initWeb() {
 
-    //Resize app for web
-    var containerWidth = window.innerWidth;
+    window.addEventListener('resize', (event) => {
+      var client = Client.getInstance();
+      client.resizeWeb();
+    });
 
-    var myApp = document.getElementById('myApp');
-    if (myApp) {
-      if (containerWidth > this.client.settings.general.webCanvasWidth) {
-        myApp.style.width = this.client.settings.general.webCanvasWidth + 'px';
-        myApp.style.marginLeft = (containerWidth - this.client.settings.general.webCanvasWidth) / 2 + 'px';
-      }
-    }
+    this.client.resizeWeb();
 
     //Load branch mobile script
     window.loadJsFile('lib/branch/web.min.js');
@@ -116,9 +113,7 @@ class topTeamerApp {
     }
 
     //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
-    Platform.prototype.fullScreen = () => {
-      return true;
-    };
+    //TODO: check if Platform.prototype.fullScreen is required - to return true always
 
     //Hook into window.open
     window.open = window.cordova.InAppBrowser.open;
@@ -144,10 +139,9 @@ class topTeamerApp {
       }
     });
 
-    window.cordova.getAppVersion((version) => {
+    AppVersion.getVersionNumber().then((version) => {
       this.client.user.clientInfo.appVersion = version;
       window.FlurryAgent.setAppVersion('' + version);
-
       this.initFacebook();
     });
   }

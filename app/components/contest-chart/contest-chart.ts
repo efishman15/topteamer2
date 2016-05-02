@@ -1,20 +1,22 @@
 import {Component, Input, EventEmitter, Output} from 'angular2/core';
-import {Client} from '../../../providers/client';
-import {Contest} from '../../../objects/objects';
+import {Client} from '../../providers/client';
+import {Contest} from '../../objects/objects';
 
 @Component({
-  selector: 'contest-chart-base',
-  templateUrl: 'build/components/contest-chart/base/contest-chart-base.html'
+  selector: 'contest-chart',
+  templateUrl: 'build/components/contest-chart/contest-chart.html'
 })
 
-export class ContestChartBaseComponent {
+export class ContestChartComponent {
 
   @Input() id:Number;
+  @Input() mode:string;
   @Input() contest:Contest;
 
   chartTeamEventHandled:boolean;
   client:Client;
-  chart:any;
+  width: number;
+  height: number;
 
   @Output() contestSelected = new EventEmitter();
   @Output() teamSelected = new EventEmitter();
@@ -61,31 +63,41 @@ export class ContestChartBaseComponent {
   }
 
   initChart() {
-    if (!this.chart) {
+    if (!this.contest.chartControl) {
+      this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
+      this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
+      var chartComponent = this;
       window.FusionCharts.ready(() => {
-        this.chart = new window.FusionCharts({
+        this.contest.chartControl = new window.FusionCharts({
           type: this.client.settings.charts.contest.type,
           renderAt: this.id + '-container',
-          width: this.client.settings.charts.contest.size.width - 2, //To solve pixel issue in pc/smartphone
-          height: this.client.settings.charts.contest.size.height,
+          width: this.width - 2,
+          height: this.height,
           dataFormat: 'json',
-          dataSource: this.contest.chartControl,
+          dataSource: this.contest.dataSource,
           events: this.events
         });
 
-        this.chart.render();
+        this.contest.chartComponent = chartComponent;
+        this.contest.chartControl.render();
 
       });
     }
   }
 
-  refresh(chartControl: any) {
-    if (this.chart) {
-      this.chart.setJSONData(chartControl);
+  refresh(dataSource: any) {
+    if (this.contest.chartControl) {
+      this.contest.chartControl.setJSONData(dataSource);
     }
     else {
-      this.contest.chartControl = chartControl;
+      this.contest.dataSource = dataSource;
       this.initChart();
     }
+  }
+
+  onResize() {
+    this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
+    this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
+    this.contest.chartControl.resizeTo(this.width - 2, this.height);
   }
 }

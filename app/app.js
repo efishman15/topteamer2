@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -20,6 +19,7 @@ var settings_1 = require('./pages/settings/settings');
 var system_tools_1 = require('./pages/system-tools/system-tools');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
 var contestsService = require('./providers/contests');
+var ionic_native_1 = require('ionic-native');
 var topTeamerApp = (function () {
     function topTeamerApp(ionicApp, platform, config, client, events, menuController) {
         var _this = this;
@@ -56,15 +56,11 @@ var topTeamerApp = (function () {
     ;
     topTeamerApp.prototype.initWeb = function () {
         var _this = this;
-        //Resize app for web
-        var containerWidth = window.innerWidth;
-        var myApp = document.getElementById('myApp');
-        if (myApp) {
-            if (containerWidth > this.client.settings.general.webCanvasWidth) {
-                myApp.style.width = this.client.settings.general.webCanvasWidth + 'px';
-                myApp.style.marginLeft = (containerWidth - this.client.settings.general.webCanvasWidth) / 2 + 'px';
-            }
-        }
+        window.addEventListener('resize', function (event) {
+            var client = client_1.Client.getInstance();
+            client.resizeWeb();
+        });
+        this.client.resizeWeb();
         //Load branch mobile script
         window.loadJsFile('lib/branch/web.min.js');
         //init facebook javascript sdk
@@ -94,9 +90,7 @@ var topTeamerApp = (function () {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
         }
         //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
-        ionic_angular_1.Platform.prototype.fullScreen = function () {
-            return true;
-        };
+        //TODO: check if Platform.prototype.fullScreen is required - to return true always
         //Hook into window.open
         window.open = window.cordova.InAppBrowser.open;
         //Load branch mobile script
@@ -113,7 +107,7 @@ var topTeamerApp = (function () {
                 window.initBranch();
             }
         });
-        window.cordova.getAppVersion(function (version) {
+        ionic_native_1.AppVersion.getVersionNumber().then(function (version) {
             _this.client.user.clientInfo.appVersion = version;
             window.FlurryAgent.setAppVersion('' + version);
             _this.initFacebook();
@@ -260,5 +254,5 @@ var topTeamerApp = (function () {
         __metadata('design:paramtypes', [ionic_angular_1.IonicApp, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events, ionic_angular_1.MenuController])
     ], topTeamerApp);
     return topTeamerApp;
-}());
+})();
 //# sourceMappingURL=app.js.map

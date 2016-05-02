@@ -2,6 +2,7 @@ import {Injectable} from 'angular2/core';
 import {Http, Response, Headers} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
+import {Push} from 'ionic-native';
 import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Modal, Events} from 'ionic-angular';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
@@ -37,6 +38,7 @@ export class Client {
   _settings:Settings;
   _loaded:Boolean = false;
   clientInfo:ClientInfo;
+  _width: number;
 
   serverGateway:ServerGateway;
 
@@ -305,11 +307,9 @@ export class Client {
 
         if (this.clientInfo.platform === 'android') {
 
-          var push = window.PushNotification.init(
+          var push = Push.init(
             {
-              'android': this.settings.google.gcm,
-              'ios': {'alert': 'true', 'badge': 'true', 'sound': 'true'},
-              'windows': {}
+              'android': this.settings.google.gcm
             }
           );
 
@@ -329,9 +329,9 @@ export class Client {
           });
 
           push.on('notification', function (notificationData) {
-            if (notificationData.additionalData && notificationData.additionalData.contestId) {
+            if (notificationData.additionalData && notificationData.additionalData['contestId']) {
               //TODO: QA - Check Push notification about a contest
-              contestsService.openContest(notificationData.additionalData.contestId);
+              contestsService.openContest(notificationData.additionalData['contestId']);
             }
           });
 
@@ -439,6 +439,33 @@ export class Client {
     this.nav.present(modal);
   }
 
+  resizeWeb() {
+    //Resize app for web
+    var containerWidth = window.innerWidth;
+
+    var myApp = document.getElementById('myApp');
+    if (myApp) {
+      var minWidth = Math.min(containerWidth, this.settings.general.webCanvasWidth);
+      this._width = minWidth;
+      myApp.style.width = minWidth + 'px';
+      myApp.style.marginLeft = (containerWidth - minWidth) / 2 + 'px';
+    }
+
+    var currentViewController = this.nav.getActive();
+    if (currentViewController && currentViewController.instance && currentViewController.instance['onResize']) {
+      currentViewController.instance['onResize']();
+    }
+  }
+
+  get width():number {
+    var innerWidth = window.innerWidth;
+    if (this._width > 0 && this._width <  innerWidth) {
+      return this._width;
+    }
+    else {
+      return innerWidth;
+    }
+  }
 
   initLoader() {
     this.loadingModalComponent = this._ionicApp.getComponent('loading');

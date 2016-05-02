@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -199,7 +198,7 @@ var QuizPage = (function () {
                 var questionChart;
                 if (this.quizData.currentQuestion.correctRatio ||
                     this.quizData.currentQuestion.correctRatio === 0) {
-                    questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats.chartControl));
+                    questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats.dataSource));
                     questionChart.data = [];
                     var roundedCorrectRatio = Math.round(this.quizData.currentQuestion.correctRatio * 100) / 100;
                     var chartData = [
@@ -464,6 +463,6 @@ var QuizPage = (function () {
         __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], QuizPage);
     return QuizPage;
-}());
+})();
 exports.QuizPage = QuizPage;
 //# sourceMappingURL=quiz.js.map

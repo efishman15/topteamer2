@@ -1,4 +1,3 @@
-"use strict";
 var _this = this;
 var client_1 = require('./client');
 var share_1 = require('../pages/share/share');

@@ -1,0 +1,97 @@
+.chart {
+  margin: 0px auto;
+  background-color: #ffffff;
+}
+
+.chart-timer {
+  position: absolute;
+  top: -4px;
+}
+
+.chart-timer-ltr {
+  right: 2px;
+}
+
+.chart-timer-rtl {
+  left: 2px;
+}
+
+.chart-top-ribbon {
+  margin: 0px auto;
+  position: relative;
+  top: 2px;
+}
+
+.chart-type-title {
+  position: absolute;
+  top: 2px;
+  font-size: 18px;
+  color: #ffffff;
+  white-space: pre;
+}
+
+.chart-type-title-ltr {
+  left: 4.5%;
+}
+
+.chart-type-title-rtl {
+  right: 4.5%;
+}
+
+.chart-end-time {
+  position: absolute;
+  color: #90a3e9;
+  font-size: 18px;
+  top: 2px;
+}
+
+.chart-end-time-ltr {
+  right: 11%;
+}
+
+.chart-end-time-rtl {
+  left: 11%;
+}
+
+.chart-margin-top {
+  margin: 0px auto;
+}
+
+.center-image-container {
+  transform: translateX(50%);
+  -moz-transform: translateX(50%);
+  -webkit-transform: translateX(50%);
+}
+
+.contests-play-image {
+  float: left;
+}
+
+.chart-bottom-area {
+  background-color: #ffffff;
+  margin: 0px auto;
+  position: relative;
+}
+
+.chart-bottom-ribbon {
+  padding-top: 5px;
+}
+
+.chart-bottom-line-separator {
+  width: 90%;
+  border-top: 2px solid #D6D6D6;
+  margin: 0px auto;
+  position: relative;
+}
+
+.chart-bottom-ribbon-participants-text {
+  padding-top: 2px;
+  color: #303030;
+  font-size: 12px;
+}
+
+.chart-bottom-ribbon-participants-number {
+  color: #303030;
+  font-weight: bold;
+  font-size: 12px;
+}

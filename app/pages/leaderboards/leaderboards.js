@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -52,6 +51,11 @@ var LeaderboardsPage = (function () {
             this.contestList.refresh();
         }
     };
+    LeaderboardsPage.prototype.onResize = function () {
+        if (this.mode === 'contests') {
+            this.contestList.onResize();
+        }
+    };
     __decorate([
         core_1.ViewChild(simple_tabs_1.SimpleTabsComponent), 
         __metadata('design:type', simple_tabs_1.SimpleTabsComponent)
@@ -72,6 +76,6 @@ var LeaderboardsPage = (function () {
         __metadata('design:paramtypes', [])
     ], LeaderboardsPage);
     return LeaderboardsPage;
-}());
+})();
 exports.LeaderboardsPage = LeaderboardsPage;
 //# sourceMappingURL=leaderboards.js.map

@@ -163,7 +163,7 @@ export class ChartsSettings {
 export class ChartSettings {
   type: string;
   size: Size;
-  chartControl: any;
+  dataSource: any;
 }
 
 export class QuestionStatsChartSettings extends ChartSettings{
@@ -179,6 +179,8 @@ export class QuestionStatsChartSettingsColors
 export class Size {
   width:number;
   height:number;
+  widthRatio:number;
+  heightRatioFromWidth:number;
 }
 
 export class Question {
@@ -341,7 +343,9 @@ export class Contest {
   endOption:string;
   questions:Questions;
   totalParticipants:number;
+  dataSource:any;
   chartControl:any;
+  chartComponent:any;
   state: string;
 
   constructor(startDate:number, endDate:number, typeId:string) {

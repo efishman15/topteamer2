@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -12,6 +11,7 @@ var core_1 = require('angular2/core');
 var http_1 = require('angular2/http');
 require('rxjs/add/operator/map');
 require('rxjs/add/operator/timeout');
+var ionic_native_1 = require('ionic-native');
 var ionic_angular_1 = require('ionic-angular');
 var facebookService = require('./facebook');
 var alertService = require('./alert');
@@ -227,10 +227,8 @@ var Client = (function () {
                     _this.logEvent('server/login');
                 }
                 if (_this.clientInfo.platform === 'android') {
-                    var push = window.PushNotification.init({
-                        'android': _this.settings.google.gcm,
-                        'ios': { 'alert': 'true', 'badge': 'true', 'sound': 'true' },
-                        'windows': {}
+                    var push = ionic_native_1.Push.init({
+                        'android': _this.settings.google.gcm
                     });
                     push.on('registration', function (registrationData) {
                         if (!registrationData || !registrationData.registrationId) {
@@ -244,9 +242,9 @@ var Client = (function () {
                         }
                     });
                     push.on('notification', function (notificationData) {
-                        if (notificationData.additionalData && notificationData.additionalData.contestId) {
+                        if (notificationData.additionalData && notificationData.additionalData['contestId']) {
                             //TODO: QA - Check Push notification about a contest
-                            contestsService.openContest(notificationData.additionalData.contestId);
+                            contestsService.openContest(notificationData.additionalData['contestId']);
                         }
                     });
                     push.on('error', function (error) {
@@ -346,6 +344,34 @@ var Client = (function () {
         });
         this.nav.present(modal);
     };
+    Client.prototype.resizeWeb = function () {
+        //Resize app for web
+        var containerWidth = window.innerWidth;
+        var myApp = document.getElementById('myApp');
+        if (myApp) {
+            var minWidth = Math.min(containerWidth, this.settings.general.webCanvasWidth);
+            this._width = minWidth;
+            myApp.style.width = minWidth + 'px';
+            myApp.style.marginLeft = (containerWidth - minWidth) / 2 + 'px';
+        }
+        var currentViewController = this.nav.getActive();
+        if (currentViewController && currentViewController.instance && currentViewController.instance['onResize']) {
+            currentViewController.instance['onResize']();
+        }
+    };
+    Object.defineProperty(Client.prototype, "width", {
+        get: function () {
+            var innerWidth = window.innerWidth;
+            if (this._width > 0 && this._width < innerWidth) {
+                return this._width;
+            }
+            else {
+                return innerWidth;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     Client.prototype.initLoader = function () {
         this.loadingModalComponent = this._ionicApp.getComponent('loading');
     };
@@ -521,7 +547,7 @@ var Client = (function () {
         __metadata('design:paramtypes', [http_1.Http])
     ], Client);
     return Client;
-}());
+})();
 exports.Client = Client;
 var ServerGateway = (function () {
     function ServerGateway(http) {
@@ -607,7 +633,7 @@ var ServerGateway = (function () {
         configurable: true
     });
     return ServerGateway;
-}());
+})();
 exports.ServerGateway = ServerGateway;
 var InternalEvent = (function () {
     function InternalEvent(eventName, eventData) {
@@ -629,6 +655,6 @@ var InternalEvent = (function () {
         configurable: true
     });
     return InternalEvent;
-}());
+})();
 exports.InternalEvent = InternalEvent;
 //# sourceMappingURL=client.js.map
