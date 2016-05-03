@@ -1,6 +1,15 @@
 .chart {
   margin: 0px auto;
   background-color: #ffffff;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.chart-radius {
+  margin: 0px auto;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  height: 15px;
 }
 
 .chart-timer {
@@ -20,6 +29,10 @@
   margin: 0px auto;
   position: relative;
   top: 2px;
+}
+
+.chart-top-ribbon-image {
+  height: 25px;
 }
 
 .chart-type-title {

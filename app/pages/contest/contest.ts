@@ -191,4 +191,8 @@ export class ContestPage {
       alertService.alert({'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST'});
     }
   }
+
+  onResize() {
+    this.contest.chartComponent.onResize();
+  }
 }

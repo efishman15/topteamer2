@@ -1,14 +1,17 @@
 <div text-center padding-top class="no-margin" [ngStyle]="{'width': width + 'px'}">
   <div class="chart-top-ribbon">
-    <img src="images/contest_top_{{client.currentLanguage.direction}}.png" [ngStyle]="{'height' : '25px', 'width': width + 'px'}">
+    <img src="images/contest_top_{{client.currentLanguage.direction}}.png" class="chart-top-ribbon-image" [ngStyle]="{'width': width + 'px'}">
     <img src="images/timer_icon.png" class="chart-timer chart-timer-{{client.currentLanguage.direction}}"
          [ngStyle]="{'width': client.settings.charts.contest.timer.width + 'px'}">
     <span class="chart-type-title chart-type-title-{{client.currentLanguage.direction}}">{{client.translate(client.settings.newContest.contestTypes[contest.type.id].text.name)}}</span>
     <span class="chart-end-time chart-end-time-{{client.currentLanguage.direction}}">{{contest.time.end.text}}</span>
   </div>
-  <div text-center class="chart"
-       [attr.id]="id + '-container'"
-       [ngStyle]="{'height': height + 'px'}">
+  <div text-center class="chart">
+    <div text-center class="chart-radius">
+    </div>
+    <div [attr.id]="id + '-container'"
+         [ngStyle]="{'height': height + 'px'}">
+    </div>
   </div>
   <div *ngIf="mode === 'list'">
     <div text-center class="chart-bottom-area chart-bottom-ribbon" [ngStyle]="{'height': client.settings.charts.contest.bottomRibbon.list + 'px'}">

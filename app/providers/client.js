@@ -372,6 +372,18 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
+    Client.prototype.adjustPixelRatio = function (size, up) {
+        var multiplier = -1;
+        if (up) {
+            multiplier = 1;
+        }
+        if (window.devicePixelRatio > 1) {
+            return size * (1 + multiplier / window.devicePixelRatio);
+        }
+        else {
+            return size;
+        }
+    };
     Client.prototype.initLoader = function () {
         this.loadingModalComponent = this._ionicApp.getComponent('loading');
     };

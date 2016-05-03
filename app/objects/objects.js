@@ -177,6 +177,14 @@ var ChartSettings = (function () {
     return ChartSettings;
 })();
 exports.ChartSettings = ChartSettings;
+var ContestChartSettings = (function (_super) {
+    __extends(ContestChartSettings, _super);
+    function ContestChartSettings() {
+        _super.apply(this, arguments);
+    }
+    return ContestChartSettings;
+})(ChartSettings);
+exports.ContestChartSettings = ContestChartSettings;
 var QuestionStatsChartSettings = (function (_super) {
     __extends(QuestionStatsChartSettings, _super);
     function QuestionStatsChartSettings() {
@@ -197,6 +205,14 @@ var Size = (function () {
     return Size;
 })();
 exports.Size = Size;
+var ContestChartSizeSettings = (function (_super) {
+    __extends(ContestChartSizeSettings, _super);
+    function ContestChartSizeSettings() {
+        _super.apply(this, arguments);
+    }
+    return ContestChartSizeSettings;
+})(Size);
+exports.ContestChartSizeSettings = ContestChartSizeSettings;
 var Question = (function () {
     function Question() {
         this._id = null;
@@ -333,6 +349,7 @@ var Team = (function () {
     function Team() {
         this.name = null;
         this.score = 0;
+        this.chartValue = 0.5;
     }
     return Team;
 })();

@@ -464,6 +464,7 @@ function setDataSource(contest, session) {
   }
   else {
     teamsOrder = [1, 0];
+    dataSource.chart.hasRTLText = 1;
   }
 
   dataSource.annotations.groups[0].items[teamsOrder[0]].text = contest.teams[0].name;
@@ -483,16 +484,6 @@ function setDataSource(contest, session) {
 
   dataSource.categories[0].category[0].label = mathjs.round(contest.teams[teamsOrder[0]].chartValue * 100,0) + '%';
   dataSource.categories[0].category[1].label = mathjs.round(contest.teams[teamsOrder[1]].chartValue * 100,0) + '%';
-
-  var netChartHeight = 1 - (generalUtils.settings.client.charts.contest.topMarginPercent/100);
-
-  //Scores
-  dataSource.dataset[0].data[0].value = contest.teams[teamsOrder[0]].chartValue * netChartHeight;
-  dataSource.dataset[0].data[1].value = contest.teams[teamsOrder[1]].chartValue * netChartHeight;
-
-  //Others (in grey)
-  dataSource.dataset[1].data[0].value = netChartHeight - dataSource.dataset[0].data[0].value;
-  dataSource.dataset[1].data[1].value = netChartHeight - dataSource.dataset[0].data[1].value;
 
 }
 

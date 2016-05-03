@@ -159,6 +159,9 @@ var ContestPage = (function () {
             alertService.alert({ 'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST' });
         }
     };
+    ContestPage.prototype.onResize = function () {
+        this.contest.chartComponent.onResize();
+    };
     __decorate([
         core_1.ViewChild(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', contest_chart_1.ContestChartComponent)

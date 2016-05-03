@@ -467,6 +467,20 @@ export class Client {
     }
   }
 
+  adjustPixelRatio(size: number, up?: boolean)
+  {
+    var multiplier = -1;
+    if (up) {
+      multiplier = 1;
+    }
+    if (window.devicePixelRatio > 1) {
+      return size*(1 + multiplier /window.devicePixelRatio);
+    }
+    else {
+      return size;
+    }
+  }
+
   initLoader() {
     this.loadingModalComponent = this._ionicApp.getComponent('loading');
   }

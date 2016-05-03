@@ -8,19 +8,19 @@ export class Settings {
   google:GoogleSettings;
   languages:Array<Language>;
   ui:Array<Array<Object>>;
-  newContest: NewContestSettings;
+  newContest:NewContestSettings;
 }
 
 export class NewContestSettings {
-  privateQuestions: NewContestPrivateQuestionsSettings;
-  contestTypes: any;
-  endOptions: any;
-  selectableContestTypes: Array<Array<string>>;
+  privateQuestions:NewContestPrivateQuestionsSettings;
+  contestTypes:any;
+  endOptions:any;
+  selectableContestTypes:Array<Array<string>>;
 }
 
 export class NewContestPrivateQuestionsSettings {
-  min: number;
-  max: number;
+  min:number;
+  max:number;
 }
 
 export class GoogleSettings {
@@ -63,11 +63,11 @@ export class QuizSettings {
   canvas:QuizCanvasSettings;
   question:QuizQuestionSettings;
   questions:QuizQuestionsSettings;
-  finish: FinishQuizSettings;
+  finish:FinishQuizSettings;
 }
 
 export class FinishQuizSettings {
-  animateResultsTimeout: number;
+  animateResultsTimeout:number;
 }
 
 export class QuizQuestionsSettings {
@@ -75,7 +75,7 @@ export class QuizQuestionsSettings {
 }
 
 export class QuizCanvasSettings {
-  font: QuizCanvasFontSettings;
+  font:QuizCanvasFontSettings;
   scores:QuizCanvasScoresSettings;
   circle:QuizCanvasCircleSettings;
   size:QuizCanvasSizeSettings;
@@ -83,66 +83,66 @@ export class QuizCanvasSettings {
 }
 
 export class QuizCanvasFontSettings {
-  scores: string;
-  signs: string;
+  scores:string;
+  signs:string;
 }
 export class QuizCanvasSizeSettings {
-  width: number;
-  height: number;
-  topOffset: number;
-  topSignOffset: number;
+  width:number;
+  height:number;
+  topOffset:number;
+  topSignOffset:number;
 }
 
 export class QuizCanvasScoresSettings {
-  size: QuizCanvasScoresSizeSettings;
-  colors: QuizCanvasScoresColorsSettings;
+  size:QuizCanvasScoresSizeSettings;
+  colors:QuizCanvasScoresColorsSettings;
 }
 
-export  class QuizCanvasScoresSizeSettings {
-  top: number;
+export class QuizCanvasScoresSizeSettings {
+  top:number;
 }
 
 export class QuizCanvasScoresColorsSettings {
-  default: string;
-  correct: string;
+  default:string;
+  correct:string;
 }
 
 export class QuizCanvasCircleSettings {
-  radius: QuizCanvasCircleRadiusSettings;
-  states: QuizCanvasCircleStatesSettings;
+  radius:QuizCanvasCircleRadiusSettings;
+  states:QuizCanvasCircleStatesSettings;
 }
 
 export class QuizCanvasCircleRadiusSettings {
-  inner: number;
-  outer: number;
+  inner:number;
+  outer:number;
 }
 
 export class QuizCanvasCircleStateSettings {
-  innerColor: string;
-  outerColor: string;
-  text: string;
-  textFillStyle: string;
+  innerColor:string;
+  outerColor:string;
+  text:string;
+  textFillStyle:string;
 }
 
 export class QuizCanvasLineSettings {
-  color: string;
-  width: number;
+  color:string;
+  width:number;
 }
 
 export class QuizCanvasCircleStatesSettings {
-  previous: QuizCanvasCircleStatePreviousSettings;
-  current: QuizCanvasCircleStateCurrentSettings;
-  next: QuizCanvasCircleStateSettings;
+  previous:QuizCanvasCircleStatePreviousSettings;
+  current:QuizCanvasCircleStateCurrentSettings;
+  next:QuizCanvasCircleStateSettings;
 }
 
 export class QuizCanvasCircleStatePreviousSettings {
-  correct: QuizCanvasCircleStateSettings;
-  incorrect: QuizCanvasCircleStateSettings;
+  correct:QuizCanvasCircleStateSettings;
+  incorrect:QuizCanvasCircleStateSettings;
 }
 
 export class QuizCanvasCircleStateCurrentSettings {
-  stats: QuizCanvasCircleStateSettings;
-  noStats: QuizCanvasCircleStateSettings;
+  stats:QuizCanvasCircleStateSettings;
+  noStats:QuizCanvasCircleStateSettings;
 }
 
 export class QuizQuestionSettings {
@@ -156,31 +156,38 @@ export class QuizQuestionAnswerSettings {
 }
 
 export class ChartsSettings {
-  contest: ChartSettings;
+  contest:ContestChartSettings;
   questionStats:QuestionStatsChartSettings;
 }
 
 export class ChartSettings {
-  type: string;
-  size: Size;
-  dataSource: any;
+  type:string;
+  dataSource:any;
 }
 
-export class QuestionStatsChartSettings extends ChartSettings{
-  colors: QuestionStatsChartSettingsColors;
+export class ContestChartSettings extends ChartSettings{
+  size: ContestChartSizeSettings;
 }
 
-export class QuestionStatsChartSettingsColors
-{
-  correct: string;
-  incorrect: string;
+export class QuestionStatsChartSettings extends ChartSettings {
+  size:Size;
+  colors:QuestionStatsChartSettingsColors;
+}
+
+export class QuestionStatsChartSettingsColors {
+  correct:string;
+  incorrect:string;
 }
 
 export class Size {
   width:number;
   height:number;
+}
+
+export class ContestChartSizeSettings extends Size {
   widthRatio:number;
   heightRatioFromWidth:number;
+  topMarginPercent:number;
 }
 
 export class Question {
@@ -266,19 +273,20 @@ export class Feature {
   lockText:string;
   unlockText:string;
   purchaseProductId:string;
-  purchaseData: PurchaseData;
+  purchaseData:PurchaseData;
 }
 
 export class PurchaseData {
-  productId: string;
-  status: string;
-  url: string;
+  productId:string;
+  status:string;
+  url:string;
 }
 
 export class PaymentData {
-  method: string;
-  data: PurchaseData;
-  constructor(method: string, data: PurchaseData) {
+  method:string;
+  data:PurchaseData;
+
+  constructor(method:string, data:PurchaseData) {
     this.method = method;
     this.data = data;
   }
@@ -346,7 +354,7 @@ export class Contest {
   dataSource:any;
   chartControl:any;
   chartComponent:any;
-  state: string;
+  state:string;
 
   constructor(startDate:number, endDate:number, typeId:string) {
     this.startDate = startDate;
@@ -363,41 +371,43 @@ export class Contest {
 }
 
 export class ContestName {
-  short: string;
-  long: string;
+  short:string;
+  long:string;
 }
 
 export class Team {
   name:string;
   score:number;
+  chartValue:number;
 
   constructor() {
     this.name = null;
     this.score = 0;
+    this.chartValue = 0.5;
   }
 }
 
 export class ContestType {
   id:string;
-  questions: Questions;
+  questions:Questions;
   userQuestions:Array<string>;
 
-  constructor(typeId: string) {
+  constructor(typeId:string) {
     this.id = typeId;
   }
 }
 
 export class ContestTypeImage {
-  url: string;
-  width: number;
-  height: number;
+  url:string;
+  width:number;
+  height:number;
 }
 
 export class ContestTypeText {
   title:string;
   description:string;
   name:string;
-  titleColor: string;
+  titleColor:string;
 }
 
 export class QuizResults {
