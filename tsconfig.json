@@ -44,6 +44,7 @@
     "app/pages/search-questions/search-questions.ts",
     "app/pages/server-popup/server-popup.ts",
     "app/pages/set-contest/set-contest.ts",
+    "app/pages/set-contest-admin/set-contest-admin.ts",
     "app/pages/settings/settings.ts",
     "app/pages/share/share.ts",
     "app/pages/system-tools/system-tools.ts",

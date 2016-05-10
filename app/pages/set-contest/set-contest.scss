@@ -9,7 +9,7 @@
 }
 
 .set-contest-label {
-  font-size: 16px;
+  font-size: 16px !important;
   color: #ffffff !important;
   background-color: transparent;
 }
@@ -25,12 +25,6 @@
   font: normal 700 20px/1 "Calibri", sans-serif;
   text-align: center;
   text-shadow: 1px 1px 0 #2c2c52;
-}
-
-.set-contest-range-input {
-  margin-left: 10px;
-  margin-right: 10px;
-  color: #ffffff;
 }
 
 .set-contest-user-questions-area {

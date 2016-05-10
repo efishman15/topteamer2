@@ -1,10 +1,11 @@
-import {Page, NavParams, Item, Select, Label,Modal} from 'ionic-angular';
-import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
+import {Page, NavParams, Modal} from 'ionic-angular';
+import {Form, FormBuilder, Control, ControlGroup, Validators} from 'angular2/common';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import {ContestPage} from '../../pages/contest/contest';
 import {QuestionEditorPage} from '../../pages/question-editor/question-editor';
 import {SearchQuestionsPage} from '../../pages/search-questions/search-questions';
+import {SetContestAdminPage} from '../../pages/set-contest-admin/set-contest-admin';
 import {MobileSharePage} from '../../pages/mobile-share/mobile-share';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
@@ -14,7 +15,7 @@ import {Contest,ContestName, Team, PaymentData} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html',
-  directives: [FORM_DIRECTIVES, DatePickerComponent]
+  directives: [DatePickerComponent]
 })
 
 export class SetContestPage {
@@ -23,18 +24,15 @@ export class SetContestPage {
   params:NavParams;
 
   minContestStart:number;
-  maxContestStart:number;
-  minContestEnd:number;
   maxContestEnd:number;
   startDate:number;
   endDate:number;
-  showRemoveContest:Boolean;
   contestLocalCopy:Contest;
   showStartDate:Boolean;
   showAdminInfo:Boolean;
   buyInProgress:Boolean;
   endOptionKeys:Array<string>;
-
+  title:string;
   contestForm:ControlGroup;
   team0:Control;
   team1:Control;
@@ -63,8 +61,6 @@ export class SetContestPage {
     this.startDate = now.getTime();
     this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
 
-    this.showRemoveContest = false;
-
     if (this.params.data.mode === 'edit') {
       this.contestLocalCopy = JSON.parse(JSON.stringify(this.params.data.contest));
 
@@ -87,7 +83,6 @@ export class SetContestPage {
     }
 
     this.client.session.features['newContest'].purchaseData.retrieved = false;
-    this.showRemoveContest = (this.params.data.mode === 'edit' && this.client.session.isAdmin);
 
     //-------------------------------------------------------------------------------------------------------------
     //Android Billing
@@ -136,6 +131,7 @@ export class SetContestPage {
     this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
     this.showAdminInfo = false;
 
+    this.setTitle();
     this.setDateLimits();
 
   }
@@ -155,16 +151,19 @@ export class SetContestPage {
     });
   }
 
-  getTitle() {
+  setTitle() {
     switch (this.params.data.mode) {
       case 'add':
-        return this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.params.data.typeId].text.name);
+        this.title = this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.params.data.typeId].text.name);
+        break;
 
       case 'edit':
-        return this.client.translate('EDIT_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name);
+        this.title = this.client.translate('EDIT_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name);
+        break;
 
       default:
-        return this.client.translate('GAME_NAME');
+        this.title = this.client.translate('GAME_NAME');
+        break;
     }
   }
 
@@ -248,39 +247,6 @@ export class SetContestPage {
       }
     )
   };
-
-  toggleAdminInfo() {
-    if (this.contestLocalCopy.teams[0].name && this.contestLocalCopy.teams[1].name) {
-      this.showAdminInfo = !this.showAdminInfo;
-    }
-  };
-
-  getArrowDirection(stateClosed) {
-    if (stateClosed) {
-      if (this.client.currentLanguage.direction === 'ltr') {
-        return '►';
-      }
-      else {
-        return '◄';
-      }
-    }
-    else {
-      return '▼';
-    }
-  }
-
-  removeContest() {
-    this.client.logEvent('contest/remove/click', {'contestId': this.contestLocalCopy._id});
-    alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.contestLocalCopy.name}).then(() => {
-      this.client.logEvent('contest/removed', {'contestId': this.contestLocalCopy._id});
-      contestsService.removeContest(this.contestLocalCopy._id).then(() => {
-        this.client.events.publish('topTeamer:contestRemoved');
-        setTimeout(() => {
-          this.client.nav.popToRoot({animate: false});
-        }, 1000);
-      });
-    });
-  }
 
   userQuestionsMinimumCheck() {
     if (this.client.settings['newContest'].privateQuestions.min === 1) {
@@ -482,6 +448,16 @@ export class SetContestPage {
     return {matchingTeams: true};
   }
 
+  setAdminInfo() {
+
+    this.client.nav.push(SetContestAdminPage,
+      {
+        'contestLocalCopy': this.contestLocalCopy,
+        'mode': this.params.data.mode,
+        'title': this.title
+      });
+  }
+
   //TODO: validate startDate<endDate
   startDateSelected(dateSelection) {
     if (dateSelection.epochLocal > this.contestLocalCopy.endDate) {
@@ -502,13 +478,11 @@ export class SetContestPage {
   setDateLimits() {
     if (!this.client.session.isAdmin) {
       this.minContestStart = this.startDate;
-      this.minContestEnd = this.startDate;
       this.maxContestEnd = this.getMaxEndDate();
     }
     else {
       var pastDate = (new Date(1970, 0, 1, 0, 0, 0)).getTime();
       this.minContestStart = pastDate;
-      this.minContestEnd = pastDate;
       this.maxContestEnd = (new Date(2100, 0, 1, 0, 0, 0)).getTime();
     }
   }
@@ -517,4 +491,6 @@ export class SetContestPage {
     //Set the maximum end date according to the last end option in the list
     return this.contestLocalCopy.startDate + this.client.settings['newContest'].endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier;
   }
+
+
 }

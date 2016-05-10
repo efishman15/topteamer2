@@ -31,10 +31,10 @@ var ContestListComponent = (function () {
         this.contestSelected.emit(data);
     };
     ContestListComponent.prototype.onResize = function () {
-        if (this.contests && this.contests.length > 0) {
-            for (var i = 0; i < this.contests.length; i++) {
-                this.contests[i].chartComponent.onResize();
-            }
+        if (this.contestChartComponents && this.contestChartComponents.length > 0) {
+            this.contestChartComponents.forEach(function (contestChartComponent) {
+                contestChartComponent.onResize();
+            });
         }
     };
     __decorate([
@@ -45,6 +45,10 @@ var ContestListComponent = (function () {
         core_1.Output(), 
         __metadata('design:type', Object)
     ], ContestListComponent.prototype, "contestSelected", void 0);
+    __decorate([
+        core_1.ViewChildren(contest_chart_1.ContestChartComponent), 
+        __metadata('design:type', core_1.QueryList)
+    ], ContestListComponent.prototype, "contestChartComponents", void 0);
     ContestListComponent = __decorate([
         core_1.Component({
             selector: 'contest-list',

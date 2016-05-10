@@ -166,11 +166,11 @@ export class ChartSettings {
 }
 
 export class ContestChartSettings extends ChartSettings{
-  size: ContestChartSizeSettings;
+  size: ChartSizeSettings;
 }
 
 export class QuestionStatsChartSettings extends ChartSettings {
-  size:Size;
+  size:ChartSizeSettings;
   colors:QuestionStatsChartSettingsColors;
 }
 
@@ -184,7 +184,7 @@ export class Size {
   height:number;
 }
 
-export class ContestChartSizeSettings extends Size {
+export class ChartSizeSettings extends Size {
   widthRatio:number;
   heightRatioFromWidth:number;
   topMarginPercent:number;
@@ -352,8 +352,6 @@ export class Contest {
   questions:Questions;
   totalParticipants:number;
   dataSource:any;
-  chartControl:any;
-  chartComponent:any;
   state:string;
 
   constructor(startDate:number, endDate:number, typeId:string) {

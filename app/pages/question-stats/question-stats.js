@@ -20,22 +20,28 @@ var QuestionStatsPage = (function () {
         var _this = this;
         this.client.logEvent('page/questionStats', { 'questionId': this.question._id });
         if (this.chartDataSource) {
+            //Adjust fonts to pixel ratio
+            this.chartDataSource.chart.legendItemFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.legendItemFontSize);
+            this.chartDataSource.chart.labelFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.labelFontSize);
             window.FusionCharts.ready(function () {
-                var chart = new window.FusionCharts({
+                _this.chart = new window.FusionCharts({
                     type: _this.client.settings.charts.questionStats.type,
                     renderAt: 'questionChart',
-                    width: _this.client.settings.charts.questionStats.size.width,
-                    height: _this.client.settings.charts.questionStats.size.height,
+                    width: '' + (_this.client.settings.charts.questionStats.size.width) * 100 + '%',
+                    height: '' + (_this.client.settings.charts.questionStats.size.height) * 100 + '%',
                     dataFormat: 'json',
                     dataSource: _this.chartDataSource
                 });
-                chart.render();
+                _this.chart.render();
             });
         }
     };
     QuestionStatsPage.prototype.dismiss = function (action) {
         this.client.logEvent('quiz/stats/' + (action ? action : 'cancel'));
         this.viewController.dismiss(action);
+    };
+    QuestionStatsPage.prototype.onResize = function () {
+        this.chart.render();
     };
     QuestionStatsPage = __decorate([
         ionic_angular_1.Page({

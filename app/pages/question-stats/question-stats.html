@@ -14,27 +14,31 @@
 
 <ion-content class="app-bg">
 
-  <div padding text-center dir="{{question.direction}}">
+  <div padding-top text-center dir="{{question.direction}}">
     <h5 class="center question-text" [innerHtml]="question.text"></h5>
   </div>
 
-  <div padding-top text-center class="question-chart-container" *ngIf="chartDataSource" id="questionChart" [ngStyle]="{'width': client.settings.charts.questionStats.size.width + 30 + 'px'}">
-  </div>
+  <div padding-top text-center class="no-margin" [ngStyle]="{'width': '' + (client.settings.charts.questionStats.size.width * 100) + '%' ,
+                   'height': '' + (client.settings.charts.questionStats.size.height * 100) + '%'}">
 
-  <div padding-top text-center>
+    <div padding-top padding-bottom class="question-chart-container" *ngIf="chartDataSource" id="questionChart">
+    </div>
 
-    <ion-buttons>
-      <button padding *ngIf="question.wikipediaHint"
+    <div padding-top>
+      <button block *ngIf="question.wikipediaHint"
               class="button-small app-button-light-blue"
               (click)="dismiss('hint')">
         {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
       </button>
-      <button padding *ngIf="question.wikipediaAnswer"
+    </div>
+    <div padding-top>
+      <button block *ngIf="question.wikipediaAnswer"
               class="button-small app-button-light-purple"
               (click)="dismiss('answer')">
         {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
       </button>
-    </ion-buttons>
+    </div>
+
   </div>
 
 </ion-content>

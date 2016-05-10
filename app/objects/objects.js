@@ -205,14 +205,14 @@ var Size = (function () {
     return Size;
 })();
 exports.Size = Size;
-var ContestChartSizeSettings = (function (_super) {
-    __extends(ContestChartSizeSettings, _super);
-    function ContestChartSizeSettings() {
+var ChartSizeSettings = (function (_super) {
+    __extends(ChartSizeSettings, _super);
+    function ChartSizeSettings() {
         _super.apply(this, arguments);
     }
-    return ContestChartSizeSettings;
+    return ChartSizeSettings;
 })(Size);
-exports.ContestChartSizeSettings = ContestChartSizeSettings;
+exports.ChartSizeSettings = ChartSizeSettings;
 var Question = (function () {
     function Question() {
         this._id = null;

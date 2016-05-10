@@ -380,6 +380,11 @@ var QuizPage = (function () {
         this.quizContext.clearRect(0, 0, this.quizCanvas.width, this.client.settings.quiz.canvas.scores.size.top);
         this.quizContext.closePath();
     };
+    QuizPage.prototype.clearQuizProgress = function () {
+        this.quizContext.beginPath();
+        this.quizContext.clearRect(0, 0, this.quizCanvas.width, this.quizCanvas.height);
+        this.quizContext.closePath();
+    };
     QuizPage.prototype.drawQuizScores = function () {
         this.clearQuizScores();
         var currentX;
@@ -454,6 +459,10 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.share = function () {
         shareService.share('quiz-fab', this.params.data.contest);
+    };
+    QuizPage.prototype.onResize = function () {
+        this.clearQuizProgress();
+        this.drawQuizProgress();
     };
     QuizPage = __decorate([
         ionic_angular_1.Page({

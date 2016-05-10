@@ -20,14 +20,16 @@
 
   <div no-margin text-center>
     <ion-row *ngFor="#row of client.settings.newContest.selectableContestTypes, #i=index">
-      <ion-col class="pointer" (click)="selectContestContent(contestTypeId)" *ngFor="#contestTypeId of client.settings.newContest.selectableContestTypes[i]">
-        <div class="contest-type-title" [ngStyle]="{'color': client.settings.newContest.contestTypes[contestTypeId].text.titleColor}">
+      <ion-col class="pointer" (click)="selectContestContent(contestTypeId)"
+               *ngFor="#contestTypeId of client.settings.newContest.selectableContestTypes[i]">
+        <div class="contest-type-title"
+             [ngStyle]="{'color': client.settings.newContest.contestTypes[contestTypeId].text.titleColor}">
           {{client.translate(client.settings.newContest.contestTypes[contestTypeId].text.title)}}
-          <img [ngStyle]="{'width': client.settings.newContest.contestTypes[contestTypeId].image.width + 'px', 'height': client.settings.newContest.contestTypes[contestTypeId].image.height + 'px'}"
-               src="{{client.settings.newContest.contestTypes[contestTypeId].image.url}}">
-          <div class="contest-type-description" text-center [ngStyle]="{'width': client.settings.newContest.contestTypes[contestTypeId].image.width + 'px'}">
-            {{client.translate(client.settings.newContest.contestTypes[contestTypeId].text.description)}}
-          </div>
+        </div>
+        <img style="width: 70%"
+             src="{{client.settings.newContest.contestTypes[contestTypeId].image.url}}">
+        <div class="contest-type-description" text-center>
+          {{client.translate(client.settings.newContest.contestTypes[contestTypeId].text.description)}}
         </div>
       </ion-col>
     </ion-row>

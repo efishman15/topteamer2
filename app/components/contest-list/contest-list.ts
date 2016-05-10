@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter} from 'angular2/core';
+import {Component, Input, Output, EventEmitter, ViewChildren, QueryList} from 'angular2/core';
 import {ContestChartComponent} from '../contest-chart/contest-chart';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
@@ -13,6 +13,8 @@ import {Contest} from "../../objects/objects";
 export class ContestListComponent {
   @Input() tab:String;
   @Output() contestSelected = new EventEmitter();
+
+  @ViewChildren(ContestChartComponent) contestChartComponents:QueryList<ContestChartComponent>;
 
   contests:Array<Contest>;
   client:Client;
@@ -37,10 +39,10 @@ export class ContestListComponent {
   }
 
   onResize() {
-    if (this.contests && this.contests.length > 0) {
-      for(var i=0; i<this.contests.length; i++) {
-        this.contests[i].chartComponent.onResize();
-      }
+    if (this.contestChartComponents && this.contestChartComponents.length > 0) {
+      this.contestChartComponents.forEach( (contestChartComponent: ContestChartComponent) => {
+        contestChartComponent.onResize();
+      });
     }
   }
 }

@@ -9,8 +9,9 @@ export class QuestionStatsPage {
 
   client:Client;
   question:Question;
-  chartDataSource:Object;
+  chartDataSource:any;
   viewController:ViewController;
+  chart: any;
 
   constructor(params:NavParams, viewController: ViewController) {
     this.client = Client.getInstance();
@@ -24,17 +25,22 @@ export class QuestionStatsPage {
     this.client.logEvent('page/questionStats', {'questionId' : this.question._id});
 
     if (this.chartDataSource) {
+
+      //Adjust fonts to pixel ratio
+      this.chartDataSource.chart.legendItemFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.legendItemFontSize);
+      this.chartDataSource.chart.labelFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.labelFontSize);
+
       window.FusionCharts.ready(() => {
-        var chart = new window.FusionCharts({
+        this.chart = new window.FusionCharts({
           type: this.client.settings.charts.questionStats.type,
           renderAt: 'questionChart',
-          width: this.client.settings.charts.questionStats.size.width,
-          height: this.client.settings.charts.questionStats.size.height,
+          width: '' + (this.client.settings.charts.questionStats.size.width) * 100 + '%',
+          height: '' + (this.client.settings.charts.questionStats.size.height) * 100 + '%',
           dataFormat: 'json',
           dataSource: this.chartDataSource
         });
 
-        chart.render();
+        this.chart.render();
 
       });
     }
@@ -44,4 +50,9 @@ export class QuestionStatsPage {
     this.client.logEvent('quiz/stats/' + (action ? action : 'cancel'));
     this.viewController.dismiss(action);
   }
+
+  onResize() {
+    this.chart.render();
+  }
+
 }

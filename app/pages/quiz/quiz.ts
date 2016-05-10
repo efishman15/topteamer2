@@ -472,6 +472,12 @@ export class QuizPage {
     this.quizContext.closePath();
   }
 
+  clearQuizProgress() {
+    this.quizContext.beginPath();
+    this.quizContext.clearRect(0, 0, this.quizCanvas.width, this.quizCanvas.height);
+    this.quizContext.closePath();
+  }
+
   drawQuizScores() {
 
     this.clearQuizScores();
@@ -559,4 +565,10 @@ export class QuizPage {
   share() {
     shareService.share('quiz-fab', this.params.data.contest);
   }
+
+  onResize() {
+    this.clearQuizProgress();
+    this.drawQuizProgress();
+  }
+
 }

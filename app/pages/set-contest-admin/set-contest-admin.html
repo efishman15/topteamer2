@@ -1,0 +1,86 @@
+<ion-navbar app-top-bar *navbar>
+
+  <ion-title>{{params.data.title}} - {{client.translate('CONTEST_ADMIN_INFO')}}</ion-title>
+
+</ion-navbar>
+
+<ion-content class="app-bg">
+
+  <h4 text-center>
+    {{client.translate(client.settings.newContest.contestTypes[params.data.contestLocalCopy.type.id].title)}}
+  </h4>
+
+  <div no-margin text-center>
+    <ion-row>
+      <ion-col>
+        <div text-center>
+          <ion-item no-lines class="transparent-background">
+            <ion-label class="set-contest-label" stacked>{{client.translate('TEAM_SCORE',{team:
+              params.data.contestLocalCopy.teams[0].name} ) }}
+            </ion-label>
+            <ion-input class="base-font"
+                       type="number"
+                       [(ngModel)]="params.data.contestLocalCopy.teams[0].score"
+                       min="1"
+                       max="1000000000000">
+            </ion-input>
+          </ion-item>
+        </div>
+      </ion-col>
+      <ion-col>
+        <div text-center>
+          <ion-item no-lines class="transparent-background">
+            <ion-label class="set-contest-label" stacked>{{client.translate('TEAM_SCORE',{team:
+              params.data.contestLocalCopy.teams[1].name} ) }}
+            </ion-label>
+            <ion-input class="base-font"
+                       input type="number"
+                       [(ngModel)]="params.data.contestLocalCopy.teams[1].score"
+                       min="1"
+                       max="1000000000000">
+            </ion-input>
+          </ion-item>
+        </div>
+      </ion-col>
+    </ion-row>
+  </div>
+
+  <div padding *ngIf="showStartDate">
+    <span class="set-contest-label">{{client.translate('CONTEST_START')}}</span>
+    <date-picker [(currentDateEpoch)]="params.data.contestLocalCopy.startDate"
+                 [(maxDate)]="params.data.contestLocalCopy.endDate"
+                 currentDateClass="date-picker-button"
+                 (dateSelected)="startDateSelected($event)">
+    </date-picker>
+  </div>
+
+  <div padding>
+    <ion-item no-lines class="transparent-background">
+      <ion-label class="set-contest-label" stacked>{{client.translate('RATING')}} (0-100):
+        {{params.data.contestLocalCopy.manualRating}}
+      </ion-label>
+    </ion-item>
+    <input class="set-contest-range-input" type="range" min="0" max="100"
+           [(ngModel)]="params.data.contestLocalCopy.manualRating"
+           value="{{params.data.contestLocalCopy.manualRating}}">
+  </div>
+
+  <div padding>
+    <ion-item no-lines class="transparent-background">
+      <ion-label class="set-contest-label" stacked>{{client.translate('PARTICIPANTS')}}:
+        {{params.data.contestLocalCopy.totalParticipants}}
+      </ion-label>
+    </ion-item>
+    <input class="set-contest-range-input" type="range" min="{{params.data.contestLocalCopy.participants}}"
+           max="10000"
+           [(ngModel)]="params.data.contestLocalCopy.totalParticipants"
+           value="{{params.data.contestLocalCopy.totalParticipants}}">
+  </div>
+
+  <div padding-left padding-right padding-top>
+    <button danger class="button-small app-button-admin" (click)="removeContest()"
+            *ngIf="showRemoveContest">{{client.translate('REMOVE_CONTEST')}}
+    </button>
+  </div>
+
+</ion-content>

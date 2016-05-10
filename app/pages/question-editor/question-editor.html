@@ -20,12 +20,13 @@
     <ion-row>
       <ion-col>
         <ion-textarea
-          rows="5"
+          id="questionControl"
+          rows="3"
           class="question-editor-input question-editor-question"
           placeholder="{{client.translate('QUESTION')}}"
           [(ngModel)]="question.text"
           ngControl="questionControl"
-          maxlength="90"
+          ngMaxlength="client.settings.quiz.question.maxLength"
           required>
         </ion-textarea>
       </ion-col>
@@ -52,12 +53,13 @@
     <ion-row>
       <ion-col>
         <ion-textarea
+          id="answer0Control"
           rows="2"
           class="question-editor-input question-editor-correct-answer"
           placeholder="{{client.translate('CORRECT_ANSWER')}}"
           [(ngModel)]="question.answers[0]"
           ngControl="answer0Control"
-          maxlength="45"
+          ngMaxlength="client.settings.quiz.question.answer.maxLength"
           required>
         </ion-textarea>
       </ion-col>
@@ -78,11 +80,13 @@
     <ion-row>
       <ion-col>
         <ion-textarea
+          id="answer1Control"
           rows="2"
           class="question-editor-input question-editor-wrong-answer"
           placeholder="{{client.translate('WRONG_ANSWER')}}"
           [(ngModel)]="question.answers[1]"
           ngControl="answer1Control"
+          ngMaxlength="client.settings.quiz.question.answer.maxLength"
           required>
         </ion-textarea>
       </ion-col>
@@ -103,11 +107,13 @@
     <ion-row>
       <ion-col>
         <ion-textarea
+          id="answer2Control"
           rows="2"
           class="question-editor-input question-editor-wrong-answer"
           placeholder="{{client.translate('WRONG_ANSWER')}}"
           [(ngModel)]="question.answers[2]"
           ngControl="answer2Control"
+          ngMaxlength="client.settings.quiz.question.answer.maxLength"
           required>
         </ion-textarea>
       </ion-col>
@@ -128,11 +134,13 @@
     <ion-row>
       <ion-col>
         <ion-textarea
+          id="answer3Control"
           rows="2"
           class="question-editor-input question-editor-wrong-answer"
           placeholder="{{client.translate('WRONG_ANSWER')}}"
           [(ngModel)]="question.answers[3]"
           ngControl="answer3Control"
+          ngMaxlength="client.settings.quiz.question.answer.maxLength"
           required>
         </ion-textarea>
       </ion-col>

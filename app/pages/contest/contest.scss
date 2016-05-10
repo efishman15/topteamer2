@@ -109,11 +109,8 @@
 
 .contest-leader-area {
   background-color: #38355d;
-}
-
-.contest-leader-item {
-  padding-left: 12px;
-  padding-right: 12px;
+  padding-left: 5%;
+  padding-right: 5%;
 }
 
 .transparent-background {
@@ -149,7 +146,13 @@
 }
 
 .contest-result-animation {
-  border-radius: 10px;
+  border-radius: 15px;
+}
+
+.contest-result-animation .item-inner {
+  border-radius: 15px;
+  margin-right: -16px; //removes padding from ion-item
+  margin-left: -16px; //removes padding from ion-item
 }
 
 .contest-result-text1 {
@@ -180,4 +183,9 @@
   color: #303030;
   font-weight: bold;
   font-size: 12px;
+}
+
+.contest-chart-bottom-container {
+  padding-left: 5%;
+  padding-right: 5%;
 }

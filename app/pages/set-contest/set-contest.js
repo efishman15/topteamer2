@@ -14,6 +14,7 @@ var client_1 = require('../../providers/client');
 var contest_1 = require('../../pages/contest/contest');
 var question_editor_1 = require('../../pages/question-editor/question-editor');
 var search_questions_1 = require('../../pages/search-questions/search-questions');
+var set_contest_admin_1 = require('../../pages/set-contest-admin/set-contest-admin');
 var mobile_share_1 = require('../../pages/mobile-share/mobile-share');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
@@ -37,7 +38,6 @@ var SetContestPage = (function () {
         now.clearTime();
         this.startDate = now.getTime();
         this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
-        this.showRemoveContest = false;
         if (this.params.data.mode === 'edit') {
             this.contestLocalCopy = JSON.parse(JSON.stringify(this.params.data.contest));
             if (this.contestLocalCopy.participants > 0) {
@@ -57,7 +57,6 @@ var SetContestPage = (function () {
             this.contestLocalCopy.type.questions = { 'visibleCount': 0, 'list': [] };
         }
         this.client.session.features['newContest'].purchaseData.retrieved = false;
-        this.showRemoveContest = (this.params.data.mode === 'edit' && this.client.session.isAdmin);
         //-------------------------------------------------------------------------------------------------------------
         //Android Billing
         //-------------------------------------------------------------------------------------------------------------
@@ -97,6 +96,7 @@ var SetContestPage = (function () {
         }
         this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
         this.showAdminInfo = false;
+        this.setTitle();
         this.setDateLimits();
     }
     SetContestPage.prototype.onPageWillEnter = function () {
@@ -113,14 +113,17 @@ var SetContestPage = (function () {
             _this.contestLocalCopy.type.questions = { 'visibleCount': questions.length, 'list': questions };
         });
     };
-    SetContestPage.prototype.getTitle = function () {
+    SetContestPage.prototype.setTitle = function () {
         switch (this.params.data.mode) {
             case 'add':
-                return this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.params.data.typeId].text.name);
+                this.title = this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.params.data.typeId].text.name);
+                break;
             case 'edit':
-                return this.client.translate('EDIT_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name);
+                this.title = this.client.translate('EDIT_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name);
+                break;
             default:
-                return this.client.translate('GAME_NAME');
+                this.title = this.client.translate('GAME_NAME');
+                break;
         }
     };
     SetContestPage.prototype.processAndroidPurchase = function (purchaseData) {
@@ -190,38 +193,6 @@ var SetContestPage = (function () {
         });
     };
     ;
-    SetContestPage.prototype.toggleAdminInfo = function () {
-        if (this.contestLocalCopy.teams[0].name && this.contestLocalCopy.teams[1].name) {
-            this.showAdminInfo = !this.showAdminInfo;
-        }
-    };
-    ;
-    SetContestPage.prototype.getArrowDirection = function (stateClosed) {
-        if (stateClosed) {
-            if (this.client.currentLanguage.direction === 'ltr') {
-                return '►';
-            }
-            else {
-                return '◄';
-            }
-        }
-        else {
-            return '▼';
-        }
-    };
-    SetContestPage.prototype.removeContest = function () {
-        var _this = this;
-        this.client.logEvent('contest/remove/click', { 'contestId': this.contestLocalCopy._id });
-        alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.contestLocalCopy.name }).then(function () {
-            _this.client.logEvent('contest/removed', { 'contestId': _this.contestLocalCopy._id });
-            contestsService.removeContest(_this.contestLocalCopy._id).then(function () {
-                _this.client.events.publish('topTeamer:contestRemoved');
-                setTimeout(function () {
-                    _this.client.nav.popToRoot({ animate: false });
-                }, 1000);
-            });
-        });
-    };
     SetContestPage.prototype.userQuestionsMinimumCheck = function () {
         if (this.client.settings['newContest'].privateQuestions.min === 1) {
             this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings['newContest'].privateQuestions.min });
@@ -391,6 +362,13 @@ var SetContestPage = (function () {
         }
         return { matchingTeams: true };
     };
+    SetContestPage.prototype.setAdminInfo = function () {
+        this.client.nav.push(set_contest_admin_1.SetContestAdminPage, {
+            'contestLocalCopy': this.contestLocalCopy,
+            'mode': this.params.data.mode,
+            'title': this.title
+        });
+    };
     //TODO: validate startDate<endDate
     SetContestPage.prototype.startDateSelected = function (dateSelection) {
         if (dateSelection.epochLocal > this.contestLocalCopy.endDate) {
@@ -409,13 +387,11 @@ var SetContestPage = (function () {
     SetContestPage.prototype.setDateLimits = function () {
         if (!this.client.session.isAdmin) {
             this.minContestStart = this.startDate;
-            this.minContestEnd = this.startDate;
             this.maxContestEnd = this.getMaxEndDate();
         }
         else {
             var pastDate = (new Date(1970, 0, 1, 0, 0, 0)).getTime();
             this.minContestStart = pastDate;
-            this.minContestEnd = pastDate;
             this.maxContestEnd = (new Date(2100, 0, 1, 0, 0, 0)).getTime();
         }
     };
@@ -426,7 +402,7 @@ var SetContestPage = (function () {
     SetContestPage = __decorate([
         ionic_angular_1.Page({
             templateUrl: 'build/pages/set-contest/set-contest.html',
-            directives: [common_1.FORM_DIRECTIVES, date_picker_1.DatePickerComponent]
+            directives: [date_picker_1.DatePickerComponent]
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams, common_1.FormBuilder])
     ], SetContestPage);

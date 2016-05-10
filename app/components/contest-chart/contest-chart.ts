@@ -19,6 +19,7 @@ export class ContestChartComponent {
   client:Client;
   width: number;
   height: number;
+  chart: any;
 
   @Output() contestSelected = new EventEmitter();
   @Output() teamSelected = new EventEmitter();
@@ -65,13 +66,12 @@ export class ContestChartComponent {
   }
 
   initChart() {
-    if (!this.contest.chartControl) {
+    if (!this.chart) {
       this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
       this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
       this.adjustResolution();
-      var chartComponent = this;
       window.FusionCharts.ready(() => {
-        this.contest.chartControl = new window.FusionCharts({
+        this.chart = new window.FusionCharts({
           type: this.client.settings.charts.contest.type,
           renderAt: this.id + '-container',
           width: this.width - WIDTH_MARGIN,
@@ -81,19 +81,23 @@ export class ContestChartComponent {
           events: this.events
         });
 
-        this.contest.chartComponent = chartComponent;
-        this.contest.chartControl.render();
+        this.chart.render();
 
       });
     }
   }
 
-  refresh(dataSource: any) {
-    if (this.contest.chartControl) {
-      this.contest.chartControl.setJSONData(dataSource);
+  refresh(contest?: Contest) {
+    if (contest) {
+      //new contest object arrived
+      this.contest = contest;
+      this.adjustResolution();
+    }
+
+    if (this.chart) {
+      this.chart.setJSONData(this.contest.dataSource);
     }
     else {
-      this.contest.dataSource = dataSource;
       this.initChart();
     }
   }
@@ -103,8 +107,8 @@ export class ContestChartComponent {
     if (this.width !== newWidth) {
       this.width = newWidth;
       this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
-      this.refresh(this.contest.dataSource);
-      this.contest.chartControl.resizeTo(this.width - WIDTH_MARGIN, this.height);
+      this.refresh();
+      this.chart.resizeTo(this.width - WIDTH_MARGIN, this.height);
     }
   }
 

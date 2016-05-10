@@ -59,8 +59,8 @@ var ContestPage = (function () {
         });
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (contest)
-            _this.contest = eventData[0];
             _this.refreshContestChart(eventData[0]);
+            _this.setPlayText();
         });
     }
     ContestPage.prototype.ngOnInit = function () {
@@ -88,7 +88,6 @@ var ContestPage = (function () {
         var _this = this;
         if (action === void 0) { action = 'join'; }
         contestsService.join(this.contest._id, team).then(function (data) {
-            _this.contest = data.contest;
             _this.refreshContestChart(data.contest);
             _this.setPlayText();
             _this.client.logEvent('contest/' + action, {
@@ -112,7 +111,8 @@ var ContestPage = (function () {
         });
     };
     ContestPage.prototype.refreshContestChart = function (contest) {
-        this.contestChartComponent.refresh(contest.dataSource);
+        this.contest = contest;
+        this.contestChartComponent.refresh(contest);
     };
     ContestPage.prototype.switchTeams = function (source) {
         this.joinContest(1 - this.contest.myTeam, source, 'switchTeams');
@@ -160,7 +160,7 @@ var ContestPage = (function () {
         }
     };
     ContestPage.prototype.onResize = function () {
-        this.contest.chartComponent.onResize();
+        this.contestChartComponent.onResize();
     };
     __decorate([
         core_1.ViewChild(contest_chart_1.ContestChartComponent), 

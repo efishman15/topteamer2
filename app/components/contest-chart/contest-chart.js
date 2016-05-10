@@ -53,13 +53,12 @@ var ContestChartComponent = (function () {
     };
     ContestChartComponent.prototype.initChart = function () {
         var _this = this;
-        if (!this.contest.chartControl) {
+        if (!this.chart) {
             this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
             this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
             this.adjustResolution();
-            var chartComponent = this;
             window.FusionCharts.ready(function () {
-                _this.contest.chartControl = new window.FusionCharts({
+                _this.chart = new window.FusionCharts({
                     type: _this.client.settings.charts.contest.type,
                     renderAt: _this.id + '-container',
                     width: _this.width - WIDTH_MARGIN,
@@ -68,17 +67,20 @@ var ContestChartComponent = (function () {
                     dataSource: _this.contest.dataSource,
                     events: _this.events
                 });
-                _this.contest.chartComponent = chartComponent;
-                _this.contest.chartControl.render();
+                _this.chart.render();
             });
         }
     };
-    ContestChartComponent.prototype.refresh = function (dataSource) {
-        if (this.contest.chartControl) {
-            this.contest.chartControl.setJSONData(dataSource);
+    ContestChartComponent.prototype.refresh = function (contest) {
+        if (contest) {
+            //new contest object arrived
+            this.contest = contest;
+            this.adjustResolution();
+        }
+        if (this.chart) {
+            this.chart.setJSONData(this.contest.dataSource);
         }
         else {
-            this.contest.dataSource = dataSource;
             this.initChart();
         }
     };
@@ -87,8 +89,8 @@ var ContestChartComponent = (function () {
         if (this.width !== newWidth) {
             this.width = newWidth;
             this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
-            this.refresh(this.contest.dataSource);
-            this.contest.chartControl.resizeTo(this.width - WIDTH_MARGIN, this.height);
+            this.refresh();
+            this.chart.resizeTo(this.width - WIDTH_MARGIN, this.height);
         }
     };
     ContestChartComponent.prototype.adjustResolution = function () {
