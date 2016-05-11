@@ -3,6 +3,7 @@ import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
+import {CalendarCell} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/set-contest-admin/set-contest-admin.html',
@@ -16,27 +17,12 @@ export class SetContestAdminPage {
   viewController: ViewController;
 
   showRemoveContest:Boolean;
-  showStartDate:Boolean;
 
   constructor(params:NavParams, viewController: ViewController) {
 
     this.client = Client.getInstance();
     this.params = params;
     this.viewController = viewController;
-
-    if (this.params.data.mode === 'edit') {
-
-      if (this.params.data.contestLocalCopy.participants > 0) {
-        this.showStartDate = false;
-      }
-      else {
-        this.showStartDate = true;
-      }
-    }
-    else if (this.params.data.mode === 'add') {
-      //Create new local instance of a contest
-      this.showStartDate = true;
-    }
 
     this.showRemoveContest = (this.params.data.mode === 'edit' && this.client.session.isAdmin);
 
@@ -48,6 +34,26 @@ export class SetContestAdminPage {
       eventData['contestId'] = this.params.data.contestLocalCopy._id;
     }
     this.client.logEvent('page/setContestAdmin', eventData);
+  }
+
+  onPageDidLeave() {
+    //For some reason manipulating the numbers turns them to strings in the model
+    this.params.data.contestLocalCopy.teams[0].score = parseInt(this.params.data.contestLocalCopy.teams[0].score);
+    this.params.data.contestLocalCopy.teams[1].score = parseInt(this.params.data.contestLocalCopy.teams[1].score);
+  }
+
+  startDateSelected(dateSelection: CalendarCell) {
+    if (this.params.data.mode === 'add') {
+      var nowDate = new Date();
+      nowDate.clearTime();
+      var nowEpoch = nowDate.getTime();
+      if (dateSelection.epochLocal > nowEpoch) {
+        //Future date - move end date respectfully
+        this.params.data.contestLocalCopy.endDate += dateSelection.epochLocal - nowEpoch;
+      }
+    }
+
+    this.params.data.contestLocalCopy.startDate = dateSelection.epochLocal;
   }
 
   removeContest() {
@@ -63,10 +69,4 @@ export class SetContestAdminPage {
     });
   }
 
-  dismiss(applyChanges: boolean) {
-    this.client.logEvent('contest/setAdmin');
-    this.viewController.dismiss(applyChanges);
-  }
-
-  //TODO: validate startDate<endDate
 }

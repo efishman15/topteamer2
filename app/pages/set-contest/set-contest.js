@@ -97,7 +97,6 @@ var SetContestPage = (function () {
         this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
         this.showAdminInfo = false;
         this.setTitle();
-        this.setDateLimits();
     }
     SetContestPage.prototype.onPageWillEnter = function () {
         var eventData = { 'mode': this.params.data.mode };
@@ -281,7 +280,7 @@ var SetContestPage = (function () {
             }
         }
         //Tweak the manual participants
-        if (this.contestLocalCopy.totalParticipants > this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants) {
+        if (this.contestLocalCopy.totalParticipants !== this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants) {
             this.contestLocalCopy.manualParticipants += this.contestLocalCopy.totalParticipants - (this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants);
         }
         delete this.contestLocalCopy['totalParticipants'];
@@ -369,35 +368,22 @@ var SetContestPage = (function () {
             'title': this.title
         });
     };
-    //TODO: validate startDate<endDate
-    SetContestPage.prototype.startDateSelected = function (dateSelection) {
-        if (dateSelection.epochLocal > this.contestLocalCopy.endDate) {
-            return false;
-        }
-        this.contestLocalCopy.startDate = dateSelection.epochLocal;
-        return true;
-    };
     SetContestPage.prototype.endDateSelected = function (dateSelection) {
-        if (dateSelection.epochLocal < this.contestLocalCopy.startDate) {
-            return false;
-        }
-        this.contestLocalCopy.endDate = dateSelection.epochLocal;
-        return true;
-    };
-    SetContestPage.prototype.setDateLimits = function () {
-        if (!this.client.session.isAdmin) {
-            this.minContestStart = this.startDate;
-            this.maxContestEnd = this.getMaxEndDate();
-        }
-        else {
-            var pastDate = (new Date(1970, 0, 1, 0, 0, 0)).getTime();
-            this.minContestStart = pastDate;
-            this.maxContestEnd = (new Date(2100, 0, 1, 0, 0, 0)).getTime();
-        }
+        //Set the end date at the end of this day (e.g. 23:59:59.999)
+        this.contestLocalCopy.endDate = dateSelection.epochLocal + 24 * 60 * 60 * 1000 - 1;
     };
     SetContestPage.prototype.getMaxEndDate = function () {
-        //Set the maximum end date according to the last end option in the list
-        return this.contestLocalCopy.startDate + this.client.settings['newContest'].endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier;
+        if (!this.client.session.isAdmin) {
+            //Allow extending by the maximum end date option in the list
+            var now = new Date();
+            now.clearTime();
+            var endOption = this.client.settings['newContest'].endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]];
+            return now.getTime() + (endOption.number * endOption.msecMultiplier);
+        }
+        else {
+            //Unlimited
+            return null;
+        }
     };
     SetContestPage = __decorate([
         ionic_angular_1.Page({

@@ -23,8 +23,6 @@ export class SetContestPage {
   client:Client;
   params:NavParams;
 
-  minContestStart:number;
-  maxContestEnd:number;
   startDate:number;
   endDate:number;
   contestLocalCopy:Contest;
@@ -132,7 +130,6 @@ export class SetContestPage {
     this.showAdminInfo = false;
 
     this.setTitle();
-    this.setDateLimits();
 
   }
 
@@ -352,7 +349,7 @@ export class SetContestPage {
     }
 
     //Tweak the manual participants
-    if (this.contestLocalCopy.totalParticipants > this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants) {
+    if (this.contestLocalCopy.totalParticipants !== this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants) {
       this.contestLocalCopy.manualParticipants += this.contestLocalCopy.totalParticipants - (this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants)
     }
 
@@ -458,39 +455,22 @@ export class SetContestPage {
       });
   }
 
-  //TODO: validate startDate<endDate
-  startDateSelected(dateSelection) {
-    if (dateSelection.epochLocal > this.contestLocalCopy.endDate) {
-      return false;
-    }
-    this.contestLocalCopy.startDate = dateSelection.epochLocal;
-    return true;
-  }
-
   endDateSelected(dateSelection) {
-    if (dateSelection.epochLocal < this.contestLocalCopy.startDate) {
-      return false;
-    }
-    this.contestLocalCopy.endDate = dateSelection.epochLocal;
-    return true;
-  }
-
-  setDateLimits() {
-    if (!this.client.session.isAdmin) {
-      this.minContestStart = this.startDate;
-      this.maxContestEnd = this.getMaxEndDate();
-    }
-    else {
-      var pastDate = (new Date(1970, 0, 1, 0, 0, 0)).getTime();
-      this.minContestStart = pastDate;
-      this.maxContestEnd = (new Date(2100, 0, 1, 0, 0, 0)).getTime();
-    }
+    //Set the end date at the end of this day (e.g. 23:59:59.999)
+    this.contestLocalCopy.endDate = dateSelection.epochLocal + 24 * 60 * 60 * 1000 - 1;
   }
 
   getMaxEndDate() {
-    //Set the maximum end date according to the last end option in the list
-    return this.contestLocalCopy.startDate + this.client.settings['newContest'].endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]].msecMultiplier;
+    if (!this.client.session.isAdmin) {
+      //Allow extending by the maximum end date option in the list
+      var now = new Date();
+      now.clearTime();
+      var endOption = this.client.settings['newContest'].endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]];
+      return now.getTime() + (endOption.number * endOption.msecMultiplier);
+    }
+    else {
+      //Unlimited
+      return null;
+    }
   }
-
-
 }

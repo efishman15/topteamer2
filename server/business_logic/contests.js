@@ -254,7 +254,7 @@ function validateContestData(data, callback) {
     }
   }
 
-  if (data.mode == 'add') {
+  if (data.mode === 'add') {
 
     var cleanContest = {};
     cleanContest.startDate = data.contest.startDate;
@@ -335,6 +335,11 @@ function updateContest(data, callback) {
 
   //Admin fields
   if (data.session.isAdmin) {
+
+    data.setData['startDate'] = data.contest.startDate;
+
+    data.setData['teams.0.score'] = data.contest.teams[0].score;
+
     if (data.contest.teams[0].score != null) {
       data.setData['teams.0.score'] = data.contest.teams[0].score;
     }

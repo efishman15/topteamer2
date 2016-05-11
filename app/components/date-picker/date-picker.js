@@ -80,6 +80,8 @@ var DatePickerComponent = (function () {
     DatePickerComponent.prototype.refreshMonth = function () {
         var firstDateOfTheMonth = new Date(this.displayedYear, this.displayedMonth, 1);
         var lastDateOfTheMonth = new Date(this.displayedYear, this.displayedMonth + 1, 0);
+        var firstDateOfTheYear = new Date(this.displayedYear, 0, 1);
+        var lastDateOfTheYear = new Date(this.displayedYear, 11, 31, 23, 59, 59, 999);
         var daysOffsetStart = firstDateOfTheMonth.getDay();
         var firstDayOfTheCalendar = new Date(firstDateOfTheMonth.getFullYear(), firstDateOfTheMonth.getMonth(), firstDateOfTheMonth.getDate() - daysOffsetStart);
         var totalDays = this.rows.length * this.cols.length;
@@ -89,6 +91,7 @@ var DatePickerComponent = (function () {
         var todayEpoch = today.getTime();
         for (var i = 0; i < totalDays; i++) {
             var cellDate = new Date(firstDayOfTheCalendar.getFullYear(), firstDayOfTheCalendar.getMonth(), firstDayOfTheCalendar.getDate() + i, 0, 0, 0);
+            cellDate.clearTime();
             var epochLocal = cellDate.getTime();
             this.calendar.push({
                 dateObject: cellDate,
@@ -98,13 +101,17 @@ var DatePickerComponent = (function () {
                 day: cellDate.getDay(),
                 dateString: cellDate.toString(),
                 epochLocal: epochLocal,
-                epochUTC: (cellDate.getTime() + (cellDate.getTimezoneOffset() * 60 * 1000)),
+                epochUTC: (epochLocal + (cellDate.getTimezoneOffset() * 60 * 1000)),
                 inMonth: (epochLocal >= firstDateOfTheMonth.getTime() && epochLocal <= lastDateOfTheMonth.getTime()),
                 disabled: ((this.minEpochLocal && epochLocal < this.minEpochLocal) || (this.maxEpochLocal && epochLocal > this.maxEpochLocal)),
                 selected: (epochLocal === this.currentDateEpoch),
                 today: (epochLocal === todayEpoch)
             });
         }
+        this.prevMonthDisabled = (this.minEpochLocal && this.minEpochLocal && firstDateOfTheMonth.getTime() < this.minEpochLocal);
+        this.nextMonthDisabled = (this.maxEpochLocal && this.maxEpochLocal && lastDateOfTheMonth.getTime() > this.maxEpochLocal);
+        this.prevYearDisabled = (this.minEpochLocal && this.minEpochLocal && firstDateOfTheYear.getTime() < this.minEpochLocal);
+        this.nextYearDisabled = (this.maxEpochLocal && this.maxEpochLocal && lastDateOfTheYear.getTime() > this.maxEpochLocal);
     };
     DatePickerComponent.prototype.getCell = function (row, col) {
         return this.calendar[(row * this.cols.length) + col];
@@ -132,7 +139,7 @@ var DatePickerComponent = (function () {
             var maxDate = new Date(this.maxDate);
             maxDate.clearTime();
             //Another 24 hours to count all the hours in the max date including up to midnight (23:59:59.999)
-            this.maxEpochLocal = maxDate.getTime() + 24 * 60 * 60 * 1000;
+            this.maxEpochLocal = maxDate.getTime() + 24 * 60 * 60 * 1000 - 1;
         }
     };
     __decorate([

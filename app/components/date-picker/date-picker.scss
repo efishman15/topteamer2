@@ -20,6 +20,7 @@
   width: 24px !important;
   background-color: transparent;
   color: #ffffff;
+  cursor: pointer;
 }
 
 .calendar-week-days {
@@ -57,4 +58,5 @@
 
 .date-disabled {
   text-decoration: line-through;
+  cursor: default;
 }

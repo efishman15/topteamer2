@@ -99,9 +99,9 @@
     </div>
     <div padding *ngIf="params.data.mode==='edit'">
       <span class="set-contest-label">{{client.translate('CONTEST_END')}}</span>
-      <date-picker [(currentDateEpoch)]="contestLocalCopy.endDate" [(minDate)]="minContestEnd"
-                   [(minDate)]="minContestStart"
-                   [(maxDate)]="maxContestEnd"
+      <date-picker [(currentDateEpoch)]="contestLocalCopy.endDate"
+                   [minDate]="contestLocalCopy.startDate"
+                   [maxDate]="getMaxEndDate()"
                    [currentDateClass]="'date-picker-button'"
                    (dateSelected)="endDateSelected($event)">
       </date-picker>

@@ -17,18 +17,6 @@ var SetContestAdminPage = (function () {
         this.client = client_1.Client.getInstance();
         this.params = params;
         this.viewController = viewController;
-        if (this.params.data.mode === 'edit') {
-            if (this.params.data.contestLocalCopy.participants > 0) {
-                this.showStartDate = false;
-            }
-            else {
-                this.showStartDate = true;
-            }
-        }
-        else if (this.params.data.mode === 'add') {
-            //Create new local instance of a contest
-            this.showStartDate = true;
-        }
         this.showRemoveContest = (this.params.data.mode === 'edit' && this.client.session.isAdmin);
     }
     SetContestAdminPage.prototype.onPageWillEnter = function () {
@@ -37,6 +25,23 @@ var SetContestAdminPage = (function () {
             eventData['contestId'] = this.params.data.contestLocalCopy._id;
         }
         this.client.logEvent('page/setContestAdmin', eventData);
+    };
+    SetContestAdminPage.prototype.onPageDidLeave = function () {
+        //For some reason manipulating the numbers turns them to strings in the model
+        this.params.data.contestLocalCopy.teams[0].score = parseInt(this.params.data.contestLocalCopy.teams[0].score);
+        this.params.data.contestLocalCopy.teams[1].score = parseInt(this.params.data.contestLocalCopy.teams[1].score);
+    };
+    SetContestAdminPage.prototype.startDateSelected = function (dateSelection) {
+        if (this.params.data.mode === 'add') {
+            var nowDate = new Date();
+            nowDate.clearTime();
+            var nowEpoch = nowDate.getTime();
+            if (dateSelection.epochLocal > nowEpoch) {
+                //Future date - move end date respectfully
+                this.params.data.contestLocalCopy.endDate += dateSelection.epochLocal - nowEpoch;
+            }
+        }
+        this.params.data.contestLocalCopy.startDate = dateSelection.epochLocal;
     };
     SetContestAdminPage.prototype.removeContest = function () {
         var _this = this;
@@ -50,10 +55,6 @@ var SetContestAdminPage = (function () {
                 }, 1000);
             });
         });
-    };
-    SetContestAdminPage.prototype.dismiss = function (applyChanges) {
-        this.client.logEvent('contest/setAdmin');
-        this.viewController.dismiss(applyChanges);
     };
     SetContestAdminPage = __decorate([
         ionic_angular_1.Page({
