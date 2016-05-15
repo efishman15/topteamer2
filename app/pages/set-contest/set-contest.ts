@@ -328,7 +328,9 @@ export class SetContestPage {
         }
         this.contestLocalCopy.type.questions.visibleCount--;
       }
-    });
+    },() => {
+              //do nothing on cancel
+            });
   };
 
   setContest() {

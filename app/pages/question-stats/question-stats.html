@@ -1,14 +1,14 @@
 <ion-toolbar app-top-bar>
 
-  <ion-buttons>
+  <ion-title>
+    {{client.translate('QUESTION_STATS_TITLE')}}
+  </ion-title>
+
+  <ion-buttons left>
     <button (click)="dismiss(null)">
       <ion-icon name="close-circle"></ion-icon>
     </button>
   </ion-buttons>
-
-  <ion-title>
-    {{client.translate('QUESTION_STATS_TITLE')}}
-  </ion-title>
 
 </ion-toolbar>
 
@@ -18,10 +18,17 @@
     <h5 class="center question-text" [innerHtml]="question.text"></h5>
   </div>
 
-  <div padding-top text-center class="no-margin" [ngStyle]="{'width': '' + (client.settings.charts.questionStats.size.width * 100) + '%' ,
-                   'height': '' + (client.settings.charts.questionStats.size.height * 100) + '%'}">
+  <div padding-top text-center
+       class="no-margin"
+       [ngStyle]="{'width': width + 'px'}">
 
-    <div padding-top padding-bottom class="question-chart-container" *ngIf="chartDataSource" id="questionChart">
+    <div text-center class="chart">
+      <div text-center class="chart-radius">
+      </div>
+      <div class="question-chart-container"
+           *ngIf="chartDataSource" id="questionChart"
+           [ngStyle]="{'height': height + 'px'}">
+      </div>
     </div>
 
     <div padding-top>

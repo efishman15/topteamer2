@@ -550,12 +550,19 @@ function setContestScores(contest) {
   if (contest.teams[0].score === 0 && contest.teams[1].score === 0) {
     contest.teams[0].chartValue = 0.5;
     contest.teams[1].chartValue = 0.5;
+    contest.leadingTeam = -1;
   }
   else {
     //Do relational compute
     var sum = contest.teams[0].score + contest.teams[1].score;
     contest.teams[0].chartValue = mathjs.round(contest.teams[0].score / sum, 2);
     contest.teams[1].chartValue = mathjs.round(contest.teams[1].score / sum, 2);
+    if (contest.teams[0].score > contest.teams[1].score) {
+      contest.leadingTeam = 0;
+    }
+    else {
+      contest.leadingTeam = 1;
+    }
   }
 }
 

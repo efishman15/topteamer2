@@ -34,6 +34,7 @@ export class QuizPage {
   questionChart:Object;
   pageInitiated:Boolean = false;
   quizStarted:Boolean = false;
+  title: string;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
@@ -57,6 +58,14 @@ export class QuizPage {
 
     this.init();
     this.contestId = this.params.data.contest._id;
+
+    if (this.params.data.contest.leadingTeam === -1) {
+      this.title = this.client.translate('TIE');
+    }
+    else {
+      this.title = this.client.translate('QUIZ_VIEW_TITLE',{'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name});
+    }
+
     this.startQuiz();
   }
 

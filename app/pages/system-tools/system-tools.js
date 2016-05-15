@@ -30,6 +30,8 @@ var SystemToolsPage = (function () {
             systemService.restart().then(function () {
                 _this.client.nav.pop();
             });
+        }, function () {
+            //Do nothing on cancel
         });
     };
     SystemToolsPage = __decorate([

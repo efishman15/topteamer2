@@ -40,6 +40,12 @@ var QuizPage = (function () {
         }
         this.init();
         this.contestId = this.params.data.contest._id;
+        if (this.params.data.contest.leadingTeam === -1) {
+            this.title = this.client.translate('TIE');
+        }
+        else {
+            this.title = this.client.translate('QUIZ_VIEW_TITLE', { 'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name });
+        }
         this.startQuiz();
     };
     QuizPage.prototype.init = function () {

@@ -27,10 +27,6 @@
   text-shadow: 1px 1px 0 #2c2c52;
 }
 
-.set-contest-user-questions-area {
-  background-color: #61c2ec;
-}
-
 .set-contest-question-buttons {
   background-color: #61c2ec;
   color: #ffffff;
@@ -42,13 +38,13 @@
   color: #ffffff;
 }
 
-.set-contest-user-questions-list {
-  margin-top: 5px;
+.questions-horizontal-margin {
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
-.small-horizontal-margin {
-  margin-left: -5px;
-  margin-right: -5px;
+.questions-scroll-area {
+  height: 230px;
 }
 
 .set-contest-team {

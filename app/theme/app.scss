@@ -12,7 +12,6 @@
 
 .player-info-avatar {
   position: relative;
-  top: 6px;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -22,14 +21,12 @@
 
 .player-info-canvas-ltr {
   position: absolute;
-  top: 3px;
   right: 45px;
 }
 
 .player-info-canvas-rtl {
   position: absolute;
   left: 45px;
-  top: 3px;
 }
 
 .my-spinner {

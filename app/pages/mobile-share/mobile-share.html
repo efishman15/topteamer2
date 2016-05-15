@@ -1,14 +1,14 @@
 <ion-toolbar app-top-bar>
 
-  <ion-buttons>
+  <ion-title>
+    {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
+  </ion-title>
+
+  <ion-buttons left>
     <button (click)="dismiss(false)">
       <ion-icon name="close-circle"></ion-icon>
     </button>
   </ion-buttons>
-
-  <ion-title>
-    {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
-  </ion-title>
 
 </ion-toolbar>
 

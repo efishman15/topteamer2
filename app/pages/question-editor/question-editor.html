@@ -1,22 +1,20 @@
 <ion-toolbar app-top-bar>
 
-  <ion-buttons>
-    <button (click)="dismiss(false)">
-      <ion-icon name="close-circle"></ion-icon>
-    </button>
-  </ion-buttons>
-
   <ion-title>
     {{title}}
   </ion-title>
 
+  <ion-buttons left>
+    <button (click)="dismiss(false)">
+      <ion-icon name="close-circle"></ion-icon>
+    </button>
+  </ion-buttons>
 </ion-toolbar>
 
 <ion-content class="app-bg">
 
   <form [ngFormModel]="questionEditorForm" name="questionEditorForm" novalidate="novalidate">
 
-    <div padding-top></div>
     <ion-row>
       <ion-col>
         <ion-textarea
@@ -29,12 +27,9 @@
           ngMaxlength="client.settings.quiz.question.maxLength"
           required>
         </ion-textarea>
-      </ion-col>
-      <ion-col width-5>
-            <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
-                  class="question-editor-characters-length">
-                  {{question.text ? question.text.length : 0}}/{{client.settings.quiz.question.maxLength}}
-            </div>
+        <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}" class="question-editor-question-characters-length">
+          {{question.text ? question.text.length : 0}}/{{client.settings.quiz.question.maxLength}}
+        </div>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="(questionControl.dirty || submitted) && (questionControl.errors && questionControl.errors.required || questionError)">
@@ -62,10 +57,7 @@
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
           required>
         </ion-textarea>
-      </ion-col>
-      <ion-col width-5>
-        <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
-             class="question-editor-characters-length">
+        <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}" class="question-editor-answer-characters-length">
           {{question.answers[0] ? question.answers[0].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
         </div>
       </ion-col>
@@ -89,10 +81,7 @@
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
           required>
         </ion-textarea>
-      </ion-col>
-      <ion-col width-5>
-        <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
-             class="question-editor-characters-length">
+        <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}" class="question-editor-answer-characters-length">
           {{question.answers[1] ? question.answers[1].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
         </div>
       </ion-col>
@@ -116,10 +105,7 @@
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
           required>
         </ion-textarea>
-      </ion-col>
-      <ion-col width-5>
-        <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
-             class="question-editor-characters-length">
+        <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}" class="question-editor-answer-characters-length">
           {{question.answers[2] ? question.answers[2].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
         </div>
       </ion-col>
@@ -143,10 +129,7 @@
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
           required>
         </ion-textarea>
-      </ion-col>
-      <ion-col width-5>
-        <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}"
-             class="question-editor-characters-length">
+        <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}" class="question-editor-answer-characters-length">
           {{question.answers[3] ? question.answers[3].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
         </div>
       </ion-col>

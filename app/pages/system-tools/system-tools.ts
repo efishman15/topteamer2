@@ -30,6 +30,8 @@ export class SystemToolsPage {
       systemService.restart().then(() => {
         this.client.nav.pop();
       });
+    }, () => {
+      //Do nothing on cancel
     });
   }
 }

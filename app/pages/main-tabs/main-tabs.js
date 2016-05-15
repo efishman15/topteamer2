@@ -42,9 +42,6 @@ var MainTabsPage = (function () {
             _this.mainTabs.select(1); //Switch to "Running contests"
         });
     }
-    MainTabsPage.prototype.ngAfterViewInit = function () {
-        this.client.initXp();
-    };
     MainTabsPage.prototype.onPageWillEnter = function () {
         if (this.needToRefreshList) {
             var selectedPage = this.mainTabs.getSelected().getActive();
@@ -55,6 +52,12 @@ var MainTabsPage = (function () {
         }
     };
     MainTabsPage.prototype.onPageDidEnter = function () {
+        //Should occur only once - and AFTER top toolbar received it's height
+        if (!this.playerInfoInitiated) {
+            this.client.initPlayerInfo();
+            this.client.initXp();
+            this.playerInfoInitiated = true;
+        }
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
     };

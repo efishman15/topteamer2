@@ -73,6 +73,8 @@
   transform: translateY(50%);
   -moz-transform: translateY(50%);
   -webkit-transform: translateY(50%);
+  -ms-transform: translateY(50%);
+  -o-transform: translateY(50%);
 }
 
 .no-padding {
@@ -104,7 +106,11 @@
 }
 
 .contest-participants-area {
-  padding-top: 12px;
+  transform: translateY(60%);
+  -webkit-transform: translateY(60%);
+  -o-transform: translateY(60%);
+  -moz-transform: translateY(60%);
+  -ms-transform: translateY(60%);
 }
 
 .contest-leader-area {

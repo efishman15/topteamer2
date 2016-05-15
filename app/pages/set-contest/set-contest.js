@@ -262,6 +262,8 @@ var SetContestPage = (function () {
                 }
                 _this.contestLocalCopy.type.questions.visibleCount--;
             }
+        }, function () {
+            //do nothing on cancel
         });
     };
     ;

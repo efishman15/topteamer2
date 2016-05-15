@@ -107,7 +107,8 @@ export class Client {
 
         this.initUser(language, data['geoInfo']);
 
-        this.initXpCanvas();
+        this.canvas = document.getElementById('playerInfoRankCanvas');
+        this._canvasContext = this.canvas.getContext('2d');
 
         this.setDirection();
 
@@ -117,6 +118,24 @@ export class Client {
         resolve();
       }, (err) => reject(err));
     });
+  }
+
+  initPlayerInfo() {
+    var navBar = document.getElementsByTagName('ion-navbar')[0];
+    var navBarHeight = navBar['offsetHeight'];
+
+    var playerInfoImage = document.getElementById('playerInfoImage');
+    playerInfoImage.style.top = (navBarHeight - playerInfoImage.offsetHeight) / 2 + 'px';
+
+    //Player info rank canvas
+    this.canvasCenterX = this.settings.xpControl.canvas.width / 2;
+    this.canvasCenterY = this.settings.xpControl.canvas.height / 2;
+    this.canvas.width = this.settings.xpControl.canvas.width;
+    this.canvas.style.width = this.settings.xpControl.canvas.width + 'px';
+    this.canvas.height = this.settings.xpControl.canvas.height;
+    this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
+    this.canvas.style.top = (navBarHeight - this.settings.xpControl.canvas.height) / 2 + 'px';
+
   }
 
   getSettings(localStorageLanguage) {
@@ -138,18 +157,6 @@ export class Client {
   initUser(language, geoInfo) {
 
    this._user = new User(language, this.clientInfo, geoInfo);
-  }
-
-  initXpCanvas() {
-    //Player info rank canvas
-    this.canvas = document.getElementById('playerInfoRankCanvas');
-    this._canvasContext = this.canvas.getContext('2d');
-    this.canvasCenterX = this.settings.xpControl.canvas.width / 2;
-    this.canvasCenterY = this.settings.xpControl.canvas.height / 2;
-    this.canvas.width = this.settings.xpControl.canvas.width;
-    this.canvas.style.width = this.settings.xpControl.canvas.width + 'px';
-    this.canvas.height = this.settings.xpControl.canvas.height;
-    this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
   }
 
   initXp() {
@@ -465,6 +472,10 @@ export class Client {
     else {
       return innerWidth;
     }
+  }
+
+  get height():number {
+    return window.innerHeight;
   }
 
   adjustPixelRatio(size: number, up?: boolean)

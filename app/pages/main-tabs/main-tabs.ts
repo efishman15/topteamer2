@@ -13,7 +13,8 @@ export class MainTabsPage {
 
   client: Client;
   @ViewChild(Tabs) mainTabs:Tabs;
-  needToRefreshList:Boolean;
+  needToRefreshList:boolean;
+  playerInfoInitiated: boolean
 
   private rootMyContestsPage;
   private rootRunningContestsPage;
@@ -54,10 +55,6 @@ export class MainTabsPage {
 
   }
 
-  ngAfterViewInit() {
-    this.client.initXp();
-  }
-
   onPageWillEnter() {
     if (this.needToRefreshList) {
       var selectedPage = this.mainTabs.getSelected().getActive();
@@ -69,6 +66,13 @@ export class MainTabsPage {
   }
 
   onPageDidEnter() {
+    //Should occur only once - and AFTER top toolbar received it's height
+    if (!this.playerInfoInitiated) {
+      this.client.initPlayerInfo();
+      this.client.initXp();
+      this.playerInfoInitiated = true;
+    }
+
     //Events here could be serverPopup just as the app loads - the page should be fully visible
     this.client.processInternalEvents();
   }

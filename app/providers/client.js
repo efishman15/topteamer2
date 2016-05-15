@@ -73,13 +73,28 @@ var Client = (function () {
                     localStorage.setItem('language', language);
                 }
                 _this.initUser(language, data['geoInfo']);
-                _this.initXpCanvas();
+                _this.canvas = document.getElementById('playerInfoRankCanvas');
+                _this._canvasContext = _this.canvas.getContext('2d');
                 _this.setDirection();
                 _this._loaded = true;
                 Client.instance = _this;
                 resolve();
             }, function (err) { return reject(err); });
         });
+    };
+    Client.prototype.initPlayerInfo = function () {
+        var navBar = document.getElementsByTagName('ion-navbar')[0];
+        var navBarHeight = navBar['offsetHeight'];
+        var playerInfoImage = document.getElementById('playerInfoImage');
+        playerInfoImage.style.top = (navBarHeight - playerInfoImage.offsetHeight) / 2 + 'px';
+        //Player info rank canvas
+        this.canvasCenterX = this.settings.xpControl.canvas.width / 2;
+        this.canvasCenterY = this.settings.xpControl.canvas.height / 2;
+        this.canvas.width = this.settings.xpControl.canvas.width;
+        this.canvas.style.width = this.settings.xpControl.canvas.width + 'px';
+        this.canvas.height = this.settings.xpControl.canvas.height;
+        this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
+        this.canvas.style.top = (navBarHeight - this.settings.xpControl.canvas.height) / 2 + 'px';
     };
     Client.prototype.getSettings = function (localStorageLanguage) {
         var postData = { 'clientInfo': this.clientInfo };
@@ -95,17 +110,6 @@ var Client = (function () {
     };
     Client.prototype.initUser = function (language, geoInfo) {
         this._user = new objects_1.User(language, this.clientInfo, geoInfo);
-    };
-    Client.prototype.initXpCanvas = function () {
-        //Player info rank canvas
-        this.canvas = document.getElementById('playerInfoRankCanvas');
-        this._canvasContext = this.canvas.getContext('2d');
-        this.canvasCenterX = this.settings.xpControl.canvas.width / 2;
-        this.canvasCenterY = this.settings.xpControl.canvas.height / 2;
-        this.canvas.width = this.settings.xpControl.canvas.width;
-        this.canvas.style.width = this.settings.xpControl.canvas.width + 'px';
-        this.canvas.height = this.settings.xpControl.canvas.height;
-        this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
     };
     Client.prototype.initXp = function () {
         this._canvasContext.clearRect(0, 0, this.settings.xpControl.canvas.width, this.settings.xpControl.canvas.height);
@@ -368,6 +372,13 @@ var Client = (function () {
             else {
                 return innerWidth;
             }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Client.prototype, "height", {
+        get: function () {
+            return window.innerHeight;
         },
         enumerable: true,
         configurable: true

@@ -2,6 +2,8 @@ import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import {Question} from '../../objects/objects';
 
+const WIDTH_MARGIN: number = 2;
+
 @Page({
   templateUrl: 'build/pages/question-stats/question-stats.html'
 })
@@ -12,6 +14,8 @@ export class QuestionStatsPage {
   chartDataSource:any;
   viewController:ViewController;
   chart: any;
+  width: number;
+  height: number;
 
   constructor(params:NavParams, viewController: ViewController) {
     this.client = Client.getInstance();
@@ -26,6 +30,9 @@ export class QuestionStatsPage {
 
     if (this.chartDataSource) {
 
+      this.width = this.client.width * this.client.settings.charts.questionStats.size.widthRatio;
+      this.height = this.client.height * this.client.settings.charts.questionStats.size.heightRatio;
+
       //Adjust fonts to pixel ratio
       this.chartDataSource.chart.legendItemFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.legendItemFontSize);
       this.chartDataSource.chart.labelFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.labelFontSize);
@@ -34,8 +41,8 @@ export class QuestionStatsPage {
         this.chart = new window.FusionCharts({
           type: this.client.settings.charts.questionStats.type,
           renderAt: 'questionChart',
-          width: '' + (this.client.settings.charts.questionStats.size.width) * 100 + '%',
-          height: '' + (this.client.settings.charts.questionStats.size.height) * 100 + '%',
+          width: this.width - WIDTH_MARGIN,
+          height: this.height,
           dataFormat: 'json',
           dataSource: this.chartDataSource
         });
@@ -46,13 +53,19 @@ export class QuestionStatsPage {
     }
   }
 
+  onResize() {
+    var newWidth = this.client.width * this.client.settings.charts.questionStats.size.widthRatio;
+    var newHeight = this.client.height * this.client.settings.charts.questionStats.size.heightRatio;
+    if (this.width !== newWidth || this.height !== newHeight) {
+      this.width = newWidth;
+      this.height = newHeight;
+      this.chart.resizeTo(this.width - WIDTH_MARGIN, this.height);
+    }
+  }
+
   dismiss(action) {
     this.client.logEvent('quiz/stats/' + (action ? action : 'cancel'));
     this.viewController.dismiss(action);
-  }
-
-  onResize() {
-    this.chart.render();
   }
 
 }

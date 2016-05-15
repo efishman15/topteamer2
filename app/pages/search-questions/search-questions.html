@@ -1,27 +1,34 @@
 <ion-toolbar app-top-bar>
 
-  <ion-buttons>
+  <ion-title>
+    {{client.translate('SEARCH_MY_QUESTIONS')}}
+  </ion-title>
+
+  <ion-buttons left>
     <button (click)="dismiss(false)">
       <ion-icon name="close-circle"></ion-icon>
     </button>
   </ion-buttons>
 
-  <ion-title>
-    {{client.translate('SEARCH_MY_QUESTIONS')}}
-  </ion-title>
-
 </ion-toolbar>
 
 <ion-content class="app-bg">
-  <ion-searchbar placeholder="{{client.translate('SEARCH')}}" [(ngModel)]="searchText" (input)="search($event)" cancelButtonText="{{client.translate('CANCEL')}}">
-  </ion-searchbar>
+  <div padding>
+    <ion-searchbar placeholder="{{client.translate('SEARCH')}}" [(ngModel)]="searchText" (input)="search($event)"
+                   cancelButtonText="{{client.translate('CANCEL')}}">
+    </ion-searchbar>
+  </div>
 
-  <ion-list>
-    <ion-item no-lines *ngFor="#question of questions" class="transparent-background">
-      <ion-label class="base-font">{{question.text}}</ion-label>
-      <ion-checkbox [(ngModel)]="question.checked" light-purple></ion-checkbox>
-    </ion-item>
-  </ion-list>
+  <div class="search-questions-scroll-container-{{client.currentLanguage.direction}}">
+    <ion-scroll scrollY="true" class="search-questions-scroll">
+      <ion-list>
+        <ion-item no-lines *ngFor="#question of questions" class="transparent-background">
+          <ion-label class="base-font">{{question.text}}</ion-label>
+          <ion-checkbox [(ngModel)]="question.checked" light-purple></ion-checkbox>
+        </ion-item>
+      </ion-list>
+    </ion-scroll>
+  </div>
 
   <div class="base-font" text-center padding *ngIf="searchText && (!questions || questions.length===0)">
     <h3><strong>{{client.translate('NO_RESULTS')}}</strong>

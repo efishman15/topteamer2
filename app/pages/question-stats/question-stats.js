@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var WIDTH_MARGIN = 2;
 var QuestionStatsPage = (function () {
     function QuestionStatsPage(params, viewController) {
         this.client = client_1.Client.getInstance();
@@ -20,6 +21,8 @@ var QuestionStatsPage = (function () {
         var _this = this;
         this.client.logEvent('page/questionStats', { 'questionId': this.question._id });
         if (this.chartDataSource) {
+            this.width = this.client.width * this.client.settings.charts.questionStats.size.widthRatio;
+            this.height = this.client.height * this.client.settings.charts.questionStats.size.heightRatio;
             //Adjust fonts to pixel ratio
             this.chartDataSource.chart.legendItemFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.legendItemFontSize);
             this.chartDataSource.chart.labelFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.labelFontSize);
@@ -27,8 +30,8 @@ var QuestionStatsPage = (function () {
                 _this.chart = new window.FusionCharts({
                     type: _this.client.settings.charts.questionStats.type,
                     renderAt: 'questionChart',
-                    width: '' + (_this.client.settings.charts.questionStats.size.width) * 100 + '%',
-                    height: '' + (_this.client.settings.charts.questionStats.size.height) * 100 + '%',
+                    width: _this.width - WIDTH_MARGIN,
+                    height: _this.height,
                     dataFormat: 'json',
                     dataSource: _this.chartDataSource
                 });
@@ -36,12 +39,18 @@ var QuestionStatsPage = (function () {
             });
         }
     };
+    QuestionStatsPage.prototype.onResize = function () {
+        var newWidth = this.client.width * this.client.settings.charts.questionStats.size.widthRatio;
+        var newHeight = this.client.height * this.client.settings.charts.questionStats.size.heightRatio;
+        if (this.width !== newWidth || this.height !== newHeight) {
+            this.width = newWidth;
+            this.height = newHeight;
+            this.chart.resizeTo(this.width - WIDTH_MARGIN, this.height);
+        }
+    };
     QuestionStatsPage.prototype.dismiss = function (action) {
         this.client.logEvent('quiz/stats/' + (action ? action : 'cancel'));
         this.viewController.dismiss(action);
-    };
-    QuestionStatsPage.prototype.onResize = function () {
-        this.chart.render();
     };
     QuestionStatsPage = __decorate([
         ionic_angular_1.Page({

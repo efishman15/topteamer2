@@ -1,8 +1,16 @@
 <ion-navbar app-top-bar *navbar>
+
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
+
   <ion-title>{{client.translate('LEADERBOARDS')}}</ion-title>
+
+  <ion-buttons left>
+    <button (click)="client.openNewContest()">
+      <ion-icon name="add-circle"></ion-icon>
+    </button>
+  </ion-buttons>
 
 </ion-navbar>
 

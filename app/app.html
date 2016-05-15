@@ -35,9 +35,8 @@
 <loading-modal id="loading"></loading-modal>
 
 <div id="playerInfo" [hidden]="client.isMenuOpen">
-  <img *ngIf="client.session" src="{{client.session.avatar}}"
+  <img id="playerInfoImage" *ngIf="client.session" src="{{client.session.avatar}}"
        class="player-info-avatar pointer" (click)="client.popToRoot()">
-  <div class="player-info-padding"></div>
   <canvas id="playerInfoRankCanvas">
   </canvas>
 </div>

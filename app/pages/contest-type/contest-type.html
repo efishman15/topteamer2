@@ -1,14 +1,14 @@
 <ion-toolbar app-top-bar>
 
-  <ion-buttons>
+  <ion-title>
+    {{client.translate('NEW_CONTEST')}}
+  </ion-title>
+
+  <ion-buttons left>
     <button (click)="selectContestContent(null)">
       <ion-icon name="close-circle"></ion-icon>
     </button>
   </ion-buttons>
-
-  <ion-title>
-    {{client.translate('NEW_CONTEST')}}
-  </ion-title>
 
 </ion-toolbar>
 
@@ -26,7 +26,7 @@
              [ngStyle]="{'color': client.settings.newContest.contestTypes[contestTypeId].text.titleColor}">
           {{client.translate(client.settings.newContest.contestTypes[contestTypeId].text.title)}}
         </div>
-        <img style="width: 70%"
+        <img class="contest-type-image"
              src="{{client.settings.newContest.contestTypes[contestTypeId].image.url}}">
         <div class="contest-type-description" text-center>
           {{client.translate(client.settings.newContest.contestTypes[contestTypeId].text.description)}}

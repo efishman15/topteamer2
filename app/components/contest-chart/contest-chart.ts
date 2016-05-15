@@ -107,7 +107,6 @@ export class ContestChartComponent {
     if (this.width !== newWidth) {
       this.width = newWidth;
       this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
-      this.refresh();
       this.chart.resizeTo(this.width - WIDTH_MARGIN, this.height);
     }
   }

@@ -2,10 +2,22 @@
   resize: none;
 }
 
-.question-editor-characters-length {
+.question-editor-question-characters-length {
   font-size: 10px;
   color: #c2c2c2;
+  margin-top: -15px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
+
+.question-editor-answer-characters-length {
+  font-size: 10px;
+  color: #c2c2c2;
+  margin-top: -17px;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
 .question-editor-answers-note {
   font-size: 12px;
   margin-right: 5px;

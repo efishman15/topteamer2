@@ -54,6 +54,8 @@ var SetContestAdminPage = (function () {
                     _this.client.nav.popToRoot({ animate: false });
                 }, 1000);
             });
+        }, function () {
+            //Do nothing on cancel
         });
     };
     SetContestAdminPage = __decorate([

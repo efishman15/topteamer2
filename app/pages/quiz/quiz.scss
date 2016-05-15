@@ -9,7 +9,11 @@
   font-size: 20px;
   color: #ffffff;
   z-index: 1 !important;
+  transform: translateZ(0) !important;
   -webkit-transform: translateZ(0) !important;
+  -moz-transform: translateZ(0) !important;
+  -o-transform: translateZ(0) !important;
+  -ms-transform: translateZ(0) !important;
 }
 
 .button.quiz-answer {

@@ -186,6 +186,7 @@ export class Size {
 
 export class ChartSizeSettings extends Size {
   widthRatio:number;
+  heightRatio: number;
   heightRatioFromWidth:number;
   topMarginPercent:number;
 }
@@ -353,6 +354,7 @@ export class Contest {
   totalParticipants:number;
   dataSource:any;
   state:string;
+  leadingTeam: number;
 
   constructor(startDate:number, endDate:number, typeId:string) {
     this.startDate = startDate;

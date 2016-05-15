@@ -107,10 +107,14 @@
       </date-picker>
     </div>
 
-    <div class="set-contest-user-questions-label-{{client.currentLanguage.direction}}" *ngIf="contestLocalCopy.type.id === 'userTrivia'">
+    <div class="set-contest-user-questions-label-{{client.currentLanguage.direction}}"
+         *ngIf="contestLocalCopy.type.id === 'userTrivia'">
       <ion-row>
         <ion-col>
-          <div padding-top padding-bottom class="set-contest-user-questions-title">{{client.translate('MY_CONTEST_QUESTIONS',{count : (contestLocalCopy.type.questions ? contestLocalCopy.type.questions.visibleCount : 0)}) }}</div>
+          <div padding-top padding-bottom class="set-contest-user-questions-title">
+            {{client.translate('MY_CONTEST_QUESTIONS',{count : (contestLocalCopy.type.questions ?
+            contestLocalCopy.type.questions.visibleCount : 0)}) }}
+          </div>
         </ion-col>
         <ion-col>
           <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}">
@@ -129,24 +133,20 @@
           </div>
         </ion-col>
       </ion-row>
-      <div padding-left padding-right *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0" class="set-contest-user-questions-area">
-        <div class="set-contest-user-questions-list small-horizontal-margin">
-          <ion-list>
-            <ion-row style="height: 40px" *ngFor="#question of contestLocalCopy.type.questions.list, #i=index" [hidden]="question.deleted">
-              <ion-col width-90>
-                <div title="{{client.translate('EDIT_QUESTION')}}" class="base-font pointer"
-                     (click)="openQuestionEditor('edit', question)">
-                  {{question.text}}
-                </div>
-              </ion-col>
-              <ion-col width-10>
-                <button class="set-contest-question-buttons" (click)="removeQuestion(i)">
-                  <ion-icon title="{{client.translate('REMOVE_QUESTION')}}" name="close-circle">
-                  </ion-icon>
-                </button>
-              </ion-col>
-            </ion-row>
-          </ion-list>
+      <div *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0">
+        <div class="questions-horizontal-margin">
+          <ion-scroll scrollY="true" class="questions-scroll-area">
+            <ion-list>
+              <ion-item
+                        *ngFor="#question of contestLocalCopy.type.questions.list, #i=index"
+                        [hidden]="question.deleted">
+                <ion-icon class="pointer" title="{{client.translate('REMOVE_QUESTION')}}" (click)="removeQuestion(i)" name="close-circle"
+                          item-right></ion-icon>
+              <span class="pointer" (click)="openQuestionEditor('edit', question)" [innerHtml]="question.text">
+              </span>
+              </ion-item>
+            </ion-list>
+          </ion-scroll>
         </div>
       </div>
     </div>
@@ -157,7 +157,9 @@
     </div>
 
     <div *ngIf="client.session.isAdmin" padding>
-      <button [disabled]="!contestLocalCopy.teams[0].name || !contestLocalCopy.teams[1].name" (click)="setAdminInfo()" class="button-small app-button-light-purple">{{client.translate('CONTEST_ADMIN_INFO')}}</button>
+      <button [disabled]="!contestLocalCopy.teams[0].name || !contestLocalCopy.teams[1].name" (click)="setAdminInfo()"
+              class="button-small app-button-light-purple">{{client.translate('CONTEST_ADMIN_INFO')}}
+      </button>
     </div>
 
     <div padding>

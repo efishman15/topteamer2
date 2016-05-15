@@ -7,10 +7,11 @@
 </ion-navbar>
 
 <ion-content class="app-bg">
-  <ion-list>
+  <ion-list inset>
     <ion-item class="app-menu-item">
       <ion-icon name="{{client.session.settings.sound ? 'volume-up' : 'volume-off'}}" item-left></ion-icon>
-      <ion-label>{{client.session.settings.sound ? client.translate('SOUND_ON') : client.translate('SOUND_OFF') }}</ion-label>
+      <ion-label>{{client.session.settings.sound ? client.translate('SOUND_ON') : client.translate('SOUND_OFF') }}
+      </ion-label>
       <ion-toggle [(ngModel)]="client.session.settings.sound" (click)="toggleSound()"></ion-toggle>
     </ion-item>
 
@@ -30,11 +31,10 @@
       </ion-select>
     </ion-item>
 
-    <ion-item class="app-menu-item">
-      <button class="app-menu-item app-menu-button app-menu-button-{{client.currentLanguage.direction}}" *ngIf="client.session" (click)="logout()">
-        <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="log-out"></ion-icon>
-        {{client.translate('SIGN_OUT')}}
-      </button>
+    <ion-item class="app-menu-item pointer" (click)="logout()">
+      <ion-icon name="log-out" item-left></ion-icon>
+      <ion-label>{{client.translate('SIGN_OUT')}}
+      </ion-label>
     </ion-item>
 
   </ion-list>
