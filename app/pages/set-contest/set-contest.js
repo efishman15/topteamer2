@@ -54,7 +54,7 @@ var SetContestPage = (function () {
             //Create new local instance of a contest
             this.contestLocalCopy = new objects_1.Contest(this.startDate, this.endDate, this.params.data.typeId);
             this.showStartDate = true;
-            this.contestLocalCopy.type.questions = { 'visibleCount': 0, 'list': [] };
+            this.contestLocalCopy.type.questions = { 'visibleCount': 0, 'list': [], 'randomOrder': false };
         }
         this.client.session.features['newContest'].purchaseData.retrieved = false;
         //-------------------------------------------------------------------------------------------------------------

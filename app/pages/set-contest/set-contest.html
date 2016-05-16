@@ -135,7 +135,7 @@
       </ion-row>
       <div *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0">
         <div class="questions-horizontal-margin">
-          <ion-scroll scrollY="true" class="questions-scroll-area">
+          <ion-scroll scrollY="true" [ngStyle]="{'height': contestLocalCopy.type.questions.visibleCount >=5 ? '230px' : (contestLocalCopy.type.questions.visibleCount * 46) + 'px'}">
             <ion-list>
               <ion-item
                         *ngFor="#question of contestLocalCopy.type.questions.list, #i=index"
@@ -147,6 +147,12 @@
               </ion-item>
             </ion-list>
           </ion-scroll>
+          <ion-item no-lines class="transparent-background">
+            <ion-label class="base-font">{{client.translate('SHOW_IN_RANDOM_ORDER')}}
+            </ion-label>
+            <ion-checkbox light-purple [(ngModel)]="contestLocalCopy.type.randomOrder" class="no-horizontal-margin">
+            </ion-checkbox>
+          </ion-item>
         </div>
       </div>
     </div>

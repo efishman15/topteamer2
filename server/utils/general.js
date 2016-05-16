@@ -16,19 +16,6 @@ module.exports.injectSettings = function (dbSettings) {
 
   settings = dbSettings;
 
-  //Compute unlockRank for each feature using the rankByXp settings
-  for (var i = 0; i < settings.server.rankByXp.length; i++) {
-    if (settings.server.rankByXp[i].unlockFeature) {
-      settings.server.features[settings.server.rankByXp[i].unlockFeature].unlockRank = settings.server.rankByXp[i].rank;
-    }
-  }
-
-  //Generate the 'client visible' part of the server settings about the question scores
-  settings.client.quiz.questions = {'score': []};
-  for (var i = 0; i < settings.server.quiz.questions.levels.length; i++) {
-    settings.client.quiz.questions.score.push(settings.server.quiz.questions.levels[i].score);
-  }
-
   checkForEvalSettings(settings);
 
   module.exports.settings = settings;

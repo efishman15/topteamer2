@@ -15,7 +15,6 @@
 }
 
 .simple-tab-common {
-  height: 40px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   margin: 0px auto;
@@ -23,12 +22,15 @@
   margin-left: 5px;
 }
 
-.simple-tab-common-text {
+.simple-tab-common-div {
+  height: 40px;
+  line-height: 40px;
+}
+
+.simple-tab-common-span {
   font-weight: bold;
   font-size: 17px;
-  transform: translateY(50%);
-  -moz-transform: translateY(50%);
-  -webkit-transform: translateY(50%);
-  -ms-transform: translateY(50%);
-  -o-transform: translateY(50%);
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
 }

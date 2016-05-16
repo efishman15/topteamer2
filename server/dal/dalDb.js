@@ -751,7 +751,7 @@ function prepareQuestionCriteria(data, callback) {
     if (!data.session.quiz.serverData.userQuestions) {
 
         //System generated questions
-        var questionLevel = generalUtils.settings.server.quiz.questions.levels[data.session.quiz.clientData.currentQuestionIndex];
+        var questionLevel = generalUtils.settings.server.quiz.questions.systemTrivia.levels[data.session.quiz.clientData.currentQuestionIndex];
 
         questionCriteria = {
             '$and': [
@@ -827,7 +827,7 @@ function getQuestionsCount(data, callback) {
 // data:
 // -----
 // input: DbHelper, session, questionCriteria, questionsCount (optional if contest has user questions)
-// output: questionsCount
+// output: question
 //----------------------------------------------------------------------------------------------------------
 module.exports.getNextQuestion = getNextQuestion;
 function getNextQuestion(data, callback) {
@@ -852,95 +852,7 @@ function getNextQuestion(data, callback) {
             return;
         }
 
-        if (data.session.quiz.clientData.totalQuestions === (data.session.quiz.clientData.currentQuestionIndex + 1)) {
-            data.session.quiz.clientData.finished = true;
-        }
-
-        //Session is dynamic - perform some evals...
-        if (question.vars) {
-
-            //define the vars as 'global' vars so they can be referenced by further evals
-            for (var key in question.vars) {
-                global[key] = eval(question.vars[key]);
-            }
-
-            //The question.text can include expressions like these: {{xp1}} {{xp2}} which need to be 'evaled'
-            question.text = question.text.replace(/\{\{(.*?)\}\}/g, function (match) {
-                return eval(match.substring(2, match.length - 2));
-            });
-
-            //The answer.answer can include expressions like these: {{xp1}} {{xp2}} which need to be 'evaled'
-            question.answers.forEach(function (element, index, array) {
-                element['text'] = element['text'].replace(/\{\{(.*?)\}\}/g, function (match) {
-                    return eval(match.substring(2, match.length - 2));
-                });
-            })
-
-            //delete global vars used for the evaluation
-            for (var key in question.vars) {
-                delete global[key];
-            }
-        }
-
-        data.session.quiz.serverData.currentQuestion = question;
-
-        data.session.quiz.clientData.currentQuestion = {
-            'text': question.text,
-            'answers': []
-        };
-
-        //For admins only - give the original answers (in their original order, item0 is the correct answer
-        //including the _id - to allow editing the question within the quiz
-
-        var originalAnswers = [];
-        if (data.session.isAdmin) {
-            data.session.quiz.clientData.currentQuestion._id = question._id;
-            for (var i = 0; i < question.answers.length; i++) {
-                originalAnswers.push(question.answers[i].text);
-            }
-        }
-
-        //Shuffle the answers
-        question.answers = random.shuffle(question.answers);
-
-        //Add them to the client question shuffled
-        for (var i = 0; i < question.answers.length; i++) {
-            data.session.quiz.clientData.currentQuestion.answers.push({'text' : question.answers[i].text});
-        }
-
-        if (data.session.isAdmin) {
-            //Index of this array is the original order (item0 = correct)
-            //value of the cell of the array points to the index of the answer in the shuffled array
-            for(var i=0; i<originalAnswers.length; i++) {
-                for (var j=0; j<question.answers.length; j++) {
-                    if (originalAnswers[i] === data.session.quiz.clientData.currentQuestion.answers[j].text) {
-                        data.session.quiz.clientData.currentQuestion.answers[j].originalIndex = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (question.wikipediaHint) {
-            data.session.quiz.clientData.currentQuestion.wikipediaHint = question.wikipediaHint;
-            data.session.quiz.clientData.currentQuestion.hintCost = generalUtils.settings.server.quiz.questions.levels[data.session.quiz.clientData.currentQuestionIndex].score * generalUtils.settings.server.quiz.hintCost;
-        }
-
-        if (question.wikipediaAnswer) {
-            data.session.quiz.clientData.currentQuestion.wikipediaAnswer = question.wikipediaAnswer;
-            data.session.quiz.clientData.currentQuestion.answerCost = generalUtils.settings.server.quiz.questions.levels[data.session.quiz.clientData.currentQuestionIndex].score * generalUtils.settings.server.quiz.answerCost;
-        }
-
-        if (question.correctAnswers > 0 || question.wrongAnswers > 0) {
-            data.session.quiz.clientData.currentQuestion.correctRatio = question.correctRatio;
-        }
-
-        //Add this question id to the list of questions already asked during this quiz
-        if (data.session.quiz.serverData.previousQuestions) {
-            data.session.quiz.serverData.previousQuestions.push(question._id);
-        }
-
-        callback(null, data);
+        callback(null, question);
     })
 };
 

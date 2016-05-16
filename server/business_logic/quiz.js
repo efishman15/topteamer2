@@ -15,6 +15,135 @@ var util = require('util');
 //--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------
+// getNextQuestion
+//
+// input: DbHelper, session, questionCriteria, questionsCount (optional if contest has user questions)
+// output: question
+//--------------------------------------------------------------------------
+function getNextQuestion(data, callback) {
+
+  dalDb.getNextQuestion(data, function (err, question) {
+
+    if (err) {
+      callback(err);
+      return;
+    }
+
+    if (data.session.quiz.clientData.totalQuestions === (data.session.quiz.clientData.currentQuestionIndex + 1)) {
+      data.session.quiz.clientData.finished = true;
+    }
+
+    //Session is dynamic - perform some evals...
+    if (question.vars) {
+
+      //define the vars as 'global' vars so they can be referenced by further evals
+      for (var key in question.vars) {
+        global[key] = eval(question.vars[key]);
+      }
+
+      //The question.text can include expressions like these: {{xp1}} {{xp2}} which need to be 'evaled'
+      question.text = question.text.replace(/\{\{(.*?)\}\}/g, function (match) {
+        return eval(match.substring(2, match.length - 2));
+      });
+
+      //The answer.answer can include expressions like these: {{xp1}} {{xp2}} which need to be 'evaled'
+      question.answers.forEach(function (element, index, array) {
+        element['text'] = element['text'].replace(/\{\{(.*?)\}\}/g, function (match) {
+          return eval(match.substring(2, match.length - 2));
+        });
+      })
+
+      //delete global vars used for the evaluation
+      for (var key in question.vars) {
+        delete global[key];
+      }
+    }
+
+    data.session.quiz.serverData.currentQuestion = question;
+
+    data.session.quiz.clientData.currentQuestion = {
+      'text': question.text,
+      'answers': []
+    };
+
+    //For admins only - give the original answers (in their original order, item0 is the correct answer
+    //including the _id - to allow editing the question within the quiz
+
+    var originalAnswers = [];
+    if (data.session.isAdmin) {
+      data.session.quiz.clientData.currentQuestion._id = question._id;
+      for (var i = 0; i < question.answers.length; i++) {
+        originalAnswers.push(question.answers[i].text);
+      }
+    }
+
+    //Shuffle the answers
+    question.answers = random.shuffle(question.answers);
+
+    //Add them to the client question shuffled
+    for (var i = 0; i < question.answers.length; i++) {
+      data.session.quiz.clientData.currentQuestion.answers.push({'text': question.answers[i].text});
+    }
+
+    if (data.session.isAdmin) {
+      //Index of this array is the original order (item0 = correct)
+      //value of the cell of the array points to the index of the answer in the shuffled array
+      for (var i = 0; i < originalAnswers.length; i++) {
+        for (var j = 0; j < question.answers.length; j++) {
+          if (originalAnswers[i] === data.session.quiz.clientData.currentQuestion.answers[j].text) {
+            data.session.quiz.clientData.currentQuestion.answers[j].originalIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    var questionScore = getQuestionScore(data);
+    if (question.wikipediaHint) {
+      data.session.quiz.clientData.currentQuestion.wikipediaHint = question.wikipediaHint;
+      data.session.quiz.clientData.currentQuestion.hintCost = questionScore * generalUtils.settings.server.quiz.hintCost;
+    }
+
+    if (question.wikipediaAnswer) {
+      data.session.quiz.clientData.currentQuestion.wikipediaAnswer = question.wikipediaAnswer;
+      data.session.quiz.clientData.currentQuestion.answerCost = questionScore * generalUtils.settings.server.quiz.answerCost;
+    }
+
+    if (question.correctAnswers > 0 || question.wrongAnswers > 0) {
+      data.session.quiz.clientData.currentQuestion.correctRatio = question.correctRatio;
+    }
+
+    //Add this question id to the list of questions already asked during this quiz
+    if (data.session.quiz.serverData.previousQuestions) {
+      data.session.quiz.serverData.previousQuestions.push(question._id);
+    }
+
+    callback(null, data);
+  });
+}
+
+//--------------------------------------------------------------------------
+// getQuestionScore
+//
+// data: session
+//--------------------------------------------------------------------------
+function getQuestionScore(data) {
+
+  var score;
+  if (data.session.quiz.serverData.contest.type === 'systemTrivia') {
+    score = generalUtils.settings.server.quiz.questions[data.session.quiz.serverData.contest.type].levels[data.session.quiz.clientData.currentQuestionIndex].score;
+  }
+  else if (data.session.quiz.serverData.contest.type === 'userTrivia') {
+    score = generalUtils.settings.server.quiz.questions[data.session.quiz.serverData.contest.type].questionScore;
+  }
+  else {
+    score = 0;
+  }
+
+  return score;
+}
+
+//--------------------------------------------------------------------------
 // setQuestionDirection
 //
 // data: session
@@ -22,7 +151,6 @@ var util = require('util');
 function setQuestionDirection(data, callback) {
 
   if (!data.session.quiz.serverData.userQuestions) {
-
 
     data.topicId = data.session.quiz.serverData.currentQuestion.topicId;
     dalDb.getTopic(data, function (err, topic) {
@@ -126,7 +254,7 @@ module.exports.start = function (req, res, next) {
       };
 
       quiz.serverData = {
-        'contestId': data.contestId,
+        'contest': {'id': data.contestId, 'type': data.contest.type.id},
         'score': 0,
         'correctAnswers': 0,
         'share': {'data': {}}
@@ -143,12 +271,17 @@ module.exports.start = function (req, res, next) {
 
       //Number of questions (either entered by user or X random questions from the system
       if (data.contest.type.id !== 'userTrivia') {
-        quiz.clientData.totalQuestions = generalUtils.settings.client.quiz.questions.score.length;
+        quiz.clientData.totalQuestions = generalUtils.settings.server.quiz.questions.systemTrivia.levels.length;
         quiz.serverData.previousQuestions = [];
       }
       else {
         quiz.clientData.totalQuestions = data.contest.type.userQuestions.length;
-        quiz.serverData.userQuestions = data.contest.type.userQuestions;
+        if (data.contest.type.randomOrder) {
+          quiz.serverData.userQuestions = random.shuffle(data.contest.type.userQuestions);
+        }
+        else {
+          quiz.serverData.userQuestions = data.contest.type.userQuestions;
+        }
       }
 
       var myTeam = data.contest.users[data.session.userId].team;
@@ -212,7 +345,7 @@ module.exports.start = function (req, res, next) {
     },
 
     //Get the next question for the quiz
-    dalDb.getNextQuestion,
+    getNextQuestion,
 
     //Sets the direction of the question
     setQuestionDirection,
@@ -278,7 +411,9 @@ module.exports.answer = function (req, res, next) {
 
         var questionScore;
         if (!data.session.quiz.clientData.reviewMode) {
-          questionScore = generalUtils.settings.server.quiz.questions.levels[data.session.quiz.clientData.currentQuestionIndex].score;
+
+          questionScore = getQuestionScore(data);
+
           if (data.answerUsed && data.session.quiz.clientData.currentQuestion.answerCost) {
             questionScore -= data.session.quiz.clientData.currentQuestion.answerCost;
           }
@@ -359,7 +494,7 @@ module.exports.answer = function (req, res, next) {
     //Retrieve the contest object - when quiz is finished
     function (data, callback) {
       if (data.session.quiz.clientData.finished) {
-        data.contestId = data.session.quiz.serverData.contestId;
+        data.contestId = data.session.quiz.serverData.contest.id;
         dalDb.getContest(data, callback);
       }
       else {
@@ -575,7 +710,7 @@ module.exports.nextQuestion = function (req, res, next) {
     },
 
     //Get the next question for the quiz
-    dalDb.getNextQuestion,
+    getNextQuestion,
 
     //Sets the direction of the question
     setQuestionDirection,

@@ -2,8 +2,10 @@
   <ion-row class="no-padding">
     <ion-col width-30 class="no-padding" *ngFor="#simpleTab of simpleTabs, #i=index" [class.active]="simpleTab.active">
       <div class="simple-tab-common" (click)="selectTab(simpleTab)" [ngClass]="{'active-tab' : simpleTab.active, 'passive-tab' : !simpleTab.active}">
-        <div class="simple-tab-common-text">
+        <div class="simple-tab-common-div">
+          <span class="simple-tab-common-span">
           {{simpleTab.simpleTabTitle}}
+          </span>
         </div>
       </div>
     </ion-col>

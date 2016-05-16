@@ -113,8 +113,10 @@ export class QuizCanvasCircleSettings {
 }
 
 export class QuizCanvasCircleRadiusSettings {
-  inner:number;
-  outer:number;
+  min:number;
+  max:number;
+  spaceRatio: number;
+  outerBorderRatio:number;
 }
 
 export class QuizCanvasCircleStateSettings {

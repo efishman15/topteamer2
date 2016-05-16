@@ -264,9 +264,16 @@ function validateContestData(data, callback) {
     if (data.contest.manualParticipants) {
       cleanContest.manualParticipants = data.contest.manualParticipants;
     }
+    else {
+      cleanContest.manualParticipants = 0;
+    }
     if (data.contest.manualRating) {
       cleanContest.manualRating = data.contest.manualRating;
     }
+    else {
+      cleanContest.manualRating = 0;
+    }
+
     cleanContest.teams = data.contest.teams;
     cleanContest.name = data.contest.name;
     cleanContest.language = data.session.settings.language;

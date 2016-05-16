@@ -43,10 +43,6 @@
   padding-right: 12px;
 }
 
-.questions-scroll-area {
-  height: 230px;
-}
-
 .set-contest-team {
   font-size: 16px;
 }
@@ -68,4 +64,9 @@
 
 .set-contest-user-questions-label-rtl {
   padding-right: 6px;
+}
+
+.no-horizontal-margin {
+  margin-left: 0px !important;
+  margin-right: 0px !important;
 }
