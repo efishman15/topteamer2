@@ -64,7 +64,7 @@ exports.confirmExitApp = function () {
     var client = client_1.Client.getInstance();
     return _this.confirm('EXIT_APP_TITLE', 'EXIT_APP_MESSAGE', null).then(function () {
         window.FlurryAgent.endSession();
-        client.platform.exitApp();
+        window.navigator['app'].exitApp();
     });
 };
 //# sourceMappingURL=alert.js.map

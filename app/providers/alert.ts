@@ -82,6 +82,6 @@ export let confirmExitApp = () => {
 
   return this.confirm('EXIT_APP_TITLE', 'EXIT_APP_MESSAGE', null).then(() => {
     window.FlurryAgent.endSession();
-    client.platform.exitApp();
+    window.navigator['app'].exitApp();
   })
 };

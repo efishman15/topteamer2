@@ -18,11 +18,13 @@ var client_1 = require('./providers/client');
 var settings_1 = require('./pages/settings/settings');
 var system_tools_1 = require('./pages/system-tools/system-tools');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
+var alertService = require('./providers/alert');
 var contestsService = require('./providers/contests');
 var ionic_native_1 = require('ionic-native');
 var topTeamerApp = (function () {
     function topTeamerApp(ionicApp, platform, config, client, events, menuController) {
         var _this = this;
+        ionicApp.setProd(true);
         this.client = client;
         client.init(ionicApp, platform, config, menuController, events).then(function () {
             _this.initApp();
@@ -49,6 +51,29 @@ var topTeamerApp = (function () {
                 // org.apache.cordova.statusbar required
                 window.StatusBar.styleDefault();
             }
+            //Handle hardware back button
+            document.addEventListener('backbutton', function (event) {
+                event.cancelBubble = true;
+                event.preventDefault();
+                var client = client_1.Client.getInstance();
+                var activeNav = client.nav;
+                var activeView = activeNav.getActive();
+                if (activeView) {
+                    if (!activeView.isRoot()) {
+                        return activeView.dismiss();
+                    }
+                    var page = activeView.instance;
+                    if (page instanceof main_tabs_1.MainTabsPage && page['mainTabs']) {
+                        activeNav = page['mainTabs'].getSelected();
+                    }
+                }
+                if (activeNav.canGoBack()) {
+                    // Detected a back button press outside of tabs page - popping a view from a navigation stack.
+                    return activeNav.pop();
+                }
+                // Exiting app due to back button press at the root view
+                return alertService.confirmExitApp();
+            }, false);
             _this.client.hideLoader();
             console.log('platform ready');
         });
@@ -163,7 +188,7 @@ var topTeamerApp = (function () {
         facebookService.getLoginStatus().then(function (result) {
             if (result['connected']) {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
-                    _this.client.nav.push(main_tabs_1.MainTabsPage).then(function () {
+                    _this.client.nav.setRoot(main_tabs_1.MainTabsPage).then(function () {
                         if (_this.deepLinkContestId) {
                             contestsService.openContest(_this.deepLinkContestId);
                         }

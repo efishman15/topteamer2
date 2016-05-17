@@ -212,8 +212,8 @@ export class Questions {
   visibleCount:number;
 
   constructor() {
-    this.visibleCount = 0;
-    this.list = [];
+      this.visibleCount = 0;
+      this.list = [];
   }
 }
 

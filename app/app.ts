@@ -11,9 +11,11 @@ import {SetContestPage} from './pages/set-contest/set-contest';
 import {SettingsPage} from './pages/settings/settings';
 import {SystemToolsPage} from './pages/system-tools/system-tools';
 import {LoadingModalComponent} from './components/loading-modal/loading-modal';
+import * as alertService from './providers/alert';
 import * as contestsService from './providers/contests';
 import {} from './interfaces/interfaces'
 import {AppVersion} from 'ionic-native';
+import {alert} from "./providers/alert";
 
 @App({
   templateUrl: 'build/app.html',
@@ -27,6 +29,8 @@ class topTeamerApp {
   deepLinkContestId: string;
 
   constructor(ionicApp:IonicApp, platform:Platform, config: Config, client:Client, events:Events, menuController:MenuController) {
+
+    ionicApp.setProd(true);
 
     this.client = client;
 
@@ -65,6 +69,33 @@ class topTeamerApp {
         window.StatusBar.styleDefault();
       }
 
+      //Handle hardware back button
+      document.addEventListener('backbutton', (event: Event) => {
+
+        event.cancelBubble = true;
+        event.preventDefault();
+
+        var client = Client.getInstance();
+        var activeNav = client.nav;
+
+        var activeView = activeNav.getActive();
+        if (activeView) {
+          if (!activeView.isRoot()) {
+            return activeView.dismiss();
+          }
+          var page = activeView.instance;
+          if (page instanceof MainTabsPage && page['mainTabs']) {
+            activeNav = page['mainTabs'].getSelected();
+          }
+        }
+
+        if (activeNav.canGoBack()) {
+          // Detected a back button press outside of tabs page - popping a view from a navigation stack.
+          return activeNav.pop();
+        }
+        // Exiting app due to back button press at the root view
+        return alertService.confirmExitApp();
+      }, false);
       this.client.hideLoader();
       console.log('platform ready');
 
@@ -203,7 +234,7 @@ class topTeamerApp {
     facebookService.getLoginStatus().then((result) => {
       if (result['connected']) {
         this.client.facebookServerConnect(result['response'].authResponse).then(() => {
-          this.client.nav.push(MainTabsPage).then(() => {
+          this.client.nav.setRoot(MainTabsPage).then(() => {
             if (this.deepLinkContestId) {
               contestsService.openContest(this.deepLinkContestId);
             }

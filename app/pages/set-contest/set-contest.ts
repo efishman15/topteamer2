@@ -11,7 +11,7 @@ import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
 import * as shareService from '../../providers/share';
-import {Contest,ContestName, Team, PaymentData} from '../../objects/objects';
+import {Contest,ContestName, Questions, Team, PaymentData} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/set-contest/set-contest.html',
@@ -77,7 +77,7 @@ export class SetContestPage {
       //Create new local instance of a contest
       this.contestLocalCopy = new Contest(this.startDate, this.endDate, this.params.data.typeId);
       this.showStartDate = true;
-      this.contestLocalCopy.type.questions = {'visibleCount': 0, 'list': [], 'randomOrder': false};
+      this.contestLocalCopy.type.questions = new Questions();
     }
 
     this.client.session.features['newContest'].purchaseData.retrieved = false;

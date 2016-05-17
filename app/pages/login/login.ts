@@ -37,9 +37,8 @@ export class LoginPage {
   login() {
     this.client.logEvent('login/facebookLogin');
     facebookService.login().then((response) => {
-      this.client.nav.pop(LoginPage);
       this.client.facebookServerConnect(response['authResponse']).then(() => {
-        this.client.nav.push(MainTabsPage);
+        this.client.nav.setRoot(MainTabsPage);
       })
     });
   };
