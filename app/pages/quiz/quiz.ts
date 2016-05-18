@@ -490,9 +490,11 @@ export class QuizPage {
     if (state.text) {
       this.quizContext.beginPath();
       this.quizContext.fillStyle = state.textFillStyle;
-      this.quizContext.font = this.client.settings.quiz.canvas.font.signs;
+      this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.signs.bold,this.circleOuterRadius + 'px', this.client.settings.quiz.canvas.font.signs.name);
       var textWidth = this.quizContext.measureText(state.text).width;
-      this.quizContext.fillText(state.text, x + (textWidth / 2), this.client.settings.quiz.canvas.size.topSignOffset);
+
+      //1.35 = 'magic number' - works for all resolutions
+      this.quizContext.fillText(state.text, x + (textWidth / 2), this.client.settings.quiz.canvas.size.topOffset + (1.35 * this.circleOuterRadius));
       this.quizContext.closePath();
     }
 
@@ -544,7 +546,7 @@ export class QuizPage {
       //Draw the score at the top of the circle
       this.quizContext.beginPath();
       this.quizContext.fillStyle = scoreColor;
-      this.quizContext.font = this.client.settings.quiz.canvas.font.scores;
+      this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.scores.bold,this.client.settings.quiz.canvas.font.scores.size, this.client.settings.quiz.canvas.font.scores.name);
       this.quizContext.fillText(questionScore, currentX + textWidth / 2, this.client.settings.quiz.canvas.scores.size.top);
       this.quizContext.closePath();
 
@@ -603,4 +605,13 @@ export class QuizPage {
     this.drawQuizProgress();
   }
 
+  getCanvasFont(bold: boolean, size: string, name: string) {
+    var font = '';
+    if (bold) {
+      font += 'bold ';
+    }
+    font += size + ' ' + name;
+
+    return font;
+  }
 }

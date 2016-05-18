@@ -4,24 +4,24 @@ var ionic_angular_1 = require('ionic-angular');
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-exports.alert = function (error) { return new Promise(function (resolve, reject) {
+exports.alert = function (message) { return new Promise(function (resolve, reject) {
     var client = client_1.Client.getInstance();
     var alert;
     var title;
-    var message;
-    if (error.type) {
-        if (!error.additionalInfo) {
-            error.additionalInfo = {};
+    var messageText;
+    if (message.type) {
+        if (!message.additionalInfo) {
+            message.additionalInfo = {};
         }
-        title = client.translate(error.type + '_TITLE');
-        message = client.translate(error.type + '_MESSAGE', error.additionalInfo);
+        title = client.translate(message.type + '_TITLE');
+        messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
     }
     else {
-        message = error;
+        messageText = message;
     }
     alert = ionic_angular_1.Alert.create({
         cssClass: client.currentLanguage.direction,
-        message: message,
+        message: messageText,
         buttons: [
             {
                 text: client.translate('OK'),

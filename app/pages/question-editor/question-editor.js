@@ -8,6 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var common_1 = require('angular2/common');
+var core_1 = require('angular2/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var objects_1 = require('../../objects/objects');
@@ -15,6 +16,7 @@ var QuestionEditorPage = (function () {
     function QuestionEditorPage(params, viewController, formBuilder) {
         this.client = client_1.Client.getInstance();
         this.viewController = viewController;
+        this.fieldInFocus = -1;
         this.mode = params.data.mode;
         if (this.mode === 'add') {
             this.title = this.client.translate('NEW_QUESTION');
@@ -106,6 +108,16 @@ var QuestionEditorPage = (function () {
         }
         this.viewController.dismiss(result);
     };
+    QuestionEditorPage.prototype.inputFocus = function (fieldId) {
+        this.fieldInFocus = fieldId;
+    };
+    QuestionEditorPage.prototype.inputBlur = function () {
+        this.fieldInFocus = -1;
+    };
+    __decorate([
+        core_1.ViewChild(ionic_angular_1.Content), 
+        __metadata('design:type', ionic_angular_1.Content)
+    ], QuestionEditorPage.prototype, "content", void 0);
     QuestionEditorPage = __decorate([
         ionic_angular_1.Page({
             templateUrl: 'build/pages/question-editor/question-editor.html'

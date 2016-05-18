@@ -113,6 +113,7 @@ var topTeamerApp = (function () {
         var _this = this;
         if (window.cordova.plugins.Keyboard) {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+            window.cordova.plugins.Keyboard.disableScroll(false);
         }
         //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
         //TODO: check if Platform.prototype.fullScreen is required - to return true always
@@ -157,6 +158,7 @@ var topTeamerApp = (function () {
                     //Will go to this contest
                     //TODO: QA - Deep linking
                     _this.deepLinkContestId = data.data_parsed.contestId;
+                    console.log('got contest id: ' + _this.deepLinkContestId);
                 }
             }
             catch (e) {

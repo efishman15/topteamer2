@@ -88,7 +88,6 @@ var ContestPage = (function () {
         var _this = this;
         if (action === void 0) { action = 'join'; }
         contestsService.join(this.contest._id, team).then(function (data) {
-            _this.refreshContestChart(data.contest);
             _this.setPlayText();
             _this.client.logEvent('contest/' + action, {
                 'contestId': _this.contest._id,
@@ -98,15 +97,25 @@ var ContestPage = (function () {
             //Should also cause refresh internally to our contest chart as well as notifying the tabs outside
             _this.client.events.publish('topTeamer:contestUpdated', data.contest);
             //Should get xp if fresh join
+            var rankModal;
             if (data.xpProgress && data.xpProgress.addition > 0) {
                 _this.client.addXp(data.xpProgress).then(function () {
                     if (data.xpProgress.rankChanged) {
-                        var modal = ionic_angular_1.Modal.create(new_rank_1.NewRankPage, {
+                        rankModal = ionic_angular_1.Modal.create(new_rank_1.NewRankPage, {
                             'xpProgress': data.xpProgress
                         });
-                        _this.client.nav.present(modal);
                     }
                 });
+            }
+            if (action === 'switchTeams') {
+                alertService.alert({ 'type': 'SWITCH_TEAMS_ALERT', 'additionalInfo': { 'team': _this.contest.teams[_this.contest.myTeam].name } }).then(function () {
+                    if (rankModal) {
+                        _this.client.nav.present(rankModal);
+                    }
+                });
+            }
+            else if (rankModal) {
+                _this.client.nav.present(rankModal);
             }
         });
     };

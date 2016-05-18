@@ -81,6 +81,12 @@ var QuizCanvasSettings = (function () {
     return QuizCanvasSettings;
 })();
 exports.QuizCanvasSettings = QuizCanvasSettings;
+var QuizCanvasFontsSettings = (function () {
+    function QuizCanvasFontsSettings() {
+    }
+    return QuizCanvasFontsSettings;
+})();
+exports.QuizCanvasFontsSettings = QuizCanvasFontsSettings;
 var QuizCanvasFontSettings = (function () {
     function QuizCanvasFontSettings() {
     }

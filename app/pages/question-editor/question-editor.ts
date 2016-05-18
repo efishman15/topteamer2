@@ -1,12 +1,16 @@
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from 'angular2/common';
-import {Page,NavParams,ViewController} from 'ionic-angular';
+import {ViewChild} from 'angular2/core';
+import {Page,NavParams,ViewController,Content} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import {Question,Questions} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/question-editor/question-editor.html'
+
 })
 export class QuestionEditorPage {
+
+  @ViewChild(Content) content: Content;
 
   client:Client;
   question:Question;
@@ -24,10 +28,12 @@ export class QuestionEditorPage {
   answer1Control: Control;
   answer2Control: Control;
   answer3Control: Control;
+  fieldInFocus: number;
 
   constructor(params:NavParams, viewController: ViewController, formBuilder:FormBuilder) {
     this.client = Client.getInstance();
     this.viewController = viewController;
+    this.fieldInFocus = -1;
 
     this.mode = params.data.mode;
 
@@ -140,5 +146,13 @@ export class QuestionEditorPage {
     }
 
     this.viewController.dismiss(result);
+  }
+
+  inputFocus(fieldId: number) {
+    this.fieldInFocus = fieldId;
+  }
+
+  inputBlur() {
+    this.fieldInFocus = -1;
   }
 }

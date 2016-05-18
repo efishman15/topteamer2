@@ -45,8 +45,8 @@ var MainTabsPage = (function () {
     MainTabsPage.prototype.onPageWillEnter = function () {
         if (this.needToRefreshList) {
             var selectedPage = this.mainTabs.getSelected().getActive();
-            if (selectedPage.instance.willEnter) {
-                selectedPage.instance.willEnter();
+            if (selectedPage.instance.onPageWillEnter) {
+                selectedPage.instance.onPageWillEnter();
             }
             this.needToRefreshList = false;
         }

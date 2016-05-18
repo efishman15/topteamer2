@@ -58,8 +58,8 @@ export class MainTabsPage {
   onPageWillEnter() {
     if (this.needToRefreshList) {
       var selectedPage = this.mainTabs.getSelected().getActive();
-      if (selectedPage.instance.willEnter) {
-        selectedPage.instance.willEnter();
+      if (selectedPage.instance.onPageWillEnter) {
+        selectedPage.instance.onPageWillEnter();
       }
       this.needToRefreshList = false;
     }

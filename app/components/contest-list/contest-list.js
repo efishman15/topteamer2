@@ -21,6 +21,9 @@ var ContestListComponent = (function () {
         return new Promise(function (resolve, reject) {
             contestsService.list(_this.tab).then(function (contests) {
                 _this.contests = contests;
+                _this.contestChartComponents.forEach(function (contestChartComponent) {
+                    contestChartComponent.refresh();
+                });
                 resolve();
             }), function () {
                 reject();

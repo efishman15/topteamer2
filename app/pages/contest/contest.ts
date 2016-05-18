@@ -109,7 +109,6 @@ export class ContestPage {
 
     contestsService.join(this.contest._id, team).then((data) => {
 
-      this.refreshContestChart(data.contest);
       this.setPlayText();
 
       this.client.logEvent('contest/' + action, {
@@ -122,16 +121,28 @@ export class ContestPage {
       this.client.events.publish('topTeamer:contestUpdated', data.contest);
 
       //Should get xp if fresh join
+      var rankModal;
       if (data.xpProgress && data.xpProgress.addition > 0) {
         this.client.addXp(data.xpProgress).then(() => {
           if (data.xpProgress.rankChanged) {
-            var modal = Modal.create(NewRankPage, {
+            rankModal = Modal.create(NewRankPage, {
               'xpProgress': data.xpProgress
             });
-            this.client.nav.present(modal);
           }
         })
       }
+
+      if (action === 'switchTeams') {
+        alertService.alert({'type': 'SWITCH_TEAMS_ALERT', 'additionalInfo': {'team': this.contest.teams[this.contest.myTeam].name}}).then(() => {
+          if (rankModal) {
+            this.client.nav.present(rankModal);
+          }
+        });
+      }
+      else if (rankModal) {
+        this.client.nav.present(rankModal);
+      }
+
     });
   }
 

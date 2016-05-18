@@ -75,22 +75,28 @@ export class QuizQuestionsSettings {
 }
 
 export class QuizCanvasSettings {
-  font:QuizCanvasFontSettings;
+  font:QuizCanvasFontsSettings;
   scores:QuizCanvasScoresSettings;
   circle:QuizCanvasCircleSettings;
   size:QuizCanvasSizeSettings;
   line:QuizCanvasLineSettings;
 }
 
-export class QuizCanvasFontSettings {
-  scores:string;
-  signs:string;
+export class QuizCanvasFontsSettings {
+  scores:QuizCanvasFontSettings;
+  signs:QuizCanvasFontSettings;
 }
+
+export class QuizCanvasFontSettings {
+  bold: boolean;
+  size: string; //e.g 20px
+  name: string;
+}
+
 export class QuizCanvasSizeSettings {
   width:number;
   height:number;
   topOffset:number;
-  topSignOffset:number;
 }
 
 export class QuizCanvasScoresSettings {

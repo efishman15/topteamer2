@@ -1,7 +1,8 @@
 export {};
 
-declare global {
-    interface Window {
+declare global
+{
+  interface Window {
     cordova: any;
     StatusBar: any;
     loadJsFile(fileName:string) : void;
@@ -18,8 +19,8 @@ declare global {
     FusionCharts: any;
     facebookConnectPlugin: any;
     PushNotification: any;
-    $cordovaSocialSharing: any;
     myLogError(errorType:string, message:string): void;
+    plugins: any;
   }
 
   interface Navigator {

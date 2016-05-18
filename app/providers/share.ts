@@ -62,7 +62,7 @@ export let mobileShare = (contest) => {
   var client = Client.getInstance();
   var shareVariables = this.getVariables(contest);
 
-  window.$cordovaSocialSharing.share(shareVariables.shareBodyNoUrl,
+  window.plugins.socialsharing.share(shareVariables.shareBodyNoUrl,
     shareVariables.shareSubject,
     client.settings.general.baseUrl + client.settings.general.logoUrl,
     shareVariables.shareUrl

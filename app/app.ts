@@ -141,6 +141,7 @@ class topTeamerApp {
   initMobile() {
     if (window.cordova.plugins.Keyboard) {
       window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+      window.cordova.plugins.Keyboard.disableScroll(false);
     }
 
     //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
@@ -200,6 +201,7 @@ class topTeamerApp {
           //Will go to this contest
           //TODO: QA - Deep linking
           this.deepLinkContestId = data.data_parsed.contestId;
+          console.log('got contest id: ' + this.deepLinkContestId)
         }
       }
       catch (e) {

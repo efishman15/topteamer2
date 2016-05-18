@@ -4,30 +4,30 @@ import {Alert, ActionSheet} from 'ionic-angular';
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-export let alert = (error) => new Promise((resolve, reject) => {
+export let alert = (message) => new Promise((resolve, reject) => {
 
   var client = Client.getInstance();
 
   var alert:Alert;
   var title;
-  var message;
+  var messageText;
 
-  if (error.type) {
-    if (!error.additionalInfo) {
-      error.additionalInfo = {};
+  if (message.type) {
+    if (!message.additionalInfo) {
+      message.additionalInfo = {};
     }
 
-    title = client.translate(error.type + '_TITLE');
-    message = client.translate(error.type + '_MESSAGE', error.additionalInfo);
+    title = client.translate(message.type + '_TITLE');
+    messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
 
   }
   else {
-    message = error;
+    messageText = message;
   }
 
   alert = Alert.create({
     cssClass: client.currentLanguage.direction,
-    message: message,
+    message: messageText,
     buttons: [
       {
         text: client.translate('OK'),

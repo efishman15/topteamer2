@@ -510,13 +510,15 @@ function setDataSource(contest, session) {
 module.exports.prepareContestForClient = prepareContestForClient;
 function prepareContestForClient(contest, session) {
 
+  setTimeDisplay(contest, session);
+
   if (contest.users && contest.users[session.userId]) {
     contest.myTeam = contest.users[session.userId].team;
     if (contest.status !== 'finished') {
       contest.state = 'play';
     }
     else {
-      contest.state = 'none';
+      contest.state = 'finished';
     }
   }
   else {
@@ -524,13 +526,11 @@ function prepareContestForClient(contest, session) {
       contest.state = 'join';
     }
     else {
-      contest.state = 'none';
+      contest.state = 'finished';
     }
   }
 
   setContestScores(contest);
-
-  setTimeDisplay(contest, session);
 
   setDataSource(contest, session);
 
