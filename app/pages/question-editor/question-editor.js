@@ -7,8 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var common_1 = require('angular2/common');
-var core_1 = require('angular2/core');
+var common_1 = require('@angular/common');
+var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var objects_1 = require('../../objects/objects');

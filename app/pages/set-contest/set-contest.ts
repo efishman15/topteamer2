@@ -1,5 +1,5 @@
 import {Page, NavParams, Modal} from 'ionic-angular';
-import {Form, FormBuilder, Control, ControlGroup, Validators} from 'angular2/common';
+import {Form, FormBuilder, Control, ControlGroup, Validators} from '@angular/common';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import {ContestPage} from '../../pages/contest/contest';

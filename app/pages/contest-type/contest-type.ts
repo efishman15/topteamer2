@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import {Component} from '@angular/core';
 import {Page, ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 

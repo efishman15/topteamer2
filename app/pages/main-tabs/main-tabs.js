@@ -8,7 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_angular_1 = require('ionic-angular');
-var core_1 = require('angular2/core');
+var core_1 = require('@angular/core');
 var my_contests_1 = require('../my-contests/my-contests');
 var running_contests_1 = require('../running-contests/running-contests');
 var leaderboards_1 = require('../leaderboards/leaderboards');

@@ -1,5 +1,5 @@
+import {ViewChild,forwardRef} from '@angular/core';
 import {Page, NavParams,Modal} from 'ionic-angular';
-import {ViewChild} from 'angular2/core';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
 import {QuizPage} from '../../pages/quiz/quiz';
@@ -15,7 +15,7 @@ import {Contest,QuizResults} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [ContestChartComponent]
+  directives: [forwardRef(() => ContestChartComponent)]
 })
 
 export class ContestPage {

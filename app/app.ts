@@ -1,6 +1,6 @@
-import {provide,ExceptionHandler} from 'angular2/core';
+import {provide,ExceptionHandler,ViewChild} from '@angular/core';
 import {MyExceptionHandler} from './providers/exceptions';
-import {App, IonicApp, Platform, Config, Events, Modal, Alert, NavController, MenuController} from 'ionic-angular';
+import {App, IonicApp, Platform, Config, Events, Modal, Alert, Nav, MenuController} from 'ionic-angular';
 import {MainTabsPage} from './pages/main-tabs/main-tabs';
 import {LoginPage} from './pages/login/login';
 import * as facebookService from './providers/facebook';
@@ -19,7 +19,7 @@ import {alert} from "./providers/alert";
 
 @App({
   templateUrl: 'build/app.html',
-  providers: [provide(ExceptionHandler, {useClass: MyExceptionHandler}), Client],
+  providers: [Client],
   config: {backButtonText: ''},
   directives: [LoadingModalComponent]
 })
@@ -27,17 +27,31 @@ class topTeamerApp {
 
   client:Client;
   deepLinkContestId: string;
+  @ViewChild(Nav) nav:Nav;
+  @ViewChild(LoadingModalComponent) loadingModalComponent:LoadingModalComponent;
+
+  ionicApp: IonicApp;
+  platform: Platform;
+  config: Config;
+  events: Events;
+  menuController: MenuController;
 
   constructor(ionicApp:IonicApp, platform:Platform, config: Config, client:Client, events:Events, menuController:MenuController) {
 
     ionicApp.setProd(true);
 
+    this.ionicApp = ionicApp;
+    this.platform = platform;
+    this.config = config;
     this.client = client;
+    this.events = events;
+    this.menuController = menuController;
+  }
 
-    client.init(ionicApp, platform, config, menuController, events).then(() => {
+  ngAfterViewInit() {
+    this.client.init(this.ionicApp, this.platform, this.config, this.menuController, this.events, this.nav, this.loadingModalComponent).then(() => {
       this.initApp();
     });
-
   }
 
   initApp() {
@@ -46,8 +60,6 @@ class topTeamerApp {
     //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
 
     this.client.platform.ready().then(() => {
-
-      this.client.initLoader();
 
       this.expandStringPrototype();
       this.declareRequestAnimationFrame();

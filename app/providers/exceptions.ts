@@ -1,4 +1,4 @@
-import {ExceptionHandler} from 'angular2/core';
+import {ExceptionHandler} from '@angular/core';
 import {Client} from './client';
 
 export class MyExceptionHandler extends ExceptionHandler {

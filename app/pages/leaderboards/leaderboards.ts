@@ -1,5 +1,5 @@
 import {Page} from 'ionic-angular';
-import {ViewChild} from 'angular2/core';
+import {ViewChild} from '@angular/core';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ContestListComponent} from '../../components/contest-list/contest-list';

@@ -88,7 +88,7 @@
                     cancelText="{{client.translate('CANCEL')}}"
                     (change)="client.logEvent('newContest/endsIn/change')"
                     (click)="client.logEvent('newContest/endsIn/click',{'endsIn': contestLocalCopy.endOption})">
-          <ion-option *ngFor="#endOptionKey of endOptionKeys"
+          <ion-option *ngFor="let endOptionKey of endOptionKeys"
                       value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
                       checked="contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value">
             {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number:
@@ -138,7 +138,7 @@
           <ion-scroll scrollY="true" [ngStyle]="{'height': contestLocalCopy.type.questions.visibleCount >=5 ? '230px' : (contestLocalCopy.type.questions.visibleCount * 46) + 'px'}">
             <ion-list>
               <ion-item
-                        *ngFor="#question of contestLocalCopy.type.questions.list, #i=index"
+                        *ngFor="let question of contestLocalCopy.type.questions.list, let i=index"
                         [hidden]="question.deleted">
                 <ion-icon class="pointer" title="{{client.translate('REMOVE_QUESTION')}}" (click)="removeQuestion(i)" name="close-circle"
                           item-right></ion-icon>

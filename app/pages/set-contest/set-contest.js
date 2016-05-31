@@ -8,7 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_angular_1 = require('ionic-angular');
-var common_1 = require('angular2/common');
+var common_1 = require('@angular/common');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
 var contest_1 = require('../../pages/contest/contest');

@@ -7,8 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('angular2/core');
-var http_1 = require('angular2/http');
+var core_1 = require('@angular/core');
+var http_1 = require('@angular/http');
 require('rxjs/add/operator/map');
 require('rxjs/add/operator/timeout');
 var ionic_native_1 = require('ionic-native');
@@ -48,7 +48,7 @@ var Client = (function () {
         }
         return Client.instance;
     };
-    Client.prototype.init = function (ionicApp, platform, config, menuController, events) {
+    Client.prototype.init = function (ionicApp, platform, config, menuController, events, nav, loadingModalComponent) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this._ionicApp = ionicApp;
@@ -56,6 +56,8 @@ var Client = (function () {
             _this._config = config;
             _this.menuController = menuController;
             _this._events = events;
+            _this._nav = nav;
+            _this.loadingModalComponent = loadingModalComponent;
             if (_this.clientInfo.mobile) {
                 if (platform.is('android')) {
                     _this.clientInfo.platform = 'android';
@@ -197,7 +199,6 @@ var Client = (function () {
     Client.prototype.setDirection = function () {
         var dir = document.createAttribute('dir');
         dir.value = this.currentLanguage.direction;
-        this._nav = this.ionicApp.getComponent('nav');
         this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
         var playerInfo = document.getElementById('playerInfo');
         if (playerInfo) {
@@ -395,9 +396,6 @@ var Client = (function () {
             return size;
         }
     };
-    Client.prototype.initLoader = function () {
-        this.loadingModalComponent = this._ionicApp.getComponent('loading');
-    };
     Client.prototype.showLoader = function () {
         var _this = this;
         if (this.loadingModalComponent) {
@@ -481,7 +479,12 @@ var Client = (function () {
     });
     Object.defineProperty(Client.prototype, "isMenuOpen", {
         get: function () {
-            return this.menuController.isOpen();
+            if (this.menuController) {
+                return this.menuController.isOpen();
+            }
+            else {
+                return false;
+            }
         },
         enumerable: true,
         configurable: true

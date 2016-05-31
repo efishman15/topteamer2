@@ -7,8 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
-var core_1 = require('angular2/core');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
 var quiz_1 = require('../../pages/quiz/quiz');
@@ -178,7 +178,7 @@ var ContestPage = (function () {
     ContestPage = __decorate([
         ionic_angular_1.Page({
             templateUrl: 'build/pages/contest/contest.html',
-            directives: [contest_chart_1.ContestChartComponent]
+            directives: [core_1.forwardRef(function () { return contest_chart_1.ContestChartComponent; })]
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], ContestPage);

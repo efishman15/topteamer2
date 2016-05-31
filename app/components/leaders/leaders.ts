@@ -1,5 +1,5 @@
 import {Client} from '../../providers/client';
-import {Component} from 'angular2/core';
+import {Component} from '@angular/core';
 import {List, Item} from 'ionic-angular';
 import * as leaderboardsService from '../../providers/leaderboards';
 import * as facebookService from '../../providers/facebook';

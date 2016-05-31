@@ -1,9 +1,9 @@
-import {Injectable} from 'angular2/core';
-import {Http, Response, Headers} from 'angular2/http';
+import {Injectable} from '@angular/core';
+import {Http, Response, Headers} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 import {Push} from 'ionic-native';
-import {IonicApp,Platform,Config, NavController, Menu, MenuController, Alert, Modal, Events} from 'ionic-angular';
+import {IonicApp,Platform,Config, Nav, Menu, MenuController, Alert, Modal, Events} from 'ionic-angular';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
 import * as contestsService from './contests';
@@ -30,7 +30,7 @@ export class Client {
   _platform:Platform;
   _config:Config;
   _events:Events;
-  _nav:NavController;
+  _nav:Nav;
   loadingModalComponent: LoadingModalComponent;
   menuController:MenuController;
   _user:User;
@@ -75,7 +75,7 @@ export class Client {
     return Client.instance;
   }
 
-  init(ionicApp:IonicApp, platform:Platform, config:Config, menuController:MenuController, events:Events) {
+  init(ionicApp:IonicApp, platform:Platform, config:Config, menuController:MenuController, events:Events, nav: Nav, loadingModalComponent: LoadingModalComponent) {
 
     return new Promise((resolve, reject) => {
 
@@ -84,6 +84,8 @@ export class Client {
       this._config = config;
       this.menuController = menuController;
       this._events = events;
+      this._nav = nav;
+      this.loadingModalComponent = loadingModalComponent;
 
       if (this.clientInfo.mobile) {
         if (platform.is('android')) {
@@ -268,7 +270,6 @@ export class Client {
   setDirection() {
     var dir = document.createAttribute('dir');
     dir.value = this.currentLanguage.direction;
-    this._nav = this.ionicApp.getComponent('nav');
     this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
 
     var playerInfo = document.getElementById('playerInfo');
@@ -492,10 +493,6 @@ export class Client {
     }
   }
 
-  initLoader() {
-    this.loadingModalComponent = this._ionicApp.getComponent('loading');
-  }
-
   showLoader() {
     if (this.loadingModalComponent) {
       setTimeout(() => {
@@ -551,7 +548,7 @@ export class Client {
     return this._events;
   }
 
-  get nav():NavController {
+  get nav():Nav {
     return this._nav;
   }
 
@@ -559,8 +556,13 @@ export class Client {
     return this._user;
   }
 
-  get isMenuOpen() {
-    return this.menuController.isOpen();
+  get isMenuOpen(): Boolean {
+    if (this.menuController) {
+      return this.menuController.isOpen();
+    }
+    else {
+      return false;
+    }
   }
 
   get endPoint():String {

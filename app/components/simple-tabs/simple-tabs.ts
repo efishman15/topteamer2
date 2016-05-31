@@ -1,4 +1,4 @@
-import {Component, Output} from 'angular2/core';
+import {Component, Output} from '@angular/core';
 import { SimpleTabComponent } from '../simple-tab/simple-tab';
 
 @Component({

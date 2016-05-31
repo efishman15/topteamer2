@@ -23,7 +23,7 @@
                   cancelText="{{client.translate('CANCEL')}}"
                   (change)="switchLanguage()"
                   (click)="client.logEvent('settings/language/click')">
-        <ion-option *ngFor="#languageKey of client.languageKeys"
+        <ion-option *ngFor="let languageKey of client.languageKeys"
                     value="{{languageKey}}"
                     checked="languageKey===client.user.settings.language">
           {{client.settings.languages[languageKey].displayNames[languageKey]}}

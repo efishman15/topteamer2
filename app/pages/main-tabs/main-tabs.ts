@@ -1,5 +1,5 @@
 import {Page, Tabs,Modal} from 'ionic-angular';
-import {ViewChild} from 'angular2/core';
+import {ViewChild} from '@angular/core';
 import {MyContestsPage} from '../my-contests/my-contests';
 import {RunningContestsPage} from '../running-contests/running-contests';
 import {LeaderboardsPage} from '../leaderboards/leaderboards';

@@ -7,8 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('angular2/core');
-var exceptions_1 = require('./providers/exceptions');
+var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var main_tabs_1 = require('./pages/main-tabs/main-tabs');
 var login_1 = require('./pages/login/login');
@@ -23,19 +22,25 @@ var contestsService = require('./providers/contests');
 var ionic_native_1 = require('ionic-native');
 var topTeamerApp = (function () {
     function topTeamerApp(ionicApp, platform, config, client, events, menuController) {
-        var _this = this;
         ionicApp.setProd(true);
+        this.ionicApp = ionicApp;
+        this.platform = platform;
+        this.config = config;
         this.client = client;
-        client.init(ionicApp, platform, config, menuController, events).then(function () {
+        this.events = events;
+        this.menuController = menuController;
+    }
+    topTeamerApp.prototype.ngAfterViewInit = function () {
+        var _this = this;
+        this.client.init(this.ionicApp, this.platform, this.config, this.menuController, this.events, this.nav, this.loadingModalComponent).then(function () {
             _this.initApp();
         });
-    }
+    };
     topTeamerApp.prototype.initApp = function () {
         //TODO: Hardware back button
         //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
         var _this = this;
         this.client.platform.ready().then(function () {
-            _this.client.initLoader();
             _this.expandStringPrototype();
             _this.declareRequestAnimationFrame();
             _this.expandDatePrototype();
@@ -271,10 +276,18 @@ var topTeamerApp = (function () {
         this.client.logEvent('menu/systemTools');
         this.client.nav.push(system_tools_1.SystemToolsPage);
     };
+    __decorate([
+        core_1.ViewChild(ionic_angular_1.Nav), 
+        __metadata('design:type', ionic_angular_1.Nav)
+    ], topTeamerApp.prototype, "nav", void 0);
+    __decorate([
+        core_1.ViewChild(loading_modal_1.LoadingModalComponent), 
+        __metadata('design:type', loading_modal_1.LoadingModalComponent)
+    ], topTeamerApp.prototype, "loadingModalComponent", void 0);
     topTeamerApp = __decorate([
         ionic_angular_1.App({
             templateUrl: 'build/app.html',
-            providers: [core_1.provide(core_1.ExceptionHandler, { useClass: exceptions_1.MyExceptionHandler }), client_1.Client],
+            providers: [client_1.Client],
             config: { backButtonText: '' },
             directives: [loading_modal_1.LoadingModalComponent]
         }), 
