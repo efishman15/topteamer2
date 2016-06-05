@@ -1,12 +1,7 @@
-import {Page, NavParams, Modal} from 'ionic-angular';
 import {Form, FormBuilder, Control, ControlGroup, Validators} from '@angular/common';
+import {Page, NavParams} from 'ionic-angular';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
-import {ContestPage} from '../../pages/contest/contest';
-import {QuestionEditorPage} from '../../pages/question-editor/question-editor';
-import {SearchQuestionsPage} from '../../pages/search-questions/search-questions';
-import {SetContestAdminPage} from '../../pages/set-contest-admin/set-contest-admin';
-import {MobileSharePage} from '../../pages/mobile-share/mobile-share';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
@@ -274,7 +269,7 @@ export class SetContestPage {
       }
     }
 
-    var modal = Modal.create(QuestionEditorPage, {
+    var modal = this.client.createModalPage('QuestionEditorPage', {
       'question': question,
       'mode': mode,
       'currentQuestions': this.contestLocalCopy.type.questions
@@ -308,10 +303,7 @@ export class SetContestPage {
       return;
     }
 
-    var modal = Modal.create(SearchQuestionsPage, {'currentQuestions': this.contestLocalCopy.type.questions});
-
-    this.client.nav.present(modal);
-
+    this.client.showModalPage('SearchQuestionsPage', {'currentQuestions': this.contestLocalCopy.type.questions});
   }
 
   removeQuestion(index) {
@@ -393,15 +385,14 @@ export class SetContestPage {
           this.client.nav.pop(options).then(() => {
             if (!this.client.user.clientInfo.mobile) {
               //For web - no animation - the share screen will be on top with its animation
-              this.client.nav.push(ContestPage, {'contest': contest}).then(() => {
+              this.client.openPage('ContestPage', {'contest': contest}).then(() => {
                 shareService.share('newContestWebPopup', contest);
               });
             }
             else {
               //Mobile - open the share mobile modal - with one button - to share or skip
-              this.client.nav.push(ContestPage, {'contest': contest}).then(() => {
-                var modal = Modal.create(MobileSharePage, {'contest': contest});
-                this.client.nav.present(modal);
+              this.client.openPage('ContestPage', {'contest': contest}).then(() => {
+                this.client.showModalPage('MobileSharePage', {'contest': contest});
               });
             }
           });
@@ -449,7 +440,7 @@ export class SetContestPage {
 
   setAdminInfo() {
 
-    this.client.nav.push(SetContestAdminPage,
+    this.client.openPage('SetContestAdminPage',
       {
         'contestLocalCopy': this.contestLocalCopy,
         'mode': this.params.data.mode,

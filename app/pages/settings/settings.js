@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
-var login_1 = require('../login/login');
 var facebookService = require('../../providers/facebook');
 var SettingsPage = (function () {
     function SettingsPage() {
@@ -41,7 +40,7 @@ var SettingsPage = (function () {
         facebookService.logout().then(function (response) {
             _this.client.logout();
             _this.client.nav.pop().then(function () {
-                _this.client.nav.setRoot(login_1.LoginPage);
+                _this.client.setRootPage('LoginPage');
             });
         });
     };

@@ -1,5 +1,4 @@
 import {Client} from './client';
-import {SharePage} from '../pages/share/share';
 import {ShareVariables} from '../objects/objects';
 
 var emailRef = '?ref=shareEmail';
@@ -84,6 +83,6 @@ export let share = (source, contest?) => {
     this.mobileShare(contest);
   }
   else {
-    client.nav.push(SharePage, {'contest' : contest});
+    client.openPage('SharePage', {'contest' : contest});
   }
 }

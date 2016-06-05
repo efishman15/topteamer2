@@ -7,14 +7,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_angular_1 = require('ionic-angular');
 var core_1 = require('@angular/core');
+var ionic_angular_1 = require('ionic-angular');
 var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var leaders_1 = require('../../components/leaders/leaders');
 var client_1 = require('../../providers/client');
-var contestsService = require('../../providers/contests');
 var LeaderboardsPage = (function () {
     function LeaderboardsPage() {
         this.mode = 'contests';
@@ -44,7 +43,7 @@ var LeaderboardsPage = (function () {
         this.leadersComponent.showWeekly();
     };
     LeaderboardsPage.prototype.onContestSelected = function (data) {
-        contestsService.openContest(data.contest._id);
+        this.client.openPage('ContestPage', { 'contestId': data.contest._id });
     };
     LeaderboardsPage.prototype.refreshList = function () {
         if (this.mode === 'contests') {

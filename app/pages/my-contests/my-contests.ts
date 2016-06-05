@@ -1,8 +1,8 @@
-import {IonicApp, Page, NavController} from 'ionic-angular';
 import {ViewChild} from '@angular/core';
+import {IonicApp, Page, NavController} from 'ionic-angular';
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Client} from '../../providers/client';
-import * as contestsService from '../../providers/contests';
+import {Contest} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/my-contests/my-contests.html',
@@ -22,14 +22,14 @@ export class MyContestsPage {
   onPageWillEnter() {
     this.client.logEvent('page/myContests');
     if (this.contestList) {
-      this.refreshList().then( () => {
+      this.refreshList().then(() => {
         this.pageLoaded = true;
       });
     }
   }
 
   ngAfterViewInit() {
-    this.refreshList().then( () => {
+    this.refreshList().then(() => {
       if (this.contestList.contests.length === 0) {
         //On load only - switch to "running contests" if no personal contests
         this.client.events.publish('topTeamer:noPersonalContests');
@@ -38,7 +38,7 @@ export class MyContestsPage {
   }
 
   onContestSelected(data) {
-    contestsService.openContest(data.contest._id);
+    this.client.openPage('ContestPage', {'contestId': data.contest._id});
   }
 
   refreshList() {

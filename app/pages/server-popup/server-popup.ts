@@ -1,13 +1,6 @@
 import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
-
-//Pages the server might want to redirect to
-import {ContestPage} from '../contest/contest';
-import {ContestParticipantsPage} from '../contest-participants/contest-participants';
-import {SetContestPage} from '../set-contest/set-contest';
-import {SettingsPage} from '../settings/settings';
-
 import * as shareService from '../../providers/share';
 import {ServerPopup} from '../../objects/objects';
 
@@ -21,8 +14,8 @@ export class ServerPopupPage {
   viewController:ViewController;
 
   constructor(params:NavParams, viewController: ViewController) {
-    this.client = Client.getInstance();
 
+    this.client = Client.getInstance();
     this.serverPopup = params.data.serverPopup;
 
     //Look for special variables such as #storeLink (based on client's platform
@@ -80,28 +73,12 @@ export class ServerPopupPage {
 
       case 'screen' :
       {
-        var screen;
-        switch(button.screen) {
-          case 'ContestPage':
-            screen = ContestPage;
-            break;
-          case 'ContestParticipantsPage':
-            screen = ContestParticipantsPage;
-            break;
-          case 'SetContestPage':
-            screen = SetContestPage;
-            break;
-          case 'SettingsPage':
-            screen = SettingsPage;
-            break;
-        }
-
         this.viewController.dismiss(button).then(() => {
           if (button.rootView) {
-            this.client.nav.setRoot(screen,button.params);
+            this.client.setRootPage(button.screen, button.params)
           }
           else {
-            this.client.nav.push(screen,button.params);
+            this.client.openPage(button.screen, button.params)
           }
         });
 

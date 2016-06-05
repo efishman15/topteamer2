@@ -9,16 +9,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
-var main_tabs_1 = require('./pages/main-tabs/main-tabs');
-var login_1 = require('./pages/login/login');
+var client_1 = require('./providers/client');
 var facebookService = require('./providers/facebook');
 var shareService = require('./providers/share');
-var client_1 = require('./providers/client');
-var settings_1 = require('./pages/settings/settings');
-var system_tools_1 = require('./pages/system-tools/system-tools');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
 var alertService = require('./providers/alert');
-var contestsService = require('./providers/contests');
 var ionic_native_1 = require('ionic-native');
 var topTeamerApp = (function () {
     function topTeamerApp(ionicApp, platform, config, client, events, menuController) {
@@ -68,7 +63,7 @@ var topTeamerApp = (function () {
                         return activeView.dismiss();
                     }
                     var page = activeView.instance;
-                    if (page instanceof main_tabs_1.MainTabsPage && page['mainTabs']) {
+                    if (page instanceof client.getPage('MainTabsPage') && page['mainTabs']) {
                         activeNav = page['mainTabs'].getSelected();
                     }
                 }
@@ -195,15 +190,15 @@ var topTeamerApp = (function () {
         facebookService.getLoginStatus().then(function (result) {
             if (result['connected']) {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
-                    _this.client.nav.setRoot(main_tabs_1.MainTabsPage).then(function () {
+                    _this.client.setRootPage('MainTabsPage').then(function () {
                         if (_this.deepLinkContestId) {
-                            contestsService.openContest(_this.deepLinkContestId);
+                            _this.client.openPage('ContestPage', { 'contestId': _this.deepLinkContestId });
                         }
                     });
                 });
             }
             else {
-                _this.client.nav.push(login_1.LoginPage);
+                _this.client.openPage('LoginPage');
             }
         });
     };
@@ -270,11 +265,11 @@ var topTeamerApp = (function () {
     };
     topTeamerApp.prototype.settings = function () {
         this.client.logEvent('menu/settings');
-        this.client.nav.push(settings_1.SettingsPage);
+        this.client.openPage('SettingsPage');
     };
     topTeamerApp.prototype.systemTools = function () {
         this.client.logEvent('menu/systemTools');
-        this.client.nav.push(system_tools_1.SystemToolsPage);
+        this.client.openPage('SystemToolsPage');
     };
     __decorate([
         core_1.ViewChild(ionic_angular_1.Nav), 

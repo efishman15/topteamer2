@@ -1,6 +1,5 @@
 import {Page,NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
-import {SetContestPage} from '../../pages/set-contest/set-contest';
 
 @Page({
   templateUrl: 'build/pages/purchase-sucess/purchase-success.html'
@@ -26,7 +25,7 @@ export class PurchaseSuccessPage {
     this.client.nav.popToRoot().then( () => {
       switch (this.client.session.features[this.params.data.featurePurchased].view.name) {
         case 'setContest':
-          this.client.nav.push(SetContestPage, this.client.session.features[this.params.data.featurePurchased].view.params);
+          this.client.openPage('SetContestPage', this.client.session.features[this.params.data.featurePurchased].view.params);
           break;
       }
     });

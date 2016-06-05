@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
-var set_contest_1 = require('../../pages/set-contest/set-contest');
 var PurchaseSuccessPage = (function () {
     function PurchaseSuccessPage(params) {
         this.client = client_1.Client.getInstance();
@@ -24,7 +23,7 @@ var PurchaseSuccessPage = (function () {
         this.client.nav.popToRoot().then(function () {
             switch (_this.client.session.features[_this.params.data.featurePurchased].view.name) {
                 case 'setContest':
-                    _this.client.nav.push(set_contest_1.SetContestPage, _this.client.session.features[_this.params.data.featurePurchased].view.params);
+                    _this.client.openPage('SetContestPage', _this.client.session.features[_this.params.data.featurePurchased].view.params);
                     break;
             }
         });

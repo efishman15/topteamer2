@@ -1,10 +1,6 @@
-import {Page, Tabs,Modal} from 'ionic-angular';
 import {ViewChild} from '@angular/core';
-import {MyContestsPage} from '../my-contests/my-contests';
-import {RunningContestsPage} from '../running-contests/running-contests';
-import {LeaderboardsPage} from '../leaderboards/leaderboards';
+import {Page, Tabs} from 'ionic-angular';
 import {Client} from '../../providers/client';
-import {ServerPopupPage} from '../server-popup/server-popup';
 
 @Page({
   templateUrl: 'build/pages/main-tabs/main-tabs.html'
@@ -21,12 +17,14 @@ export class MainTabsPage {
   private rootLeaderboardsPage;
 
   constructor() {
-    // set the root pages for each tab
-    this.rootMyContestsPage = MyContestsPage;
-    this.rootRunningContestsPage = RunningContestsPage;
-    this.rootLeaderboardsPage = LeaderboardsPage;
 
     this.client = Client.getInstance();
+
+    // set the root pages for each tab
+    this.rootMyContestsPage = this.client.getPage('MyContestsPage');
+    this.rootRunningContestsPage = this.client.getPage('RunningContestsPage');
+    this.rootLeaderboardsPage = this.client.getPage('LeaderboardsPage');
+
 
     this.client.events.subscribe('topTeamer:contestCreated', (eventData) => {
       this.needToRefreshList = true;
@@ -45,8 +43,7 @@ export class MainTabsPage {
     });
 
     this.client.events.subscribe('topTeamer:serverPopup', (eventData) => {
-      var modal = Modal.create(ServerPopupPage, {'serverPopup': eventData[0]});
-      this.client.nav.present(modal);
+      this.client.showModalPage('ServerPopupPage', {'serverPopup': eventData[0]});
     });
 
     this.client.events.subscribe('topTeamer:noPersonalContests', (eventData) => {

@@ -10,11 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
-//Pages the server might want to redirect to
-var contest_1 = require('../contest/contest');
-var contest_participants_1 = require('../contest-participants/contest-participants');
-var set_contest_1 = require('../set-contest/set-contest');
-var settings_1 = require('../settings/settings');
 var shareService = require('../../providers/share');
 var ServerPopupPage = (function () {
     function ServerPopupPage(params, viewController) {
@@ -69,27 +64,12 @@ var ServerPopupPage = (function () {
                 }
             case 'screen':
                 {
-                    var screen;
-                    switch (button.screen) {
-                        case 'ContestPage':
-                            screen = contest_1.ContestPage;
-                            break;
-                        case 'ContestParticipantsPage':
-                            screen = contest_participants_1.ContestParticipantsPage;
-                            break;
-                        case 'SetContestPage':
-                            screen = set_contest_1.SetContestPage;
-                            break;
-                        case 'SettingsPage':
-                            screen = settings_1.SettingsPage;
-                            break;
-                    }
                     this.viewController.dismiss(button).then(function () {
                         if (button.rootView) {
-                            _this.client.nav.setRoot(screen, button.params);
+                            _this.client.setRootPage(button.screen, button.params);
                         }
                         else {
-                            _this.client.nav.push(screen, button.params);
+                            _this.client.openPage(button.screen, button.params);
                         }
                     });
                     break;

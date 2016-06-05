@@ -1,6 +1,5 @@
 var _this = this;
 var client_1 = require('./client');
-var share_1 = require('../pages/share/share');
 var objects_1 = require('../objects/objects');
 var emailRef = '?ref=shareEmail';
 function adjustUrl(url) {
@@ -64,7 +63,7 @@ exports.share = function (source, contest) {
         _this.mobileShare(contest);
     }
     else {
-        client.nav.push(share_1.SharePage, { 'contest': contest });
+        client.openPage('SharePage', { 'contest': contest });
     }
 };
 //# sourceMappingURL=share.js.map

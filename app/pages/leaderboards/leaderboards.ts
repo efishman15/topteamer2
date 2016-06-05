@@ -1,11 +1,10 @@
-import {Page} from 'ionic-angular';
 import {ViewChild} from '@angular/core';
+import {Page} from 'ionic-angular';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {LeadersComponent} from '../../components/leaders/leaders';
 import {Client} from '../../providers/client';
-import * as contestsService from '../../providers/contests';
 
 @Page({
   templateUrl: 'build/pages/leaderboards/leaderboards.html',
@@ -53,7 +52,7 @@ export class LeaderboardsPage {
   }
 
   onContestSelected(data) {
-    contestsService.openContest(data.contest._id);
+    this.client.openPage('ContestPage', {'contestId': data.contest._id});
   }
 
   refreshList() {

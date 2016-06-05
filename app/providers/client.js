@@ -15,10 +15,8 @@ var ionic_native_1 = require('ionic-native');
 var ionic_angular_1 = require('ionic-angular');
 var facebookService = require('./facebook');
 var alertService = require('./alert');
-var contestsService = require('./contests');
 var objects_1 = require('../objects/objects');
-var contest_type_1 = require('../pages/contest-type/contest-type');
-var set_contest_1 = require('../pages/set-contest/set-contest');
+var classesService = require('./classes');
 var Client = (function () {
     function Client(http) {
         this.circle = Math.PI * 2;
@@ -249,7 +247,7 @@ var Client = (function () {
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData['contestId']) {
                             //TODO: QA - Check Push notification about a contest
-                            contestsService.openContest(notificationData.additionalData['contestId']);
+                            this.openPage('ContestPage', { 'contestId': notificationData.additionalData['contestId'] });
                         }
                     });
                     push.on('error', function (error) {
@@ -339,15 +337,31 @@ var Client = (function () {
     Client.prototype.openNewContest = function () {
         var _this = this;
         this.logEvent('menu/newContest');
-        var modal = ionic_angular_1.Modal.create(contest_type_1.ContestTypePage);
+        var modal = this.createModalPage('ContestTypePage');
         modal.onDismiss(function (contestTypeId) {
             if (contestTypeId) {
                 setTimeout(function () {
-                    _this.nav.push(set_contest_1.SetContestPage, { 'mode': 'add', 'typeId': contestTypeId });
+                    _this.openPage('SetContestPage', { 'mode': 'add', 'typeId': contestTypeId });
                 }, 500);
             }
         });
-        this.nav.present(modal);
+        return this.nav.present(modal);
+    };
+    Client.prototype.getPage = function (name) {
+        return classesService.get(name);
+    };
+    Client.prototype.openPage = function (name, params) {
+        return this.nav.push(classesService.get(name), params);
+    };
+    Client.prototype.createModalPage = function (name, params) {
+        return ionic_angular_1.Modal.create(classesService.get(name), params);
+    };
+    Client.prototype.showModalPage = function (name, params) {
+        var modal = this.createModalPage(name, params);
+        return this.nav.present(modal);
+    };
+    Client.prototype.setRootPage = function (name, params) {
+        return this.nav.setRoot(classesService.get(name), params);
     };
     Client.prototype.resizeWeb = function () {
         //Resize app for web

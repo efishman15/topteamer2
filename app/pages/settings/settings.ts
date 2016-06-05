@@ -1,6 +1,5 @@
-import {Page,NavParams} from 'ionic-angular';
+import {Page} from 'ionic-angular';
 import {Client} from '../../providers/client';
-import {LoginPage} from '../login/login';
 import * as facebookService from '../../providers/facebook';
 
 @Page({
@@ -44,7 +43,7 @@ export class SettingsPage {
     facebookService.logout().then((response) => {
       this.client.logout();
       this.client.nav.pop().then(() => {
-        this.client.nav.setRoot(LoginPage);
+        this.client.setRootPage('LoginPage');
       });
     });
   }

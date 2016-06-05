@@ -1,11 +1,6 @@
-import {ViewChild,forwardRef} from '@angular/core';
-import {Page, NavParams,Modal} from 'ionic-angular';
+import {ViewChild} from '@angular/core';
+import {Page, NavParams} from 'ionic-angular';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
-import {ContestParticipantsPage} from '../../pages/contest-participants/contest-participants';
-import {QuizPage} from '../../pages/quiz/quiz';
-import {SetContestPage} from '../../pages/set-contest/set-contest';
-import {FacebookPostPage} from '../../pages/facebook-post/facebook-post';
-import {NewRankPage} from '../../pages/new-rank/new-rank'
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
@@ -15,7 +10,7 @@ import {Contest,QuizResults} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [forwardRef(() => ContestChartComponent)]
+  directives: [ContestChartComponent]
 })
 
 export class ContestPage {
@@ -25,7 +20,7 @@ export class ContestPage {
   contest:Contest;
   lastQuizResults:QuizResults = null;
   animateLastResults:Boolean = false;
-  contestId:String;
+  contestId:string;
   playText: string;
 
   @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
@@ -54,8 +49,7 @@ export class ContestPage {
 
       if (this.lastQuizResults.data.facebookPost) {
         this.animateLastResults = false;
-        var modal = Modal.create(FacebookPostPage, {'quizResults': this.lastQuizResults});
-        this.client.nav.present(modal);
+        this.client.showModalPage('FacebookPostPage', {'quizResults': this.lastQuizResults});
       }
       else {
         this.animateLastResults = true;
@@ -98,11 +92,12 @@ export class ContestPage {
       'team': '' + this.contest.myTeam,
       'sourceClick': source
     });
-    this.client.nav.push(QuizPage, {'contest': this.contest, 'source': source});
+
+    this.client.openPage('QuizPage', {'contest': this.contest, 'source': source});
   }
 
   showParticipants(source) {
-    this.client.nav.push(ContestParticipantsPage, {'contest': this.contest, 'source': source});
+    this.client.openPage('ContestParticipantsPage', {'contest': this.contest, 'source': source});
   }
 
   joinContest(team, source, action:string = 'join') {
@@ -125,7 +120,7 @@ export class ContestPage {
       if (data.xpProgress && data.xpProgress.addition > 0) {
         this.client.addXp(data.xpProgress).then(() => {
           if (data.xpProgress.rankChanged) {
-            rankModal = Modal.create(NewRankPage, {
+            rankModal = this.client.createModalPage('NewRankPage', {
               'xpProgress': data.xpProgress
             });
           }
@@ -157,7 +152,7 @@ export class ContestPage {
 
   editContest() {
     this.client.logEvent('contest/edit/click', {'contestId' : this.contest._id});
-    this.client.nav.push(SetContestPage, {'mode': 'edit', 'contest': this.contest});
+    this.client.openPage('SetContestPage', {'mode': 'edit', 'contest': this.contest});
   }
 
   share(source) {

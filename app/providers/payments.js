@@ -1,6 +1,5 @@
 var client_1 = require('./client');
 var facebookService = require('./facebook');
-var purchase_success_1 = require('../pages/purchase-success/purchase-success');
 var objects_1 = require('../objects/objects');
 //------------------------------------------------------
 //-- buy
@@ -70,7 +69,7 @@ exports.buy = function (feature, isMobile) { return new Promise(function (resolv
 exports.showPurchaseSuccess = function (serverPurchaseData) {
     var client = client_1.Client.getInstance();
     client.session.features = serverPurchaseData.features;
-    client.nav.push(purchase_success_1.PurchaseSuccessPage, { 'featurePurchased': serverPurchaseData.featurePurchased });
+    client.openPage('PurchaseSuccessPage', { 'featurePurchased': serverPurchaseData.featurePurchased });
 };
 //------------------------------------------------------
 //-- processPayment

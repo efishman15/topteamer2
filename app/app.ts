@@ -1,21 +1,13 @@
 import {provide,ExceptionHandler,ViewChild} from '@angular/core';
 import {MyExceptionHandler} from './providers/exceptions';
-import {App, IonicApp, Platform, Config, Events, Modal, Alert, Nav, MenuController} from 'ionic-angular';
-import {MainTabsPage} from './pages/main-tabs/main-tabs';
-import {LoginPage} from './pages/login/login';
+import {App, IonicApp, Platform, Config, Events, Nav, MenuController} from 'ionic-angular';
+import {Client} from './providers/client';
 import * as facebookService from './providers/facebook';
 import * as shareService from './providers/share';
-import {Client} from './providers/client';
-import {ContestTypePage} from './pages/contest-type/contest-type';
-import {SetContestPage} from './pages/set-contest/set-contest';
-import {SettingsPage} from './pages/settings/settings';
-import {SystemToolsPage} from './pages/system-tools/system-tools';
 import {LoadingModalComponent} from './components/loading-modal/loading-modal';
 import * as alertService from './providers/alert';
-import * as contestsService from './providers/contests';
 import {} from './interfaces/interfaces'
 import {AppVersion} from 'ionic-native';
-import {alert} from "./providers/alert";
 
 @App({
   templateUrl: 'build/app.html',
@@ -96,7 +88,7 @@ class topTeamerApp {
             return activeView.dismiss();
           }
           var page = activeView.instance;
-          if (page instanceof MainTabsPage && page['mainTabs']) {
+          if (page instanceof client.getPage('MainTabsPage') && page['mainTabs']) {
             activeNav = page['mainTabs'].getSelected();
           }
         }
@@ -248,15 +240,15 @@ class topTeamerApp {
     facebookService.getLoginStatus().then((result) => {
       if (result['connected']) {
         this.client.facebookServerConnect(result['response'].authResponse).then(() => {
-          this.client.nav.setRoot(MainTabsPage).then(() => {
+          this.client.setRootPage('MainTabsPage').then(() => {
             if (this.deepLinkContestId) {
-              contestsService.openContest(this.deepLinkContestId);
+              this.client.openPage('ContestPage', {'contestId' : this.deepLinkContestId});
             }
           });
         })
       }
       else {
-        this.client.nav.push(LoginPage);
+        this.client.openPage('LoginPage');
       }
     });
   }
@@ -336,11 +328,11 @@ class topTeamerApp {
 
   settings() {
     this.client.logEvent('menu/settings');
-    this.client.nav.push(SettingsPage);
+    this.client.openPage('SettingsPage');
   }
 
   systemTools() {
     this.client.logEvent('menu/systemTools');
-    this.client.nav.push(SystemToolsPage);
+    this.client.openPage('SystemToolsPage');
   }
 }

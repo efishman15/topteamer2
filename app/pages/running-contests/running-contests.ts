@@ -1,8 +1,7 @@
-import {IonicApp, Page, NavController} from 'ionic-angular';
 import {ViewChild} from '@angular/core';
+import {IonicApp, Page, NavController} from 'ionic-angular';
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Client} from '../../providers/client';
-import * as contestsService from '../../providers/contests';
 
 @Page({
   templateUrl: 'build/pages/running-contests/running-contests.html',
@@ -30,7 +29,7 @@ export class RunningContestsPage {
   }
 
   onContestSelected(data) {
-    contestsService.openContest(data.contest._id);
+    this.client.openPage('ContestPage', {'contestId': data.contest._id});
   }
 
   refreshList() {

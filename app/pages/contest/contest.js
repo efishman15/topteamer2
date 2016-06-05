@@ -10,11 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
-var contest_participants_1 = require('../../pages/contest-participants/contest-participants');
-var quiz_1 = require('../../pages/quiz/quiz');
-var set_contest_1 = require('../../pages/set-contest/set-contest');
-var facebook_post_1 = require('../../pages/facebook-post/facebook-post');
-var new_rank_1 = require('../../pages/new-rank/new-rank');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var alertService = require('../../providers/alert');
@@ -43,8 +38,7 @@ var ContestPage = (function () {
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
                 _this.animateLastResults = false;
-                var modal = ionic_angular_1.Modal.create(facebook_post_1.FacebookPostPage, { 'quizResults': _this.lastQuizResults });
-                _this.client.nav.present(modal);
+                _this.client.showModalPage('FacebookPostPage', { 'quizResults': _this.lastQuizResults });
             }
             else {
                 _this.animateLastResults = true;
@@ -79,10 +73,10 @@ var ContestPage = (function () {
             'team': '' + this.contest.myTeam,
             'sourceClick': source
         });
-        this.client.nav.push(quiz_1.QuizPage, { 'contest': this.contest, 'source': source });
+        this.client.openPage('QuizPage', { 'contest': this.contest, 'source': source });
     };
     ContestPage.prototype.showParticipants = function (source) {
-        this.client.nav.push(contest_participants_1.ContestParticipantsPage, { 'contest': this.contest, 'source': source });
+        this.client.openPage('ContestParticipantsPage', { 'contest': this.contest, 'source': source });
     };
     ContestPage.prototype.joinContest = function (team, source, action) {
         var _this = this;
@@ -101,7 +95,7 @@ var ContestPage = (function () {
             if (data.xpProgress && data.xpProgress.addition > 0) {
                 _this.client.addXp(data.xpProgress).then(function () {
                     if (data.xpProgress.rankChanged) {
-                        rankModal = ionic_angular_1.Modal.create(new_rank_1.NewRankPage, {
+                        rankModal = _this.client.createModalPage('NewRankPage', {
                             'xpProgress': data.xpProgress
                         });
                     }
@@ -128,7 +122,7 @@ var ContestPage = (function () {
     };
     ContestPage.prototype.editContest = function () {
         this.client.logEvent('contest/edit/click', { 'contestId': this.contest._id });
-        this.client.nav.push(set_contest_1.SetContestPage, { 'mode': 'edit', 'contest': this.contest });
+        this.client.openPage('SetContestPage', { 'mode': 'edit', 'contest': this.contest });
     };
     ContestPage.prototype.share = function (source) {
         shareService.share(source, this.contest);
@@ -178,7 +172,7 @@ var ContestPage = (function () {
     ContestPage = __decorate([
         ionic_angular_1.Page({
             templateUrl: 'build/pages/contest/contest.html',
-            directives: [core_1.forwardRef(function () { return contest_chart_1.ContestChartComponent; })]
+            directives: [contest_chart_1.ContestChartComponent]
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], ContestPage);

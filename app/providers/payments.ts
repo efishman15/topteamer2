@@ -1,6 +1,5 @@
 import {Client} from './client';
 import * as facebookService from './facebook';
-import {PurchaseSuccessPage} from '../pages/purchase-success/purchase-success'
 import {Feature,PaymentData,PurchaseData} from '../objects/objects';
 
 //------------------------------------------------------
@@ -85,7 +84,7 @@ export let showPurchaseSuccess = (serverPurchaseData) => {
   var client = Client.getInstance();
 
   client.session.features = serverPurchaseData.features
-  client.nav.push(PurchaseSuccessPage, {'featurePurchased': serverPurchaseData.featurePurchased});
+  client.openPage('PurchaseSuccessPage', {'featurePurchased': serverPurchaseData.featurePurchased});
 };
 
 //------------------------------------------------------

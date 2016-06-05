@@ -1,5 +1,4 @@
 var client_1 = require('./client');
-var contest_1 = require('../pages/contest/contest');
 //------------------------------------------------------
 //-- list
 //------------------------------------------------------
@@ -24,16 +23,6 @@ exports.getContest = function (contestId) {
     var client = client_1.Client.getInstance();
     return client.serverPost('contests/get', postData);
 };
-//------------------------------------------------------
-//-- openContest
-//------------------------------------------------------
-exports.openContest = function (contestId) { return new Promise(function (resolve, reject) {
-    var client = client_1.Client.getInstance();
-    exports.getContest(contestId).then(function (contest) {
-        client.nav.push(contest_1.ContestPage, { 'contest': contest });
-        resolve();
-    });
-}); };
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------

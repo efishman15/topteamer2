@@ -10,9 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var ionic_angular_1 = require('ionic-angular');
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
-var question_stats_1 = require('../../pages/question-stats/question-stats');
-var question_editor_1 = require('../../pages/question-editor/question-editor');
-var new_rank_1 = require('../../pages/new-rank/new-rank');
 var client_1 = require('../../providers/client');
 var quizService = require('../../providers/quiz');
 var soundService = require('../../providers/sound');
@@ -172,7 +169,7 @@ var QuizPage = (function () {
                         _this.quizProceed();
                     }
                     else {
-                        var modal = ionic_angular_1.Modal.create(new_rank_1.NewRankPage, {
+                        var modal = _this.client.createModalPage('NewRankPage', {
                             'xpProgress': _this.quizData.xpProgress
                         });
                         modal.onDismiss(function (okPressed) {
@@ -248,7 +245,7 @@ var QuizPage = (function () {
                         questionChart.chart.paletteColors = this.client.settings.charts.questionStats.colors.incorrect + ',' + this.client.settings.charts.questionStats.colors.correct;
                     }
                 }
-                var modal = ionic_angular_1.Modal.create(question_stats_1.QuestionStatsPage, {
+                var modal = this.client.createModalPage('QuestionStatsPage', {
                     'question': this.quizData.currentQuestion,
                     'chartDataSource': questionChart
                 });
@@ -470,7 +467,7 @@ var QuizPage = (function () {
         for (var i = 0; i < this.quizData.currentQuestion.answers.length; i++) {
             question.answers[this.quizData.currentQuestion.answers[i].originalIndex] = this.quizData.currentQuestion.answers[i].text;
         }
-        var modal = ionic_angular_1.Modal.create(question_editor_1.QuestionEditorPage, { 'question': question, 'mode': 'edit' });
+        var modal = this.client.createModalPage('QuestionEditorPage', { 'question': question, 'mode': 'edit' });
         modal.onDismiss(function (result) {
             if (!result) {
                 return;

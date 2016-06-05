@@ -7,21 +7,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_angular_1 = require('ionic-angular');
 var core_1 = require('@angular/core');
-var my_contests_1 = require('../my-contests/my-contests');
-var running_contests_1 = require('../running-contests/running-contests');
-var leaderboards_1 = require('../leaderboards/leaderboards');
+var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
-var server_popup_1 = require('../server-popup/server-popup');
 var MainTabsPage = (function () {
     function MainTabsPage() {
         var _this = this;
-        // set the root pages for each tab
-        this.rootMyContestsPage = my_contests_1.MyContestsPage;
-        this.rootRunningContestsPage = running_contests_1.RunningContestsPage;
-        this.rootLeaderboardsPage = leaderboards_1.LeaderboardsPage;
         this.client = client_1.Client.getInstance();
+        // set the root pages for each tab
+        this.rootMyContestsPage = this.client.getPage('MyContestsPage');
+        this.rootRunningContestsPage = this.client.getPage('RunningContestsPage');
+        this.rootLeaderboardsPage = this.client.getPage('LeaderboardsPage');
         this.client.events.subscribe('topTeamer:contestCreated', function (eventData) {
             _this.needToRefreshList = true;
         });
@@ -35,8 +31,7 @@ var MainTabsPage = (function () {
             _this.needToRefreshList = true;
         });
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
-            var modal = ionic_angular_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
-            _this.client.nav.present(modal);
+            _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
         });
         this.client.events.subscribe('topTeamer:noPersonalContests', function (eventData) {
             _this.mainTabs.select(1); //Switch to "Running contests"

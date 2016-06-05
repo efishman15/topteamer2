@@ -7,15 +7,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_angular_1 = require('ionic-angular');
 var common_1 = require('@angular/common');
+var ionic_angular_1 = require('ionic-angular');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
-var contest_1 = require('../../pages/contest/contest');
-var question_editor_1 = require('../../pages/question-editor/question-editor');
-var search_questions_1 = require('../../pages/search-questions/search-questions');
-var set_contest_admin_1 = require('../../pages/set-contest-admin/set-contest-admin');
-var mobile_share_1 = require('../../pages/mobile-share/mobile-share');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
 var alertService = require('../../providers/alert');
@@ -217,7 +212,7 @@ var SetContestPage = (function () {
                 return;
             }
         }
-        var modal = ionic_angular_1.Modal.create(question_editor_1.QuestionEditorPage, {
+        var modal = this.client.createModalPage('QuestionEditorPage', {
             'question': question,
             'mode': mode,
             'currentQuestions': this.contestLocalCopy.type.questions
@@ -245,8 +240,7 @@ var SetContestPage = (function () {
             alertService.alert(this.client.translate('MAX_USER_QUESTIONS_REACHED', { max: this.client.settings['newContest'].privateQuestions.max }));
             return;
         }
-        var modal = ionic_angular_1.Modal.create(search_questions_1.SearchQuestionsPage, { 'currentQuestions': this.contestLocalCopy.type.questions });
-        this.client.nav.present(modal);
+        this.client.showModalPage('SearchQuestionsPage', { 'currentQuestions': this.contestLocalCopy.type.questions });
     };
     SetContestPage.prototype.removeQuestion = function (index) {
         var _this = this;
@@ -316,15 +310,14 @@ var SetContestPage = (function () {
                     _this.client.nav.pop(options).then(function () {
                         if (!_this.client.user.clientInfo.mobile) {
                             //For web - no animation - the share screen will be on top with its animation
-                            _this.client.nav.push(contest_1.ContestPage, { 'contest': contest }).then(function () {
+                            _this.client.openPage('ContestPage', { 'contest': contest }).then(function () {
                                 shareService.share('newContestWebPopup', contest);
                             });
                         }
                         else {
                             //Mobile - open the share mobile modal - with one button - to share or skip
-                            _this.client.nav.push(contest_1.ContestPage, { 'contest': contest }).then(function () {
-                                var modal = ionic_angular_1.Modal.create(mobile_share_1.MobileSharePage, { 'contest': contest });
-                                _this.client.nav.present(modal);
+                            _this.client.openPage('ContestPage', { 'contest': contest }).then(function () {
+                                _this.client.showModalPage('MobileSharePage', { 'contest': contest });
                             });
                         }
                     });
@@ -364,7 +357,7 @@ var SetContestPage = (function () {
         return { matchingTeams: true };
     };
     SetContestPage.prototype.setAdminInfo = function () {
-        this.client.nav.push(set_contest_admin_1.SetContestAdminPage, {
+        this.client.openPage('SetContestAdminPage', {
             'contestLocalCopy': this.contestLocalCopy,
             'mode': this.params.data.mode,
             'title': this.title

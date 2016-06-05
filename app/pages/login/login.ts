@@ -1,8 +1,6 @@
-import {Page,Modal} from 'ionic-angular';
-import {MainTabsPage} from '../main-tabs/main-tabs';
+import {Page} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
-import {ServerPopupPage} from '../server-popup/server-popup';
 
 @Page({
   templateUrl: 'build/pages/login/login.html'
@@ -15,8 +13,7 @@ export class LoginPage {
     this.client = Client.getInstance();
 
     this.client.events.subscribe('topTeamer:serverPopup', (eventData) => {
-      var modal = Modal.create(ServerPopupPage, {'serverPopup': eventData[0]});
-      this.client.nav.present(modal);
+      this.client.showModalPage('ServerPopupPage', {'serverPopup': eventData[0]});
     });
 
   }
@@ -38,7 +35,7 @@ export class LoginPage {
     this.client.logEvent('login/facebookLogin');
     facebookService.login().then((response) => {
       this.client.facebookServerConnect(response['authResponse']).then(() => {
-        this.client.nav.setRoot(MainTabsPage);
+        this.client.setRootPage('MainTabsPage');
       })
     });
   };

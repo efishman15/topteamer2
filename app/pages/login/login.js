@@ -8,17 +8,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var ionic_angular_1 = require('ionic-angular');
-var main_tabs_1 = require('../main-tabs/main-tabs');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
-var server_popup_1 = require('../server-popup/server-popup');
 var LoginPage = (function () {
     function LoginPage() {
         var _this = this;
         this.client = client_1.Client.getInstance();
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
-            var modal = ionic_angular_1.Modal.create(server_popup_1.ServerPopupPage, { 'serverPopup': eventData[0] });
-            _this.client.nav.present(modal);
+            _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
         });
     }
     LoginPage.prototype.onPageLoaded = function () {
@@ -36,7 +33,7 @@ var LoginPage = (function () {
         this.client.logEvent('login/facebookLogin');
         facebookService.login().then(function (response) {
             _this.client.facebookServerConnect(response['authResponse']).then(function () {
-                _this.client.nav.setRoot(main_tabs_1.MainTabsPage);
+                _this.client.setRootPage('MainTabsPage');
             });
         });
     };

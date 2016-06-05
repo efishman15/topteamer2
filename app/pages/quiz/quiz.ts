@@ -1,16 +1,12 @@
-import {Page, NavParams,Modal} from 'ionic-angular';
+import {Page, NavParams} from 'ionic-angular';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener';
 import {TransitionListener} from '../../directives/transition-listener/transition-listener';
-import {QuestionStatsPage} from '../../pages/question-stats/question-stats';
-import {QuestionEditorPage} from '../../pages/question-editor/question-editor';
-import {NewRankPage} from '../../pages/new-rank/new-rank';
 import {Client} from '../../providers/client';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
 import * as shareService from '../../providers/share';
 import * as alertService from '../../providers/alert';
-import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings} from '../../objects/objects';
-import {ChartSettings} from "../../objects/objects";
+import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings,ChartSettings} from '../../objects/objects';
 
 @Page({
   templateUrl: 'build/pages/quiz/quiz.html',
@@ -221,7 +217,7 @@ export class QuizPage {
             this.quizProceed();
           }
           else {
-            var modal = Modal.create(NewRankPage, {
+            var modal = this.client.createModalPage('NewRankPage', {
               'xpProgress': this.quizData.xpProgress
             });
 
@@ -313,7 +309,7 @@ export class QuizPage {
           }
         }
 
-        var modal = Modal.create(QuestionStatsPage, {
+        var modal = this.client.createModalPage('QuestionStatsPage', {
           'question': this.quizData.currentQuestion,
           'chartDataSource': questionChart
         });
@@ -580,7 +576,7 @@ export class QuizPage {
     for (var i = 0; i < this.quizData.currentQuestion.answers.length; i++) {
       question.answers[this.quizData.currentQuestion.answers[i].originalIndex] = this.quizData.currentQuestion.answers[i].text;
     }
-    var modal = Modal.create(QuestionEditorPage, {'question': question, 'mode': 'edit'});
+    var modal = this.client.createModalPage('QuestionEditorPage', {'question': question, 'mode': 'edit'});
     modal.onDismiss((result) => {
       if (!result) {
         return;

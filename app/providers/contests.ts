@@ -1,5 +1,4 @@
 import {Client} from './client';
-import {ContestPage} from '../pages/contest/contest'
 
 //------------------------------------------------------
 //-- list
@@ -28,19 +27,6 @@ export let getContest = (contestId:string) => {
   var client = Client.getInstance();
   return client.serverPost('contests/get', postData);
 }
-
-//------------------------------------------------------
-//-- openContest
-//------------------------------------------------------
-export let openContest = (contestId:string) => new Promise((resolve, reject) => {
-
-  var client = Client.getInstance();
-
-  getContest(contestId).then((contest) => {
-    client.nav.push(ContestPage, {'contest': contest});
-    resolve();
-  })
-})
 
 //------------------------------------------------------
 //-- openContest

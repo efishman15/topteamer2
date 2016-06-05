@@ -6,11 +6,9 @@ import {Push} from 'ionic-native';
 import {IonicApp,Platform,Config, Nav, Menu, MenuController, Alert, Modal, Events} from 'ionic-angular';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
-import * as contestsService from './contests';
 import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo} from '../objects/objects';
 import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
-import {ContestTypePage} from '../pages/contest-type/contest-type';
-import {SetContestPage} from '../pages/set-contest/set-contest';
+import * as classesService from './classes';
 
 @Injectable()
 export class Client {
@@ -339,7 +337,7 @@ export class Client {
           push.on('notification', function (notificationData) {
             if (notificationData.additionalData && notificationData.additionalData['contestId']) {
               //TODO: QA - Check Push notification about a contest
-              contestsService.openContest(notificationData.additionalData['contestId']);
+              this.openPage('ContestPage', {'contestId' : notificationData.additionalData['contestId']})
             }
           });
 
@@ -436,15 +434,36 @@ export class Client {
 
   openNewContest() {
     this.logEvent('menu/newContest');
-    var modal = Modal.create(ContestTypePage);
+    var modal = this.createModalPage('ContestTypePage');
     modal.onDismiss((contestTypeId) => {
       if (contestTypeId) {
         setTimeout(() => {
-          this.nav.push(SetContestPage, {'mode': 'add', 'typeId': contestTypeId});
+          this.openPage('SetContestPage', {'mode': 'add', 'typeId': contestTypeId});
         }, 500);
       }
     });
-    this.nav.present(modal);
+    return this.nav.present(modal);
+  }
+
+  getPage(name: string) {
+    return classesService.get(name);
+  }
+
+  openPage(name: string, params?: any) {
+    return this.nav.push(classesService.get(name), params);
+  }
+
+  createModalPage(name: string, params?: any) {
+    return Modal.create(classesService.get(name), params);
+  }
+
+  showModalPage(name: string, params?: any) {
+    var modal = this.createModalPage(name, params);
+    return this.nav.present(modal);
+  }
+
+  setRootPage(name: string, params?: any) {
+    return this.nav.setRoot(classesService.get(name), params);
   }
 
   resizeWeb() {
