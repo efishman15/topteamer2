@@ -23,7 +23,8 @@ var ServerPopupPage = (function () {
         }
         this.viewController = viewController;
     }
-    ServerPopupPage.prototype.onPageWillEnter = function () {
+    //The only life cycle eve currently called in modals
+    ServerPopupPage.prototype.ngAfterViewInit = function () {
         this.client.logEvent('page/serverPopup', { 'title': this.serverPopup.title, 'message': this.serverPopup.message });
     };
     ServerPopupPage.prototype.buttonAction = function (button) {

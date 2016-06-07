@@ -77,16 +77,6 @@
   text-shadow: 1px 1px 0 #2c2c52;
 }
 
-.app-fab-left {
-  bottom: 10px;
-  right: 10px;
-}
-
-.app-fab-right {
-  bottom: 10px;
-  left: 10px;
-}
-
 .select-text {
   padding-left: 10px;
 }
@@ -105,4 +95,9 @@
 
 .app-smaller-title {
   font-size: 18px !important;
+}
+
+.app-fab-padding {
+  padding-left: 25px;
+  padding-right: 25px;
 }

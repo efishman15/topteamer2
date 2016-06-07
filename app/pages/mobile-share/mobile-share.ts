@@ -18,7 +18,8 @@ export class MobileSharePage {
     this.viewController = viewController;
   }
 
-  onPageWillEnter() {
+  //The only life cycle eve currently called in modals
+  ngAfterViewInit() {
     this.client.logEvent('page/mobileShare', {'contestId' : this.contest._id});
   }
 

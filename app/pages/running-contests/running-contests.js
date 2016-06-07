@@ -25,7 +25,7 @@ var RunningContestsPage = (function () {
         this.refreshList();
     };
     RunningContestsPage.prototype.onContestSelected = function (data) {
-        this.client.openPage('ContestPage', { 'contestId': data.contest._id });
+        this.client.displayContest(data.contest._id);
     };
     RunningContestsPage.prototype.refreshList = function () {
         this.contestList.refresh();

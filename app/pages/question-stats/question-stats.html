@@ -14,38 +14,41 @@
 
 <ion-content class="app-bg">
 
-  <div padding-top padding-left padding-right text-center dir="{{question.direction}}">
-    <h5 class="center question-text" [innerHtml]="question.text"></h5>
-  </div>
+  <div padding-top padding-left padding-right text-center>
 
-  <div padding-top text-center
-       class="no-margin"
-       [ngStyle]="{'width': width + 'px'}">
+    <div dir="{{question.direction}}">
+      <h5 class="center question-text" [innerHtml]="question.text"></h5>
+    </div>
 
-    <div text-center class="chart">
-      <div text-center class="chart-radius">
+    <div padding-top text-center
+         class="no-margin"
+         [ngStyle]="{'width': width + 'px'}">
+
+      <div *ngIf="chartDataSource" text-center class="chart">
+        <div text-center class="chart-radius">
+        </div>
+        <div class="question-chart-container"
+             id="questionChart"
+             [ngStyle]="{'height': height + 'px'}">
+        </div>
       </div>
-      <div class="question-chart-container"
-           *ngIf="chartDataSource" id="questionChart"
-           [ngStyle]="{'height': height + 'px'}">
+
+      <div padding-top>
+        <button block *ngIf="question.wikipediaHint"
+                class="button-small app-button-light-blue"
+                (click)="dismiss('hint')">
+          {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
+        </button>
       </div>
-    </div>
+      <div padding-top>
+        <button block *ngIf="question.wikipediaAnswer"
+                class="button-small app-button-light-purple"
+                (click)="dismiss('answer')">
+          {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
+        </button>
+      </div>
 
-    <div padding-top>
-      <button block *ngIf="question.wikipediaHint"
-              class="button-small app-button-light-blue"
-              (click)="dismiss('hint')">
-        {{ client.translate('HINT_FOR_SCORE',{score : question.hintCost}) }}
-      </button>
     </div>
-    <div padding-top>
-      <button block *ngIf="question.wikipediaAnswer"
-              class="button-small app-button-light-purple"
-              (click)="dismiss('answer')">
-        {{ client.translate('ANSWER_FOR_SCORE',{score : question.answerCost}) }}
-      </button>
-    </div>
-
   </div>
 
 </ion-content>

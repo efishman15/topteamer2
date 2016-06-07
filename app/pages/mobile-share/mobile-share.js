@@ -16,7 +16,8 @@ var MobileSharePage = (function () {
         this.contest = params.data.contest;
         this.viewController = viewController;
     }
-    MobileSharePage.prototype.onPageWillEnter = function () {
+    //The only life cycle eve currently called in modals
+    MobileSharePage.prototype.ngAfterViewInit = function () {
         this.client.logEvent('page/mobileShare', { 'contestId': this.contest._id });
     };
     MobileSharePage.prototype.dismiss = function (okPressed) {

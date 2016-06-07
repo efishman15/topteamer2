@@ -39,6 +39,7 @@ var QuestionEditorPage = (function () {
             answer3Control: this.answer3Control
         });
         this.currentQuestions = params.data.currentQuestions;
+        this.submitted = false;
     }
     QuestionEditorPage.prototype.ngOnInit = function () {
         //Bypassing what seems to be an angular2 bug: cannot set an interpolated expression for maxlength in textarea html5 object
@@ -58,13 +59,13 @@ var QuestionEditorPage = (function () {
         maxLengthAttrAnswer3.value = '' + this.client.settings.quiz.question.answer.maxLength;
         document.getElementById('answer3Control').children[0].attributes.setNamedItem(maxLengthAttrAnswer3);
     };
-    QuestionEditorPage.prototype.onPageWillEnter = function () {
+    //The only life cycle eve currently called in modals
+    QuestionEditorPage.prototype.ngAfterViewInit = function () {
         var eventData = { 'mode': this.mode };
         if (this.mode === 'edit') {
             eventData['questionId'] = this.question._id;
         }
         this.client.logEvent('page/questionEditor', eventData);
-        this.submitted = false;
     };
     QuestionEditorPage.prototype.dismiss = function (applyChanges) {
         this.client.logEvent('question/' + (applyChanges ? 'set' : 'cancel'));

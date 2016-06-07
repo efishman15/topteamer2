@@ -18,7 +18,8 @@ var SearchQuestionsPage = (function () {
         this.currentQuestions = params.data.currentQuestions;
         this.searchText = '';
     }
-    SearchQuestionsPage.prototype.onPageWillEnter = function () {
+    //The only life cycle eve currently called in modals
+    SearchQuestionsPage.prototype.ngAfterViewInit = function () {
         this.client.logEvent('page/searchQuestions');
     };
     SearchQuestionsPage.prototype.search = function (event) {

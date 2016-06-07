@@ -242,7 +242,7 @@ class topTeamerApp {
         this.client.facebookServerConnect(result['response'].authResponse).then(() => {
           this.client.setRootPage('MainTabsPage').then(() => {
             if (this.deepLinkContestId) {
-              this.client.openPage('ContestPage', {'contestId' : this.deepLinkContestId});
+              this.client.displayContest(this.deepLinkContestId);
             }
           });
         })

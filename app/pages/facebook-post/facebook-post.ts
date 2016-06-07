@@ -18,7 +18,8 @@ export class FacebookPostPage {
     this.quizResults = params.data.quizResults;
   }
 
-  onPageWillEnter() {
+  //The only life cycle eve currently called in modals
+  ngAfterViewInit() {
     this.client.logEvent('page/facebookPost', {'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey});
   }
 

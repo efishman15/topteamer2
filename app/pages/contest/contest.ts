@@ -16,11 +16,9 @@ import {Contest,QuizResults} from '../../objects/objects';
 export class ContestPage {
 
   client:Client;
-  params:NavParams;
   contest:Contest;
   lastQuizResults:QuizResults = null;
-  animateLastResults:Boolean = false;
-  contestId:string;
+  animateLastResults:boolean = false;
   playText: string;
 
   @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
@@ -28,19 +26,8 @@ export class ContestPage {
   constructor(params:NavParams) {
 
     this.client = Client.getInstance();
-    this.params = params;
-
-    if (this.params.data.contest) {
-      this.contestId = this.params.data.contest._id;
-      this.contest = this.params.data.contest;
-    }
-    else {
-      //Retrieve contest by id
-      this.contestId = this.params.data.contestId;
-      contestsService.getContest(this.params.data.contestId).then((contest) => {
-        this.contest = contest;
-      });
-    }
+    this.contest = params.data.contest;
+    this.setPlayText();
 
     this.client.events.subscribe('topTeamer:quizFinished', (eventData) => {
       //Event data comes as an array of data objects - we expect only one (last quiz results)
@@ -73,12 +60,8 @@ export class ContestPage {
     });
   }
 
-  ngOnInit() {
-    this.setPlayText();
-  }
-
   onPageWillEnter() {
-    this.client.logEvent('page/contest',{'contestId' : this.contestId});
+    this.client.logEvent('page/contest',{'contestId' : this.contest._id});
   }
 
   onPageWillLeave() {

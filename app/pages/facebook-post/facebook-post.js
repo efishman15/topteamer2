@@ -16,7 +16,8 @@ var FacebookPostPage = (function () {
         this.client = client_1.Client.getInstance();
         this.quizResults = params.data.quizResults;
     }
-    FacebookPostPage.prototype.onPageWillEnter = function () {
+    //The only life cycle eve currently called in modals
+    FacebookPostPage.prototype.ngAfterViewInit = function () {
         this.client.logEvent('page/facebookPost', { 'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey });
     };
     FacebookPostPage.prototype.post = function () {

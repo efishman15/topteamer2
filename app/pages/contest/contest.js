@@ -21,18 +21,8 @@ var ContestPage = (function () {
         this.lastQuizResults = null;
         this.animateLastResults = false;
         this.client = client_1.Client.getInstance();
-        this.params = params;
-        if (this.params.data.contest) {
-            this.contestId = this.params.data.contest._id;
-            this.contest = this.params.data.contest;
-        }
-        else {
-            //Retrieve contest by id
-            this.contestId = this.params.data.contestId;
-            contestsService.getContest(this.params.data.contestId).then(function (contest) {
-                _this.contest = contest;
-            });
-        }
+        this.contest = params.data.contest;
+        this.setPlayText();
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
@@ -57,11 +47,8 @@ var ContestPage = (function () {
             _this.setPlayText();
         });
     }
-    ContestPage.prototype.ngOnInit = function () {
-        this.setPlayText();
-    };
     ContestPage.prototype.onPageWillEnter = function () {
-        this.client.logEvent('page/contest', { 'contestId': this.contestId });
+        this.client.logEvent('page/contest', { 'contestId': this.contest._id });
     };
     ContestPage.prototype.onPageWillLeave = function () {
         this.animateLastResults = false;

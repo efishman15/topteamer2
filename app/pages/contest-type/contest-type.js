@@ -14,7 +14,8 @@ var ContestTypePage = (function () {
         this.client = client_1.Client.getInstance();
         this.viewController = viewController;
     }
-    ContestTypePage.prototype.onPageWillEnter = function () {
+    //The only life cycle eve currently called in modals
+    ContestTypePage.prototype.ngAfterViewInit = function () {
         this.client.logEvent('page/contestType');
     };
     ContestTypePage.prototype.selectContestContent = function (contestTypeId) {

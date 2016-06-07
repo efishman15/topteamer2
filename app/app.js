@@ -192,7 +192,7 @@ var topTeamerApp = (function () {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
                     _this.client.setRootPage('MainTabsPage').then(function () {
                         if (_this.deepLinkContestId) {
-                            _this.client.openPage('ContestPage', { 'contestId': _this.deepLinkContestId });
+                            _this.client.displayContest(_this.deepLinkContestId);
                         }
                     });
                 });

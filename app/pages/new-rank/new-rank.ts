@@ -15,13 +15,12 @@ export class NewRankPage {
     this.client = Client.getInstance();
     this.xpProgress = params.data.xpProgress;
     this.viewController = viewController;
-  }
-
-  onPageWillEnter() {
     this.client.logEvent('page/newRank', {'rank' : this.client.session.rank});
   }
 
-  onPageDidEnter() {
+  //The only life cycle eve currently called in modals
+  ngAfterViewInit() {
+    this.client.logEvent('page/newRank', {'rank' : this.client.session.rank});
     soundService.play('audio/finish_great_1');
   }
 

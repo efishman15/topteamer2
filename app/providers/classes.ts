@@ -11,6 +11,7 @@ import {NewRankPage} from '../pages/new-rank/new-rank';
 import {PurchaseSuccessPage} from '../pages/purchase-success/purchase-success';
 import {QuestionEditorPage} from '../pages/question-editor/question-editor';
 import {QuestionStatsPage} from '../pages/question-stats/question-stats';
+import {QuizPage} from '../pages/quiz/quiz';
 import {RunningContestsPage} from '../pages/running-contests/running-contests';
 import {SearchQuestionsPage} from '../pages/search-questions/search-questions';
 import {ServerPopupPage} from '../pages/server-popup/server-popup';
@@ -53,6 +54,8 @@ export let get = (className:string) => {
       return <any>QuestionEditorPage;
     case 'QuestionStatsPage':
       return <any>QuestionStatsPage;
+    case 'QuizPage':
+      return <any>QuizPage;
     case 'RunningContestsPage':
       return <any>RunningContestsPage;
     case 'SearchQuestionsPage':

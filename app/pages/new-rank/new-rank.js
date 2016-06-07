@@ -15,11 +15,11 @@ var NewRankPage = (function () {
         this.client = client_1.Client.getInstance();
         this.xpProgress = params.data.xpProgress;
         this.viewController = viewController;
-    }
-    NewRankPage.prototype.onPageWillEnter = function () {
         this.client.logEvent('page/newRank', { 'rank': this.client.session.rank });
-    };
-    NewRankPage.prototype.onPageDidEnter = function () {
+    }
+    //The only life cycle eve currently called in modals
+    NewRankPage.prototype.ngAfterViewInit = function () {
+        this.client.logEvent('page/newRank', { 'rank': this.client.session.rank });
         soundService.play('audio/finish_great_1');
     };
     NewRankPage.prototype.dismiss = function (okPressed) {

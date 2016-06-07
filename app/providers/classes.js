@@ -11,6 +11,7 @@ var new_rank_1 = require('../pages/new-rank/new-rank');
 var purchase_success_1 = require('../pages/purchase-success/purchase-success');
 var question_editor_1 = require('../pages/question-editor/question-editor');
 var question_stats_1 = require('../pages/question-stats/question-stats');
+var quiz_1 = require('../pages/quiz/quiz');
 var running_contests_1 = require('../pages/running-contests/running-contests');
 var search_questions_1 = require('../pages/search-questions/search-questions');
 var server_popup_1 = require('../pages/server-popup/server-popup');
@@ -50,6 +51,8 @@ exports.get = function (className) {
             return question_editor_1.QuestionEditorPage;
         case 'QuestionStatsPage':
             return question_stats_1.QuestionStatsPage;
+        case 'QuizPage':
+            return quiz_1.QuizPage;
         case 'RunningContestsPage':
             return running_contests_1.RunningContestsPage;
         case 'SearchQuestionsPage':

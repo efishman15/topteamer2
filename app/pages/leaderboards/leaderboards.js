@@ -43,7 +43,7 @@ var LeaderboardsPage = (function () {
         this.leadersComponent.showWeekly();
     };
     LeaderboardsPage.prototype.onContestSelected = function (data) {
-        this.client.openPage('ContestPage', { 'contestId': data.contest._id });
+        this.client.displayContest(data.contest._id);
     };
     LeaderboardsPage.prototype.refreshList = function () {
         if (this.mode === 'contests') {

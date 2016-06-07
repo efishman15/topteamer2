@@ -22,7 +22,8 @@ export class SearchQuestionsPage {
     this.searchText = '';
   }
 
-  onPageWillEnter() {
+  //The only life cycle eve currently called in modals
+  ngAfterViewInit() {
     this.client.logEvent('page/searchQuestions');
   }
 

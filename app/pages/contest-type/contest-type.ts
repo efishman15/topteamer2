@@ -9,13 +9,14 @@ export class ContestTypePage {
   client:Client;
   viewController: ViewController;
 
-  onPageWillEnter() {
-    this.client.logEvent('page/contestType');
-  }
-
   constructor(viewController: ViewController) {
     this.client = Client.getInstance();
     this.viewController = viewController;
+  }
+
+  //The only life cycle eve currently called in modals
+  ngAfterViewInit() {
+    this.client.logEvent('page/contestType');
   }
 
   selectContestContent(contestTypeId) {

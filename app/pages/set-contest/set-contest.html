@@ -29,61 +29,63 @@
 
   <form [ngFormModel]="contestForm" name="contestForm" novalidate="novalidate">
 
-    <ion-row>
-      <ion-col>
-        <ion-item>
-          <ion-input type="text"
-                     class="set-contest-team"
-                     ngControl="team0"
-                     [(ngModel)]="contestLocalCopy.teams[0].name"
-                     placeholder="{{client.translate('TEAM0')}}"
-                     maxlength="15"
-                     [disabled]="client.session.features.newContest.locked">
-          </ion-input>
-        </ion-item>
-      </ion-col>
-      <ion-col width-10>
-        <div padding-top class="set-contest-against" text-center>{{client.translate('AGAINST')}}</div>
-      </ion-col>
-      <ion-col>
-        <ion-item>
-          <ion-input type="text"
-                     class="set-contest-team"
-                     ngControl="team1"
-                     [(ngModel)]="contestLocalCopy.teams[1].name"
-                     placeholder="{{client.translate('TEAM1')}}"
-                     maxlength="15"
-                     [disabled]="client.session.features.newContest.locked">
-          </ion-input>
-        </ion-item>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col width-40>
-        <div text-center *ngIf="(team0.dirty || submitted) && team0.errors && team0.errors.required"
-             class="invalid-input">
-          {{client.translate('FIELD_REQUIRED')}}
-        </div>
-      </ion-col>
-      <ion-col>
-        <div text-center
-             *ngIf="(contestForm.dirty || submitted) && contestForm.errors && contestForm.errors.matchingTeams"
-             class="invalid-input">
-          {{client.translate('SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES_MESSAGE')}}
-        </div>
-      </ion-col>
-      <ion-col width-40>
-        <div text-center *ngIf="(team1.dirty || submitted) && team1.errors && team1.errors.required"
-             class="invalid-input">
-          {{client.translate('FIELD_REQUIRED')}}
-        </div>
-      </ion-col>
-    </ion-row>
+    <div padding-left padding-right>
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-input type="text"
+                       class="set-contest-team"
+                       ngControl="team0"
+                       [(ngModel)]="contestLocalCopy.teams[0].name"
+                       placeholder="{{client.translate('TEAM0')}}"
+                       maxlength="15"
+                       [disabled]="client.session.features.newContest.locked">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col width-10>
+          <div padding-top class="set-contest-against" text-center>{{client.translate('AGAINST')}}</div>
+        </ion-col>
+        <ion-col>
+          <ion-item>
+            <ion-input type="text"
+                       class="set-contest-team"
+                       ngControl="team1"
+                       [(ngModel)]="contestLocalCopy.teams[1].name"
+                       placeholder="{{client.translate('TEAM1')}}"
+                       maxlength="15"
+                       [disabled]="client.session.features.newContest.locked">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col width-40>
+          <div text-center *ngIf="(team0.dirty || submitted) && team0.errors && team0.errors.required"
+               class="invalid-input">
+            {{client.translate('FIELD_REQUIRED')}}
+          </div>
+        </ion-col>
+        <ion-col>
+          <div text-center
+               *ngIf="(contestForm.dirty || submitted) && contestForm.errors && contestForm.errors.matchingTeams"
+               class="invalid-input">
+            {{client.translate('SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES_MESSAGE')}}
+          </div>
+        </ion-col>
+        <ion-col width-40>
+          <div text-center *ngIf="(team1.dirty || submitted) && team1.errors && team1.errors.required"
+               class="invalid-input">
+            {{client.translate('FIELD_REQUIRED')}}
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
 
-    <div *ngIf="params.data.mode==='add'">
+    <div class="set-contest-ends-in-{{client.currentLanguage.direction}}" *ngIf="params.data.mode==='add'">
       <ion-item no-lines class="transparent-background">
         <ion-label class="base-font">{{client.translate('ENDS_IN')}}</ion-label>
-        <ion-select class="base-font" multiple="false" no-lines [(ngModel)]="contestLocalCopy.endOption"
+        <ion-select interface="action-sheet" class="base-font" multiple="false" no-lines [(ngModel)]="contestLocalCopy.endOption"
                     okText="{{client.translate('OK')}}"
                     cancelText="{{client.translate('CANCEL')}}"
                     (change)="client.logEvent('newContest/endsIn/change')"
@@ -107,8 +109,7 @@
       </date-picker>
     </div>
 
-    <div class="set-contest-user-questions-label-{{client.currentLanguage.direction}}"
-         *ngIf="contestLocalCopy.type.id === 'userTrivia'">
+    <div padding-left padding-right *ngIf="contestLocalCopy.type.id === 'userTrivia'">
       <ion-row>
         <ion-col>
           <div padding-top padding-bottom class="set-contest-user-questions-title">
@@ -134,9 +135,8 @@
         </ion-col>
       </ion-row>
       <div *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0">
-        <div class="questions-horizontal-margin">
-          <ion-scroll scrollY="true" [ngStyle]="{'height': contestLocalCopy.type.questions.visibleCount >=5 ? '230px' : (contestLocalCopy.type.questions.visibleCount * 46) + 'px'}">
-            <ion-list>
+          <ion-scroll class="set-contest-questions-scroll-{{client.currentLanguage.direction}}" scrollY="true" [ngStyle]="{'height': contestLocalCopy.type.questions.visibleCount >=5 ? '230px' : (contestLocalCopy.type.questions.visibleCount * 46) + 'px'}">
+            <ion-list class="set-contet-questions-list">
               <ion-item
                         *ngFor="let question of contestLocalCopy.type.questions.list, let i=index"
                         [hidden]="question.deleted">
@@ -147,14 +147,13 @@
               </ion-item>
             </ion-list>
           </ion-scroll>
-          <ion-item no-lines class="transparent-background">
+          <ion-item no-lines class="transparent-background set-contest-questions-random-order">
             <ion-label class="base-font">{{client.translate('SHOW_IN_RANDOM_ORDER')}}
             </ion-label>
-            <ion-checkbox light-purple [(ngModel)]="contestLocalCopy.type.randomOrder" class="no-horizontal-margin">
+            <ion-checkbox light-purple [(ngModel)]="contestLocalCopy.type.randomOrder" class="set-contest-random-order-checkbox-{{client.currentLanguage.direction}}">
             </ion-checkbox>
           </ion-item>
         </div>
-      </div>
     </div>
 
     <div padding-left padding-right class="invalid-input"

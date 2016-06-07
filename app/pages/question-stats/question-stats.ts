@@ -24,10 +24,8 @@ export class QuestionStatsPage {
     this.viewController = viewController;
   }
 
-  onPageWillEnter() {
-
-    this.client.logEvent('page/questionStats', {'questionId' : this.question._id});
-
+  //The only life cycle eve currently called in modals
+  ngAfterViewInit() {
     if (this.chartDataSource) {
 
       this.width = this.client.width * this.client.settings.charts.questionStats.size.widthRatio;
@@ -51,6 +49,7 @@ export class QuestionStatsPage {
 
       });
     }
+    this.client.logEvent('page/questionStats', {'questionId' : this.question._id});
   }
 
   onResize() {

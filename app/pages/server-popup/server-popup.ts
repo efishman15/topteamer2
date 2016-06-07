@@ -28,7 +28,8 @@ export class ServerPopupPage {
     this.viewController = viewController;
   }
 
-  onPageWillEnter() {
+  //The only life cycle eve currently called in modals
+  ngAfterViewInit() {
     this.client.logEvent('page/serverPopup', {'title' : this.serverPopup.title, 'message' : this.serverPopup.message});
   }
 

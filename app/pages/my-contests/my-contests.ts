@@ -38,7 +38,7 @@ export class MyContestsPage {
   }
 
   onContestSelected(data) {
-    this.client.openPage('ContestPage', {'contestId': data.contest._id});
+    this.client.displayContest(data.contest._id);
   }
 
   refreshList() {

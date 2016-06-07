@@ -17,9 +17,9 @@ var QuestionStatsPage = (function () {
         this.chartDataSource = params.data.chartDataSource;
         this.viewController = viewController;
     }
-    QuestionStatsPage.prototype.onPageWillEnter = function () {
+    //The only life cycle eve currently called in modals
+    QuestionStatsPage.prototype.ngAfterViewInit = function () {
         var _this = this;
-        this.client.logEvent('page/questionStats', { 'questionId': this.question._id });
         if (this.chartDataSource) {
             this.width = this.client.width * this.client.settings.charts.questionStats.size.widthRatio;
             this.height = this.client.height * this.client.settings.charts.questionStats.size.heightRatio;
@@ -38,6 +38,7 @@ var QuestionStatsPage = (function () {
                 _this.chart.render();
             });
         }
+        this.client.logEvent('page/questionStats', { 'questionId': this.question._id });
     };
     QuestionStatsPage.prototype.onResize = function () {
         var newWidth = this.client.width * this.client.settings.charts.questionStats.size.widthRatio;

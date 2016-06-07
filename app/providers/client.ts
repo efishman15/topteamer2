@@ -4,9 +4,10 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 import {Push} from 'ionic-native';
 import {IonicApp,Platform,Config, Nav, Menu, MenuController, Alert, Modal, Events} from 'ionic-angular';
+import * as contestsService from './contests';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
-import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo} from '../objects/objects';
+import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo,Contest} from '../objects/objects';
 import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
 import * as classesService from './classes';
 
@@ -29,14 +30,14 @@ export class Client {
   _config:Config;
   _events:Events;
   _nav:Nav;
-  loadingModalComponent: LoadingModalComponent;
+  loadingModalComponent:LoadingModalComponent;
   menuController:MenuController;
   _user:User;
   _session:Session;
   _settings:Settings;
   _loaded:Boolean = false;
   clientInfo:ClientInfo;
-  _width: number;
+  _width:number;
 
   serverGateway:ServerGateway;
 
@@ -73,7 +74,7 @@ export class Client {
     return Client.instance;
   }
 
-  init(ionicApp:IonicApp, platform:Platform, config:Config, menuController:MenuController, events:Events, nav: Nav, loadingModalComponent: LoadingModalComponent) {
+  init(ionicApp:IonicApp, platform:Platform, config:Config, menuController:MenuController, events:Events, nav:Nav, loadingModalComponent:LoadingModalComponent) {
 
     return new Promise((resolve, reject) => {
 
@@ -156,7 +157,7 @@ export class Client {
 
   initUser(language, geoInfo) {
 
-   this._user = new User(language, this.clientInfo, geoInfo);
+    this._user = new User(language, this.clientInfo, geoInfo);
   }
 
   initXp() {
@@ -337,7 +338,7 @@ export class Client {
           push.on('notification', function (notificationData) {
             if (notificationData.additionalData && notificationData.additionalData['contestId']) {
               //TODO: QA - Check Push notification about a contest
-              this.openPage('ContestPage', {'contestId' : notificationData.additionalData['contestId']})
+              this.displayContest(notificationData.additionalData['contestId']);
             }
           });
 
@@ -445,24 +446,30 @@ export class Client {
     return this.nav.present(modal);
   }
 
-  getPage(name: string) {
+  displayContest(contestId:string) {
+    contestsService.getContest(contestId).then((contest:Contest) => {
+      this.openPage('ContestPage', {'contest': contest});
+    });
+  }
+
+  getPage(name:string) {
     return classesService.get(name);
   }
 
-  openPage(name: string, params?: any) {
+  openPage(name:string, params?:any) {
     return this.nav.push(classesService.get(name), params);
   }
 
-  createModalPage(name: string, params?: any) {
+  createModalPage(name:string, params?:any) {
     return Modal.create(classesService.get(name), params);
   }
 
-  showModalPage(name: string, params?: any) {
+  showModalPage(name:string, params?:any) {
     var modal = this.createModalPage(name, params);
     return this.nav.present(modal);
   }
 
-  setRootPage(name: string, params?: any) {
+  setRootPage(name:string, params?:any) {
     return this.nav.setRoot(classesService.get(name), params);
   }
 
@@ -486,7 +493,7 @@ export class Client {
 
   get width():number {
     var innerWidth = window.innerWidth;
-    if (this._width > 0 && this._width <  innerWidth) {
+    if (this._width > 0 && this._width < innerWidth) {
       return this._width;
     }
     else {
@@ -498,14 +505,13 @@ export class Client {
     return window.innerHeight;
   }
 
-  adjustPixelRatio(size: number, up?: boolean)
-  {
+  adjustPixelRatio(size:number, up?:boolean) {
     var multiplier = -1;
     if (up) {
       multiplier = 1;
     }
     if (window.devicePixelRatio > 1) {
-      return size*(1 + multiplier /window.devicePixelRatio);
+      return size * (1 + multiplier / window.devicePixelRatio);
     }
     else {
       return size;
@@ -516,7 +522,7 @@ export class Client {
     if (this.loadingModalComponent) {
       setTimeout(() => {
         this.loadingModalComponent.show();
-      },100);
+      }, 100);
     }
   }
 
@@ -524,7 +530,7 @@ export class Client {
     if (this.loadingModalComponent) {
       setTimeout(() => {
         this.loadingModalComponent.hide();
-      },100);
+      }, 100);
     }
   }
 
@@ -575,7 +581,7 @@ export class Client {
     return this._user;
   }
 
-  get isMenuOpen(): Boolean {
+  get isMenuOpen():Boolean {
     if (this.menuController) {
       return this.menuController.isOpen();
     }
@@ -642,11 +648,11 @@ export class Client {
     this._session = null;
   }
 
-  setLoggedUserId(userId: string) {
+  setLoggedUserId(userId:string) {
     window.FlurryAgent.setUserId(userId);
   }
 
-  logEvent(eventName: string, eventParams?: Object) {
+  logEvent(eventName:string, eventParams?:Object) {
     if (eventParams) {
       window.FlurryAgent.logEvent(eventName, eventParams);
     }

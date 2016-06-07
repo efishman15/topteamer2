@@ -13,6 +13,7 @@ require('rxjs/add/operator/map');
 require('rxjs/add/operator/timeout');
 var ionic_native_1 = require('ionic-native');
 var ionic_angular_1 = require('ionic-angular');
+var contestsService = require('./contests');
 var facebookService = require('./facebook');
 var alertService = require('./alert');
 var objects_1 = require('../objects/objects');
@@ -247,7 +248,7 @@ var Client = (function () {
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData['contestId']) {
                             //TODO: QA - Check Push notification about a contest
-                            this.openPage('ContestPage', { 'contestId': notificationData.additionalData['contestId'] });
+                            this.displayContest(notificationData.additionalData['contestId']);
                         }
                     });
                     push.on('error', function (error) {
@@ -346,6 +347,12 @@ var Client = (function () {
             }
         });
         return this.nav.present(modal);
+    };
+    Client.prototype.displayContest = function (contestId) {
+        var _this = this;
+        contestsService.getContest(contestId).then(function (contest) {
+            _this.openPage('ContestPage', { 'contest': contest });
+        });
     };
     Client.prototype.getPage = function (name) {
         return classesService.get(name);
