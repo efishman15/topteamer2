@@ -18,8 +18,8 @@ export class SetContestPage {
   client:Client;
   params:NavParams;
 
-  startDate:number;
-  endDate:number;
+  nowWithoutTimeEpoch: number;
+  currentTimeOnlyInMilliseconds: number;
   contestLocalCopy:Contest;
   showStartDate:Boolean;
   showAdminInfo:Boolean;
@@ -48,11 +48,13 @@ export class SetContestPage {
       team1: this.team1
     }, {validator: this.matchingTeamsValidator});
 
-    //Start date is today, end date is by default within 24 hours
-    var now = new Date();
-    now.clearTime();
-    this.startDate = now.getTime();
-    this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
+    //Start date is today, end date is by default as set by the server
+    var nowWithTime = new Date();
+
+    var nowWithoutTime = new Date();
+    nowWithoutTime.clearTime();
+    this.currentTimeOnlyInMilliseconds = nowWithTime.getTime() - nowWithoutTime.getTime();
+    this.nowWithoutTimeEpoch = nowWithoutTime.getTime();
 
     if (this.params.data.mode === 'edit') {
       this.contestLocalCopy = JSON.parse(JSON.stringify(this.params.data.contest));
@@ -69,8 +71,21 @@ export class SetContestPage {
       }
     }
     else if (this.params.data.mode === 'add') {
-      //Create new local instance of a contest
-      this.contestLocalCopy = new Contest(this.startDate, this.endDate, this.params.data.typeId);
+
+      var endOption;
+      for(var i=0; i<this.endOptionKeys.length; i++) {
+        if (this.client.settings['newContest'].endOptions[this.endOptionKeys[i]].isDefault) {
+          endOption = this.endOptionKeys[i];
+          break;
+        }
+      }
+      if (!endOption) {
+        //If no default - set the last as defulat
+        endOption = this.endOptionKeys[this.endOptionKeys.length - 1];
+      }
+
+      var endDate = this.getEndDateAccordingToEndsIn(endOption);
+      this.contestLocalCopy = new Contest(this.params.data.typeId, this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds, endDate, endOption);
       this.showStartDate = true;
       this.contestLocalCopy.type.questions = new Questions();
     }
@@ -438,6 +453,17 @@ export class SetContestPage {
     return {matchingTeams: true};
   }
 
+  setEndsIn() {
+    this.contestLocalCopy.endDate = this.getEndDateAccordingToEndsIn(this.contestLocalCopy.endOption);
+    this.client.logEvent('newContest/endsIn/click',{'endsIn': this.contestLocalCopy.endOption});
+  }
+
+  getEndDateAccordingToEndsIn(endsIn: string) {
+    var endOption = this.client.settings['newContest'].endOptions[endsIn];
+    var endDate = this.nowWithoutTimeEpoch +  this.currentTimeOnlyInMilliseconds + (endOption.number * endOption.msecMultiplier);
+    return endDate;
+  }
+
   setAdminInfo() {
 
     this.client.openPage('SetContestAdminPage',
@@ -450,16 +476,14 @@ export class SetContestPage {
 
   endDateSelected(dateSelection) {
     //Set the end date at the end of this day (e.g. 23:59:59.999)
-    this.contestLocalCopy.endDate = dateSelection.epochLocal + 24 * 60 * 60 * 1000 - 1;
+    this.contestLocalCopy.endDate = dateSelection.epochLocal + this.currentTimeOnlyInMilliseconds;
   }
 
   getMaxEndDate() {
     if (!this.client.session.isAdmin) {
       //Allow extending by the maximum end date option in the list
-      var now = new Date();
-      now.clearTime();
       var endOption = this.client.settings['newContest'].endOptions[this.endOptionKeys[this.endOptionKeys.length - 1]];
-      return now.getTime() + (endOption.number * endOption.msecMultiplier);
+      return this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds + (endOption.number * endOption.msecMultiplier);
     }
     else {
       //Unlimited

@@ -43,17 +43,23 @@ export class SetContestAdminPage {
   }
 
   startDateSelected(dateSelection: CalendarCell) {
+    var nowDateWithTime = new Date();
+    var nowDateWithoutTime = new Date();
+    nowDateWithoutTime .clearTime();
+    var nowEpochWithTime = nowDateWithTime.getTime();
+    var nowEpochWithoutTime = nowDateWithoutTime.getTime();
+    var currentTimeInMilliseconds = nowEpochWithTime - nowEpochWithoutTime;
     if (this.params.data.mode === 'add') {
-      var nowDate = new Date();
-      nowDate.clearTime();
-      var nowEpoch = nowDate.getTime();
-      if (dateSelection.epochLocal > nowEpoch) {
+      if (dateSelection.epochLocal > nowEpochWithoutTime) {
         //Future date - move end date respectfully
-        this.params.data.contestLocalCopy.endDate += dateSelection.epochLocal - nowEpoch;
+        this.params.data.contestLocalCopy.endDate += dateSelection.epochLocal - nowEpochWithoutTime + currentTimeInMilliseconds;
       }
     }
 
-    this.params.data.contestLocalCopy.startDate = dateSelection.epochLocal;
+    this.params.data.contestLocalCopy.startDate = dateSelection.epochLocal + currentTimeInMilliseconds;
+    if (this.params.data.contestLocalCopy.startDate > this.params.data.contestLocalCopy.endDate) {
+      this.params.data.contestLocalCopy.endDate = this.params.data.contestLocalCopy.startDate + 24*60*60*1000; //add additional 24 hours
+    }
   }
 
   removeContest() {

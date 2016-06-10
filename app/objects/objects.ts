@@ -364,15 +364,16 @@ export class Contest {
   state:string;
   leadingTeam: number;
 
-  constructor(startDate:number, endDate:number, typeId:string) {
+  constructor(typeId:string, startDate: number, endDate: number, endOption: string) {
+
     this.startDate = startDate;
-    this.endDate = endDate;
+    this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
+    this.endOption = endOption;
     this.type = new ContestType(typeId);
     this.rating = 0;
     this.manualRating = 0;
     this.participants = 0;
     this.manualParticipants = 0;
-    this.endOption = 'h24';
     this.teams = [new Team(), new Team()];
     this.questions = new Questions();
   }

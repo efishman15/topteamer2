@@ -85,11 +85,14 @@
     <div class="set-contest-ends-in-{{client.currentLanguage.direction}}" *ngIf="params.data.mode==='add'">
       <ion-item no-lines class="transparent-background">
         <ion-label class="base-font">{{client.translate('ENDS_IN')}}</ion-label>
-        <ion-select interface="action-sheet" class="base-font" multiple="false" no-lines [(ngModel)]="contestLocalCopy.endOption"
+        <ion-select interface="action-sheet"
+                    class="base-font"
+                    multiple="false"
+                    no-lines
+                    [(ngModel)]="contestLocalCopy.endOption"
                     okText="{{client.translate('OK')}}"
                     cancelText="{{client.translate('CANCEL')}}"
-                    (change)="client.logEvent('newContest/endsIn/change')"
-                    (click)="client.logEvent('newContest/endsIn/click',{'endsIn': contestLocalCopy.endOption})">
+                    (change)="setEndsIn()">
           <ion-option *ngFor="let endOptionKey of endOptionKeys"
                       value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
                       checked="contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value">
