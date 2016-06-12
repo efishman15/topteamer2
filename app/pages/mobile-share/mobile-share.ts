@@ -1,9 +1,10 @@
+import {Component} from '@angular/core';
 import {Page,NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as shareService from '../../providers/share';
 import {Contest} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/mobile-share/mobile-share.html'
 })
 export class MobileSharePage {

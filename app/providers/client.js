@@ -47,13 +47,12 @@ var Client = (function () {
         }
         return Client.instance;
     };
-    Client.prototype.init = function (ionicApp, platform, config, menuController, events, nav, loadingModalComponent) {
+    Client.prototype.init = function (app, platform, config, events, nav, loadingModalComponent) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this._ionicApp = ionicApp;
+            _this._app = app;
             _this._platform = platform;
             _this._config = config;
-            _this.menuController = menuController;
             _this._events = events;
             _this._nav = nav;
             _this.loadingModalComponent = loadingModalComponent;
@@ -333,7 +332,7 @@ var Client = (function () {
         }
     };
     Client.prototype.setPageTitle = function (key, params) {
-        this.ionicApp.setTitle(this.translate(key, params));
+        this.app.setTitle(this.translate(key, params));
     };
     Client.prototype.openNewContest = function () {
         var _this = this;
@@ -456,9 +455,9 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Client.prototype, "ionicApp", {
+    Object.defineProperty(Client.prototype, "app", {
         get: function () {
-            return this._ionicApp;
+            return this._app;
         },
         enumerable: true,
         configurable: true
@@ -494,18 +493,6 @@ var Client = (function () {
     Object.defineProperty(Client.prototype, "user", {
         get: function () {
             return this._user;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "isMenuOpen", {
-        get: function () {
-            if (this.menuController) {
-                return this.menuController.isOpen();
-            }
-            else {
-                return false;
-            }
         },
         enumerable: true,
         configurable: true

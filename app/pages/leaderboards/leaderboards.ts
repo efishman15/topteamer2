@@ -1,12 +1,11 @@
-import {ViewChild} from '@angular/core';
-import {Page} from 'ionic-angular';
+import {Component,ViewChild} from '@angular/core';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {LeadersComponent} from '../../components/leaders/leaders';
 import {Client} from '../../providers/client';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/leaderboards/leaderboards.html',
   directives: [SimpleTabsComponent, SimpleTabComponent,ContestListComponent,LeadersComponent]
 })
@@ -23,7 +22,7 @@ export class LeaderboardsPage {
     this.client = Client.getInstance();
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     if (this.simpleTabsComponent) {
       this.simpleTabsComponent.switchToTab(0);
     }

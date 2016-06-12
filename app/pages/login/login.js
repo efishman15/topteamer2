@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_angular_1 = require('ionic-angular');
+var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
 var LoginPage = (function () {
@@ -18,13 +18,13 @@ var LoginPage = (function () {
             _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
         });
     }
-    LoginPage.prototype.onPageLoaded = function () {
+    LoginPage.prototype.ionViewLoaded = function () {
         this.client.setPageTitle('GAME_NAME');
     };
-    LoginPage.prototype.onPageWillEnter = function () {
+    LoginPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/login');
     };
-    LoginPage.prototype.onPageDidEnter = function () {
+    LoginPage.prototype.ionViewDidEnter = function () {
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
     };
@@ -44,7 +44,7 @@ var LoginPage = (function () {
         this.client.logEvent('login/changeLanguage', { language: language });
     };
     LoginPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/login/login.html'
         }), 
         __metadata('design:paramtypes', [])

@@ -1,4 +1,5 @@
-import {Page,NavParams} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams} from 'ionic-angular';
 import {LeadersComponent} from '../../components/leaders/leaders';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
@@ -7,7 +8,7 @@ import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import {Contest} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/contest-participants/contest-participants.html',
   directives: [SimpleTabsComponent, SimpleTabComponent,LeadersComponent]
 })
@@ -38,7 +39,7 @@ export class ContestParticipantsPage {
     }
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     this.client.logEvent('page/contestParticipants',{'contestId' : this.contestId});
     if (this.leadersComponent) {
       this.showContestParticipants();

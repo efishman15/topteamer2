@@ -1,11 +1,12 @@
-import {Page, NavParams, ViewController} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams, ViewController} from 'ionic-angular';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
 import {CalendarCell} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/set-contest-admin/set-contest-admin.html',
   directives: [DatePickerComponent]
 })
@@ -28,7 +29,7 @@ export class SetContestAdminPage {
 
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     var eventData = {'mode': this.params.data.mode};
     if (this.params.data.mode === 'edit') {
       eventData['contestId'] = this.params.data.contestLocalCopy._id;
@@ -36,7 +37,7 @@ export class SetContestAdminPage {
     this.client.logEvent('page/setContestAdmin', eventData);
   }
 
-  onPageDidLeave() {
+  ionViewDidLeave() {
     //For some reason manipulating the numbers turns them to strings in the model
     this.params.data.contestLocalCopy.teams[0].score = parseInt(this.params.data.contestLocalCopy.teams[0].score);
     this.params.data.contestLocalCopy.teams[1].score = parseInt(this.params.data.contestLocalCopy.teams[1].score);

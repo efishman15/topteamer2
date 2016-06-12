@@ -1,4 +1,5 @@
-import {Page, NavParams} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams} from 'ionic-angular';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener';
 import {TransitionListener} from '../../directives/transition-listener/transition-listener';
 import {Client} from '../../providers/client';
@@ -8,7 +9,7 @@ import * as shareService from '../../providers/share';
 import * as alertService from '../../providers/alert';
 import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings,ChartSettings} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/quiz/quiz.html',
   directives: [AnimationListener, TransitionListener]
 })
@@ -43,13 +44,13 @@ export class QuizPage {
     this.init();
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     this.client.logEvent('page/quiz', {'contestId': this.params.data.contest._id});
   }
 
-  onPageDidEnter() {
+  ionViewDidEnter() {
 
-    //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
+    //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
     if (this.quizStarted) {
       return;
     }

@@ -1,10 +1,11 @@
-import {Page,NavParams,ViewController} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import {Question} from '../../objects/objects';
 
 const WIDTH_MARGIN: number = 2;
 
-@Page({
+@Component({
   templateUrl: 'build/pages/question-stats/question-stats.html'
 })
 export class QuestionStatsPage {

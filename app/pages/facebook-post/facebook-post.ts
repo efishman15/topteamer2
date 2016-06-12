@@ -1,9 +1,10 @@
-import {Page,NavParams,ViewController} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
 import {QuizResults} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/facebook-post/facebook-post.html'
 })
 export class FacebookPostPage {

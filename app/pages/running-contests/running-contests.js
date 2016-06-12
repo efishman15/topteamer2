@@ -8,14 +8,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
 var RunningContestsPage = (function () {
     function RunningContestsPage() {
         this.client = client_1.Client.getInstance();
     }
-    RunningContestsPage.prototype.onPageWillEnter = function () {
+    RunningContestsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/runningContests');
         if (this.contestList) {
             this.refreshList();
@@ -38,7 +37,7 @@ var RunningContestsPage = (function () {
         __metadata('design:type', contest_list_1.ContestListComponent)
     ], RunningContestsPage.prototype, "contestList", void 0);
     RunningContestsPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/running-contests/running-contests.html',
             directives: [contest_list_1.ContestListComponent]
         }), 

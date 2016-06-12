@@ -7,11 +7,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var leaders_1 = require('../../components/leaders/leaders');
 var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
-var core_1 = require('@angular/core');
+var core_2 = require('@angular/core');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestParticipantsPage = (function () {
@@ -31,7 +32,7 @@ var ContestParticipantsPage = (function () {
             });
         }
     }
-    ContestParticipantsPage.prototype.onPageWillEnter = function () {
+    ContestParticipantsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/contestParticipants', { 'contestId': this.contestId });
         if (this.leadersComponent) {
             this.showContestParticipants();
@@ -57,11 +58,11 @@ var ContestParticipantsPage = (function () {
         this.leadersComponent.showContestParticipants(this.contest._id, teamId);
     };
     __decorate([
-        core_1.ViewChild(leaders_1.LeadersComponent), 
+        core_2.ViewChild(leaders_1.LeadersComponent), 
         __metadata('design:type', leaders_1.LeadersComponent)
     ], ContestParticipantsPage.prototype, "leadersComponent", void 0);
     ContestParticipantsPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/contest-participants/contest-participants.html',
             directives: [simple_tabs_1.SimpleTabsComponent, simple_tab_1.SimpleTabComponent, leaders_1.LeadersComponent]
         }), 

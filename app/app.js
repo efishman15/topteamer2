@@ -15,23 +15,21 @@ var shareService = require('./providers/share');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
 var alertService = require('./providers/alert');
 var ionic_native_1 = require('ionic-native');
-var topTeamerApp = (function () {
-    function topTeamerApp(ionicApp, platform, config, client, events, menuController) {
-        ionicApp.setProd(true);
-        this.ionicApp = ionicApp;
+var TopTeamerApp = (function () {
+    function TopTeamerApp(app, platform, config, client, events) {
+        this.app = app;
         this.platform = platform;
         this.config = config;
         this.client = client;
         this.events = events;
-        this.menuController = menuController;
     }
-    topTeamerApp.prototype.ngAfterViewInit = function () {
+    TopTeamerApp.prototype.ngAfterViewInit = function () {
         var _this = this;
-        this.client.init(this.ionicApp, this.platform, this.config, this.menuController, this.events, this.nav, this.loadingModalComponent).then(function () {
+        this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent).then(function () {
             _this.initApp();
         });
     };
-    topTeamerApp.prototype.initApp = function () {
+    TopTeamerApp.prototype.initApp = function () {
         //TODO: Hardware back button
         //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
         var _this = this;
@@ -79,7 +77,7 @@ var topTeamerApp = (function () {
         });
     };
     ;
-    topTeamerApp.prototype.initWeb = function () {
+    TopTeamerApp.prototype.initWeb = function () {
         var _this = this;
         window.addEventListener('resize', function (event) {
             var client = client_1.Client.getInstance();
@@ -109,7 +107,7 @@ var topTeamerApp = (function () {
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
     };
-    topTeamerApp.prototype.initMobile = function () {
+    TopTeamerApp.prototype.initMobile = function () {
         var _this = this;
         if (window.cordova.plugins.Keyboard) {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -139,14 +137,14 @@ var topTeamerApp = (function () {
             _this.initFacebook();
         });
     };
-    topTeamerApp.prototype.initFlurry = function () {
+    TopTeamerApp.prototype.initFlurry = function () {
         //FlurryAgent.setDebugLogEnabled(true);
         window.FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
         window.myLogError = function (errorType, message) {
             window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
         };
     };
-    topTeamerApp.prototype.initBranch = function () {
+    TopTeamerApp.prototype.initBranch = function () {
         var _this = this;
         window.myHandleBranch = function (err, data) {
             try {
@@ -185,7 +183,7 @@ var topTeamerApp = (function () {
             window.initBranch();
         }, 2000);
     };
-    topTeamerApp.prototype.initFacebook = function () {
+    TopTeamerApp.prototype.initFacebook = function () {
         var _this = this;
         facebookService.getLoginStatus().then(function (result) {
             if (result['connected']) {
@@ -202,7 +200,7 @@ var topTeamerApp = (function () {
             }
         });
     };
-    topTeamerApp.prototype.declareRequestAnimationFrame = function () {
+    TopTeamerApp.prototype.declareRequestAnimationFrame = function () {
         // Fallback where requestAnimationFrame or its equivalents are not supported in the current browser
         window.myRequestAnimationFrame = (function () {
             return window.requestAnimationFrame ||
@@ -213,7 +211,7 @@ var topTeamerApp = (function () {
                 };
         })();
     };
-    topTeamerApp.prototype.expandStringPrototype = function () {
+    TopTeamerApp.prototype.expandStringPrototype = function () {
         if (!String.prototype.format) {
             String.prototype.format = function () {
                 var args = arguments;
@@ -249,7 +247,7 @@ var topTeamerApp = (function () {
             };
         }
     };
-    topTeamerApp.prototype.expandDatePrototype = function () {
+    TopTeamerApp.prototype.expandDatePrototype = function () {
         if (!Date.prototype.clearTime) {
             Date.prototype.clearTime = function () {
                 this.setHours(0);
@@ -259,35 +257,40 @@ var topTeamerApp = (function () {
             };
         }
     };
-    topTeamerApp.prototype.share = function () {
+    TopTeamerApp.prototype.share = function () {
         this.client.logEvent('menu/share');
         shareService.share('menu');
     };
-    topTeamerApp.prototype.settings = function () {
+    TopTeamerApp.prototype.settings = function () {
         this.client.logEvent('menu/settings');
         this.client.openPage('SettingsPage');
     };
-    topTeamerApp.prototype.systemTools = function () {
+    TopTeamerApp.prototype.systemTools = function () {
         this.client.logEvent('menu/systemTools');
         this.client.openPage('SystemToolsPage');
+    };
+    TopTeamerApp.prototype.menuOpened = function (opened) {
+        this.isMenuOpen = opened;
     };
     __decorate([
         core_1.ViewChild(ionic_angular_1.Nav), 
         __metadata('design:type', ionic_angular_1.Nav)
-    ], topTeamerApp.prototype, "nav", void 0);
+    ], TopTeamerApp.prototype, "nav", void 0);
     __decorate([
         core_1.ViewChild(loading_modal_1.LoadingModalComponent), 
         __metadata('design:type', loading_modal_1.LoadingModalComponent)
-    ], topTeamerApp.prototype, "loadingModalComponent", void 0);
-    topTeamerApp = __decorate([
-        ionic_angular_1.App({
+    ], TopTeamerApp.prototype, "loadingModalComponent", void 0);
+    TopTeamerApp = __decorate([
+        core_1.Component({
             templateUrl: 'build/app.html',
-            providers: [client_1.Client],
-            config: { backButtonText: '' },
             directives: [loading_modal_1.LoadingModalComponent]
         }), 
-        __metadata('design:paramtypes', [ionic_angular_1.IonicApp, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events, ionic_angular_1.MenuController])
-    ], topTeamerApp);
-    return topTeamerApp;
+        __metadata('design:paramtypes', [ionic_angular_1.App, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events])
+    ], TopTeamerApp);
+    return TopTeamerApp;
 })();
+exports.TopTeamerApp = TopTeamerApp;
+ionic_angular_1.ionicBootstrap(TopTeamerApp, [client_1.Client], {
+    backButtonText: '', prodMode: true
+});
 //# sourceMappingURL=app.js.map

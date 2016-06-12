@@ -1,10 +1,11 @@
-import {Page,NavParams,ViewController} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
 import {Questions,Question} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/search-questions/search-questions.html'
 })
 export class SearchQuestionsPage {

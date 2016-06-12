@@ -1,9 +1,9 @@
-import {Page} from 'ionic-angular';
+import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
 import * as alertService from '../../providers/alert';
 import * as systemService from '../../providers/system';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/system-tools/system-tools.html'
 })
 
@@ -15,7 +15,7 @@ export class SystemToolsPage {
     this.client = Client.getInstance();
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     this.client.logEvent('page/systemTools');
   }
 

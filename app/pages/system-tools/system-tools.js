@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_angular_1 = require('ionic-angular');
+var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
 var alertService = require('../../providers/alert');
 var systemService = require('../../providers/system');
@@ -15,7 +15,7 @@ var SystemToolsPage = (function () {
     function SystemToolsPage() {
         this.client = client_1.Client.getInstance();
     }
-    SystemToolsPage.prototype.onPageWillEnter = function () {
+    SystemToolsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/systemTools');
     };
     SystemToolsPage.prototype.clearCache = function () {
@@ -35,7 +35,7 @@ var SystemToolsPage = (function () {
         });
     };
     SystemToolsPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/system-tools/system-tools.html'
         }), 
         __metadata('design:paramtypes', [])

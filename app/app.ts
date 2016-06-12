@@ -1,6 +1,6 @@
-import {provide,ExceptionHandler,ViewChild} from '@angular/core';
+import {Component,provide,ExceptionHandler,ViewChild} from '@angular/core';
 import {MyExceptionHandler} from './providers/exceptions';
-import {App, IonicApp, Platform, Config, Events, Nav, MenuController} from 'ionic-angular';
+import {ionicBootstrap, App, Platform, Config, Events, Nav} from 'ionic-angular';
 import {Client} from './providers/client';
 import * as facebookService from './providers/facebook';
 import * as shareService from './providers/share';
@@ -9,39 +9,34 @@ import * as alertService from './providers/alert';
 import {} from './interfaces/interfaces'
 import {AppVersion} from 'ionic-native';
 
-@App({
+@Component({
   templateUrl: 'build/app.html',
-  providers: [Client],
-  config: {backButtonText: ''},
   directives: [LoadingModalComponent]
 })
-class topTeamerApp {
+export class TopTeamerApp {
 
   client:Client;
   deepLinkContestId: string;
   @ViewChild(Nav) nav:Nav;
   @ViewChild(LoadingModalComponent) loadingModalComponent:LoadingModalComponent;
 
-  ionicApp: IonicApp;
+  app: App;
   platform: Platform;
   config: Config;
   events: Events;
-  menuController: MenuController;
+  isMenuOpen: boolean;
 
-  constructor(ionicApp:IonicApp, platform:Platform, config: Config, client:Client, events:Events, menuController:MenuController) {
+  constructor(app:App, platform:Platform, config: Config, client:Client, events:Events) {
 
-    ionicApp.setProd(true);
-
-    this.ionicApp = ionicApp;
+    this.app = app;
     this.platform = platform;
     this.config = config;
     this.client = client;
     this.events = events;
-    this.menuController = menuController;
   }
 
   ngAfterViewInit() {
-    this.client.init(this.ionicApp, this.platform, this.config, this.menuController, this.events, this.nav, this.loadingModalComponent).then(() => {
+    this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent).then(() => {
       this.initApp();
     });
   }
@@ -335,4 +330,12 @@ class topTeamerApp {
     this.client.logEvent('menu/systemTools');
     this.client.openPage('SystemToolsPage');
   }
+
+  menuOpened(opened: boolean) {
+    this.isMenuOpen = opened;
+  }
 }
+
+ionicBootstrap(TopTeamerApp, [Client], {
+  backButtonText: '', prodMode: true
+});

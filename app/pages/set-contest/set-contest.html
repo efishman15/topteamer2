@@ -92,7 +92,7 @@
                     [(ngModel)]="contestLocalCopy.endOption"
                     okText="{{client.translate('OK')}}"
                     cancelText="{{client.translate('CANCEL')}}"
-                    (change)="setEndsIn()">
+                    (ionChange)="setEndsIn()">
           <ion-option *ngFor="let endOptionKey of endOptionKeys"
                       value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
                       checked="contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value">

@@ -37,16 +37,16 @@ var MainTabsPage = (function () {
             _this.mainTabs.select(1); //Switch to "Running contests"
         });
     }
-    MainTabsPage.prototype.onPageWillEnter = function () {
+    MainTabsPage.prototype.ionViewWillEnter = function () {
         if (this.needToRefreshList) {
             var selectedPage = this.mainTabs.getSelected().getActive();
-            if (selectedPage.instance.onPageWillEnter) {
-                selectedPage.instance.onPageWillEnter();
+            if (selectedPage.instance.ionViewWillEnter) {
+                selectedPage.instance.ionViewWillEnter();
             }
             this.needToRefreshList = false;
         }
     };
-    MainTabsPage.prototype.onPageDidEnter = function () {
+    MainTabsPage.prototype.ionViewDidEnter = function () {
         //Should occur only once - and AFTER top toolbar received it's height
         if (!this.playerInfoInitiated) {
             this.client.initPlayerInfo();
@@ -67,7 +67,7 @@ var MainTabsPage = (function () {
         __metadata('design:type', ionic_angular_1.Tabs)
     ], MainTabsPage.prototype, "mainTabs", void 0);
     MainTabsPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/main-tabs/main-tabs.html'
         }), 
         __metadata('design:paramtypes', [])

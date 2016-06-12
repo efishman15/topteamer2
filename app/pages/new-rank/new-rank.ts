@@ -1,8 +1,9 @@
-import {Page,NavParams,ViewController} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as soundService from '../../providers/sound';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/new-rank/new-rank.html'
 })
 export class NewRankPage {

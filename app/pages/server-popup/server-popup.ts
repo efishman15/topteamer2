@@ -1,10 +1,11 @@
-import {Page,NavParams,ViewController} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as shareService from '../../providers/share';
 import {ServerPopup} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/server-popup/server-popup.html'
 })
 export class ServerPopupPage {

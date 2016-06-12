@@ -1,5 +1,5 @@
-import {ViewChild} from '@angular/core';
-import {Page, NavParams} from 'ionic-angular';
+import {Component,ViewChild} from '@angular/core';
+import {NavParams} from 'ionic-angular';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
@@ -8,7 +8,7 @@ import * as shareService from '../../providers/share';
 import * as soundService from '../../providers/sound';
 import {Contest,QuizResults} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/contest/contest.html',
   directives: [ContestChartComponent]
 })
@@ -60,11 +60,11 @@ export class ContestPage {
     });
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     this.client.logEvent('page/contest',{'contestId' : this.contest._id});
   }
 
-  onPageWillLeave() {
+  ionViewWillLeave() {
     this.animateLastResults = false;
     this.lastQuizResults = null;
   }

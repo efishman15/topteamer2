@@ -1,8 +1,8 @@
-import {ViewChild} from '@angular/core';
-import {Page, Tabs} from 'ionic-angular';
+import {Component,ViewChild} from '@angular/core';
+import {Tabs} from 'ionic-angular';
 import {Client} from '../../providers/client';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/main-tabs/main-tabs.html'
 })
 export class MainTabsPage {
@@ -52,17 +52,17 @@ export class MainTabsPage {
 
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     if (this.needToRefreshList) {
       var selectedPage = this.mainTabs.getSelected().getActive();
-      if (selectedPage.instance.onPageWillEnter) {
-        selectedPage.instance.onPageWillEnter();
+      if (selectedPage.instance.ionViewWillEnter) {
+        selectedPage.instance.ionViewWillEnter();
       }
       this.needToRefreshList = false;
     }
   }
 
-  onPageDidEnter() {
+  ionViewDidEnter() {
     //Should occur only once - and AFTER top toolbar received it's height
     if (!this.playerInfoInitiated) {
       this.client.initPlayerInfo();

@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var PurchaseSuccessPage = (function () {
@@ -14,7 +15,7 @@ var PurchaseSuccessPage = (function () {
         this.client = client_1.Client.getInstance();
         this.params = params;
     }
-    PurchaseSuccessPage.prototype.onPageWillEnter = function () {
+    PurchaseSuccessPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/purchaseSuccess', { 'feature': this.params.data.featurePurchased });
         this.unlockText = this.client.translate(this.client.session.features[this.params.data.featurePurchased].unlockText);
     };
@@ -29,7 +30,7 @@ var PurchaseSuccessPage = (function () {
         });
     };
     PurchaseSuccessPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/purchase-sucess/purchase-success.html'
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams])

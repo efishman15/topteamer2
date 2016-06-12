@@ -1,4 +1,4 @@
-<ion-menu *ngIf="client.loaded" [content]="content" side="{{client.currentLanguage.align}}">
+<ion-menu *ngIf="client.loaded" [content]="content" side="{{client.currentLanguage.align}}" (ionOpen)="menuOpened(true)" (ionClose)="menuOpened(false)">
 
   <ion-toolbar light-blue>
     <ion-title><div text-center>{{client.translate('TOOLS')}}</div></ion-title>
@@ -34,7 +34,7 @@
 
 <loading-modal id="loading"></loading-modal>
 
-<div id="playerInfo" [hidden]="client.isMenuOpen">
+<div id="playerInfo" [hidden]="isMenuOpen">
   <img id="playerInfoImage" *ngIf="client.session" src="{{client.session.avatar}}"
        class="player-info-avatar pointer" (click)="client.popToRoot()">
   <canvas id="playerInfoRankCanvas">

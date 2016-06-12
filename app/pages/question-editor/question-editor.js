@@ -120,7 +120,7 @@ var QuestionEditorPage = (function () {
         __metadata('design:type', ionic_angular_1.Content)
     ], QuestionEditorPage.prototype, "content", void 0);
     QuestionEditorPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/question-editor/question-editor.html'
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams, ionic_angular_1.ViewController, common_1.FormBuilder])

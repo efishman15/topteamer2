@@ -1,7 +1,8 @@
-import {Page, ViewController} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/contest-type/contest-type.html'
 })
 export class ContestTypePage {
@@ -14,7 +15,7 @@ export class ContestTypePage {
     this.viewController = viewController;
   }
 
-  //The only life cycle eve currently called in modals
+  //The only life cycle event currently called in modals
   ngAfterViewInit() {
     this.client.logEvent('page/contestType');
   }

@@ -8,7 +8,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
 var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var contest_list_1 = require('../../components/contest-list/contest-list');
@@ -19,7 +18,7 @@ var LeaderboardsPage = (function () {
         this.mode = 'contests';
         this.client = client_1.Client.getInstance();
     }
-    LeaderboardsPage.prototype.onPageWillEnter = function () {
+    LeaderboardsPage.prototype.ionViewWillEnter = function () {
         if (this.simpleTabsComponent) {
             this.simpleTabsComponent.switchToTab(0);
         }
@@ -68,7 +67,7 @@ var LeaderboardsPage = (function () {
         __metadata('design:type', leaders_1.LeadersComponent)
     ], LeaderboardsPage.prototype, "leadersComponent", void 0);
     LeaderboardsPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/leaderboards/leaderboards.html',
             directives: [simple_tabs_1.SimpleTabsComponent, simple_tab_1.SimpleTabComponent, contest_list_1.ContestListComponent, leaders_1.LeadersComponent]
         }), 

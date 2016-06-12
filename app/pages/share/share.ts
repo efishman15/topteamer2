@@ -1,9 +1,10 @@
-import {Page,NavParams} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as shareService from '../../providers/share';
 import {Contest,ShareVariables} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/share/share.html'
 })
 
@@ -22,7 +23,7 @@ export class SharePage {
     this.shareVariables = shareService.getVariables(this.contest);
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     if (this.contest) {
       this.client.logEvent('page/share', {'contestId': this.contest._id});
     }

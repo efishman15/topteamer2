@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
@@ -19,14 +20,14 @@ var SetContestAdminPage = (function () {
         this.viewController = viewController;
         this.showRemoveContest = (this.params.data.mode === 'edit' && this.client.session.isAdmin);
     }
-    SetContestAdminPage.prototype.onPageWillEnter = function () {
+    SetContestAdminPage.prototype.ionViewWillEnter = function () {
         var eventData = { 'mode': this.params.data.mode };
         if (this.params.data.mode === 'edit') {
             eventData['contestId'] = this.params.data.contestLocalCopy._id;
         }
         this.client.logEvent('page/setContestAdmin', eventData);
     };
-    SetContestAdminPage.prototype.onPageDidLeave = function () {
+    SetContestAdminPage.prototype.ionViewDidLeave = function () {
         //For some reason manipulating the numbers turns them to strings in the model
         this.params.data.contestLocalCopy.teams[0].score = parseInt(this.params.data.contestLocalCopy.teams[0].score);
         this.params.data.contestLocalCopy.teams[1].score = parseInt(this.params.data.contestLocalCopy.teams[1].score);
@@ -65,7 +66,7 @@ var SetContestAdminPage = (function () {
         });
     };
     SetContestAdminPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/set-contest-admin/set-contest-admin.html',
             directives: [date_picker_1.DatePickerComponent]
         }), 

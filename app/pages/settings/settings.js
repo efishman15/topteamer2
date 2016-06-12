@@ -7,18 +7,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var ionic_angular_1 = require('ionic-angular');
+var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
 var facebookService = require('../../providers/facebook');
 var SettingsPage = (function () {
     function SettingsPage() {
         this.client = client_1.Client.getInstance();
     }
-    SettingsPage.prototype.onPageWillEnter = function () {
+    SettingsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/settings');
         this.originalLanguage = this.client.session.settings.language;
     };
-    SettingsPage.prototype.onPageDidLeave = function () {
+    SettingsPage.prototype.ionViewDidLeave = function () {
         if (this.client.session.settings.language != this.originalLanguage) {
             this.client.events.publish('topTeamer:languageChanged');
         }
@@ -45,7 +45,7 @@ var SettingsPage = (function () {
         });
     };
     SettingsPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/settings/settings.html'
         }), 
         __metadata('design:paramtypes', [])

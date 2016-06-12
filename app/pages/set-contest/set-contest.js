@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var core_1 = require('@angular/core');
 var common_1 = require('@angular/common');
 var ionic_angular_1 = require('ionic-angular');
 var date_picker_1 = require('../../components/date-picker/date-picker');
@@ -105,7 +106,7 @@ var SetContestPage = (function () {
         this.showAdminInfo = false;
         this.setTitle();
     }
-    SetContestPage.prototype.onPageWillEnter = function () {
+    SetContestPage.prototype.ionViewWillEnter = function () {
         var eventData = { 'mode': this.params.data.mode };
         if (this.params.data.mode === 'edit') {
             eventData['contestId'] = this.params.data.contest._id;
@@ -400,7 +401,7 @@ var SetContestPage = (function () {
         }
     };
     SetContestPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/set-contest/set-contest.html',
             directives: [date_picker_1.DatePickerComponent]
         }), 

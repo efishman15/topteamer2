@@ -1,8 +1,8 @@
-import {Page} from 'ionic-angular';
+import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/login/login.html'
 })
 export class LoginPage {
@@ -18,15 +18,15 @@ export class LoginPage {
 
   }
 
-  onPageLoaded() {
+  ionViewLoaded() {
     this.client.setPageTitle('GAME_NAME');
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     this.client.logEvent('page/login');
   }
 
-  onPageDidEnter() {
+  ionViewDidEnter() {
     //Events here could be serverPopup just as the app loads - the page should be fully visible
     this.client.processInternalEvents();
   }

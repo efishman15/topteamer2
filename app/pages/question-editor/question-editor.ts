@@ -1,10 +1,10 @@
 import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from '@angular/common';
-import {ViewChild} from '@angular/core';
-import {Page,NavParams,ViewController,Content} from 'ionic-angular';
+import {Component,ViewChild} from '@angular/core';
+import {NavParams,ViewController,Content} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import {Question,Questions} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/question-editor/question-editor.html'
 
 })

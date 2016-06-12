@@ -14,7 +14,7 @@
 
 <ion-content class="app-bg">
   <div padding>
-    <ion-searchbar placeholder="{{client.translate('SEARCH')}}" [(ngModel)]="searchText" (input)="search($event)"
+    <ion-searchbar placeholder="{{client.translate('SEARCH')}}" [(ngModel)]="searchText" (ionInput)="search($event)"
                    cancelButtonText="{{client.translate('CANCEL')}}">
     </ion-searchbar>
   </div>

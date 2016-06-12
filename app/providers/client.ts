@@ -3,7 +3,7 @@ import {Http, Response, Headers} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 import {Push} from 'ionic-native';
-import {IonicApp,Platform,Config, Nav, Menu, MenuController, Alert, Modal, Events} from 'ionic-angular';
+import {App,Platform,Config, Nav, Alert, Modal, Events} from 'ionic-angular';
 import * as contestsService from './contests';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
@@ -25,13 +25,12 @@ export class Client {
   canvasCenterX:number;
   canvasCenterY:number;
 
-  _ionicApp:IonicApp;
+  _app:App;
   _platform:Platform;
   _config:Config;
   _events:Events;
   _nav:Nav;
   loadingModalComponent:LoadingModalComponent;
-  menuController:MenuController;
   _user:User;
   _session:Session;
   _settings:Settings;
@@ -74,14 +73,13 @@ export class Client {
     return Client.instance;
   }
 
-  init(ionicApp:IonicApp, platform:Platform, config:Config, menuController:MenuController, events:Events, nav:Nav, loadingModalComponent:LoadingModalComponent) {
+  init(app:App, platform:Platform, config:Config, events:Events, nav:Nav, loadingModalComponent:LoadingModalComponent) {
 
     return new Promise((resolve, reject) => {
 
-      this._ionicApp = ionicApp;
+      this._app = app;
       this._platform = platform;
       this._config = config;
-      this.menuController = menuController;
       this._events = events;
       this._nav = nav;
       this.loadingModalComponent = loadingModalComponent;
@@ -430,7 +428,7 @@ export class Client {
   }
 
   setPageTitle(key:string, params ?:Object) {
-    this.ionicApp.setTitle(this.translate(key, params));
+    this.app.setTitle(this.translate(key, params));
   }
 
   openNewContest() {
@@ -557,8 +555,8 @@ export class Client {
     return this._loaded;
   }
 
-  get ionicApp():IonicApp {
-    return this._ionicApp;
+  get app():App {
+    return this._app;
   }
 
   get platform():Platform {
@@ -579,15 +577,6 @@ export class Client {
 
   get user():User {
     return this._user;
-  }
-
-  get isMenuOpen():Boolean {
-    if (this.menuController) {
-      return this.menuController.isOpen();
-    }
-    else {
-      return false;
-    }
   }
 
   get endPoint():String {
@@ -760,15 +749,15 @@ export class ServerGateway {
 }
 
 export class InternalEvent {
-  _eventName:String;
+  _eventName:string;
   _eventData:Object;
 
-  constructor(eventName:String, eventData:Object) {
+  constructor(eventName:string, eventData:Object) {
     this._eventName = eventName;
     this._eventData = eventData;
   }
 
-  get eventName():String {
+  get eventName():string {
     return this._eventName;
   }
 

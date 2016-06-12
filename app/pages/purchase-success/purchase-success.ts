@@ -1,7 +1,8 @@
-import {Page,NavParams} from 'ionic-angular';
+import {Component} from '@angular/core';
+import {NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/purchase-sucess/purchase-success.html'
 })
 
@@ -16,7 +17,7 @@ export class PurchaseSuccessPage {
     this.params = params;
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     this.client.logEvent('page/purchaseSuccess', {'feature' : this.params.data.featurePurchased});
     this.unlockText = this.client.translate(this.client.session.features[this.params.data.featurePurchased].unlockText);
   }

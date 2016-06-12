@@ -1,5 +1,6 @@
+import {Component} from '@angular/core';
 import {Form, FormBuilder, Control, ControlGroup, Validators} from '@angular/common';
-import {Page, NavParams} from 'ionic-angular';
+import {NavParams} from 'ionic-angular';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
@@ -8,7 +9,7 @@ import * as alertService from '../../providers/alert';
 import * as shareService from '../../providers/share';
 import {Contest,ContestName, Questions, Team, PaymentData} from '../../objects/objects';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/set-contest/set-contest.html',
   directives: [DatePickerComponent]
 })
@@ -143,7 +144,7 @@ export class SetContestPage {
 
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     var eventData = {'mode': this.params.data.mode};
     if (this.params.data.mode === 'edit') {
       eventData['contestId'] = this.params.data.contest._id;

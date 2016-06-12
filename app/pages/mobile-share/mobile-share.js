@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var shareService = require('../../providers/share');
@@ -30,7 +31,7 @@ var MobileSharePage = (function () {
         });
     };
     MobileSharePage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/mobile-share/mobile-share.html'
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams, ionic_angular_1.ViewController])

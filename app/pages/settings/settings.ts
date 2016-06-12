@@ -1,8 +1,8 @@
-import {Page} from 'ionic-angular';
+import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
 import * as facebookService from '../../providers/facebook';
 
-@Page({
+@Component({
   templateUrl: 'build/pages/settings/settings.html'
 })
 
@@ -15,12 +15,12 @@ export class SettingsPage {
     this.client = Client.getInstance();
   }
 
-  onPageWillEnter() {
+  ionViewWillEnter() {
     this.client.logEvent('page/settings');
     this.originalLanguage = this.client.session.settings.language;
   }
 
-  onPageDidLeave() {
+  ionViewDidLeave() {
     if (this.client.session.settings.language != this.originalLanguage) {
       this.client.events.publish('topTeamer:languageChanged');
     }

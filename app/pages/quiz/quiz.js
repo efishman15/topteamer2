@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
@@ -27,11 +28,11 @@ var QuizPage = (function () {
     QuizPage.prototype.ngOnInit = function () {
         this.init();
     };
-    QuizPage.prototype.onPageWillEnter = function () {
+    QuizPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
     };
-    QuizPage.prototype.onPageDidEnter = function () {
-        //onPageDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
+    QuizPage.prototype.ionViewDidEnter = function () {
+        //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
         if (this.quizStarted) {
             return;
         }
@@ -497,7 +498,7 @@ var QuizPage = (function () {
         return font;
     };
     QuizPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/quiz/quiz.html',
             directives: [animation_listener_1.AnimationListener, transition_listener_1.TransitionListener]
         }), 

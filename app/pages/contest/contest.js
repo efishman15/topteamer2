@@ -47,10 +47,10 @@ var ContestPage = (function () {
             _this.setPlayText();
         });
     }
-    ContestPage.prototype.onPageWillEnter = function () {
+    ContestPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/contest', { 'contestId': this.contest._id });
     };
-    ContestPage.prototype.onPageWillLeave = function () {
+    ContestPage.prototype.ionViewWillLeave = function () {
         this.animateLastResults = false;
         this.lastQuizResults = null;
     };
@@ -157,7 +157,7 @@ var ContestPage = (function () {
         __metadata('design:type', contest_chart_1.ContestChartComponent)
     ], ContestPage.prototype, "contestChartComponent", void 0);
     ContestPage = __decorate([
-        ionic_angular_1.Page({
+        core_1.Component({
             templateUrl: 'build/pages/contest/contest.html',
             directives: [contest_chart_1.ContestChartComponent]
         }), 
