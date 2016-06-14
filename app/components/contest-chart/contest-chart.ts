@@ -2,7 +2,7 @@ import {Component, Input, EventEmitter, Output} from '@angular/core';
 import {Client} from '../../providers/client';
 import {Contest} from '../../objects/objects';
 
-const WIDTH_MARGIN: number = 2;
+const WIDTH_MARGIN:number = 2;
 
 @Component({
   selector: 'contest-chart',
@@ -12,14 +12,11 @@ const WIDTH_MARGIN: number = 2;
 export class ContestChartComponent {
 
   @Input() id:Number;
-  @Input() mode:string;
   @Input() contest:Contest;
 
   chartTeamEventHandled:boolean;
   client:Client;
-  width: number;
-  height: number;
-  chart: any;
+  chart:any;
 
   @Output() contestSelected = new EventEmitter();
   @Output() teamSelected = new EventEmitter();
@@ -53,11 +50,11 @@ export class ContestChartComponent {
     this.client = Client.getInstance();
   }
 
-  onContestSelected(source: string) {
+  onContestSelected(source:string) {
     this.contestSelected.emit({'contest': this.contest, 'source': source});
   }
 
-  onTeamSelected(teamId: number, source: string) {
+  onTeamSelected(teamId:number, source:string) {
     this.teamSelected.emit({'teamId': teamId, 'contest': this.contest, 'source': source})
   }
 
@@ -67,15 +64,13 @@ export class ContestChartComponent {
 
   initChart() {
     if (!this.chart) {
-      this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-      this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
       this.adjustResolution();
       window.FusionCharts.ready(() => {
         this.chart = new window.FusionCharts({
           type: this.client.settings.charts.contest.type,
           renderAt: this.id + '-container',
-          width: this.width - WIDTH_MARGIN,
-          height: this.height,
+          width: this.client.chartWidth - WIDTH_MARGIN,
+          height: this.client.chartHeight,
           dataFormat: 'json',
           dataSource: this.contest.dataSource,
           events: this.events
@@ -87,7 +82,7 @@ export class ContestChartComponent {
     }
   }
 
-  refresh(contest?: Contest) {
+  refresh(contest?:Contest) {
     if (contest) {
       //new contest object arrived
       this.contest = contest;
@@ -103,20 +98,15 @@ export class ContestChartComponent {
   }
 
   onResize() {
-    var newWidth = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-    if (this.width !== newWidth) {
-      this.width = newWidth;
-      this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
-      this.chart.resizeTo(this.width - WIDTH_MARGIN, this.height);
-    }
+    this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
   }
 
   adjustResolution() {
     this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[0].fontSize);
     this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[1].fontSize);
-    var topMarginPercent = this.client.adjustPixelRatio(this.client.settings.charts.contest.size.topMarginPercent,true);
+    var topMarginPercent = this.client.adjustPixelRatio(this.client.settings.charts.contest.size.topMarginPercent, true);
 
-    var netChartHeight = 1 - (topMarginPercent/100);
+    var netChartHeight = 1 - (topMarginPercent / 100);
 
     var teamsOrder;
     if (this.client.currentLanguage.direction === 'ltr') {

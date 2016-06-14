@@ -18,6 +18,7 @@
     "app/objects/objects.ts",
     "app/app.ts",
     "app/components/contest-chart/contest-chart.ts",
+    "app/components/contest-details/contest-details.ts",
     "app/components/contest-list/contest-list.ts",
     "app/components/date-picker/date-picker.ts",
     "app/components/leaders/leaders.ts",

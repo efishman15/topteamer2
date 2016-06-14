@@ -336,6 +336,6 @@ export class TopTeamerApp {
   }
 }
 
-ionicBootstrap(TopTeamerApp, [Client], {
-  backButtonText: '', prodMode: true
+ionicBootstrap(TopTeamerApp, [provide(ExceptionHandler, {useClass: MyExceptionHandler}),Client], {
+  backButtonText:'', prodMode: true
 });

@@ -395,8 +395,13 @@ var QuizPage = (function () {
             this.quizContext.fillStyle = state.textFillStyle;
             this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.signs.bold, this.circleOuterRadius + 'px', this.client.settings.quiz.canvas.font.signs.name);
             var textWidth = this.quizContext.measureText(state.text).width;
+            var directionMultiplier = 1;
+            if (this.client.currentLanguage.direction === 'ltr') {
+                //For left to right - need to draw "behind" the x supplied, for rtl - "after"
+                directionMultiplier = -1;
+            }
             //1.35 = 'magic number' - works for all resolutions
-            this.quizContext.fillText(state.text, x + (textWidth / 2), this.client.settings.quiz.canvas.size.topOffset + (1.35 * this.circleOuterRadius));
+            this.quizContext.fillText(state.text, x + (directionMultiplier * textWidth / 2), this.client.settings.quiz.canvas.size.topOffset + (1.35 * this.circleOuterRadius));
             this.quizContext.closePath();
         }
     };
@@ -412,14 +417,20 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.drawQuizScores = function () {
         this.clearQuizScores();
+        this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.scores.bold, this.client.settings.quiz.canvas.font.scores.size, this.client.settings.quiz.canvas.font.scores.name);
         var currentX;
+        var directionMultiplier = 1;
         if (this.client.currentLanguage.direction === 'ltr') {
             currentX = this.circleOuterRadius;
+            directionMultiplier = -1;
         }
         else {
             currentX = this.quizCanvas.width - this.circleOuterRadius;
         }
-        var circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.circleOuterRadius * 2) / (this.quizData.totalQuestions - 1);
+        var circleOffsets = 0;
+        if (this.quizData.totalQuestions > 1) {
+            circleOffsets = (this.quizCanvas.width - this.quizData.totalQuestions * this.circleOuterRadius * 2) / (this.quizData.totalQuestions - 1);
+        }
         for (var i = 0; i < this.quizData.totalQuestions; i++) {
             var questionScore;
             if (!this.quizData.reviewMode) {
@@ -437,8 +448,7 @@ var QuizPage = (function () {
             //Draw the score at the top of the circle
             this.quizContext.beginPath();
             this.quizContext.fillStyle = scoreColor;
-            this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.scores.bold, this.client.settings.quiz.canvas.font.scores.size, this.client.settings.quiz.canvas.font.scores.name);
-            this.quizContext.fillText(questionScore, currentX + textWidth / 2, this.client.settings.quiz.canvas.scores.size.top);
+            this.quizContext.fillText(questionScore, currentX + directionMultiplier * textWidth / 2, this.client.settings.quiz.canvas.scores.size.top);
             this.quizContext.closePath();
             if (this.client.currentLanguage.direction === 'ltr') {
                 if (i < this.quizData.totalQuestions - 1) {

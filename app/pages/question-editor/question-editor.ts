@@ -65,29 +65,6 @@ export class QuestionEditorPage {
 
   }
 
-  ngOnInit() {
-    //Bypassing what seems to be an angular2 bug: cannot set an interpolated expression for maxlength in textarea html5 object
-    var maxLengthAttrQuestion = document.createAttribute('maxlength');
-    maxLengthAttrQuestion.value = '' + this.client.settings.quiz.question.maxLength;
-    document.getElementById('questionControl').children[0].attributes.setNamedItem(maxLengthAttrQuestion);
-
-    var maxLengthAttrAnswer0 = document.createAttribute('maxlength');
-    maxLengthAttrAnswer0.value = '' + this.client.settings.quiz.question.answer.maxLength;
-    document.getElementById('answer0Control').children[0].attributes.setNamedItem(maxLengthAttrAnswer0);
-
-    var maxLengthAttrAnswer1 = document.createAttribute('maxlength');
-    maxLengthAttrAnswer1.value = '' + this.client.settings.quiz.question.answer.maxLength;
-    document.getElementById('answer1Control').children[0].attributes.setNamedItem(maxLengthAttrAnswer1);
-
-    var maxLengthAttrAnswer2 = document.createAttribute('maxlength');
-    maxLengthAttrAnswer2.value = '' + this.client.settings.quiz.question.answer.maxLength;
-    document.getElementById('answer2Control').children[0].attributes.setNamedItem(maxLengthAttrAnswer2);
-
-    var maxLengthAttrAnswer3 = document.createAttribute('maxlength');
-    maxLengthAttrAnswer3.value = '' + this.client.settings.quiz.question.answer.maxLength;
-    document.getElementById('answer3Control').children[0].attributes.setNamedItem(maxLengthAttrAnswer3);
-  }
-
   //The only life cycle eve currently called in modals
   ngAfterViewInit() {
 

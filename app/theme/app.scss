@@ -59,7 +59,7 @@
   color: #ffffff;
   display: inline-block;
   padding: 8px 20px;
-  font: normal 700 20px/1 "Calibri", sans-serif;
+  font: normal 700 20px/1 "Roboto", "Helvetica Neue", sans-serif;
   text-align: center;
   text-shadow: 1px 1px 0 #1c78a9;
 }
@@ -72,7 +72,7 @@
   color: #ffffff;
   display: inline-block;
   padding: 8px 20px;
-  font: normal 700 20px/1 "Calibri", sans-serif;
+  font: normal 700 20px/1 "Roboto", "Helvetica Neue", sans-serif;
   text-align: center;
   text-shadow: 1px 1px 0 #2c2c52;
 }
@@ -96,4 +96,21 @@
 .app-smaller-title {
   font-size: 18px !important;
 }
+
+.no-padding {
+  padding: 0px !important;
+}
+
+.no-margin {
+  margin: 0px auto !important;
+}
+
+.no-wrap-text {
+  overflow: visible !important;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
 

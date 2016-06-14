@@ -54,15 +54,13 @@ var ContestChartComponent = (function () {
     ContestChartComponent.prototype.initChart = function () {
         var _this = this;
         if (!this.chart) {
-            this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-            this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
             this.adjustResolution();
             window.FusionCharts.ready(function () {
                 _this.chart = new window.FusionCharts({
                     type: _this.client.settings.charts.contest.type,
                     renderAt: _this.id + '-container',
-                    width: _this.width - WIDTH_MARGIN,
-                    height: _this.height,
+                    width: _this.client.chartWidth - WIDTH_MARGIN,
+                    height: _this.client.chartHeight,
                     dataFormat: 'json',
                     dataSource: _this.contest.dataSource,
                     events: _this.events
@@ -85,12 +83,7 @@ var ContestChartComponent = (function () {
         }
     };
     ContestChartComponent.prototype.onResize = function () {
-        var newWidth = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-        if (this.width !== newWidth) {
-            this.width = newWidth;
-            this.height = this.width * this.client.settings.charts.contest.size.heightRatioFromWidth;
-            this.chart.resizeTo(this.width - WIDTH_MARGIN, this.height);
-        }
+        this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
     };
     ContestChartComponent.prototype.adjustResolution = function () {
         this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[0].fontSize);
@@ -115,10 +108,6 @@ var ContestChartComponent = (function () {
         core_1.Input(), 
         __metadata('design:type', Number)
     ], ContestChartComponent.prototype, "id", void 0);
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', String)
-    ], ContestChartComponent.prototype, "mode", void 0);
     __decorate([
         core_1.Input(), 
         __metadata('design:type', objects_1.Contest)

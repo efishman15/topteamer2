@@ -70,18 +70,6 @@
   margin: 0px auto;
 }
 
-.center-image-container {
-  transform: translateX(50%);
-  -moz-transform: translateX(50%);
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  -o-transform: translateX(50%);
-}
-
-.contests-play-image {
-  float: left;
-}
-
 .chart-bottom-area {
   background-color: #ffffff;
   margin: 0px auto;
@@ -90,13 +78,6 @@
 
 .chart-bottom-ribbon {
   padding-top: 5px;
-}
-
-.chart-bottom-line-separator {
-  width: 90%;
-  border-top: 2px solid #D6D6D6;
-  margin: 0px auto;
-  position: relative;
 }
 
 .chart-bottom-ribbon-participants-text {

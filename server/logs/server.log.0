@@ -1,0 +1,4 @@
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10908,"level":30,"options":{"url":"http://freegeoip.net/json/5.29.242.54","timeout":3000},"error":{"code":"ETIMEDOUT","connect":true},"msg":"Error during request from api","time":"2016-06-13T09:44:21.441Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":17548,"level":30,"msg":"server up!","time":"2016-06-13T10:22:00.769Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":17548,"level":30,"options":{"url":"http://freegeoip.net/json/5.29.242.54","timeout":3000},"error":{"code":"ETIMEDOUT","connect":true},"msg":"Error during request from api","time":"2016-06-13T13:23:31.700Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12948,"level":30,"msg":"server up!","time":"2016-06-13T14:08:12.748Z","v":0}

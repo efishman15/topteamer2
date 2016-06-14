@@ -1,6 +1,7 @@
 import {Component,ViewChild} from '@angular/core';
 import {NavParams} from 'ionic-angular';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
+import {ContestDetailsComponent} from '../../components/contest-details/contest-details';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
@@ -10,7 +11,7 @@ import {Contest,QuizResults} from '../../objects/objects';
 
 @Component({
   templateUrl: 'build/pages/contest/contest.html',
-  directives: [ContestChartComponent]
+  directives: [ContestChartComponent, ContestDetailsComponent]
 })
 
 export class ContestPage {
@@ -22,6 +23,7 @@ export class ContestPage {
   playText: string;
 
   @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
+  @ViewChild(ContestDetailsComponent) contestDetailsComponent:ContestDetailsComponent;
 
   constructor(params:NavParams) {
 
@@ -30,8 +32,11 @@ export class ContestPage {
     this.setPlayText();
 
     this.client.events.subscribe('topTeamer:quizFinished', (eventData) => {
-      //Event data comes as an array of data objects - we expect only one (last quiz results)
 
+      //Refresh the contest chart and the contest details
+      this.refreshContestChart(eventData[0].contest)
+
+      //Event data comes as an array of data objects - we expect only one (last quiz results)
       this.lastQuizResults = eventData[0];
 
       if (this.lastQuizResults.data.facebookPost) {
@@ -127,6 +132,7 @@ export class ContestPage {
   refreshContestChart(contest) {
     this.contest = contest;
     this.contestChartComponent.refresh(contest);
+    this.contestDetailsComponent.refresh(contest);
   }
 
   switchTeams(source) {

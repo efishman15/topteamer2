@@ -8,6 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var exceptions_1 = require('./providers/exceptions');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('./providers/client');
 var facebookService = require('./providers/facebook');
@@ -290,7 +291,7 @@ var TopTeamerApp = (function () {
     return TopTeamerApp;
 })();
 exports.TopTeamerApp = TopTeamerApp;
-ionic_angular_1.ionicBootstrap(TopTeamerApp, [client_1.Client], {
+ionic_angular_1.ionicBootstrap(TopTeamerApp, [core_1.provide(core_1.ExceptionHandler, { useClass: exceptions_1.MyExceptionHandler }), client_1.Client], {
     backButtonText: '', prodMode: true
 });
 //# sourceMappingURL=app.js.map

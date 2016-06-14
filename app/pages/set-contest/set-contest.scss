@@ -22,7 +22,7 @@
   color: #ffffff;
   display: inline-block;
   padding: 8px 20px;
-  font: normal 700 20px/1 "Calibri", sans-serif;
+  font: normal 700 20px/1 "Roboto", "Helvetica Neue", sans-serif;
   text-align: center;
   text-shadow: 1px 1px 0 #2c2c52;
 }
@@ -97,4 +97,20 @@
 .set-contest-random-order-checkbox-rtl {
   margin-left: 0px !important;
   margin-right: 0px !important;
+}
+
+.set-contest-my-team-item-ltr {
+  margin-left: -5px;
+}
+
+.set-contest-my-team-item-rtl {
+  margin-right: -5px;
+}
+
+.set-contest-other-team-item-ltr {
+  margin-left: 5px;
+}
+
+.set-contest-other-team-item-rtl {
+  margin-right: 5px;
 }

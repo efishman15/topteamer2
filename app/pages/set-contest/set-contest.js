@@ -23,12 +23,17 @@ var SetContestPage = (function () {
         this.client = client_1.Client.getInstance();
         this.params = params;
         this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
-        this.team0 = new common_1.Control('', common_1.Validators.required);
-        this.team1 = new common_1.Control('', common_1.Validators.required);
-        this.contestForm = formBuilder.group({
-            team0: this.team0,
-            team1: this.team1
+        this.team0Control = new common_1.Control('', common_1.Validators.required);
+        this.team1Control = new common_1.Control('', common_1.Validators.required);
+        this.subjectControl = new common_1.Control('', common_1.Validators.required);
+        this.matchingTeamsControlGroup = formBuilder.group({
+            team0Control: this.team0Control,
+            team1Control: this.team1Control
         }, { validator: this.matchingTeamsValidator });
+        this.contestForm = formBuilder.group({
+            matchingTeamsControlGroup: this.matchingTeamsControlGroup,
+            subjectControl: this.subjectControl
+        });
         //Start date is today, end date is by default as set by the server
         var nowWithTime = new Date();
         var nowWithoutTime = new Date();
@@ -61,6 +66,8 @@ var SetContestPage = (function () {
             }
             var endDate = this.getEndDateAccordingToEndsIn(endOption);
             this.contestLocalCopy = new objects_1.Contest(this.params.data.typeId, this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds, endDate, endOption);
+            //Set contest subject
+            this.contestLocalCopy.subject = this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name, { 'name': this.client.session.name });
             this.showStartDate = true;
             this.contestLocalCopy.type.questions = new objects_1.Questions();
         }
@@ -104,7 +111,6 @@ var SetContestPage = (function () {
         }
         this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
         this.showAdminInfo = false;
-        this.setTitle();
     }
     SetContestPage.prototype.ionViewWillEnter = function () {
         var eventData = { 'mode': this.params.data.mode };
@@ -119,19 +125,6 @@ var SetContestPage = (function () {
         contestsService.getQuestions(this.contestLocalCopy.type.userQuestions).then(function (questions) {
             _this.contestLocalCopy.type.questions = { 'visibleCount': questions.length, 'list': questions };
         });
-    };
-    SetContestPage.prototype.setTitle = function () {
-        switch (this.params.data.mode) {
-            case 'add':
-                this.title = this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.params.data.typeId].text.name);
-                break;
-            case 'edit':
-                this.title = this.client.translate('EDIT_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name);
-                break;
-            default:
-                this.title = this.client.translate('GAME_NAME');
-                break;
-        }
     };
     SetContestPage.prototype.processAndroidPurchase = function (purchaseData) {
         var _this = this;
@@ -199,14 +192,7 @@ var SetContestPage = (function () {
             _this.buyInProgress = false;
         });
     };
-    ;
-    SetContestPage.prototype.userQuestionsMinimumCheck = function () {
-        if (this.client.settings['newContest'].privateQuestions.min === 1) {
-            this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings['newContest'].privateQuestions.min });
-        }
-        else {
-            this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings['newContest'].privateQuestions.min });
-        }
+    SetContestPage.prototype.userQuestionsMinimumError = function () {
         if (this.userQuestionsInvalid) {
             return true;
         }
@@ -283,9 +269,13 @@ var SetContestPage = (function () {
         }
         if (this.contestLocalCopy.type.id === 'userTrivia') {
             if (!this.contestLocalCopy.type.questions || this.contestLocalCopy.type.questions.visibleCount < this.client.settings['newContest'].privateQuestions.min) {
-                if (!this.userQuestionsMinimumCheck()) {
-                    return;
+                if (this.client.settings['newContest'].privateQuestions.min === 1) {
+                    this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings['newContest'].privateQuestions.min });
                 }
+                else {
+                    this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', { minimum: this.client.settings['newContest'].privateQuestions.min });
+                }
+                return;
             }
         }
         //Tweak the manual participants
@@ -299,7 +289,7 @@ var SetContestPage = (function () {
             this.contestLocalCopy.name.long = this.client.translate('CONTEST_NAME_LONG', {
                 'team0': this.contestLocalCopy.teams[0].name,
                 'team1': this.contestLocalCopy.teams[1].name,
-                'type': this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name)
+                'type': this.contestLocalCopy.subject
             });
             this.contestLocalCopy.name.short = this.client.translate('CONTEST_NAME_SHORT', {
                 'team0': this.contestLocalCopy.teams[0].name,
@@ -347,18 +337,18 @@ var SetContestPage = (function () {
         }
     };
     SetContestPage.prototype.matchingTeamsValidator = function (group) {
-        var val;
+        var value;
         var valid = true;
         for (name in group.controls) {
             //Empty value in one of the teams will be caught in the required validator
             if (!group.controls[name].value) {
                 return null;
             }
-            if (val === undefined) {
-                val = group.controls[name].value;
+            if (value === undefined) {
+                value = group.controls[name].value;
             }
             else {
-                if (val === group.controls[name].value) {
+                if (value && group.controls[name].value && value.trim() === group.controls[name].value.trim()) {
                     valid = false;
                     break;
                 }
@@ -398,6 +388,14 @@ var SetContestPage = (function () {
         else {
             //Unlimited
             return null;
+        }
+    };
+    SetContestPage.prototype.subjectFocus = function () {
+        if (!this.readOnlySubjectAlerted && this.contestLocalCopy.type.id === 'systemTrivia') {
+            this.readOnlySubjectAlerted = true;
+            alertService.alert({
+                'type': 'SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA'
+            });
         }
     };
     SetContestPage = __decorate([

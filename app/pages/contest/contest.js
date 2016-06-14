@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
+var contest_details_1 = require('../../components/contest-details/contest-details');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var alertService = require('../../providers/alert');
@@ -24,6 +25,8 @@ var ContestPage = (function () {
         this.contest = params.data.contest;
         this.setPlayText();
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
+            //Refresh the contest chart and the contest details
+            _this.refreshContestChart(eventData[0].contest);
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
@@ -103,6 +106,7 @@ var ContestPage = (function () {
     ContestPage.prototype.refreshContestChart = function (contest) {
         this.contest = contest;
         this.contestChartComponent.refresh(contest);
+        this.contestDetailsComponent.refresh(contest);
     };
     ContestPage.prototype.switchTeams = function (source) {
         this.joinContest(1 - this.contest.myTeam, source, 'switchTeams');
@@ -156,10 +160,14 @@ var ContestPage = (function () {
         core_1.ViewChild(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', contest_chart_1.ContestChartComponent)
     ], ContestPage.prototype, "contestChartComponent", void 0);
+    __decorate([
+        core_1.ViewChild(contest_details_1.ContestDetailsComponent), 
+        __metadata('design:type', contest_details_1.ContestDetailsComponent)
+    ], ContestPage.prototype, "contestDetailsComponent", void 0);
     ContestPage = __decorate([
         core_1.Component({
             templateUrl: 'build/pages/contest/contest.html',
-            directives: [contest_chart_1.ContestChartComponent]
+            directives: [contest_chart_1.ContestChartComponent, contest_details_1.ContestDetailsComponent]
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], ContestPage);

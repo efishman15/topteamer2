@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var contest_chart_1 = require('../contest-chart/contest-chart');
+var contest_details_1 = require('../contest-details/contest-details');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestListComponent = (function () {
@@ -24,19 +25,27 @@ var ContestListComponent = (function () {
                 _this.contestChartComponents.forEach(function (contestChartComponent) {
                     contestChartComponent.refresh();
                 });
+                var i = 0;
+                _this.contestDetailsComponents.forEach(function (contestDetailsComponent) {
+                    contestDetailsComponent.refresh(contests[i]);
+                    i++;
+                });
                 resolve();
             }), function () {
                 reject();
             };
         });
     };
-    ContestListComponent.prototype.onContestSelected = function (data) {
-        this.contestSelected.emit(data);
+    ContestListComponent.prototype.onContestSelected = function (event) {
+        this.contestSelected.emit(event);
     };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {
             this.contestChartComponents.forEach(function (contestChartComponent) {
                 contestChartComponent.onResize();
+            });
+            this.contestDetailsComponents.forEach(function (contestDetailsComponent) {
+                contestDetailsComponent.onResize();
             });
         }
     };
@@ -52,11 +61,15 @@ var ContestListComponent = (function () {
         core_1.ViewChildren(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', core_1.QueryList)
     ], ContestListComponent.prototype, "contestChartComponents", void 0);
+    __decorate([
+        core_1.ViewChildren(contest_details_1.ContestDetailsComponent), 
+        __metadata('design:type', core_1.QueryList)
+    ], ContestListComponent.prototype, "contestDetailsComponents", void 0);
     ContestListComponent = __decorate([
         core_1.Component({
             selector: 'contest-list',
             templateUrl: 'build/components/contest-list/contest-list.html',
-            directives: [contest_chart_1.ContestChartComponent],
+            directives: [contest_chart_1.ContestChartComponent, contest_details_1.ContestDetailsComponent],
         }), 
         __metadata('design:paramtypes', [])
     ], ContestListComponent);

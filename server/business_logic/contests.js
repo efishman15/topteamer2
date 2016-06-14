@@ -133,8 +133,8 @@ function validateContestData(data, callback) {
   }
 
   //Required fields
-  if (!data.contest.startDate || !data.contest.endDate || !data.contest.teams || !data.contest.type) {
-    callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, type'));
+  if (!data.contest.startDate || !data.contest.endDate || !data.contest.teams || !data.contest.type || !data.contest.subject) {
+    callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, type, subject'));
     return;
   }
 
@@ -276,6 +276,8 @@ function validateContestData(data, callback) {
 
     cleanContest.teams = data.contest.teams;
     cleanContest.name = data.contest.name;
+    cleanContest.subject = data.contest.subject;
+
     cleanContest.language = data.session.settings.language;
     cleanContest.score = 0; //The total score gained for this contest
 
@@ -331,6 +333,7 @@ function updateContest(data, callback) {
   data.setData['name'] = data.contest.name;
   data.setData['teams.0.name'] = data.contest.teams[0].name;
   data.setData['teams.1.name'] = data.contest.teams[1].name;
+  data.setData['subject'] = data.contest.subject;
   data.setData.endDate = data.contest.endDate;
 
   //If team names are changing - a new link is created in branch.io with the new contest teams /name

@@ -15,13 +15,11 @@ export let play = (sound) => {
 
   if (playMp3) {
     audio.src = sound + '.mp3';
-    audio.load();
     audio.play();
     return true;
   }
   else if (playOgg) {
     audio.src = sound + '.ogg';
-    audio.load();
     audio.play();
     return true;
   }

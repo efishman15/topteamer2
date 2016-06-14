@@ -387,6 +387,17 @@ module.exports.answer = function (req, res, next) {
       sessionUtils.getSession(data, callback);
     },
 
+    //Retrieve the contest object - when quiz is finished
+    function (data, callback) {
+      if (data.session.quiz.clientData.finished) {
+        data.contestId = data.session.quiz.serverData.contest.id;
+        dalDb.getContest(data, callback);
+      }
+      else {
+        callback(null, data);
+      }
+    },
+
     //Check answer
     function (data, callback) {
 
@@ -408,6 +419,14 @@ module.exports.answer = function (req, res, next) {
         data.session.quiz.serverData.correctAnswers++;
 
         commonBusinessLogic.addXp(data, 'correctAnswer');
+
+        //PerfectScore story
+        if (data.session.quiz.serverData.correctAnswers === data.session.quiz.clientData.totalQuestions) {
+          //Contest object is retrieved if reached all questions => quiz finished
+          var myTeam = data.contest.users[data.session.userId].team;
+          commonBusinessLogic.addXp(data, 'quizFullScore');
+          setPostStory(data, 'gotPerfectScore', data.contest.teams[myTeam].link);
+        }
 
         var questionScore;
         if (!data.session.quiz.clientData.reviewMode) {
@@ -491,17 +510,6 @@ module.exports.answer = function (req, res, next) {
       }
     },
 
-    //Retrieve the contest object - when quiz is finished
-    function (data, callback) {
-      if (data.session.quiz.clientData.finished) {
-        data.contestId = data.session.quiz.serverData.contest.id;
-        dalDb.getContest(data, callback);
-      }
-      else {
-        callback(null, data);
-      }
-    },
-
     //Check to save the quiz score into the contest object - when quiz is finished
     function (data, callback) {
 
@@ -512,12 +520,6 @@ module.exports.answer = function (req, res, next) {
 
       var myTeam = data.contest.users[data.session.userId].team;
       var myContestUser = data.contest.users[data.session.userId];
-
-      //PerfectScore story
-      if (data.session.quiz.serverData.correctAnswers === data.session.quiz.clientData.totalQuestions) {
-        commonBusinessLogic.addXp(data, 'quizFullScore');
-        setPostStory(data, 'gotPerfectScore', data.contest.teams[myTeam].link);
-      }
 
       //Update all leaderboards with the score achieved - don't wait for any callbacks of the leaderboard - can
       //be done fully async and continue doing other stuff

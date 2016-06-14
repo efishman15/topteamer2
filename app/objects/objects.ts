@@ -263,6 +263,7 @@ export class ClientInfo {
 }
 
 export class Session {
+  name:string;
   rank:number;
   features:Object;
   score:number;
@@ -348,6 +349,7 @@ export class CalendarCell {
 export class Contest {
   _id:string;
   name:ContestName;
+  subject:string;
   startDate:number;
   endDate:number;
   myTeam:number;

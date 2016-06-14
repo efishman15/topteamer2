@@ -25,6 +25,7 @@
           [(ngModel)]="question.text"
           ngControl="questionControl"
           ngMaxlength="client.settings.quiz.question.maxLength"
+          [attr.maxlength]="client.settings.quiz.question.maxLength"
           (focus)="inputFocus(0)"
           (blur)="inputBlur()"
           required>
@@ -55,6 +56,7 @@
           [(ngModel)]="question.answers[0]"
           ngControl="answer0Control"
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
+          [attr.maxlength]="client.settings.quiz.question.answer.maxLength"
           (focus)="inputFocus(1)"
           (blur)="inputBlur()"
           required>
@@ -81,6 +83,7 @@
           [(ngModel)]="question.answers[1]"
           ngControl="answer1Control"
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
+          [attr.maxlength]="client.settings.quiz.question.answer.maxLength"
           (focus)="inputFocus(2)"
           (blur)="inputBlur()"
           required>
@@ -107,6 +110,7 @@
           [(ngModel)]="question.answers[2]"
           ngControl="answer2Control"
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
+          [attr.maxlength]="client.settings.quiz.question.answer.maxLength"
           (focus)="inputFocus(3)"
           (blur)="inputBlur()"
           required>
@@ -133,6 +137,7 @@
           [(ngModel)]="question.answers[3]"
           ngControl="answer3Control"
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
+          [attr.maxlength]="client.settings.quiz.question.answer.maxLength"
           (focus)="inputFocus(4)"
           (blur)="inputBlur()"
           required>

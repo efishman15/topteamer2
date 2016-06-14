@@ -19,20 +19,23 @@ export class SetContestPage {
   client:Client;
   params:NavParams;
 
-  nowWithoutTimeEpoch: number;
-  currentTimeOnlyInMilliseconds: number;
+  nowWithoutTimeEpoch:number;
+  currentTimeOnlyInMilliseconds:number;
   contestLocalCopy:Contest;
-  showStartDate:Boolean;
-  showAdminInfo:Boolean;
-  buyInProgress:Boolean;
+  showStartDate:boolean;
+  showAdminInfo:boolean;
+  buyInProgress:boolean;
+  team0Control:Control;
+  team1Control:Control;
+  matchingTeamsControlGroup:ControlGroup;
+  subjectControl:Control;
   endOptionKeys:Array<string>;
   title:string;
   contestForm:ControlGroup;
-  team0:Control;
-  team1:Control;
-  contestNameChanged:Boolean;
-  userQuestionsInvalid:String;
-  submitted:Boolean;
+  contestNameChanged:boolean;
+  userQuestionsInvalid:string;
+  submitted:boolean;
+  readOnlySubjectAlerted:boolean;
 
   constructor(params:NavParams, formBuilder:FormBuilder) {
 
@@ -41,13 +44,18 @@ export class SetContestPage {
 
     this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
 
-    this.team0 = new Control('', Validators.required);
-    this.team1 = new Control('', Validators.required);
+    this.team0Control = new Control('', Validators.required);
+    this.team1Control = new Control('', Validators.required);
+    this.subjectControl = new Control('', Validators.required);
+    this.matchingTeamsControlGroup = formBuilder.group({
+      team0Control: this.team0Control,
+      team1Control: this.team1Control
+    }, {validator: this.matchingTeamsValidator});
 
     this.contestForm = formBuilder.group({
-      team0: this.team0,
-      team1: this.team1
-    }, {validator: this.matchingTeamsValidator});
+      matchingTeamsControlGroup: this.matchingTeamsControlGroup,
+      subjectControl: this.subjectControl
+    });
 
     //Start date is today, end date is by default as set by the server
     var nowWithTime = new Date();
@@ -74,7 +82,7 @@ export class SetContestPage {
     else if (this.params.data.mode === 'add') {
 
       var endOption;
-      for(var i=0; i<this.endOptionKeys.length; i++) {
+      for (var i = 0; i < this.endOptionKeys.length; i++) {
         if (this.client.settings['newContest'].endOptions[this.endOptionKeys[i]].isDefault) {
           endOption = this.endOptionKeys[i];
           break;
@@ -87,6 +95,10 @@ export class SetContestPage {
 
       var endDate = this.getEndDateAccordingToEndsIn(endOption);
       this.contestLocalCopy = new Contest(this.params.data.typeId, this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds, endDate, endOption);
+
+      //Set contest subject
+      this.contestLocalCopy.subject = this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name, {'name': this.client.session.name});
+
       this.showStartDate = true;
       this.contestLocalCopy.type.questions = new Questions();
     }
@@ -140,8 +152,6 @@ export class SetContestPage {
     this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
     this.showAdminInfo = false;
 
-    this.setTitle();
-
   }
 
   ionViewWillEnter() {
@@ -157,22 +167,6 @@ export class SetContestPage {
     contestsService.getQuestions(this.contestLocalCopy.type.userQuestions).then((questions) => {
       this.contestLocalCopy.type.questions = {'visibleCount': questions.length, 'list': questions};
     });
-  }
-
-  setTitle() {
-    switch (this.params.data.mode) {
-      case 'add':
-        this.title = this.client.translate('NEW_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.params.data.typeId].text.name);
-        break;
-
-      case 'edit':
-        this.title = this.client.translate('EDIT_CONTEST') + ' - ' + this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name);
-        break;
-
-      default:
-        this.title = this.client.translate('GAME_NAME');
-        break;
-    }
   }
 
   processAndroidPurchase(purchaseData) {
@@ -254,15 +248,9 @@ export class SetContestPage {
         this.buyInProgress = false;
       }
     )
-  };
+  }
 
-  userQuestionsMinimumCheck() {
-    if (this.client.settings['newContest'].privateQuestions.min === 1) {
-      this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings['newContest'].privateQuestions.min});
-    }
-    else {
-      this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings['newContest'].privateQuestions.min});
-    }
+  userQuestionsMinimumError() {
 
     if (this.userQuestionsInvalid) {
       return true;
@@ -336,10 +324,11 @@ export class SetContestPage {
         }
         this.contestLocalCopy.type.questions.visibleCount--;
       }
-    },() => {
-              //do nothing on cancel
-            });
-  };
+    }, () => {
+      //do nothing on cancel
+    });
+  }
+  ;
 
   setContest() {
 
@@ -352,9 +341,14 @@ export class SetContestPage {
     if (this.contestLocalCopy.type.id === 'userTrivia') {
       if (!this.contestLocalCopy.type.questions || this.contestLocalCopy.type.questions.visibleCount < this.client.settings['newContest'].privateQuestions.min) {
 
-        if (!this.userQuestionsMinimumCheck()) {
-          return;
+        if (this.client.settings['newContest'].privateQuestions.min === 1) {
+          this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings['newContest'].privateQuestions.min});
         }
+        else {
+          this.userQuestionsInvalid = this.client.translate('SERVER_ERROR_MINIMUM_USER_QUESTIONS_SINGLE_MESSAGE', {minimum: this.client.settings['newContest'].privateQuestions.min});
+        }
+
+        return;
       }
     }
 
@@ -373,7 +367,7 @@ export class SetContestPage {
       this.contestLocalCopy.name.long = this.client.translate('CONTEST_NAME_LONG', {
         'team0': this.contestLocalCopy.teams[0].name,
         'team1': this.contestLocalCopy.teams[1].name,
-        'type': this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name)
+        'type': this.contestLocalCopy.subject
       });
       this.contestLocalCopy.name.short = this.client.translate('CONTEST_NAME_SHORT', {
         'team0': this.contestLocalCopy.teams[0].name,
@@ -426,7 +420,8 @@ export class SetContestPage {
   }
 
   matchingTeamsValidator(group:ControlGroup) {
-    let val;
+
+    let value;
     let valid = true;
 
     for (name in group.controls) {
@@ -436,11 +431,11 @@ export class SetContestPage {
         return null;
       }
 
-      if (val === undefined) {
-        val = group.controls[name].value;
+      if (value === undefined) {
+        value = group.controls[name].value;
       }
       else {
-        if (val === group.controls[name].value) {
+        if (value && group.controls[name].value && value.trim() === group.controls[name].value.trim()) {
           valid = false;
           break;
         }
@@ -456,12 +451,12 @@ export class SetContestPage {
 
   setEndsIn() {
     this.contestLocalCopy.endDate = this.getEndDateAccordingToEndsIn(this.contestLocalCopy.endOption);
-    this.client.logEvent('newContest/endsIn/click',{'endsIn': this.contestLocalCopy.endOption});
+    this.client.logEvent('newContest/endsIn/click', {'endsIn': this.contestLocalCopy.endOption});
   }
 
-  getEndDateAccordingToEndsIn(endsIn: string) {
+  getEndDateAccordingToEndsIn(endsIn:string) {
     var endOption = this.client.settings['newContest'].endOptions[endsIn];
-    var endDate = this.nowWithoutTimeEpoch +  this.currentTimeOnlyInMilliseconds + (endOption.number * endOption.msecMultiplier);
+    var endDate = this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds + (endOption.number * endOption.msecMultiplier);
     return endDate;
   }
 
@@ -489,6 +484,15 @@ export class SetContestPage {
     else {
       //Unlimited
       return null;
+    }
+  }
+
+  subjectFocus() {
+    if (!this.readOnlySubjectAlerted && this.contestLocalCopy.type.id === 'systemTrivia') {
+      this.readOnlySubjectAlerted = true;
+      alertService.alert({
+        'type': 'SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA'
+      });
     }
   }
 }

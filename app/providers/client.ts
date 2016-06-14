@@ -37,6 +37,8 @@ export class Client {
   _loaded:Boolean = false;
   clientInfo:ClientInfo;
   _width:number;
+  _chartWidth: number;
+  _chartHeight: number;
 
   serverGateway:ServerGateway;
 
@@ -483,9 +485,15 @@ export class Client {
       myApp.style.marginLeft = (containerWidth - minWidth) / 2 + 'px';
     }
 
-    var currentViewController = this.nav.getActive();
-    if (currentViewController && currentViewController.instance && currentViewController.instance['onResize']) {
-      currentViewController.instance['onResize']();
+    this._chartWidth = this.width * this.settings.charts.contest.size.widthRatio;
+    this._chartHeight = this.width * this.settings.charts.contest.size.heightRatioFromWidth;
+
+    //Invoke 'onResize' for each view that has it
+    for(var i=0; i<this.nav.length(); i++) {
+      var viewController = this.nav.getByIndex(i);
+      if (viewController && viewController.instance && viewController.instance['onResize']) {
+        viewController.instance['onResize']();
+      }
     }
   }
 
@@ -501,6 +509,14 @@ export class Client {
 
   get height():number {
     return window.innerHeight;
+  }
+
+  get chartWidth():number {
+    return this._chartWidth;
+  }
+
+  get chartHeight():number {
+    return this._chartHeight;
   }
 
   adjustPixelRatio(size:number, up?:boolean) {
