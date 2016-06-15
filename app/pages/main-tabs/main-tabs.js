@@ -28,7 +28,7 @@ var MainTabsPage = (function () {
             _this.needToRefreshList = true;
         });
         this.client.events.subscribe('topTeamer:languageChanged', function (eventData) {
-            _this.needToRefreshList = true;
+            window.location.reload();
         });
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
             _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
@@ -38,13 +38,7 @@ var MainTabsPage = (function () {
         });
     }
     MainTabsPage.prototype.ionViewWillEnter = function () {
-        if (this.needToRefreshList) {
-            var selectedPage = this.mainTabs.getSelected().getActive();
-            if (selectedPage.instance.ionViewWillEnter) {
-                selectedPage.instance.ionViewWillEnter();
-            }
-            this.needToRefreshList = false;
-        }
+        this.refreshActiveTab();
     };
     MainTabsPage.prototype.ionViewDidEnter = function () {
         //Should occur only once - and AFTER top toolbar received it's height
@@ -60,6 +54,15 @@ var MainTabsPage = (function () {
         var selectedPage = this.mainTabs.getSelected().getActive();
         if (selectedPage.instance && selectedPage.instance.onResize) {
             selectedPage.instance.onResize();
+        }
+    };
+    MainTabsPage.prototype.refreshActiveTab = function () {
+        if (this.needToRefreshList) {
+            var selectedPage = this.mainTabs.getSelected().getActive();
+            if (selectedPage.instance.ionViewWillEnter) {
+                selectedPage.instance.ionViewWillEnter();
+            }
+            this.needToRefreshList = false;
         }
     };
     __decorate([

@@ -32,10 +32,7 @@ export class SettingsPage {
   }
 
   switchLanguage() {
-    this.client.switchLanguage(this.client.currentLanguage.value).then(() => {
-      this.client.session.settings.language = this.client.user.settings.language;
-      this.client.logEvent('settings/language/change', {language: this.client.user.settings.language});
-    });
+    this.client.switchLanguage();
   }
 
   logout() {

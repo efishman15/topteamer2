@@ -318,6 +318,11 @@ module.exports.retrieveAdminSession = retrieveAdminSession;
 function retrieveAdminSession(data, callback) {
 
     retrieveSession(data, function (err, data) {
+        if(err) {
+          callback(err);
+          return;
+        }
+
         if (!data.session.isAdmin) {
             callback(new exceptions.ServerException('This action is permitted for admins only', {'sessionId': data.token}, 'warn', 403));
             return;

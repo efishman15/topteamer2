@@ -53,6 +53,7 @@ export class XpControlFont {
 export class GeneralSettings {
   webCanvasWidth:number;
   facebookFanPage:string;
+  debugMode:boolean;
 }
 
 export class FacebookSettings {

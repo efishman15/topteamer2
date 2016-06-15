@@ -28,11 +28,7 @@ var SettingsPage = (function () {
         this.client.toggleSound();
     };
     SettingsPage.prototype.switchLanguage = function () {
-        var _this = this;
-        this.client.switchLanguage(this.client.currentLanguage.value).then(function () {
-            _this.client.session.settings.language = _this.client.user.settings.language;
-            _this.client.logEvent('settings/language/change', { language: _this.client.user.settings.language });
-        });
+        this.client.switchLanguage();
     };
     SettingsPage.prototype.logout = function () {
         var _this = this;

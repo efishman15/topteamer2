@@ -5,23 +5,46 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var core_1 = require('@angular/core');
 var client_1 = require('./client');
+var MyArrayLogger = (function () {
+    function MyArrayLogger() {
+        this.res = [];
+    }
+    MyArrayLogger.prototype.log = function (s) {
+        this.res.push(s);
+    };
+    MyArrayLogger.prototype.logError = function (s) {
+        this.res.push(s);
+    };
+    MyArrayLogger.prototype.logGroup = function (s) {
+        this.res.push(s);
+    };
+    MyArrayLogger.prototype.logGroupEnd = function () {
+        this.res.forEach(function (error) {
+            console.error(error);
+        });
+    };
+    ;
+    return MyArrayLogger;
+})();
+exports.MyArrayLogger = MyArrayLogger;
 var MyExceptionHandler = (function (_super) {
     __extends(MyExceptionHandler, _super);
     function MyExceptionHandler() {
-        _super.apply(this, arguments);
+        _super.call(this, new MyArrayLogger(), true);
     }
     MyExceptionHandler.prototype.call = function (exception, stackTrace, reason) {
         var errorMessage = exception.message;
         if (exception.wrapperStack) {
             errorMessage += ', ' + exception.wrapperStack;
         }
-        var client = client_1.Client.getInstance();
-        console.error(errorMessage);
         if (window.myLogError) {
             //might not be initialized yet during app load
             window.myLogError('UnhandledException', errorMessage);
         }
-        _super.prototype.call.call(this, exception, stackTrace, reason);
+        var client = client_1.Client.getInstance();
+        if (client && client.settings.general && client.settings.general.debugMode) {
+            _super.prototype.call.call(this, exception, stackTrace, reason);
+        }
     };
     return MyExceptionHandler;
 })(core_1.ExceptionHandler);

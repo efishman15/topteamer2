@@ -39,7 +39,7 @@ export class MainTabsPage {
     });
 
     this.client.events.subscribe('topTeamer:languageChanged', (eventData) => {
-      this.needToRefreshList = true;
+      window.location.reload();
     });
 
     this.client.events.subscribe('topTeamer:serverPopup', (eventData) => {
@@ -53,13 +53,7 @@ export class MainTabsPage {
   }
 
   ionViewWillEnter() {
-    if (this.needToRefreshList) {
-      var selectedPage = this.mainTabs.getSelected().getActive();
-      if (selectedPage.instance.ionViewWillEnter) {
-        selectedPage.instance.ionViewWillEnter();
-      }
-      this.needToRefreshList = false;
-    }
+    this.refreshActiveTab();
   }
 
   ionViewDidEnter() {
@@ -78,6 +72,16 @@ export class MainTabsPage {
     var selectedPage = this.mainTabs.getSelected().getActive();
     if (selectedPage.instance && selectedPage.instance.onResize) {
       selectedPage.instance.onResize();
+    }
+  }
+
+  refreshActiveTab() {
+    if (this.needToRefreshList) {
+      var selectedPage = this.mainTabs.getSelected().getActive();
+      if (selectedPage.instance.ionViewWillEnter) {
+        selectedPage.instance.ionViewWillEnter();
+      }
+      this.needToRefreshList = false;
     }
   }
 }

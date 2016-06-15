@@ -241,17 +241,17 @@ var Client = (function () {
                         //Update the server with the registration id - if server has no registration or it has a different reg id
                         //Just submit and forget
                         if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
-                            this.post('user/setGcmRegistration', { 'registrationId': registrationData.registrationId });
+                            _this.serverPost('user/setGcmRegistration', { 'registrationId': registrationData.registrationId });
                         }
                     });
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData['contestId']) {
                             //TODO: QA - Check Push notification about a contest
-                            this.displayContest(notificationData.additionalData['contestId']);
+                            _this.displayContest(notificationData.additionalData['contestId']);
                         }
                     });
                     push.on('error', function (error) {
-                        this.logError('PushNotificationError', 'Error during push: ' + error.message);
+                        _this.logError('PushNotificationError', 'Error during push: ' + error.message);
                     });
                     var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
                     if (storedGcmRegistration && !_this.session.gcmRegistrationId) {
@@ -575,10 +575,19 @@ var Client = (function () {
         localStorage.setItem('language', language);
         this.setDirection();
     };
-    Client.prototype.switchLanguage = function (language) {
-        this.localSwitchLanguage(language);
-        var postData = { 'language': language };
-        return this.serverPost('user/switchLanguage', postData);
+    Client.prototype.switchLanguage = function () {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.localSwitchLanguage(_this.user.settings.language);
+            var postData = { 'language': _this.user.settings.language };
+            _this.serverPost('user/switchLanguage', postData).then(function () {
+                _this.session.settings.language = _this.user.settings.language;
+                _this.logEvent('settings/language/change', { language: _this.user.settings.language });
+                resolve();
+            }, function () {
+                reject();
+            });
+        });
     };
     Client.prototype.logout = function () {
         this.serverGateway.token = null;

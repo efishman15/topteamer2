@@ -320,7 +320,7 @@ export class Client {
             }
           );
 
-          push.on('registration', function (registrationData) {
+          push.on('registration', (registrationData) => {
 
             if (!registrationData || !registrationData.registrationId) {
               return;
@@ -331,18 +331,18 @@ export class Client {
             //Update the server with the registration id - if server has no registration or it has a different reg id
             //Just submit and forget
             if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
-              this.post('user/setGcmRegistration', {'registrationId': registrationData.registrationId});
+              this.serverPost('user/setGcmRegistration', {'registrationId': registrationData.registrationId});
             }
           });
 
-          push.on('notification', function (notificationData) {
+          push.on('notification', (notificationData) => {
             if (notificationData.additionalData && notificationData.additionalData['contestId']) {
               //TODO: QA - Check Push notification about a contest
               this.displayContest(notificationData.additionalData['contestId']);
             }
           });
 
-          push.on('error', function (error) {
+          push.on('error', (error) => {
             this.logError('PushNotificationError', 'Error during push: ' + error.message);
           });
 
@@ -642,10 +642,18 @@ export class Client {
     this.setDirection();
   }
 
-  switchLanguage(language:string) {
-    this.localSwitchLanguage(language);
-    var postData = {'language': language};
-    return this.serverPost('user/switchLanguage', postData);
+  switchLanguage() {
+    return new Promise((resolve, reject) => {
+      this.localSwitchLanguage(this.user.settings.language);
+      var postData = {'language': this.user.settings.language};
+      this.serverPost('user/switchLanguage', postData).then( () => {
+        this.session.settings.language = this.user.settings.language;
+        this.logEvent('settings/language/change', {language: this.user.settings.language});
+        resolve();
+      }, () => {
+        reject();
+      });
+    });
   }
 
   logout() {
