@@ -379,8 +379,6 @@ var Client = (function () {
             myApp.style.width = minWidth + 'px';
             myApp.style.marginLeft = (containerWidth - minWidth) / 2 + 'px';
         }
-        this._chartWidth = this.width * this.settings.charts.contest.size.widthRatio;
-        this._chartHeight = this.width * this.settings.charts.contest.size.heightRatioFromWidth;
         //Invoke 'onResize' for each view that has it
         for (var i = 0; i < this.nav.length(); i++) {
             var viewController = this.nav.getByIndex(i);
@@ -411,6 +409,9 @@ var Client = (function () {
     });
     Object.defineProperty(Client.prototype, "chartWidth", {
         get: function () {
+            if (this._chartWidth === undefined) {
+                this._chartWidth = this.width * this.settings.charts.contest.size.widthRatio;
+            }
             return this._chartWidth;
         },
         enumerable: true,
@@ -418,6 +419,9 @@ var Client = (function () {
     });
     Object.defineProperty(Client.prototype, "chartHeight", {
         get: function () {
+            if (this._chartHeight === undefined) {
+                this._chartHeight = this.width * this.settings.charts.contest.size.heightRatioFromWidth;
+            }
             return this._chartHeight;
         },
         enumerable: true,
