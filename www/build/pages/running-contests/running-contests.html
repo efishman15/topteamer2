@@ -1,0 +1,25 @@
+<ion-navbar app-top-bar *navbar>
+
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+
+  <ion-title>{{client.translate('RUNNING_CONTESTS')}}</ion-title>
+
+  <ion-buttons left>
+    <button (click)="client.openNewContest()">
+      <ion-icon name="add-circle"></ion-icon>
+    </button>
+  </ion-buttons>
+
+</ion-navbar>
+
+<ion-content class="app-bg">
+
+  <contest-list tab="running"
+                (contestSelected)="onContestSelected($event)">
+
+  </contest-list>
+
+</ion-content>
+

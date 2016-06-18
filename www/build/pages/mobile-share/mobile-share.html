@@ -1,0 +1,32 @@
+<ion-toolbar app-top-bar>
+
+  <ion-title>
+    {{client.translate('SHARE_WITH_FRIENDS_TITLE')}}
+  </ion-title>
+
+  <ion-buttons left>
+    <button (click)="dismiss(false)">
+      <ion-icon name="close-circle"></ion-icon>
+    </button>
+  </ion-buttons>
+
+</ion-toolbar>
+
+<ion-content class="app-bg">
+
+  <div text-center class="base-font">
+    <img padding-top src="images/cup.png" width="250" height="250">
+    <h3>{{contest.name.long}}</h3>
+    <h4 padding-bottom>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h4>
+
+    <button padding-top class="button-small button-facebook" (click)="dismiss(true)">
+      {{client.translate('SHARE')}}
+    </button>
+
+    <div padding-top text-center class="pointer button-not-now" (click)="dismiss(false)">{{client.translate('NOT_NOW')}}
+    </div>
+
+  </div>
+
+</ion-content>
+

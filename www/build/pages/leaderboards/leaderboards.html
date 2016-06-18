@@ -1,0 +1,34 @@
+<ion-navbar app-top-bar *navbar>
+
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+
+  <ion-title>{{client.translate('LEADERBOARDS')}}</ion-title>
+
+  <ion-buttons left>
+    <button (click)="client.openNewContest()">
+      <ion-icon name="add-circle"></ion-icon>
+    </button>
+  </ion-buttons>
+
+</ion-navbar>
+
+<ion-content class="app-bg">
+
+  <simple-tabs>
+    <simple-tab simpleTabTitle="{{client.translate('RECENTLY_FINISHED_CONTESTS')}}"
+                (selected)="showRecentlyFinishedContests()"></simple-tab>
+    <simple-tab simpleTabTitle="{{client.translate('FRIENDS')}}" (selected)="showFriendsLeaderboard()"></simple-tab>
+    <simple-tab simpleTabTitle="{{client.translate('WEEKLY')}}" (selected)="showWeeklyLeaderboard()"></simple-tab>
+  </simple-tabs>
+
+  <contest-list [hidden]="mode !== 'contests'" tab="recentlyFinished"
+                (contestSelected)="onContestSelected($event)">
+  </contest-list>
+
+  <leaders [hidden]="mode !== 'leaders'">
+
+  </leaders>
+
+</ion-content>

@@ -1,0 +1,26 @@
+<ion-navbar app-top-bar *navbar>
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>{{client.translate('SHARE_WITH_FRIENDS_TITLE')}}</ion-title>
+
+</ion-navbar>
+
+<ion-content class="app-bg">
+
+  <div class="base-font" padding text-center>
+    <h3 padding *ngIf="contest">{{contest.name.long}}</h3>
+    <h3 padding *ngIf="!contest">{{client.translate('GAME_NAME')}}</h3>
+    <h5>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h5>
+
+    <ion-list>
+      <div padding *ngFor="let row of client.settings.share.web.networks, let i=index">
+        <a padding *ngFor="let network of client.settings.share.web.networks[i]" (click)="share(network)" title="{{network.name}}">
+          <img src="{{network.image}}" width="{{client.settings.share.web.iconSize.width}}"
+               height="client.settings.share.web.iconSize.height">
+        </a>
+      </div>
+    </ion-list>
+  </div>
+
+</ion-content>

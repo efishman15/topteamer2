@@ -1,0 +1,42 @@
+<ion-navbar app-top-bar *navbar>
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>{{client.translate('SETTINGS')}}</ion-title>
+
+</ion-navbar>
+
+<ion-content class="app-bg">
+  <ion-list inset>
+    <ion-item class="app-menu-item">
+      <ion-icon name="{{client.session.settings.sound ? 'volume-up' : 'volume-off'}}" item-left></ion-icon>
+      <ion-label>{{client.session.settings.sound ? client.translate('SOUND_ON') : client.translate('SOUND_OFF') }}
+      </ion-label>
+      <ion-toggle [(ngModel)]="client.session.settings.sound" (click)="toggleSound()"></ion-toggle>
+    </ion-item>
+
+    <ion-item class="app-menu-item">
+      <ion-icon name="globe" item-left></ion-icon>
+      <ion-label class="base-font">{{client.translate('LANGUAGE')}}</ion-label>
+      <ion-select interface="action-sheet" multiple="false" [(ngModel)]="client.user.settings.language"
+                  okText="{{client.translate('OK')}}"
+                  cancelText="{{client.translate('CANCEL')}}"
+                  (ionChange)="client.switchLanguage()">
+        <ion-option *ngFor="let languageKey of client.languageKeys"
+                    value="{{languageKey}}"
+                    checked="languageKey===client.user.settings.language">
+          {{client.settings.languages[languageKey].displayNames[languageKey]}}
+        </ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="app-menu-item pointer" (click)="logout()">
+      <ion-icon name="log-out" item-left></ion-icon>
+      <ion-label>{{client.translate('SIGN_OUT')}}
+      </ion-label>
+    </ion-item>
+
+  </ion-list>
+
+
+</ion-content>

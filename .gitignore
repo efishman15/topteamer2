@@ -21,7 +21,6 @@ platforms/
 plugins/
 plugins/android.json
 plugins/ios.json
-www/build/
 $RECYCLE.BIN/
 server/logs/
 server/node_modules/

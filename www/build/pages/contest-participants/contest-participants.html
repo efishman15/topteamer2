@@ -1,0 +1,20 @@
+<ion-navbar app-top-bar *navbar>
+  <button menuToggle>
+    <ion-icon name="menu"></ion-icon>
+  </button>
+  <ion-title>{{client.translate('CONTEST_LEADERS')}}</ion-title>
+</ion-navbar>
+
+<ion-content class="app-bg" *ngIf="contest">
+
+  <simple-tabs>
+    <simple-tab simpleTabTitle="{{client.translate('CONTEST_LEADERS_GENERAL_SCORING')}}"
+                (selected)="showContestParticipants()"></simple-tab>
+    <simple-tab simpleTabTitle="{{contest.teams[0].name}}" (selected)="showTeamParticipants(0)"></simple-tab>
+    <simple-tab simpleTabTitle="{{contest.teams[1].name}}" (selected)="showTeamParticipants(1)"></simple-tab>
+  </simple-tabs>
+
+  <leaders>
+
+  </leaders>
+</ion-content>
