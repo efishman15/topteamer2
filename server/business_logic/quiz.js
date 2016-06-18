@@ -425,7 +425,9 @@ module.exports.answer = function (req, res, next) {
           //Contest object is retrieved if reached all questions => quiz finished
           var myTeam = data.contest.users[data.session.userId].team;
           commonBusinessLogic.addXp(data, 'quizFullScore');
-          setPostStory(data, 'gotPerfectScore', data.contest.teams[myTeam].link);
+          if (!data.session.quiz.clientData.reviewMode) {
+            setPostStory(data, 'gotPerfectScore', data.contest.teams[myTeam].link);
+          }
         }
 
         var questionScore;

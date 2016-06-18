@@ -37,8 +37,9 @@ export class Client {
   _loaded:Boolean = false;
   clientInfo:ClientInfo;
   _width:number;
-  _chartWidth: number;
-  _chartHeight: number;
+  _chartWidth:number;
+  _chartHeight:number;
+  _deepLinkContestId: string;
 
   serverGateway:ServerGateway;
 
@@ -79,46 +80,47 @@ export class Client {
 
     return new Promise((resolve, reject) => {
 
-      this._app = app;
-      this._platform = platform;
-      this._config = config;
-      this._events = events;
-      this._nav = nav;
-      this.loadingModalComponent = loadingModalComponent;
+        this._app = app;
+        this._platform = platform;
+        this._config = config;
+        this._events = events;
+        this._nav = nav;
+        this.loadingModalComponent = loadingModalComponent;
 
-      if (this.clientInfo.mobile) {
-        if (platform.is('android')) {
-          this.clientInfo.platform = 'android';
+        if (this.clientInfo.mobile) {
+          if (platform.is('android')) {
+            this.clientInfo.platform = 'android';
+          }
+          else if (platform.is('ios')) {
+            this.clientInfo.platform = 'ios';
+          }
         }
-        else if (platform.is('ios')) {
-          this.clientInfo.platform = 'ios';
-        }
+
+        var language = localStorage.getItem('language');
+
+        this.getSettings(language).then((data) => {
+
+          this._settings = data['settings'];
+          if (!language || language === 'undefined') {
+            //Language was computed on the server using geoInfo or the fallback to the default language
+            language = data['language'];
+            localStorage.setItem('language', language);
+          }
+
+          this.initUser(language, data['geoInfo']);
+
+          this.canvas = document.getElementById('playerInfoRankCanvas');
+          this._canvasContext = this.canvas.getContext('2d');
+
+          this.setDirection();
+
+          this._loaded = true;
+          Client.instance = this;
+
+          resolve();
+        }, (err) => reject(err));
       }
-
-      var language = localStorage.getItem('language');
-
-      this.getSettings(language).then((data) => {
-
-        this._settings = data['settings'];
-        if (!language || language === 'undefined') {
-          //Language was computed on the server using geoInfo or the fallback to the default language
-          language = data['language'];
-          localStorage.setItem('language', language);
-        }
-
-        this.initUser(language, data['geoInfo']);
-
-        this.canvas = document.getElementById('playerInfoRankCanvas');
-        this._canvasContext = this.canvas.getContext('2d');
-
-        this.setDirection();
-
-        this._loaded = true;
-        Client.instance = this;
-
-        resolve();
-      }, (err) => reject(err));
-    });
+    );
   }
 
   initPlayerInfo() {
@@ -343,7 +345,7 @@ export class Client {
           });
 
           push.on('error', (error) => {
-            this.logError('PushNotificationError', 'Error during push: ' + error.message);
+            window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
           });
 
           var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
@@ -486,7 +488,7 @@ export class Client {
     }
 
     //Invoke 'onResize' for each view that has it
-    for(var i=0; i<this.nav.length(); i++) {
+    for (var i = 0; i < this.nav.length(); i++) {
       var viewController = this.nav.getByIndex(i);
       if (viewController && viewController.instance && viewController.instance['onResize']) {
         viewController.instance['onResize']();
@@ -627,6 +629,14 @@ export class Client {
     return this._canvasContext;
   }
 
+  get deepLinkContestId():string {
+    return this._deepLinkContestId;
+  }
+
+  set deepLinkContestId(value: string) {
+    this._deepLinkContestId = value;
+  }
+
   translate(key:string, params ?:Object) {
     var translatedValue = this.settings.ui[this.user.settings.language][key];
     if (params) {
@@ -649,7 +659,7 @@ export class Client {
     return new Promise((resolve, reject) => {
       this.localSwitchLanguage(this.user.settings.language);
       var postData = {'language': this.user.settings.language};
-      this.serverPost('user/switchLanguage', postData).then( () => {
+      this.serverPost('user/switchLanguage', postData).then(() => {
         this.session.settings.language = this.user.settings.language;
         this.logEvent('settings/language/change', {language: this.user.settings.language});
         resolve();

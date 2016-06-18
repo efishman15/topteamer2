@@ -16,7 +16,6 @@ import {AppVersion} from 'ionic-native';
 export class TopTeamerApp {
 
   client:Client;
-  deepLinkContestId: string;
   @ViewChild(Nav) nav:Nav;
   @ViewChild(LoadingModalComponent) loadingModalComponent:LoadingModalComponent;
 
@@ -24,7 +23,6 @@ export class TopTeamerApp {
   platform: Platform;
   config: Config;
   events: Events;
-  isMenuOpen: boolean;
 
   constructor(app:App, platform:Platform, config: Config, client:Client, events:Events) {
 
@@ -198,9 +196,12 @@ export class TopTeamerApp {
 
         if (data.data_parsed && data.data_parsed.contestId) {
           //Will go to this contest
-          //TODO: QA - Deep linking
-          this.deepLinkContestId = data.data_parsed.contestId;
-          console.log('got contest id: ' + this.deepLinkContestId)
+          if (this.client.session) {
+            this.client.displayContest(data.data_parsed.contestId);
+          }
+          else {
+            this.client.deepLinkContestId = data.data_parsed.contestId;
+          }
         }
       }
       catch (e) {
@@ -235,11 +236,7 @@ export class TopTeamerApp {
     facebookService.getLoginStatus().then((result) => {
       if (result['connected']) {
         this.client.facebookServerConnect(result['response'].authResponse).then(() => {
-          this.client.setRootPage('MainTabsPage').then(() => {
-            if (this.deepLinkContestId) {
-              this.client.displayContest(this.deepLinkContestId);
-            }
-          });
+          this.client.setRootPage('MainTabsPage');
         })
       }
       else {
@@ -330,12 +327,8 @@ export class TopTeamerApp {
     this.client.logEvent('menu/systemTools');
     this.client.openPage('SystemToolsPage');
   }
-
-  menuOpened(opened: boolean) {
-    this.isMenuOpen = opened;
-  }
 }
 
 ionicBootstrap(TopTeamerApp, [provide(ExceptionHandler, {useClass: MyExceptionHandler}),Client], {
-  backButtonText:'', prodMode: true
+  backButtonText:'', prodMode: true, navExitApp: false
 });

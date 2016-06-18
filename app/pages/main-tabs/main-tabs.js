@@ -49,6 +49,12 @@ var MainTabsPage = (function () {
         }
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
+        //Came from external deep linking
+        if (this.client.deepLinkContestId) {
+            var contestId = this.client.deepLinkContestId;
+            this.client.deepLinkContestId = null;
+            this.client.displayContest(contestId);
+        }
     };
     MainTabsPage.prototype.onResize = function () {
         var selectedPage = this.mainTabs.getSelected().getActive();

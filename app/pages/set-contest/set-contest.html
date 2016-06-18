@@ -35,7 +35,7 @@
                        [(ngModel)]="contestLocalCopy.teams[0].name"
                        placeholder="{{client.translate('TEAM0')}}"
                        maxlength="15"
-                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-5px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
+                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-10px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
                        [disabled]="client.session.features.newContest.locked">
             </ion-input>
           </ion-item>
@@ -51,7 +51,7 @@
                        [(ngModel)]="contestLocalCopy.teams[1].name"
                        placeholder="{{client.translate('TEAM1')}}"
                        maxlength="15"
-                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '5px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '5px' : ''}"
+                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-10px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
                        [disabled]="client.session.features.newContest.locked">
             </ion-input>
           </ion-item>
@@ -139,7 +139,8 @@
           <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}">
             <button
               (click)="openQuestionEditor('add')"
-              class="set-contest-question-buttons">
+              class="set-contest-question-buttons"
+              [ngStyle]="{'padding-right': client.currentLanguage.direction==='ltr'?'10px':null, 'padding-left': client.currentLanguage.direction==='rtl'?'10px':null}">
               <ion-icon class="set-contest-add-icon" name="add-circle"></ion-icon>
               {{client.translate('ADD')}}
             </button>

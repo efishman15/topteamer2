@@ -31,7 +31,7 @@ exports.alert = function (message) { return new Promise(function (resolve, rejec
         ]
     });
     if (title) {
-        alert.setTitle(title);
+        alert.setTitle('<span style="float: ' + client.currentLanguage.align + '">' + title + '</span>');
     }
     client.nav.present(alert);
 }); };
@@ -40,8 +40,9 @@ exports.alert = function (message) { return new Promise(function (resolve, rejec
 //------------------------------------------------------
 exports.confirm = function (title, message, params) { return new Promise(function (resolve, reject) {
     var client = client_1.Client.getInstance();
+    var alignedTitle = '<span style="float: ' + client.currentLanguage.align + '">' + client.translate(title, params) + '</span>';
     var alert = ionic_angular_1.Alert.create({
-        title: client.translate(title, params),
+        title: alignedTitle,
         message: client.translate(message, params),
         cssClass: client.currentLanguage.direction,
         buttons: [

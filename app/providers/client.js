@@ -251,7 +251,7 @@ var Client = (function () {
                         }
                     });
                     push.on('error', function (error) {
-                        _this.logError('PushNotificationError', 'Error during push: ' + error.message);
+                        window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
                     });
                     var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
                     if (storedGcmRegistration && !_this.session.gcmRegistrationId) {
@@ -561,6 +561,16 @@ var Client = (function () {
     Object.defineProperty(Client.prototype, "canvasContext", {
         get: function () {
             return this._canvasContext;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Client.prototype, "deepLinkContestId", {
+        get: function () {
+            return this._deepLinkContestId;
+        },
+        set: function (value) {
+            this._deepLinkContestId = value;
         },
         enumerable: true,
         configurable: true

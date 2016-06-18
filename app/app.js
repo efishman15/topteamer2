@@ -155,9 +155,12 @@ var TopTeamerApp = (function () {
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
                     //Will go to this contest
-                    //TODO: QA - Deep linking
-                    _this.deepLinkContestId = data.data_parsed.contestId;
-                    console.log('got contest id: ' + _this.deepLinkContestId);
+                    if (_this.client.session) {
+                        _this.client.displayContest(data.data_parsed.contestId);
+                    }
+                    else {
+                        _this.client.deepLinkContestId = data.data_parsed.contestId;
+                    }
                 }
             }
             catch (e) {
@@ -189,11 +192,7 @@ var TopTeamerApp = (function () {
         facebookService.getLoginStatus().then(function (result) {
             if (result['connected']) {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
-                    _this.client.setRootPage('MainTabsPage').then(function () {
-                        if (_this.deepLinkContestId) {
-                            _this.client.displayContest(_this.deepLinkContestId);
-                        }
-                    });
+                    _this.client.setRootPage('MainTabsPage');
                 });
             }
             else {
@@ -270,9 +269,6 @@ var TopTeamerApp = (function () {
         this.client.logEvent('menu/systemTools');
         this.client.openPage('SystemToolsPage');
     };
-    TopTeamerApp.prototype.menuOpened = function (opened) {
-        this.isMenuOpen = opened;
-    };
     __decorate([
         core_1.ViewChild(ionic_angular_1.Nav), 
         __metadata('design:type', ionic_angular_1.Nav)
@@ -292,6 +288,6 @@ var TopTeamerApp = (function () {
 })();
 exports.TopTeamerApp = TopTeamerApp;
 ionic_angular_1.ionicBootstrap(TopTeamerApp, [core_1.provide(core_1.ExceptionHandler, { useClass: exceptions_1.MyExceptionHandler }), client_1.Client], {
-    backButtonText: '', prodMode: true
+    backButtonText: '', prodMode: true, navExitApp: false
 });
 //# sourceMappingURL=app.js.map
