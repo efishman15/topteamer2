@@ -173,12 +173,13 @@ module.exports.getSettings = function (req, res, next) {
       if (!data.language) {
         var ipInfo = get_ip(req);
         if (ipInfo && ipInfo.clientIp) {
+          console.log('clientIp: ' + JSON.stringify(ipInfo.clientIp));
           data.geoLocator = 0;
-          if (ipInfo.clientIp.toString().startsWith('::')) {
+          if (ipInfo.clientIp.startsWith('::')) {
             data.ip = ipInfo.clientIp.slice(7);
           }
           else {
-            data.ip = ipInfo.clientIp.toString();
+            data.ip = ipInfo.clientIp;
           }
           getGeoInfo(data, callback);
         }
