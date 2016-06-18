@@ -41,7 +41,6 @@ export class TopTeamerApp {
 
   initApp() {
 
-    //TODO: Hardware back button
     //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
 
     this.client.platform.ready().then(() => {
@@ -140,9 +139,6 @@ export class TopTeamerApp {
       window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       window.cordova.plugins.Keyboard.disableScroll(false);
     }
-
-    //Must be set manually for keyboard issue when opened - to scroll elements of the focused field
-    //TODO: check if Platform.prototype.fullScreen is required - to return true always
 
     //Hook into window.open
     window.open = window.cordova.InAppBrowser.open;

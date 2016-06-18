@@ -246,7 +246,6 @@ var Client = (function () {
                     });
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-                            //TODO: QA - Check Push notification about a contest
                             _this.displayContest(notificationData.additionalData['contestId']);
                         }
                     });
@@ -629,12 +628,10 @@ var ServerGateway = (function () {
     function ServerGateway(http) {
         this.http = http;
         if (!window.cordova) {
-            //this._endPoint = 'http://www.topteamer.com/'
             this._endPoint = window.location.protocol + '//' + window.location.host + '/';
         }
         else {
-            //TODO: change back to prod site
-            this._endPoint = 'http://dev.topteamer.com/';
+            this._endPoint = 'http://www.topteamer.com/';
         }
         this._eventQueue = [];
     }

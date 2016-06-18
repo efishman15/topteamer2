@@ -95,20 +95,32 @@
         "popup" : {
           "en" : {
             "title" : "New version",
-            "message" : "<h3>New version</h3>",
+            "message" : "<h3>Please update to the latest version - your account and game level will be saved</h3>",
             "preventBack" : true,
-            "image" : "images/info.png",
             "buttons" : [{
                 "action" : "linkExit",
                 "link" : "#storeLink",
                 "text" : "OK"
-              }]
+              }],
+            "image" : {
+              "url" : "images/info.png",
+              "size" : {
+                "width" : 100,
+                "height" : 100
+              }
+            }
           },
           "he" : {
             "title" : "גרסה חדשה",
-            "message" : "<h3>אנא עדכנו לגירסה החדשה שלנו - חשבונכם ורמתכם במשחק יישמרו</h3>",
+            "message" : "<h3>אנא עדכנו לגירסה החדשה - חשבונכם ורמתכם במשחק יישמרו</h3>",
             "preventBack" : true,
-            "image" : "images/info.png",
+            "image" : {
+              "url" : "images/info.png",
+              "size" : {
+                "width" : 100,
+                "height" : 100
+              }
+            },
             "buttons" : [{
                 "action" : "linkExit",
                 "link" : "#storeLink",
@@ -117,14 +129,20 @@
           },
           "es" : {
             "title" : "Nueva versión",
-            "message" : "<h3>Por favor, actualice a nuestra nueva versión - su cuenta y el rango será preservado</h3>",
+            "message" : "<h3>Por favor, actualice a la última versión - su cuenta y el nivel de juego se guardará</h3>",
             "preventBack" : true,
-            "image" : "images/info.png",
             "buttons" : [{
                 "action" : "linkExit",
                 "link" : "#storeLink",
                 "text" : "OK"
-              }]
+              }],
+            "image" : {
+              "url" : "images/info.png",
+              "size" : {
+                "width" : 100,
+                "height" : 100
+              }
+            }
           }
         }
       }
@@ -178,27 +196,32 @@
     },
     "quiz" : {
       "questions" : {
-        "levels" : [{
-            "minCorrectRatio" : 0.95,
-            "maxCorrectRatio" : 1.01,
-            "score" : 50
-          }, {
-            "minCorrectRatio" : 0.75,
-            "maxCorrectRatio" : 0.95,
-            "score" : 100
-          }, {
-            "minCorrectRatio" : 0.55,
-            "maxCorrectRatio" : 0.75,
-            "score" : 200
-          }, {
-            "minCorrectRatio" : 0.5,
-            "maxCorrectRatio" : 0.55,
-            "score" : 500
-          }, {
-            "minCorrectRatio" : 0.0,
-            "maxCorrectRatio" : 0.5,
-            "score" : 1000
-          }]
+        "systemTrivia" : {
+          "levels" : [{
+              "minCorrectRatio" : 0.95,
+              "maxCorrectRatio" : 1.01,
+              "score" : 50
+            }, {
+              "minCorrectRatio" : 0.75,
+              "maxCorrectRatio" : 0.95,
+              "score" : 100
+            }, {
+              "minCorrectRatio" : 0.55,
+              "maxCorrectRatio" : 0.75,
+              "score" : 200
+            }, {
+              "minCorrectRatio" : 0.5,
+              "maxCorrectRatio" : 0.55,
+              "score" : 500
+            }, {
+              "minCorrectRatio" : 0.0,
+              "maxCorrectRatio" : 0.5,
+              "score" : 1000
+            }]
+        },
+        "userTrivia" : {
+          "questionScore" : 100
+        }
       },
       "hintCost" : 0.2,
       "answerCost" : 0.5,
@@ -219,9 +242,9 @@
           "facebookPost" : {
             "action" : "topteamer:lead",
             "dialogImage" : {
-              "url" : "../../images/share_image.png",
-              "width" : 350,
-              "height" : 350
+              "url" : "images/cup.png",
+              "width" : 250,
+              "height" : 250
             },
             "object" : {
               "name" : "team"
@@ -235,9 +258,9 @@
           "facebookPost" : {
             "action" : "topteamer:empower",
             "dialogImage" : {
-              "url" : "../../images/share_image.png",
-              "width" : 350,
-              "height" : 350
+              "url" : "images/cup.png",
+              "width" : 250,
+              "height" : 250
             },
             "object" : {
               "name" : "team"
@@ -251,9 +274,9 @@
           "facebookPost" : {
             "action" : "topteamer:become",
             "dialogImage" : {
-              "url" : "../../images/share_image.png",
-              "width" : 350,
-              "height" : 350
+              "url" : "images/cup.png",
+              "width" : 250,
+              "height" : 250
             },
             "object" : {
               "name" : "contestLeader"
@@ -267,9 +290,9 @@
           "facebookPost" : {
             "action" : "topteamer:become",
             "dialogImage" : {
-              "url" : "../../images/share_image.png",
-              "width" : 350,
-              "height" : 350
+              "url" : "images/cup.png",
+              "width" : 250,
+              "height" : 250
             },
             "object" : {
               "name" : "teamLeader"
@@ -283,9 +306,9 @@
           "facebookPost" : {
             "action" : "topteamer:promote",
             "dialogImage" : {
-              "url" : "../../images/share_image.png",
-              "width" : 350,
-              "height" : 350
+              "url" : "images/cup.png",
+              "width" : 250,
+              "height" : 250
             },
             "object" : {
               "name" : "team"
@@ -455,12 +478,46 @@
     },
     "charts" : {
       "contest" : {
-        "chartControl" : {
+        "type" : "stackedcolumn2d",
+        "size" : {
+          "heightRatioFromWidth" : 0.5,
+          "widthRatio" : 0.9,
+          "topMarginPercent" : 15
+        },
+        "time" : {
+          "finished" : {
+            "color" : "#ff0000"
+          },
+          "running" : {
+            "color" : "#000000"
+          },
+          "starting" : {
+            "color" : "#000000"
+          }
+        },
+        "timer" : {
+          "width" : 30
+        },
+        "bottomRibbon" : {
+          "list" : 30,
+          "detailed" : 140
+        },
+        "myTeam" : [{
+            "bold" : 1,
+            "y" : "$dataset.1.set.1.startY - 18",
+            "underline" : 1,
+            "italic" : 1
+          }, {
+            "bold" : 1,
+            "y" : "$dataset.1.set.1.startY - 18",
+            "underline" : 1,
+            "italic" : 1
+          }],
+        "dataSource" : {
           "chart" : {
-            "bgColor" : "#FFFFFF",
+            "bgColor" : "#ffffff",
             "baseFont" : "Arial",
             "showBorder" : 0,
-            "canvasBorderColor" : "#FFFFFF",
             "yAxisMinValue" : 0.0,
             "yAxisMaxValue" : 1.0,
             "numDivLines" : 0,
@@ -468,7 +525,6 @@
             "showYAxisValues" : 0,
             "chartBottomMargin" : 0,
             "usePlotGradientColor" : 0,
-            "labelFontSize" : 20,
             "showValues" : 0,
             "showLegend" : 0,
             "showPlotBorder" : 1,
@@ -477,7 +533,9 @@
             "showTooltip" : 0,
             "chartTopMargin" : 0,
             "chartLeftMargin" : 0,
-            "chartRightMargin" : 0
+            "chartRightMargin" : 0,
+            "showCanvasBorder" : 0,
+            "canvasBorderColor" : "#ffffff"
           },
           "annotations" : {
             "groups" : [{
@@ -485,15 +543,15 @@
                 "items" : [{
                     "id" : "label",
                     "type" : "text",
-                    "y" : "$dataset.1.set.1.startY -16",
-                    "fontSize" : 22,
-                    "fontColor" : "#2888AC"
+                    "y" : "$dataset.1.set.1.startY - 18",
+                    "fontColor" : "#2888AC",
+                    "fontSize" : 22.0
                   }, {
                     "id" : "label",
                     "type" : "text",
-                    "y" : "$dataset.1.set.1.startY - 16",
-                    "fontSize" : 22,
-                    "fontColor" : "#BF0045"
+                    "y" : "$dataset.1.set.1.startY - 18",
+                    "fontColor" : "#BF0045",
+                    "fontSize" : 22
                   }]
               }]
           },
@@ -521,43 +579,15 @@
                   "color" : "#DCDCDC"
                 }]
             }]
-        },
-        "type" : "stackedcolumn2d",
-        "size" : {
-          "width" : 340,
-          "height" : 160
-        },
-        "topMarginPercent" : 20,
-        "time" : {
-          "finished" : {
-            "color" : "#ff0000"
-          },
-          "running" : {
-            "color" : "#000000"
-          },
-          "starting" : {
-            "color" : "#000000"
-          }
-        },
-        "topRibbonWidth" : 340,
-        "timer" : {
-          "width" : 30
-        },
-        "bottomRibbon" : {
-          "list" : 30,
-          "detailed" : 140
-        },
-        "myTeam" : [{
-            "bold" : 1,
-            "y" : "$dataset.1.set.1.startY - 18"
-          }, {
-            "bold" : 1,
-            "y" : "$dataset.1.set.1.startY - 18",
-            "bgAlpha" : 1
-          }]
+        }
       },
       "questionStats" : {
-        "chartControl" : {
+        "type" : "doughnut2d",
+        "colors" : {
+          "correct" : "#37b37d",
+          "incorrect" : "#f35e4a"
+        },
+        "dataSource" : {
           "chart" : {
             "baseFont" : "Arial",
             "paletteColors" : "#f35e4a,#37b37d",
@@ -578,14 +608,9 @@
             "showTooltip" : 0
           }
         },
-        "type" : "doughnut2d",
         "size" : {
-          "width" : 500,
-          "height" : 350
-        },
-        "colors" : {
-          "correct" : "#37b37d",
-          "incorrect" : "#f35e4a"
+          "widthRatio" : 0.9,
+          "heightRatio" : 0.5
         }
       }
     },
@@ -626,8 +651,10 @@
         },
         "circle" : {
           "radius" : {
-            "inner" : 15,
-            "outer" : 20
+            "outerBorderRatio" : 0.25,
+            "spaceRatio" : 0.5,
+            "max" : 20.0,
+            "min" : 10.0
           },
           "states" : {
             "previous" : {
@@ -635,13 +662,13 @@
                 "innerColor" : "#37b37d",
                 "outerColor" : "#0fe783",
                 "textFillStyle" : "#ffffff",
-                "text" : "✔"
+                "text" : "✓"
               },
               "incorrect" : {
                 "innerColor" : "#f35e4a",
                 "outerColor" : "#f87765",
                 "textFillStyle" : "#ffffff",
-                "text" : "✖"
+                "text" : "✗"
               }
             },
             "current" : {
@@ -662,29 +689,42 @@
           }
         },
         "size" : {
-          "width" : 576,
           "height" : 52,
-          "topOffset" : 12,
-          "topSignOffset" : 39
+          "topOffset" : 12
         },
         "line" : {
           "color" : "#4c59a2",
           "width" : 3
         },
         "font" : {
-          "scores" : "bold 10px Helvetica",
-          "signs" : "bold 20px Helvetica"
+          "scores" : {
+            "bold" : true,
+            "name" : "Helvetica",
+            "size" : "10px"
+          },
+          "signs" : {
+            "bold" : true,
+            "name" : "Helvetica"
+          }
         }
       },
       "question" : {
         "maxLength" : 90,
         "answer" : {
-          "maxLength" : 45
+          "maxLength" : 50
         },
-        "wrongAnswerMillisecondsDelay" : 3000
+        "wrongAnswerMillisecondsDelay" : 1500
       },
       "finish" : {
         "animateResultsTimeout" : 6000
+      },
+      "questions" : {
+        "systemTrivia" : {
+          "scores" : ["eval:settings.server.quiz.questions.systemTrivia.levels[0].score", "eval:settings.server.quiz.questions.systemTrivia.levels[1].score", "eval:settings.server.quiz.questions.systemTrivia.levels[2].score", "eval:settings.server.quiz.questions.systemTrivia.levels[3].score", "eval:settings.server.quiz.questions.systemTrivia.levels[4].score"]
+        },
+        "userTrivia" : {
+          "questionScore" : "eval:settings.server.quiz.questions.userTrivia.questionScore"
+        }
       }
     },
     "general" : {
@@ -693,12 +733,13 @@
       "baseUrlWithoutProtocol" : "//www.topteamer.com/",
       "logoUrl" : "images/logo.png",
       "facebookFanPage" : "https://www.facebook.com/392678080828378",
-      "webCanvasWidth" : 640,
+      "webCanvasWidth" : 780,
       "downloadUrl" : {
         "en" : "https://bnc.lt/m/Hh6urSo20n",
         "he" : "https://bnc.lt/m/MpHMrSo20n",
         "es" : "https://bnc.lt/m/Rxi4rSo20n"
-      }
+      },
+      "debugMode" : true
     },
     "share" : {
       "web" : {
@@ -756,33 +797,7 @@
     "newContest" : {
       "privateQuestions" : {
         "min" : 1,
-        "max" : 5
-      },
-      "endOptions" : {
-        "m30" : {
-          "value" : "m30",
-          "number" : 30,
-          "units" : "ENDS_IN_MINUTES",
-          "msecMultiplier" : 60000
-        },
-        "h4" : {
-          "value" : "h4",
-          "number" : 4,
-          "units" : "ENDS_IN_HOURS",
-          "msecMultiplier" : 3600000
-        },
-        "h24" : {
-          "value" : "h24",
-          "number" : 24,
-          "units" : "ENDS_IN_HOURS",
-          "msecMultiplier" : 3600000
-        },
-        "d3" : {
-          "value" : "d3",
-          "number" : 3,
-          "units" : "ENDS_IN_DAYS",
-          "msecMultiplier" : 86400000
-        }
+        "max" : 30
       },
       "contestTypes" : {
         "systemTrivia" : {
@@ -814,7 +829,40 @@
           }
         }
       },
-      "selectableContestTypes" : [["systemTrivia", "userTrivia"]]
+      "selectableContestTypes" : [["systemTrivia", "userTrivia"]],
+      "endOptions" : {
+        "m5" : {
+          "value" : "m5",
+          "number" : 5,
+          "units" : "ENDS_IN_MINUTES",
+          "msecMultiplier" : 60000
+        },
+        "m60" : {
+          "value" : "m60",
+          "number" : 60,
+          "units" : "ENDS_IN_MINUTES",
+          "msecMultiplier" : 60000
+        },
+        "h4" : {
+          "value" : "h4",
+          "number" : 4,
+          "units" : "ENDS_IN_HOURS",
+          "msecMultiplier" : 3600000
+        },
+        "h24" : {
+          "value" : "h24",
+          "number" : 24,
+          "units" : "ENDS_IN_HOURS",
+          "msecMultiplier" : 3600000,
+          "isDefault" : true
+        },
+        "d3" : {
+          "value" : "d3",
+          "number" : 3,
+          "units" : "ENDS_IN_DAYS",
+          "msecMultiplier" : 86400000
+        }
+      }
     },
     "ui" : {
       "en" : {
@@ -865,7 +913,6 @@
         "DAYS" : "days",
         "HOURS" : "hours",
         "MINUTES" : "minutes",
-        "PLAY_AGAIN" : "Play again",
         "PULL_TO_REFRESH" : "Pull to refresh...",
         "CONTEST_LIST" : "Contest List",
         "FACEBOOK_CONNECT_RELAX_MESSAGE" : "We will never post anything without your permission !",
@@ -895,8 +942,6 @@
         "SERVER_ERROR_MINIMUM_USER_QUESTIONS_PLURAL_MESSAGE" : "Please enter at least {{minimum}} questions",
         "SERVER_ERROR_MAXIMUM_USER_QUESTIONS_TITLE" : "Maximum questions",
         "SERVER_ERROR_MAXIMUM_USER_QUESTIONS_MESSAGE" : "You cannot submit more than {{maximum}} questions",
-        "SERVER_ERROR_GAME_IS_REQUIRED_TITLE" : "Game required",
-        "SERVER_ERROR_GAME_IS_REQUIRED_MESSAGE" : "Please select a game",
         "MY_CONTESTS" : "My Contests",
         "RUNNING_CONTESTS" : "Top contests",
         "RECENTLY_FINISHED_CONTESTS" : "Finished",
@@ -991,9 +1036,9 @@
         "REVIEW_MODE_OWNER_MESSAGE" : "For fair play you are only allowed to review your own questions, and your correct answers will not contribute any smartpoints to your team",
         "REVIEW_MODE_PLAY_AGAIN_MESSAGE" : "For fair play only your first results will contribute smartpoints to your team",
         "SELECT_CONTEST_TYPE" : "Select contest type:",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "Trivia: system generated questions",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.levels.length + ' random questions generated by the system'",
-        "CONTEST_TYPE_TRIVIA_USER_TITLE" : "Trivia: knowledge contest",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "Trivia questions",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.systemTrivia.levels.length + ' random trivia questions generated by the system'",
+        "CONTEST_TYPE_TRIVIA_USER_TITLE" : "Your questions",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'You can enter ' + eval:settings.client.newContest.privateQuestions.min + '-' + eval:settings.client.newContest.privateQuestions.max + ' questions of your own'",
         "SEARCH" : "Search",
         "SEARCH_MY_QUESTIONS" : "Search questions I added",
@@ -1005,17 +1050,26 @@
         "CONTEST_CREATED_ON" : "On {{month}} {{day}}, {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["S", "M", "T", "W", "T", "F", "S"],
         "DATE_PICKER_MONTH_NAMES" : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        "TRIVIA" : "Trivia",
         "GAME_NAME" : "Top Teamer",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} won",
         "AGAINST" : "vs.",
-        "TIE" : "Tie",
+        "TIE" : "Draw contest",
         "PLAY_FOR_TEAM" : "Play for {{team}}",
         "CONTEST_NAME_LONG" : "{{team0}} vs. {{team1}}: {{type}}",
         "CONTEST_NAME_SHORT" : "{{team0}} vs. {{team1}}",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivia",
-        "CONTEST_TYPE_TRIVIA_USER_NAME" : "Knowledge Contest",
-        "CONTEST_VIEW_TITLE" : "Who's the best?"
+        "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivia questions",
+        "CONTEST_TYPE_TRIVIA_USER_NAME" : "{{name}}'s questions",
+        "CONTEST_VIEW_TITLE" : "Who's the best?",
+        "QUIZ_VIEW_TITLE" : "Leaders: {{Team}}",
+        "SHOW_IN_RANDOM_ORDER" : "Show in random order",
+        "RUNNING_CONTESTS_TAB_TEXT" : "Leading",
+        "SWITCH_TEAMS_ALERT_TITLE" : "Switch Team",
+        "SWITCH_TEAMS_ALERT_MESSAGE" : "You started playing for {{team}} team",
+        "SUBJECT" : "Subject",
+        "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_TITLE" : "Changing subject",
+        "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "For system trivia contests the subject can not be changed. You can create a new contest and choose 'Your questions' and then enter a subject describing those questions",
+        "CONFIRM_EXIT_QUIZ_TITLE" : "Confirm exit",
+        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "The points you gained will not credit your team. Are you sure you would like to exit?"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1065,7 +1119,6 @@
         "DAYS" : "ימים",
         "HOURS" : "שעות",
         "MINUTES" : "דקות",
-        "PLAY_AGAIN" : "שחקו שוב",
         "PULL_TO_REFRESH" : "משכו לעדכון...",
         "CONTEST_LIST" : "רשימת התחרויות",
         "FACEBOOK_CONNECT_RELAX_MESSAGE" : "אנו לעולם לא נפרסם דבר ללא רשותכם!",
@@ -1095,10 +1148,8 @@
         "SERVER_ERROR_MINIMUM_USER_QUESTIONS_PLURAL_MESSAGE" : "'אנא הזינו לפחות ' + eval:settings.client.newContest.privateQuestions.min + ' שאלות'",
         "SERVER_ERROR_MAXIMUM_USER_QUESTIONS_TITLE" : "מקסימום שאלות",
         "SERVER_ERROR_MAXIMUM_USER_QUESTIONS_MESSAGE" : "'לא ניתן להזין יותר מ- ' + eval:settings.client.newContest.privateQuestions.max + ' שאלות'",
-        "SERVER_ERROR_GAME_IS_REQUIRED_TITLE" : "חובה לבחור משחק",
-        "SERVER_ERROR_GAME_IS_REQUIRED_MESSAGE" : "אנא בחרו את המשחק",
         "MY_CONTESTS" : "התחרויות שלי",
-        "RUNNING_CONTESTS" : "התחרויות המובילות",
+        "RUNNING_CONTESTS" : "תחרויות מובילות",
         "RECENTLY_FINISHED_CONTESTS" : "הסתיימו",
         "SUCCESS_RATIO" : "({{correctRatio}}% הצליחו)",
         "NEW_RANK_TITLE" : "מזל טוב!",
@@ -1133,7 +1184,7 @@
         "SHARE_BODY" : "אתם חייבים להסתכל על המשחק המגניב הזה: {{url}}",
         "SHARE_BODY_NO_URL" : "אתם חייבים להסתכל על המשחק המגניב הזה",
         "SHARE_BODY_WITH_CONTEST" : "הצטרפתי לשחק עבור קבוצת {{team}}. בואו לעזור: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות: '{{name}}' - בואו לעזור",
+        "SHARE_BODY_NO_URL_WITH_CONTEST" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות '{{name}}' - בואו לעזור",
         "JOIN_A_CONTEST_MESSAGE" : "אנא הצטרפו לאחת התחרויות המובילות על מנת שתופיע בתחרויות שלי",
         "LEADERBOARDS" : "היכל התהילה",
         "FRIENDS" : "חברים",
@@ -1188,10 +1239,10 @@
         "REVIEW_MODE_OWNER" : "על מנת לשמור על משחק הוגן, יוצרי התחרות לא יכולים לזכות את קבוצתם בנקודות",
         "REVIEW_MODE_PLAY_AGAIN" : "על מנת לשמור על משחק הוגן, רק תוצאות המשחק הראשון יזכו את קבוצתכם בנקודות",
         "SELECT_CONTEST_TYPE" : "בחרו את סוג התחרות",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "שאלות שלנו",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.levels.length + ' שאלות מתחלפות מתוך מאגר המערכת'",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "שאלות טריוויה",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.systemTrivia.levels.length + ' שאלות טריוויה מתחלפות מתוך מאגר המערכת'",
         "CONTEST_TYPE_TRIVIA_USER_TITLE" : "שאלות שלכם",
-        "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'הזינו אתם את השאלות. עד ' + eval:settings.client.newContest.privateQuestions.max + ' שאלות לתחרות'",
+        "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'הזינו בעצמכם עד ' + eval:settings.client.newContest.privateQuestions.max + ' שאלות לתחרות'",
         "SEARCH" : "חיפוש",
         "SEARCH_MY_QUESTIONS" : "חיפוש שאלות שהוספתי",
         "RESULTS" : "תוצאות",
@@ -1202,17 +1253,26 @@
         "CONTEST_CREATED_ON" : "ב {{day}} ל {{month}}, {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["א", "ב", "ג", "ד", "ה", "ו", "ש"],
         "DATE_PICKER_MONTH_NAMES" : ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"],
-        "TRIVIA" : "ידע כללי",
         "GAME_NAME" : "Top Teamer",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ניצחו",
         "AGAINST" : "נגד",
-        "TIE" : "תיקו",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "ידע כללי",
-        "CONTEST_TYPE_TRIVIA_USER_NAME" : "תחרות ידע",
+        "TIE" : "תיקו בתחרות",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "שאלות טריוויה",
+        "CONTEST_TYPE_TRIVIA_USER_NAME" : "השאלות של {{name}}",
         "PLAY_FOR_TEAM" : "שחקו עבור {{team}}",
         "CONTEST_NAME_LONG" : "{{team0}} נגד {{team1}}: {{type}}",
         "CONTEST_NAME_SHORT" : "{{team0}} נגד {{team1}}",
-        "CONTEST_VIEW_TITLE" : "מי יותר שווה?"
+        "CONTEST_VIEW_TITLE" : "מי יותר שווה?",
+        "QUIZ_VIEW_TITLE" : "מובילים: {{Team}}",
+        "SHOW_IN_RANDOM_ORDER" : "הציגו בסדר אקראי",
+        "RUNNING_CONTESTS_TAB_TEXT" : "המובילות",
+        "SWITCH_TEAMS_ALERT_TITLE" : "החלפת קבוצה",
+        "SWITCH_TEAMS_ALERT_MESSAGE" : "עברתם לשחק עבור קבוצת {{team}}",
+        "SUBJECT" : "נושא",
+        "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_TITLE" : "שינוי נושא",
+        "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "לתחרויות טריוויה לא ניתן לשנות את הנושא. תוכלו ליצור תחרות חדשה עם השאלות שלכם ובה תוכלו להזין נושא המתאר את השאלות שהזנתם",
+        "CONFIRM_EXIT_QUIZ_TITLE" : "יציאה באמצע",
+        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "הניקוד שצברתם לא ייזכה את קבוצתכם. האם אתם בטוחים שברצונכם לצאת?"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1262,7 +1322,6 @@
         "DAYS" : "días",
         "HOURS" : "horas",
         "MINUTES" : "minutos",
-        "PLAY_AGAIN" : "Juega de nuevo",
         "PULL_TO_REFRESH" : "Tirar para actualizar...",
         "CONTEST_LIST" : "Lista Concurso",
         "FACEBOOK_CONNECT_RELAX_MESSAGE" : "Nunca vamos a publicar nada sin su permiso !",
@@ -1292,8 +1351,6 @@
         "SERVER_ERROR_MINIMUM_USER_QUESTIONS_PLURAL_MESSAGE" : "'Por favor, introduzca al menos' + eval:settings.client.newContest.privateQuestions.min + ' preguntas'",
         "SERVER_ERROR_MAXIMUM_USER_QUESTIONS_TITLE" : "preguntas máximos",
         "SERVER_ERROR_MAXIMUM_USER_QUESTIONS_MESSAGE" : "'No se puede presentar más de ' + eval:settings.client.newContest.privateQuestions.max + ' preguntas'",
-        "SERVER_ERROR_GAME_IS_REQUIRED_TITLE" : "requerido Juego",
-        "SERVER_ERROR_GAME_IS_REQUIRED_MESSAGE" : "Por favor, seleccione un juego",
         "MY_CONTESTS" : "Mis Concursos",
         "RUNNING_CONTESTS" : "Top concursos",
         "RECENTLY_FINISHED_CONTESTS" : "Terminado",
@@ -1390,9 +1447,9 @@
         "REVIEW_MODE_OWNER" : "For fair play you are only allowed to review your own questions, and your correct answers will not contribute any smartpoints to your team",
         "REVIEW_MODE_PLAY_AGAIN" : "Para el juego limpio sólo sus primeros resultados contribuirán SmartPoints a su equipo",
         "SELECT_CONTEST_TYPE" : "Seleccione el tipo de concurso:",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "Trivia: preguntas Sistema generada",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.levels.length + ' preguntas aleatorios generados por el sistema'",
-        "CONTEST_TYPE_TRIVIA_USER_TITLE" : "Trivia: competencia conocimiento",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "preguntas de trivia",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.systemTrivia.levels.length + ' generados por el sistema preguntas de trivia'",
+        "CONTEST_TYPE_TRIVIA_USER_TITLE" : "preguntas de {{name}}",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'Puede introducir ' + eval:settings.client.newContest.privateQuestions.min + '-'  + eval:settings.client.newContest.privateQuestions.max + ' preguntas de su propio'",
         "SEARCH" : "Buscar",
         "SEARCH_MY_QUESTIONS" : "Buscar preguntas que añaden",
@@ -1404,17 +1461,26 @@
         "CONTEST_CREATED_ON" : "El {{day}} de {{month}} {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["D", "L", "M", "M", "J", "V", "S"],
         "DATE_PICKER_MONTH_NAMES" : ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-        "TRIVIA" : "Trivialidades",
         "GAME_NAME" : "Top Teamer",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ganadas",
         "AGAINST" : "frente a",
-        "TIE" : "Corbata",
+        "TIE" : "Dibuje la competencia",
         "PLAY_FOR_TEAM" : "Jugar para {{team}}",
         "CONTEST_NAME_LONG" : "{{team0}} frente a {{team1}}: {{type}}",
         "CONTEST_NAME_SHORT" : "{{team0}} frente a {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivialidades",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "Concurso de conocimiento",
-        "CONTEST_VIEW_TITLE" : "¿Quién es el mejor?"
+        "CONTEST_VIEW_TITLE" : "¿Quién es el mejor?",
+        "QUIZ_VIEW_TITLE" : "Líderes: {{Team}} equipo",
+        "SHOW_IN_RANDOM_ORDER" : "Mostrar en orden aleatorio",
+        "RUNNING_CONTESTS_TAB_TEXT" : "Líder",
+        "SWITCH_TEAMS_ALERT_TITLE" : "interruptor equipo",
+        "SWITCH_TEAMS_ALERT_MESSAGE" : "Empezó a jugar para el equipo de {{team}}",
+        "SUBJECT" : "Tema",
+        "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_TITLE" : "Cambio de tema",
+        "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "Para trivia concursos sistema el sujeto no puede ser cambiado . Puede crear un nuevo concurso y elegir 'Tus preguntas' y luego introduzca un asunto que describe aquellas preguntas",
+        "CONFIRM_EXIT_QUIZ_TITLE" : "confirmar la salida",
+        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "Los puntos que adquirió no acreditar su equipo . ¿Está seguro de que desea salir?"
       }
     },
     "platforms" : {
