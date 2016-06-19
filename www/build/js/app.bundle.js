@@ -5159,7 +5159,13 @@ exports.getVariables = function (contest) {
 exports.mobileShare = function (contest) {
     var client = client_1.Client.getInstance();
     var shareVariables = _this.getVariables(contest);
-    window.plugins.socialsharing.share(shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl);
+    client.showLoader();
+    window.plugins.socialsharing.share(shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl, function () {
+        client.hideLoader();
+    }, function (result) {
+        client.hideLoader();
+        window.myLogError('Mobile Share', JSON.stringify(result));
+    });
 };
 exports.share = function (source, contest) {
     var client = client_1.Client.getInstance();

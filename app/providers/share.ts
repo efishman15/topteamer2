@@ -61,10 +61,18 @@ export let mobileShare = (contest) => {
   var client = Client.getInstance();
   var shareVariables = this.getVariables(contest);
 
+  client.showLoader();
   window.plugins.socialsharing.share(shareVariables.shareBodyNoUrl,
     shareVariables.shareSubject,
     client.settings.general.baseUrl + client.settings.general.logoUrl,
-    shareVariables.shareUrl
+    shareVariables.shareUrl,
+    () => {
+      client.hideLoader();
+    },
+    (result) => {
+      client.hideLoader();
+      window.myLogError('Mobile Share', JSON.stringify(result));
+    }
   );
 }
 
