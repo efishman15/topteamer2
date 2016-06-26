@@ -267,6 +267,8 @@ function validateContestData(data, callback) {
     else {
       cleanContest.manualParticipants = 0;
     }
+    cleanContest.totalParticipants = cleanContest.participants + cleanContest.manualParticipants;
+
     if (data.contest.manualRating) {
       cleanContest.manualRating = data.contest.manualRating;
     }
@@ -359,221 +361,15 @@ function updateContest(data, callback) {
     if (data.contest.manualParticipants != null) {
       data.setData['manualParticipants'] = data.contest.manualParticipants;
     }
+    if (data.contest.totalParticipants != null) {
+      data.setData['totalParticipants'] = data.contest.totalParticipants;
+    }
     if (data.contest.manualRating != null) {
       data.setData['manualRating'] = data.contest.manualRating;
     }
   }
 
   dalDb.setContest(data, callback);
-}
-
-//------------------------------------------------------
-//-- setTimeDisplay
-//-- Sets the contest.time object - see as follows
-//------------------------------------------------------
-function setTimeDisplay(contest, session) {
-
-  var now = (new Date()).getTime();
-
-  contest.time = {
-    'start': {
-      'text': null,
-      'color': null
-    },
-    'end': {
-      'text': null,
-      'color': null
-    }
-  };
-
-  //Set contest status
-  if (contest.endDate < now) {
-    contest.status = 'finished';
-  }
-  else if (contest.startDate > now) {
-    contest.status = 'starting';
-  }
-  else {
-    contest.status = 'running';
-  }
-
-  var term;
-  var number;
-  var units;
-  var color;
-  var minutes;
-
-  //-------------------
-  // Start Time
-  //-------------------
-  minutes = mathjs.abs(now - contest.startDate) / 1000 / 60;
-  if (minutes >= 60 * 24) {
-    number = mathjs.ceil(minutes / 24 / 60);
-    units = 'DAYS';
-  }
-  else if (minutes >= 60) {
-    number = mathjs.ceil(minutes / 60);
-    units = 'HOURS';
-  }
-  else {
-    number = mathjs.ceil(minutes);
-    units = 'MINUTES';
-  }
-  if (now > contest.startDate) {
-    term = 'CONTEST_STARTED';
-    color = generalUtils.settings.client.charts.contest.time.running.color;
-  }
-  else {
-    term = 'CONTEST_STARTING';
-    color = generalUtils.settings.client.charts.contest.time.starting.color;
-  }
-  contest.time.start.text = generalUtils.translate(session.settings.language, term, {
-    number: number,
-    units: generalUtils.translate(session.settings.language, units)
-  });
-  contest.time.start.color = color;
-
-  //-------------------
-  // End Time
-  //-------------------
-  minutes = mathjs.abs(contest.endDate - now) / 1000 / 60;
-  if (minutes >= 60 * 24) {
-    number = mathjs.ceil(minutes / 24 / 60);
-    units = 'DAYS';
-  }
-  else if (minutes >= 60) {
-    number = mathjs.ceil(minutes / 60);
-    units = 'HOURS';
-  }
-  else {
-    number = mathjs.ceil(minutes);
-    units = 'MINUTES';
-  }
-  if (now < contest.endDate) {
-    term = 'CONTEST_ENDS_IN';
-    color = generalUtils.settings.client.charts.contest.time.running.color;
-  }
-  else {
-    term = 'CONTEST_ENDED';
-    color = generalUtils.settings.client.charts.contest.time.finished.color;
-  }
-  contest.time.end.text = generalUtils.translate(session.settings.language, term, {
-    number: number,
-    units: generalUtils.translate(session.settings.language, units)
-  });
-  contest.time.end.color = color;
-}
-
-//------------------------------------------------------
-//-- setDataSource
-//-- Sets the contest.setDataSource object
-//------------------------------------------------------
-function setDataSource(contest, session) {
-
-  var dataSource = JSON.parse(JSON.stringify(generalUtils.settings.client.charts.contest.dataSource));
-  contest.dataSource = dataSource;
-
-  var teamsOrder;
-
-  if (generalUtils.settings.client.languages[session.settings.language].direction === 'ltr') {
-    teamsOrder = [0, 1];
-  }
-  else {
-    teamsOrder = [1, 0];
-    dataSource.chart.hasRTLText = 1;
-  }
-
-  dataSource.annotations.groups[0].items[teamsOrder[0]].text = contest.teams[0].name;
-  dataSource.annotations.groups[0].items[0].x = '$dataset.0.set.0.centerX';
-
-  dataSource.annotations.groups[0].items[teamsOrder[1]].text = contest.teams[1].name;
-  dataSource.annotations.groups[0].items[1].x = '$dataset.0.set.1.centerX';
-
-  if (contest.myTeam === 0 || contest.myTeam === 1) {
-    var myTeamProperties = Object.keys(generalUtils.settings.client.charts.contest.myTeam[teamsOrder[contest.myTeam]]);
-    for (var i = 0; i < myTeamProperties.length; i++) {
-      //Apply all properties of "my team" to the label of my team
-      dataSource.annotations.groups[0].items[teamsOrder[contest.myTeam]][myTeamProperties[i]] = generalUtils.settings.client.charts.contest.myTeam[contest.myTeam][myTeamProperties[i]];
-    }
-  }
-
-  dataSource.categories[0].category[0].label = mathjs.round(contest.teams[teamsOrder[0]].chartValue * 100, 0) + '%';
-  dataSource.categories[0].category[1].label = mathjs.round(contest.teams[teamsOrder[1]].chartValue * 100, 0) + '%';
-
-}
-
-//---------------------------------------------------------------------
-// prepareContestForClient
-//
-// Updates:
-// 1. Status field (finished, starting, running)
-// 2. Ends in fields.
-// 3. Chart values as a result of a score change
-//---------------------------------------------------------------------
-module.exports.prepareContestForClient = prepareContestForClient;
-function prepareContestForClient(contest, session) {
-
-  setTimeDisplay(contest, session);
-
-  if (contest.users && contest.users[session.userId]) {
-    contest.myTeam = contest.users[session.userId].team;
-    if (contest.status !== 'finished') {
-      contest.state = 'play';
-    }
-    else {
-      contest.state = 'finished';
-    }
-  }
-  else {
-    if (contest.status !== 'finished') {
-      contest.state = 'join';
-    }
-    else {
-      contest.state = 'finished';
-    }
-  }
-
-  setContestScores(contest);
-
-  setDataSource(contest, session);
-
-  if (session.isAdmin || contest.creator.id.toString() === session.userId.toString()) {
-    contest.owner = true;
-  }
-
-  //Fields not to be disclosed to the client
-  delete contest.leader['userId'];
-  delete contest['users'];
-  delete contest['language'];
-}
-
-//---------------------------------------------------------------------
-// setContestScores
-//
-// Updates:
-// Chart values as a result of a score change
-//---------------------------------------------------------------------
-module.exports.setContestScores = setContestScores;
-function setContestScores(contest) {
-
-  //Chart values
-  if (contest.teams[0].score === 0 && contest.teams[1].score === 0) {
-    contest.teams[0].chartValue = 0.5;
-    contest.teams[1].chartValue = 0.5;
-    contest.leadingTeam = -1;
-  }
-  else {
-    //Do relational compute
-    var sum = contest.teams[0].score + contest.teams[1].score;
-    contest.teams[0].chartValue = mathjs.round(contest.teams[0].score / sum, 2);
-    contest.teams[1].chartValue = mathjs.round(contest.teams[1].score / sum, 2);
-    if (contest.teams[0].score > contest.teams[1].score) {
-      contest.leadingTeam = 0;
-    }
-    else {
-      contest.leadingTeam = 1;
-    }
-  }
 }
 
 //---------------------------------------------------------------------
@@ -689,6 +485,7 @@ function joinContestTeam(data, callback) {
   //Increment participants only if I did not join this contest yet
   if (joinToContestObject(data.contest, data.teamId, data.session)) {
     data.setData.participants = data.contest.participants;
+    data.setData.totalParticipants = data.contest.totalParticipants;
     data.newJoin = true;
     data.setData.lastParticipantJoinDate = (new Date()).getTime();
   }
@@ -717,6 +514,7 @@ function joinToContestObject(contest, teamId, session) {
   //Increment participants only if I did not join this contest yet
   if (!contest.users[session.userId]) {
     contest.participants++;
+    contest.totalParticipants++;
     contest.lastParticipantJoinDate = now;
     newJoin = true;
   }
@@ -915,16 +713,8 @@ module.exports.getContests = function (req, res, next) {
     function (data, callback) {
       data.closeConnection = true;
       dalDb.getContests(data, callback);
-    },
-
-    //Set contest status for each contest
-    function (data, callback) {
-      for (var i = 0; i < data.contests.length; i++) {
-        prepareContestForClient(data.contests[i], data.session);
-      }
-
-      callback(null, data);
     }
+
   ];
 
   async.waterfall(operations, function (err, data) {

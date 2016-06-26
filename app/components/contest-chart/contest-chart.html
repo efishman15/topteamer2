@@ -4,7 +4,7 @@
     <img src="images/timer_icon.png" class="chart-timer chart-timer-{{client.currentLanguage.direction}}"
          [ngStyle]="{'width': client.settings.charts.contest.timer.width + 'px'}">
     <span class="chart-type-title chart-type-title-{{client.currentLanguage.direction}}">{{contest.subject}}</span>
-    <span class="chart-end-time chart-end-time-{{client.currentLanguage.direction}}">{{contest.time.end.text}}</span>
+    <span class="chart-end-time chart-end-time-{{client.currentLanguage.direction}}" [ngClass]="{'contest-end-time-running': contest.status !== 'finished', 'contest-end-time-ended': contest.status === 'finished'}">{{contest.time.end.text}}</span>
   </div>
   <div text-center class="chart">
     <div text-center class="chart-radius">

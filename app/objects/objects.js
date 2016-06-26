@@ -345,6 +345,18 @@ var Contest = (function () {
     return Contest;
 })();
 exports.Contest = Contest;
+var ContestTimeData = (function () {
+    function ContestTimeData() {
+    }
+    return ContestTimeData;
+})();
+exports.ContestTimeData = ContestTimeData;
+var ContestTime = (function () {
+    function ContestTime() {
+    }
+    return ContestTime;
+})();
+exports.ContestTime = ContestTime;
 var ContestName = (function () {
     function ContestName() {
     }

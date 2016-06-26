@@ -431,3 +431,17 @@ module.exports.getYearWeek = function () {
   return '' + thisYear + '' + week;
 };
 
+//-------------------------------------------------------------------------------------------------------
+// Receives and array of strings and converts it to object
+// in which each item is a property in the new object having the specified object value
+//-------------------------------------------------------------------------------------------------------
+module.exports.arrayToObject = function (array, objectValue) {
+
+  var newObject = {};
+  array.forEach(function (element, index, array) {
+    newObject[element] = objectValue;
+  });
+
+  return newObject;
+};
+

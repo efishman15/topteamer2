@@ -13,21 +13,22 @@ var mathjs = require('mathjs');
 // Cache variables
 //---------------------------------------------------------------------
 var topics = {};
+var contestListClientFields = null;
 
 //---------------------------------------------------------------------
 // Class DbHelper
 //---------------------------------------------------------------------
 function DbHelper(db) {
-    this.db = db;
+  this.db = db;
 }
 
 //Class Methods
 DbHelper.prototype.getCollection = function (collectionName) {
-    return this.db.collection(collectionName);
+  return this.db.collection(collectionName);
 };
 
 DbHelper.prototype.close = function () {
-    return this.db.close();
+  return this.db.close();
 };
 
 //---------------------------------------------------------------------
@@ -38,9 +39,9 @@ DbHelper.prototype.close = function () {
 // checkToCloseDb
 //---------------------------------------------------------------------
 function checkToCloseDb(data) {
-    if (data.closeConnection && data.closeConnection) {
-        closeDb(data);
-    }
+  if (data.closeConnection && data.closeConnection) {
+    closeDb(data);
+  }
 }
 
 //---------------------------------------------------------------------
@@ -48,25 +49,25 @@ function checkToCloseDb(data) {
 //---------------------------------------------------------------------
 function buildQuestionsResult(questions) {
 
-    questionsResult = [];
-    for (var i = 0; i < questions.length; i++) {
+  questionsResult = [];
+  for (var i = 0; i < questions.length; i++) {
 
-        var question = {
-            '_id': questions[i]._id,
-            'text': questions[i].text,
-            'contests': questions[i].contests
-        };
+    var question = {
+      '_id': questions[i]._id,
+      'text': questions[i].text,
+      'contests': questions[i].contests
+    };
 
-        questionsResult.push(question);
+    questionsResult.push(question);
 
 
-        questionsResult[i].answers = [];
-        for (var j = 0; j < questions[i].answers.length; j++) {
-            questionsResult[i].answers.push(questions[i].answers[j].text);
-        }
+    questionsResult[i].answers = [];
+    for (var j = 0; j < questions[i].answers.length; j++) {
+      questionsResult[i].answers.push(questions[i].answers[j].text);
     }
+  }
 
-    return questionsResult;
+  return questionsResult;
 }
 
 //------------------------------------------------------------------------------------------------
@@ -80,52 +81,52 @@ function buildQuestionsResult(questions) {
 // output: user
 //------------------------------------------------------------------------------------------------
 function register(data, callback) {
-    var usersCollection = data.DbHelper.getCollection('Users');
+  var usersCollection = data.DbHelper.getCollection('Users');
 
-    var now = (new Date()).getTime();
+  var now = (new Date()).getTime();
 
-    var avatar = data.user.avatar;
+  var avatar = data.user.avatar;
 
-    data.user.settings.sound = true;
-    var newUser = {
-        'facebookUserId': data.user.thirdParty.id,
-        'facebookAccessToken': data.user.thirdParty.accessToken,
-        'name': data.user.name,
-        'email': data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
-        'geoInfo': data.user.geoInfo,
-        'ageRange': data.user.ageRange,
-        'settings': data.user.settings,
-        'score': 0,
-        'xp': 0,
-        'rank': 1,
-        'createdAt': now,
-        'lastLogin': now
-    };
+  data.user.settings.sound = true;
+  var newUser = {
+    'facebookUserId': data.user.thirdParty.id,
+    'facebookAccessToken': data.user.thirdParty.accessToken,
+    'name': data.user.name,
+    'email': data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
+    'geoInfo': data.user.geoInfo,
+    'ageRange': data.user.ageRange,
+    'settings': data.user.settings,
+    'score': 0,
+    'xp': 0,
+    'rank': 1,
+    'createdAt': now,
+    'lastLogin': now
+  };
 
-    usersCollection.insert(newUser
-        , {}, function (err, insertResult) {
-            if (err) {
+  usersCollection.insert(newUser
+    , {}, function (err, insertResult) {
+      if (err) {
 
-                closeDb(data);
+        closeDb(data);
 
-                callback(new exceptions.ServerException('Error inserting new user', {
-                    'user': newUser,
-                    'dbError': err
-                }, 'error'));
-                return;
-            }
+        callback(new exceptions.ServerException('Error inserting new user', {
+          'user': newUser,
+          'dbError': err
+        }, 'error'));
+        return;
+      }
 
-            newUser.thirdParty = data.user.thirdParty;
-            data.user = newUser;
-            data.user.justRegistered = true; //does not need to be in db - just returned back to the client
+      newUser.thirdParty = data.user.thirdParty;
+      data.user = newUser;
+      data.user.justRegistered = true; //does not need to be in db - just returned back to the client
 
-            //restore avatar - computed field
-            data.user.avatar = avatar;
+      //restore avatar - computed field
+      data.user.avatar = avatar;
 
-            checkToCloseDb(data);
+      checkToCloseDb(data);
 
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 }
 
 //---------------------------------------------------------------------
@@ -140,8 +141,8 @@ function register(data, callback) {
 //---------------------------------------------------------------------
 module.exports.closeDb = closeDb;
 function closeDb(data) {
-    data.DbHelper.close();
-    delete data.DbHelper;
+  data.DbHelper.close();
+  delete data.DbHelper;
 }
 
 //---------------------------------------------------------------------
@@ -156,14 +157,14 @@ function closeDb(data) {
 //---------------------------------------------------------------------
 module.exports.connect = connect;
 function connect(callback) {
-    mongoClient.connect(CONNECTION_STRING, function (err, db) {
-        if (err) {
-            callback(new exceptions.ServerException('Error connecting to the database', {'dbError': err}, 'error'));
-            return;
-        }
+  mongoClient.connect(CONNECTION_STRING, function (err, db) {
+    if (err) {
+      callback(new exceptions.ServerException('Error connecting to the database', {'dbError': err}, 'error'));
+      return;
+    }
 
-        callback(null, {'DbHelper': new DbHelper(db)});
-    })
+    callback(null, {'DbHelper': new DbHelper(db)});
+  })
 }
 
 //---------------------------------------------------------------------
@@ -178,37 +179,37 @@ function connect(callback) {
 module.exports.loadSettings = loadSettings;
 function loadSettings(data, callback) {
 
-    if (!data || !data.DbHelper) {
-        connect(function (err, connectData) {
-            if (!data) {
-                data = {'closeConnection': true};
-            }
-            data.DbHelper = connectData.DbHelper;
-            loadSettings(data, callback);
-        });
-        return;
+  if (!data || !data.DbHelper) {
+    connect(function (err, connectData) {
+      if (!data) {
+        data = {'closeConnection': true};
+      }
+      data.DbHelper = connectData.DbHelper;
+      loadSettings(data, callback);
+    });
+    return;
+  }
+
+  var settingsCollection = data.DbHelper.getCollection('Settings');
+  settingsCollection.findOne({}, {}, function (err, settings) {
+    if (err || !settings) {
+
+      closeDb(data);
+
+      callback(new exceptions.ServerException('Error finding contest', {
+        'data': data,
+        'dbError': err
+      }, 'error'));
+
+      return;
     }
 
-    var settingsCollection = data.DbHelper.getCollection('Settings');
-    settingsCollection.findOne({}, {}, function (err, settings) {
-        if (err || !settings) {
+    checkToCloseDb(data);
 
-            closeDb(data);
+    data.settings = settings;
 
-            callback(new exceptions.ServerException('Error finding contest', {
-                'data': data,
-                'dbError': err
-            }, 'error'));
-
-            return;
-        }
-
-        checkToCloseDb(data);
-
-        data.settings = settings;
-
-        callback(null, data);
-    })
+    callback(null, data);
+  })
 };
 
 //---------------------------------------------------------------------
@@ -222,34 +223,34 @@ function loadSettings(data, callback) {
 // output: topic
 //---------------------------------------------------------------------
 module.exports.getTopic = function (data, callback) {
-    var topic = topics['' + data.topicId];
-    if (topic) {
+  var topic = topics['' + data.topicId];
+  if (topic) {
+    data.topic = topic;
+    callback(null, data);
+  }
+  else {
+    connect(function (err, connectData) {
+      var topicsCollection = connectData.DbHelper.getCollection('Topics');
+      topicsCollection.findOne({
+        'topicId': data.topicId
+      }, {}, function (err, topic) {
+        if (err || !topic) {
+
+          closeDb(connectData);
+
+          callback(new exceptions.ServerException('Error retrieving topic by id', {
+            'topicId': data.topicId,
+            'dbError': err
+          }, 'error'));
+          return;
+        }
+        topics['' + data.topicId] = topic;
+
         data.topic = topic;
         callback(null, data);
-    }
-    else {
-        connect(function (err, connectData) {
-            var topicsCollection = connectData.DbHelper.getCollection('Topics');
-            topicsCollection.findOne({
-                'topicId': data.topicId
-            }, {}, function (err, topic) {
-                if (err || !topic) {
-
-                    closeDb(connectData);
-
-                    callback(new exceptions.ServerException('Error retrieving topic by id', {
-                        'topicId': data.topicId,
-                        'dbError': err
-                    }, 'error'));
-                    return;
-                }
-                topics['' + data.topicId] = topic;
-
-                data.topic = topic;
-                callback(null, data);
-            })
-        })
-    }
+      })
+    })
+  }
 };
 
 //---------------------------------------------------------------------
@@ -265,71 +266,71 @@ module.exports.getTopic = function (data, callback) {
 module.exports.retrieveSession = retrieveSession;
 function retrieveSession(data, callback) {
 
-    var criteria;
-    if (data.token) {
-        criteria = {'userToken': data.token}
-    }
-    else if (data.userId) {
-        criteria = {'userId': ObjectId(data.userId)}
-    }
-    else if (data.facebookUserId) {
-        criteria = {'facebookUserId': data.facebookUserId}
-    }
-    else {
-        callback(new exceptions.ServerException('Error retrieving session - no session identifier was supplied', null, 'info', 401));
+  var criteria;
+  if (data.token) {
+    criteria = {'userToken': data.token}
+  }
+  else if (data.userId) {
+    criteria = {'userId': ObjectId(data.userId)}
+  }
+  else if (data.facebookUserId) {
+    criteria = {'facebookUserId': data.facebookUserId}
+  }
+  else {
+    callback(new exceptions.ServerException('Error retrieving session - no session identifier was supplied', null, 'info', 401));
+    return;
+  }
+
+  //If no connection open - call recursively to this function from within the 'connect' block
+  if (!data.DbHelper) {
+    connect(function (err, connectData) {
+
+      data.closeConnection = true; //Indicates to close the connection after the action
+      data.DbHelper = connectData.DbHelper;
+      retrieveSession(data, callback);
+    });
+    return;
+  }
+
+  var sessionsCollection = data.DbHelper.getCollection('Sessions');
+
+  sessionsCollection.findOne(
+    criteria, {},
+    function (err, session) {
+      if (!data.sessionOptional && (err || !session)) {
+
+        closeDb(data);
+
+        //Serverity 'low' does not exist - thus skipping writing to logs and console
+        callback(new exceptions.ServerException('Error retrieving session - session expired', {'sessionId': data.token}, 'low', 401));
         return;
+      }
+
+      data.session = session;
+
+      checkToCloseDb(data);
+
+      callback(null, data);
     }
-
-    //If no connection open - call recursively to this function from within the 'connect' block
-    if (!data.DbHelper) {
-        connect(function (err, connectData) {
-
-            data.closeConnection = true; //Indicates to close the connection after the action
-            data.DbHelper = connectData.DbHelper;
-            retrieveSession(data, callback);
-        });
-        return;
-    }
-
-    var sessionsCollection = data.DbHelper.getCollection('Sessions');
-
-    sessionsCollection.findOne(
-        criteria, {},
-        function (err, session) {
-            if (!data.sessionOptional && (err || !session)) {
-
-                closeDb(data);
-
-                //Serverity 'low' does not exist - thus skipping writing to logs and console
-                callback(new exceptions.ServerException('Error retrieving session - session expired', {'sessionId': data.token}, 'low', 401));
-                return;
-            }
-
-            data.session = session;
-
-            checkToCloseDb(data);
-
-            callback(null, data);
-        }
-    )
+  )
 }
 
 module.exports.retrieveAdminSession = retrieveAdminSession;
 function retrieveAdminSession(data, callback) {
 
-    retrieveSession(data, function (err, data) {
-        if(err) {
-          callback(err);
-          return;
-        }
+  retrieveSession(data, function (err, data) {
+    if (err) {
+      callback(err);
+      return;
+    }
 
-        if (!data.session.isAdmin) {
-            callback(new exceptions.ServerException('This action is permitted for admins only', {'sessionId': data.token}, 'warn', 403));
-            return;
-        }
+    if (!data.session.isAdmin) {
+      callback(new exceptions.ServerException('This action is permitted for admins only', {'sessionId': data.token}, 'warn', 403));
+      return;
+    }
 
-        callback(null, data);
-    })
+    callback(null, data);
+  })
 }
 
 
@@ -345,27 +346,27 @@ function retrieveAdminSession(data, callback) {
 //---------------------------------------------------------------------
 module.exports.storeSession = function (data, callback) {
 
-    data.session.expires = new Date((new Date()).getTime() + generalUtils.settings.server.db.sessionExpirationMilliseconds)
-    var sessionsCollection = data.DbHelper.getCollection('Sessions');
-    sessionsCollection.update(
-        {
-            '_id': data.session._id
-        },
-        data.session,
-        function (err, updated) {
-            if (err) {
+  data.session.expires = new Date((new Date()).getTime() + generalUtils.settings.server.db.sessionExpirationMilliseconds)
+  var sessionsCollection = data.DbHelper.getCollection('Sessions');
+  sessionsCollection.update(
+    {
+      '_id': data.session._id
+    },
+    data.session,
+    function (err, updated) {
+      if (err) {
 
-                closeDb(data);
+        closeDb(data);
 
-                callback(new exceptions.ServerException('Error storing session expired - session expired', {'sessionId': data.session._id}, 'info', 401));
-                return;
-            }
+        callback(new exceptions.ServerException('Error storing session expired - session expired', {'sessionId': data.session._id}, 'info', 401));
+        return;
+      }
 
-            checkToCloseDb(data);
+      checkToCloseDb(data);
 
-            callback(null, data);
-        }
-    )
+      callback(null, data);
+    }
+  )
 };
 
 //---------------------------------------------------------------------
@@ -380,49 +381,49 @@ module.exports.storeSession = function (data, callback) {
 //---------------------------------------------------------------------
 module.exports.setUser = function (data, callback) {
 
-    if (!data.setData && !data.unsetData) {
-        callback(new exceptions.ServerException('Cannot update user, either setData or unsetData must be supplied', {
-            'setData': data.setData,
-            'unsetData': data.unsetData,
-            'dbError': err
+  if (!data.setData && !data.unsetData) {
+    callback(new exceptions.ServerException('Cannot update user, either setData or unsetData must be supplied', {
+      'setData': data.setData,
+      'unsetData': data.unsetData,
+      'dbError': err
+    }, 'error'));
+  }
+
+  var usersCollection = data.DbHelper.getCollection('Users');
+
+  if (!data.setUserWhereClause) {
+    data.setUserWhereClause = {'_id': ObjectId(data.session.userId)};
+  }
+
+  var updateClause = {};
+  if (data.setData) {
+    updateClause['$set'] = data.setData;
+  }
+  if (data.unsetData) {
+    updateClause['$unset'] = data.unsetData;
+  }
+
+  usersCollection.updateOne(data.setUserWhereClause, updateClause,
+    function (err, results) {
+
+      if (err || results.nModified < 1) {
+
+        closeDb(data);
+
+        callback(new exceptions.ServerException('Error updating user', {
+          'setUserWhereClause': data.setUserWhereClause,
+          'setData': data.setData,
+          'unsetData': data.unsetData,
+          'dbError': err
         }, 'error'));
-    }
 
-    var usersCollection = data.DbHelper.getCollection('Users');
+        return;
+      }
 
-    if (!data.setUserWhereClause) {
-        data.setUserWhereClause = {'_id': ObjectId(data.session.userId)};
-    }
+      checkToCloseDb(data);
 
-    var updateClause = {};
-    if (data.setData) {
-        updateClause['$set'] = data.setData;
-    }
-    if (data.unsetData) {
-        updateClause['$unset'] = data.unsetData;
-    }
-
-    usersCollection.updateOne(data.setUserWhereClause, updateClause,
-        function (err, results) {
-
-            if (err || results.nModified < 1) {
-
-                closeDb(data);
-
-                callback(new exceptions.ServerException('Error updating user', {
-                    'setUserWhereClause': data.setUserWhereClause,
-                    'setData': data.setData,
-                    'unsetData': data.unsetData,
-                    'dbError': err
-                }, 'error'));
-
-                return;
-            }
-
-            checkToCloseDb(data);
-
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 };
 
 //---------------------------------------------------------------------
@@ -438,90 +439,90 @@ module.exports.setUser = function (data, callback) {
 //---------------------------------------------------------------------
 module.exports.facebookLogin = function (data, callback) {
 
-    var usersCollection = data.DbHelper.getCollection('Users');
+  var usersCollection = data.DbHelper.getCollection('Users');
 
-    //Save avatar which is a computed field
-    //The findAndModify will bring a 'fresh' user object from db
-    //Put the avatar back later on this fresh object
-    var avatar = data.user.avatar;
+  //Save avatar which is a computed field
+  //The findAndModify will bring a 'fresh' user object from db
+  //Put the avatar back later on this fresh object
+  var avatar = data.user.avatar;
 
-    var thirdParty = data.user.thirdParty;
-    var clientInfo = data.user.clientInfo;
+  var thirdParty = data.user.thirdParty;
+  var clientInfo = data.user.clientInfo;
 
-    var now = (new Date()).getTime();
+  var now = (new Date()).getTime();
 
-    usersCollection.findOne({'facebookUserId': data.user.thirdParty.id}, {}, function (err, user) {
-            if (err || !user) {
-                register(data, callback);
-                return;
-            }
+  usersCollection.findOne({'facebookUserId': data.user.thirdParty.id}, {}, function (err, user) {
+      if (err || !user) {
+        register(data, callback);
+        return;
+      }
 
-            var dailyXp = 0;
-            var prevLogin = new Date(user.lastLogin);
+      var dailyXp = 0;
+      var prevLogin = new Date(user.lastLogin);
 
-            var today = new Date();
-            var now = today.getTime();
+      var today = new Date();
+      var now = today.getTime();
 
-            if (prevLogin.getUTCDay() != today.getUTCDay() ||
-                prevLogin.getUTCMonth() != today.getUTCMonth() ||
-                prevLogin.getUTCFullYear() != today.getUTCFullYear()) {
+      if (prevLogin.getUTCDay() != today.getUTCDay() ||
+        prevLogin.getUTCMonth() != today.getUTCMonth() ||
+        prevLogin.getUTCFullYear() != today.getUTCFullYear()) {
 
-                var xpProgress = new generalUtils.XpProgress(user.xp, user.rank);
-                xpProgress.addXp(user, 'login');
-            }
+        var xpProgress = new generalUtils.XpProgress(user.xp, user.rank);
+        xpProgress.addXp(user, 'login');
+      }
 
-            var setObject = {
-                '$set': {
-                    'lastLogin': now,
-                    'facebookAccessToken': data.user.thirdParty.accessToken,
-                    'name': data.user.name,  //keep sync with Facebook changes
-                    'email': data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
-                    'ageRange': data.user.ageRange, //keep sync with Facebook changes
-                    'xp': user.xp,
-                    'rank': user.rank,
-                    'friends': thirdParty.friends
-                }
-            };
-
-            usersCollection.updateOne({'_id': user._id}, setObject
-                , function (err, results) {
-
-                    if (err || results.nModified < 1) {
-
-                        closeDb(data);
-
-                        callback(new exceptions.ServerException('Error updating user during login', {
-                            'user': user
-                        }, 'error'));
-
-                        return;
-                    }
-
-                    //Update all those fields also locally as previouselly they were only updated in the db
-                    user.lastLogin = now;
-                    user.name = data.user.name;
-                    user.email = data.user.email;
-                    user.ageRange = data.user.ageRange;
-
-                    data.user = user;
-
-                    //restore the avatar back
-                    data.user.avatar = avatar;
-
-                    if (thirdParty) {
-                        data.user.thirdParty = thirdParty;
-                    }
-
-                    if (clientInfo) {
-                        data.user.clientInfo = clientInfo;
-                    }
-
-                    checkToCloseDb(data);
-
-                    callback(null, data);
-                });
+      var setObject = {
+        '$set': {
+          'lastLogin': now,
+          'facebookAccessToken': data.user.thirdParty.accessToken,
+          'name': data.user.name,  //keep sync with Facebook changes
+          'email': data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
+          'ageRange': data.user.ageRange, //keep sync with Facebook changes
+          'xp': user.xp,
+          'rank': user.rank,
+          'friends': thirdParty.friends
         }
-    );
+      };
+
+      usersCollection.updateOne({'_id': user._id}, setObject
+        , function (err, results) {
+
+          if (err || results.nModified < 1) {
+
+            closeDb(data);
+
+            callback(new exceptions.ServerException('Error updating user during login', {
+              'user': user
+            }, 'error'));
+
+            return;
+          }
+
+          //Update all those fields also locally as previouselly they were only updated in the db
+          user.lastLogin = now;
+          user.name = data.user.name;
+          user.email = data.user.email;
+          user.ageRange = data.user.ageRange;
+
+          data.user = user;
+
+          //restore the avatar back
+          data.user.avatar = avatar;
+
+          if (thirdParty) {
+            data.user.thirdParty = thirdParty;
+          }
+
+          if (clientInfo) {
+            data.user.clientInfo = clientInfo;
+          }
+
+          checkToCloseDb(data);
+
+          callback(null, data);
+        });
+    }
+  );
 };
 
 //---------------------------------------------------------------------
@@ -538,116 +539,116 @@ module.exports.facebookLogin = function (data, callback) {
 //---------------------------------------------------------------------
 module.exports.createOrUpdateSession = function (data, callback) {
 
-    var userToken = uuid.v1();
-    var sessionsCollection = data.DbHelper.getCollection('Sessions');
+  var userToken = uuid.v1();
+  var sessionsCollection = data.DbHelper.getCollection('Sessions');
 
-    var now = new Date();
-    var nowEpoch = now.getTime();
+  var now = new Date();
+  var nowEpoch = now.getTime();
 
-    var setObject = {
-        'userId': ObjectId(data.user._id),
-        'facebookUserId': data.user.facebookUserId,
-        'friends': data.user.thirdParty.friends,
-        'isAdmin': data.user.isAdmin,
-        'facebookAccessToken': data.user.facebookAccessToken,
-        'name': data.user.name,
-        'ageRange': data.user.ageRange,
-        'avatar': data.user.avatar,
-        'created': nowEpoch,
-        'expires': new Date(nowEpoch + generalUtils.settings.server.db.sessionExpirationMilliseconds), //must be without getTime() since db internally removes by TTL - and ttl works only when it is actual date and not epoch
-        'userToken': userToken,
-        'settings': data.user.settings,
-        'score': data.user.score,
-        'xp': data.user.xp,
-        'rank': data.user.rank,
-        'features': data.features,
-        'clientInfo': data.user.clientInfo,
-    };
+  var setObject = {
+    'userId': ObjectId(data.user._id),
+    'facebookUserId': data.user.facebookUserId,
+    'friends': data.user.thirdParty.friends,
+    'isAdmin': data.user.isAdmin,
+    'facebookAccessToken': data.user.facebookAccessToken,
+    'name': data.user.name,
+    'ageRange': data.user.ageRange,
+    'avatar': data.user.avatar,
+    'created': nowEpoch,
+    'expires': new Date(nowEpoch + generalUtils.settings.server.db.sessionExpirationMilliseconds), //must be without getTime() since db internally removes by TTL - and ttl works only when it is actual date and not epoch
+    'userToken': userToken,
+    'settings': data.user.settings,
+    'score': data.user.score,
+    'xp': data.user.xp,
+    'rank': data.user.rank,
+    'features': data.features,
+    'clientInfo': data.user.clientInfo,
+  };
 
-    if (data.user.justRegistered) {
-        setObject.justRegistered = true;
-    }
+  if (data.user.justRegistered) {
+    setObject.justRegistered = true;
+  }
 
-    if (data.user.gcmRegistrationId) {
-        setObject.gcmRegistrationId = data.user.gcmRegistrationId
-    }
+  if (data.user.gcmRegistrationId) {
+    setObject.gcmRegistrationId = data.user.gcmRegistrationId
+  }
 
-    sessionsCollection.findAndModify({'userId': ObjectId(data.user._id)}, {},
-        {
-            $set: setObject,
-        }, {upsert: true, new: true}, function (err, session) {
+  sessionsCollection.findAndModify({'userId': ObjectId(data.user._id)}, {},
+    {
+      $set: setObject,
+    }, {upsert: true, new: true}, function (err, session) {
 
-            if (err) {
+      if (err) {
 
+        closeDb(data);
+
+        callback(new exceptions.ServerException('Error finding/creating session', {
+          'userId': user._id,
+          'dbError': err
+        }, 'error'));
+        return;
+      }
+
+      data.session = session.value;
+
+      //Write to session history
+      var sessionsHistoryCollection = data.DbHelper.getCollection('SessionHistory');
+      var sessionHistoryRecord = JSON.parse(JSON.stringify(data.session));
+      sessionHistoryRecord.sessionId = sessionHistoryRecord._id;
+      delete sessionHistoryRecord._id;
+
+      sessionsHistoryCollection.insert(sessionHistoryRecord
+        , {}, function (sessionHistoryError, insertResult) {
+          if (sessionHistoryError) {
+
+            closeDb(data);
+
+            callback(new exceptions.ServerException('Error inserting session history record', {
+              'session': data.session,
+              'dbError': sessionHistoryError
+            }, 'error'));
+            return;
+          }
+
+          if (session.lastErrorObject.upserted) {
+
+            var closeConnection = data.closeConnection;
+
+            data.closeConnection = false;
+
+            //Do not close connection on an inner logAction
+            data.logAction = {
+              'action': 'login',
+              'userId': data.session.userId,
+              'sessionId': data.session.userToken
+            };
+
+            logAction(data, function (err, data) {
+
+              if (err) {
                 closeDb(data);
 
-                callback(new exceptions.ServerException('Error finding/creating session', {
-                    'userId': user._id,
-                    'dbError': err
+                callback(new exceptions.ServerException('Error inserting log record', {
+                  'action': data.action,
+                  'session': data.session,
+                  'dbError': err
                 }, 'error'));
                 return;
-            }
+              }
 
-            data.session = session.value;
+              data.closeConnection = closeConnection;
 
-            //Write to session history
-            var sessionsHistoryCollection = data.DbHelper.getCollection('SessionHistory');
-            var sessionHistoryRecord = JSON.parse(JSON.stringify(data.session));
-            sessionHistoryRecord.sessionId = sessionHistoryRecord._id;
-            delete sessionHistoryRecord._id;
+              checkToCloseDb(data);
 
-            sessionsHistoryCollection.insert(sessionHistoryRecord
-                , {}, function (sessionHistoryError, insertResult) {
-                    if (sessionHistoryError) {
-
-                        closeDb(data);
-
-                        callback(new exceptions.ServerException('Error inserting session history record', {
-                            'session': data.session,
-                            'dbError': sessionHistoryError
-                        }, 'error'));
-                        return;
-                    }
-
-                    if (session.lastErrorObject.upserted) {
-
-                        var closeConnection = data.closeConnection;
-
-                        data.closeConnection = false;
-
-                        //Do not close connection on an inner logAction
-                        data.logAction = {
-                            'action': 'login',
-                            'userId': data.session.userId,
-                            'sessionId': data.session.userToken
-                        };
-
-                        logAction(data, function (err, data) {
-
-                            if (err) {
-                                closeDb(data);
-
-                                callback(new exceptions.ServerException('Error inserting log record', {
-                                    'action': data.action,
-                                    'session': data.session,
-                                    'dbError': err
-                                }, 'error'));
-                                return;
-                            }
-
-                            data.closeConnection = closeConnection;
-
-                            checkToCloseDb(data);
-
-                            callback(null, data);
-                        })
-                    }
-                    else {
-                        checkToCloseDb(data);
-                        callback(null, data);
-                    }
-                });
-        })
+              callback(null, data);
+            })
+          }
+          else {
+            checkToCloseDb(data);
+            callback(null, data);
+          }
+        });
+    })
 };
 
 
@@ -661,46 +662,46 @@ module.exports.createOrUpdateSession = function (data, callback) {
 // output: <NA>
 //---------------------------------------------------------------------
 module.exports.logout = function (data, callback) {
-    var sessionsCollection = data.DbHelper.getCollection('Sessions');
-    sessionsCollection.findOne({
+  var sessionsCollection = data.DbHelper.getCollection('Sessions');
+  sessionsCollection.findOne({
+    'userToken': data.token
+  }, {}, function (err, session) {
+    if (err || !session) {
+
+      closeDb(data);
+
+      callback(new exceptions.ServerException('Error logging out from session - session expired', {
+        'userId': data.token,
+        'dbError': err
+      }, 'info'));
+      return;
+    }
+
+    //Actual logout - remove the session
+    sessionsCollection.remove(
+      {
         'userToken': data.token
-    }, {}, function (err, session) {
-        if (err || !session) {
+      }
+      , {w: 1, single: true},
+      function (err, numberOfRemovedDocs) {
+        if (err || numberOfRemovedDocs.ok == 0) {
+          //Session does not exist - stop the call chain
 
-            closeDb(data);
+          closeDb(data);
 
-            callback(new exceptions.ServerException('Error logging out from session - session expired', {
-                'userId': data.token,
-                'dbError': err
-            }, 'info'));
-            return;
+          callback(new exceptions.ServerException('Error logging out from session - session expired', {
+            'userId': data.token,
+            'dbError': err
+          }, 'info'));
+          return;
         }
 
-        //Actual logout - remove the session
-        sessionsCollection.remove(
-            {
-                'userToken': data.token
-            }
-            , {w: 1, single: true},
-            function (err, numberOfRemovedDocs) {
-                if (err || numberOfRemovedDocs.ok == 0) {
-                    //Session does not exist - stop the call chain
+        checkToCloseDb(data);
 
-                    closeDb(data);
-
-                    callback(new exceptions.ServerException('Error logging out from session - session expired', {
-                        'userId': data.token,
-                        'dbError': err
-                    }, 'info'));
-                    return;
-                }
-
-                checkToCloseDb(data);
-
-                callback(null, data);
-            }
-        );
-    })
+        callback(null, data);
+      }
+    );
+  })
 };
 
 //---------------------------------------------------------------------
@@ -715,27 +716,27 @@ module.exports.logout = function (data, callback) {
 module.exports.logAction = logAction;
 function logAction(data, callback) {
 
-    var logCollection = data.DbHelper.getCollection('Log');
+  var logCollection = data.DbHelper.getCollection('Log');
 
-    data.logAction.date = (new Date()).getTime();
+  data.logAction.date = (new Date()).getTime();
 
-    logCollection.insert(data.logAction
-        , {}, function (err, insertResult) {
-            if (err) {
+  logCollection.insert(data.logAction
+    , {}, function (err, insertResult) {
+      if (err) {
 
-                closeDb(data);
+        closeDb(data);
 
-                callback(new exceptions.ServerException('Error inserting record to log', {
-                    'action': data.logAction,
-                    'dbError': err
-                }, 'error'));
-                return;
-            }
+        callback(new exceptions.ServerException('Error inserting record to log', {
+          'action': data.logAction,
+          'dbError': err
+        }, 'error'));
+        return;
+      }
 
-            checkToCloseDb(data);
+      checkToCloseDb(data);
 
-            callback(null, data);
-        })
+      callback(null, data);
+    })
 };
 
 //---------------------------------------------------------------------
@@ -749,50 +750,50 @@ function logAction(data, callback) {
 module.exports.prepareQuestionCriteria = prepareQuestionCriteria;
 function prepareQuestionCriteria(data, callback) {
 
-    var questionCriteria;
+  var questionCriteria;
 
-    data.session.quiz.clientData.currentQuestionIndex++;
+  data.session.quiz.clientData.currentQuestionIndex++;
 
-    if (!data.session.quiz.serverData.userQuestions) {
+  if (!data.session.quiz.serverData.userQuestions) {
 
-        //System generated questions
-        var questionLevel = generalUtils.settings.server.quiz.questions.systemTrivia.levels[data.session.quiz.clientData.currentQuestionIndex];
+    //System generated questions
+    var questionLevel = generalUtils.settings.server.quiz.questions.systemTrivia.levels[data.session.quiz.clientData.currentQuestionIndex];
 
-        questionCriteria = {
-            '$and': [
-                {'_id': {'$nin': data.session.quiz.serverData.previousQuestions}},
-                {'topicId': {'$in': generalUtils.settings.server.triviaTopicsPerLanguage[data.session.settings.language]}},
-                {
-                    '$or': [
-                        {'correctAnswers': 0, 'wrongAnswers': 0},
-                        {
-                            '$and': [
-                                {'correctRatio': {$gte: questionLevel.minCorrectRatio}},
-                                {'correctRatio': {$lt: questionLevel.maxCorrectRatio}}
-                            ]
-                        }]
-                }
-            ]
-        };
-
-        //Filter by age if available
-        if (data.session.ageRange) {
-            if (data.session.ageRange.min) {
-                questionCriteria['$and'].push({'minAge': {$lte: data.session.ageRange.min}});
-            }
-
-            if (data.session.ageRange.max) {
-                questionCriteria['$and'].push({'maxAge': {$gte: data.session.ageRange.max}});
-            }
+    questionCriteria = {
+      '$and': [
+        {'_id': {'$nin': data.session.quiz.serverData.previousQuestions}},
+        {'topicId': {'$in': generalUtils.settings.server.triviaTopicsPerLanguage[data.session.settings.language]}},
+        {
+          '$or': [
+            {'correctAnswers': 0, 'wrongAnswers': 0},
+            {
+              '$and': [
+                {'correctRatio': {$gte: questionLevel.minCorrectRatio}},
+                {'correctRatio': {$lt: questionLevel.maxCorrectRatio}}
+              ]
+            }]
         }
-    }
-    else {
-        //User questions - get the exact current question in the quiz
-        questionCriteria = {'_id': ObjectId(data.session.quiz.serverData.userQuestions[data.session.quiz.clientData.currentQuestionIndex])}
-    }
-    data.questionCriteria = questionCriteria;
+      ]
+    };
 
-    callback(null, data);
+    //Filter by age if available
+    if (data.session.ageRange) {
+      if (data.session.ageRange.min) {
+        questionCriteria['$and'].push({'minAge': {$lte: data.session.ageRange.min}});
+      }
+
+      if (data.session.ageRange.max) {
+        questionCriteria['$and'].push({'maxAge': {$gte: data.session.ageRange.max}});
+      }
+    }
+  }
+  else {
+    //User questions - get the exact current question in the quiz
+    questionCriteria = {'_id': ObjectId(data.session.quiz.serverData.userQuestions[data.session.quiz.clientData.currentQuestionIndex])}
+  }
+  data.questionCriteria = questionCriteria;
+
+  callback(null, data);
 };
 
 //---------------------------------------------------------------------
@@ -807,21 +808,21 @@ function prepareQuestionCriteria(data, callback) {
 //---------------------------------------------------------------------
 module.exports.getQuestionsCount = getQuestionsCount;
 function getQuestionsCount(data, callback) {
-    var questionsCollection = data.DbHelper.getCollection('Questions');
-    questionsCollection.count(data.questionCriteria, function (err, count) {
-        if (err || count === 0) {
-            callback(new exceptions.ServerException('Error retrieving number of questions from the database', {
-                'count': count,
-                'questionCriteria': data.questionCriteria,
-                'dbError': err
-            }, 'error'));
-            return;
-        }
+  var questionsCollection = data.DbHelper.getCollection('Questions');
+  questionsCollection.count(data.questionCriteria, function (err, count) {
+    if (err || count === 0) {
+      callback(new exceptions.ServerException('Error retrieving number of questions from the database', {
+        'count': count,
+        'questionCriteria': data.questionCriteria,
+        'dbError': err
+      }, 'error'));
+      return;
+    }
 
-        data.questionsCount = count;
+    data.questionsCount = count;
 
-        callback(null, data);
-    })
+    callback(null, data);
+  })
 };
 
 //----------------------------------------------------------------------------------------------------------
@@ -836,29 +837,29 @@ function getQuestionsCount(data, callback) {
 //----------------------------------------------------------------------------------------------------------
 module.exports.getNextQuestion = getNextQuestion;
 function getNextQuestion(data, callback) {
-    var skip
+  var skip
 
-    if (!data.session.quiz.serverData.userQuestions) {
-        skip = random.rnd(0, data.questionsCount - 1);
+  if (!data.session.quiz.serverData.userQuestions) {
+    skip = random.rnd(0, data.questionsCount - 1);
+  }
+  else {
+    skip = 0;
+  }
+
+  var questionsCollection = data.DbHelper.getCollection('Questions');
+  questionsCollection.findOne(data.questionCriteria, {skip: skip}, function (err, question) {
+    if (err || !question) {
+      callback(new exceptions.ServerException('Error retrieving next question from database', {
+        'questionsCount': data.questionsCount,
+        'questionCriteria': data.questionCriteria,
+        'skip': skip,
+        'dbError': err
+      }, 'error'));
+      return;
     }
-    else {
-        skip = 0;
-    }
 
-    var questionsCollection = data.DbHelper.getCollection('Questions');
-    questionsCollection.findOne(data.questionCriteria, {skip: skip}, function (err, question) {
-        if (err || !question) {
-            callback(new exceptions.ServerException('Error retrieving next question from database', {
-                'questionsCount': data.questionsCount,
-                'questionCriteria': data.questionCriteria,
-                'skip': skip,
-                'dbError': err
-            }, 'error'));
-            return;
-        }
-
-        callback(null, question);
-    })
+    callback(null, question);
+  })
 };
 
 //------------------------------------------------------------------------------------------------
@@ -873,24 +874,24 @@ function getNextQuestion(data, callback) {
 //------------------------------------------------------------------------------------------------
 module.exports.addContest = addContest;
 function addContest(data, callback) {
-    var contestsCollection = data.DbHelper.getCollection('Contests');
+  var contestsCollection = data.DbHelper.getCollection('Contests');
 
-    contestsCollection.insert(data.contest
-        , {}, function (err, insertResult) {
+  contestsCollection.insert(data.contest
+    , {}, function (err, insertResult) {
 
-            if (err) {
+      if (err) {
 
-                closeDb(data);
+        closeDb(data);
 
-                callback(new exceptions.ServerException('Error adding contest', {
-                    'data': data,
-                    'dbError': err
-                }, 'error'));
-                return;
-            }
+        callback(new exceptions.ServerException('Error adding contest', {
+          'data': data,
+          'dbError': err
+        }, 'error'));
+        return;
+      }
 
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 }
 
 //------------------------------------------------------------------------------------------------
@@ -905,39 +906,39 @@ function addContest(data, callback) {
 //------------------------------------------------------------------------------------------------
 module.exports.setContest = setContest;
 function setContest(data, callback) {
-    var contestsCollection = data.DbHelper.getCollection('Contests');
+  var contestsCollection = data.DbHelper.getCollection('Contests');
 
-    var whereClause = {'_id': ObjectId(data.contest._id)};
+  var whereClause = {'_id': ObjectId(data.contest._id)};
 
-    //Only contest owners or admins can update the contest
-    if (data.checkOwner && !data.session.isAdmin) {
-        whereClause['creator.id'] = ObjectId(data.session.userId);
-    }
+  //Only contest owners or admins can update the contest
+  if (data.checkOwner && !data.session.isAdmin) {
+    whereClause['creator.id'] = ObjectId(data.session.userId);
+  }
 
-    contestsCollection.findAndModify(whereClause, {},
-        {
-            $set: data.setData
-        }, {w: 1, new: true}, function (err, contest) {
+  contestsCollection.findAndModify(whereClause, {},
+    {
+      $set: data.setData
+    }, {w: 1, new: true}, function (err, contest) {
 
-            if (err || !contest || !contest.value) {
-                closeDb(data);
+      if (err || !contest || !contest.value) {
+        closeDb(data);
 
-                callback(new exceptions.ServerException('Error setting contest', {
-                    'whereClause': whereClause,
-                    'session': data.session,
-                    'setData': data.setData,
-                    'contestId': data.contestId,
-                    'dbError': err
-                }, 'error'));
-                return;
-            }
+        callback(new exceptions.ServerException('Error setting contest', {
+          'whereClause': whereClause,
+          'session': data.session,
+          'setData': data.setData,
+          'contestId': data.contestId,
+          'dbError': err
+        }, 'error'));
+        return;
+      }
 
-            data.contest = contest.value; //refreshes the latest state object from db
+      data.contest = contest.value; //refreshes the latest state object from db
 
-            checkToCloseDb(data);
+      checkToCloseDb(data);
 
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 }
 
 //------------------------------------------------------------------------------------------------
@@ -953,29 +954,29 @@ function setContest(data, callback) {
 module.exports.removeContest = removeContest;
 function removeContest(data, callback) {
 
-    var contestsCollection = data.DbHelper.getCollection('Contests');
-    contestsCollection.remove(
-        {
-            '_id': ObjectId(data.contestId)
-        }
-        , {w: 1, single: true},
-        function (err, numberOfRemovedDocs) {
-            if (err || numberOfRemovedDocs.ok === 0) {
+  var contestsCollection = data.DbHelper.getCollection('Contests');
+  contestsCollection.remove(
+    {
+      '_id': ObjectId(data.contestId)
+    }
+    , {w: 1, single: true},
+    function (err, numberOfRemovedDocs) {
+      if (err || numberOfRemovedDocs.ok === 0) {
 
-                //Contest does not exist - stop the call chain
-                closeDb(data);
+        //Contest does not exist - stop the call chain
+        closeDb(data);
 
-                callback(new exceptions.ServerException('Error removing contest', {
-                    'data': data,
-                    'dbError': err
-                }, 'error'));
-                return;
-            }
+        callback(new exceptions.ServerException('Error removing contest', {
+          'data': data,
+          'dbError': err
+        }, 'error'));
+        return;
+      }
 
-            checkToCloseDb(data);
+      checkToCloseDb(data);
 
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 }
 
 //------------------------------------------------------------------------------------------------
@@ -991,26 +992,26 @@ function removeContest(data, callback) {
 module.exports.getContest = getContest;
 function getContest(data, callback) {
 
-    var contestsCollection = data.DbHelper.getCollection('Contests');
-    contestsCollection.findOne({
-        '_id': ObjectId(data.contestId)
-    }, {}, function (err, contest) {
-        if (err || !contest) {
+  var contestsCollection = data.DbHelper.getCollection('Contests');
+  contestsCollection.findOne({
+    '_id': ObjectId(data.contestId)
+  }, {}, function (err, contest) {
+    if (err || !contest) {
 
-            closeDb(data);
+      closeDb(data);
 
-            callback(new exceptions.ServerException('Error finding contest', {
-                'data': data,
-                'dbError': err
-            }, 'error'));
+      callback(new exceptions.ServerException('Error finding contest', {
+        'data': data,
+        'dbError': err
+      }, 'error'));
 
-            return;
-        }
+      return;
+    }
 
-        data.contest = contest;
+    data.contest = contest;
 
-        callback(null, data);
-    })
+    callback(null, data);
+  })
 }
 
 //---------------------------------------------------------------------
@@ -1024,44 +1025,61 @@ function getContest(data, callback) {
 module.exports.prepareContestsQuery = prepareContestsQuery;
 function prepareContestsQuery(data, callback) {
 
-    data.contestQuery = {};
-    data.contestQuery.where = {'language': data.session.settings.language};
-    data.contestQuery.sort = [];
+  data.contestQuery = [];
+  var whereClause = {'$match': {'language': data.session.settings.language}}
+  var limitClause;
+  var sortClause = {'$sort' : {}};
 
-    var now = (new Date()).getTime();
+  if (!contestListClientFields) {
+    contestListClientFields = generalUtils.arrayToObject(generalUtils.settings.server.contestList.clientFields,1);
+  }
 
-    switch (data.tab) {
-        case 'mine':
-            data.contestQuery.where.endDate = {$gte: now}; //not finished yet
-            data.contestQuery.where['users.' + data.session.userId] = {$exists: true};
-            data.contestQuery.limit = 0; //Retrieve ALL my running contest
-            data.contestQuery.sort.push(['participants', 'desc']);  //order by participants descending
-            break;
+  //Will return owner=true if I am the owner of the contest or null (to save JSON space) if not
+  contestListClientFields['owner'] = {$cond: [{$eq: ['$creator.id', ObjectId(data.session.userId)]},true,null]};
 
-        case 'running':
-            data.contestQuery.where.endDate = {$gte: now}; //not finished yet
-            data.contestQuery.limit = generalUtils.settings.server.contestList.pageSize;
-            data.contestQuery.sort.push(['participants', 'desc']);  //order by participants descending
-            break;
+  //Will return the user's team if joined to a team or null if not
+  contestListClientFields['myTeam'] = {$cond: [{$eq: ['$users.' + data.session.userId + '.userId', ObjectId(data.session.userId)]},'$users.' + data.session.userId + '.team',null]};
 
-        case 'recentlyFinished':
-            data.contestQuery.where.endDate = {
-                $lt: now,
-                $gte: now - (generalUtils.settings.server.contestList.recentlyFinishedDays * 24 * 60 * 60 * 1000)
-            }; //finished in the past 2 days
-            data.contestQuery.limit = generalUtils.settings.server.contestList.pageSize;
-            data.contestQuery.sort.push(['endDate', 'desc']);  //order by participants descending
-            break;
+  var fieldsClause = {'$project' : contestListClientFields};
 
-        default:
-            closeDb(data);
-            callback(new exceptions.ServerException('Error getting contests - tab invalid or not supplied', {
-                'data': data
-            }, 'error'));
-            return;
-    }
+  var now = (new Date()).getTime();
 
-    callback(null, data);
+  switch (data.tab) {
+    case 'mine':
+      whereClause['$match'].endDate = {$gte: now}; //not finished yet
+      whereClause['$match']['users.' + data.session.userId] = {$exists: true};
+      sortClause['$sort'].participants = -1; //descending
+      break;
+
+    case 'running':
+      whereClause['$match'].endDate = {$gte: now}; //not finished yet
+      limitClause = {'$limit': generalUtils.settings.server.contestList.pageSize};
+      sortClause['$sort'].participants = -1; //descending
+      break;
+
+    case 'recentlyFinished':
+      //Finished between now and X days ago as set in settings
+      whereClause['$match'].endDate = {$lt: now, $gte: now - (generalUtils.settings.server.contestList.recentlyFinishedDays * 24 * 60 * 60 * 1000)};
+      limitClause = {'$limit': generalUtils.settings.server.contestList.pageSize};
+      sortClause['$sort'].endDate = -1; //descending
+      break;
+
+    default:
+      closeDb(data);
+      callback(new exceptions.ServerException('Error getting contests - tab invalid or not supplied', {
+        'data': data
+      }, 'error'));
+      return;
+  }
+
+  data.contestQuery.push(whereClause);
+  data.contestQuery.push(sortClause);
+  data.contestQuery.push(fieldsClause);
+  if (limitClause) {
+    data.contestQuery.push(limitClause);
+  }
+
+  callback(null, data);
 }
 
 //------------------------------------------------------------------------------------------------
@@ -1076,29 +1094,23 @@ function prepareContestsQuery(data, callback) {
 //------------------------------------------------------------------------------------------------
 module.exports.getContests = getContests;
 function getContests(data, callback) {
-    var contestsCollection = data.DbHelper.getCollection('Contests');
-    contestsCollection.find(data.contestQuery.where,
-        {
-            limit: data.contestQuery.limit,
-            sort: data.contestQuery.sort
-        },
-        function (err, contestsCursor) {
-            if (err || !contestsCursor) {
+  var contestsCollection = data.DbHelper.getCollection('Contests');
+  contestsCollection.aggregate(data.contestQuery,
+    function (err, contests) {
+      if (err || !contests) {
 
-                callback(new exceptions.ServerException('Error retrieving contests', {
-                    'data': data,
-                    'dbError': err
-                }, 'error'));
+        callback(new exceptions.ServerException('Error retrieving contests', {
+          'contestQuery': data.contestQuery,
+          'dbError': err
+        }, 'error'));
 
-                return;
-            }
-            contestsCursor.toArray(function (err, contests) {
+        return;
+      }
 
-                data.contests = contests;
-                callback(null, data);
-            });
+      data.contests = contests;
+      callback(null, data);
 
-        });
+    });
 }
 
 //------------------------------------------------------------------------------------------------
@@ -1114,74 +1126,74 @@ function getContests(data, callback) {
 module.exports.updateQuestionStatistics = updateQuestionStatistics;
 function updateQuestionStatistics(data, callback) {
 
-    var questionsCollection = data.DbHelper.getCollection('Questions');
-    questionsCollection.findOne({
-        '_id': ObjectId(data.session.quiz.serverData.currentQuestion._id)
-    }, {}, function (err, question) {
+  var questionsCollection = data.DbHelper.getCollection('Questions');
+  questionsCollection.findOne({
+    '_id': ObjectId(data.session.quiz.serverData.currentQuestion._id)
+  }, {}, function (err, question) {
 
-        if (err || !question) {
+    if (err || !question) {
 
-            closeDb(data);
+      closeDb(data);
 
-            callback(new exceptions.ServerException('Error finding question to update statistics', {
-                'data': data,
-                'dbError': err
-            }, 'error'));
-            return;
+      callback(new exceptions.ServerException('Error finding question to update statistics', {
+        'data': data,
+        'dbError': err
+      }, 'error'));
+      return;
+    }
+
+    var correctAnswers = question.correctAnswers;
+    var wrongAnswers = question.wrongAnswers;
+    if (data.clientResponse.question.correct) {
+      correctAnswers++;
+    }
+    else {
+      wrongAnswers++;
+    }
+    var correctRatio = correctAnswers / (correctAnswers + wrongAnswers);
+
+    var answered;
+    var answerRatio;
+    if (!question.answers[data.id].answered) {
+      answered = 0;
+    }
+    else {
+      answered = question.answers[data.id].answered;
+    }
+    answered++;
+    answerRatio = answered / (correctAnswers + wrongAnswers);
+
+    var setClause = {};
+    setClause.correctAnswers = correctAnswers;
+    setClause.wrongAnswers = wrongAnswers;
+    setClause.correctRatio = correctRatio;
+    setClause['answers.' + data.id + '.answered'] = answered;
+    setClause['answers.' + data.id + '.answerRatio'] = answerRatio;
+
+    questionsCollection.updateOne({'_id': ObjectId(data.session.quiz.serverData.currentQuestion._id)},
+      {
+        $set: setClause
+      }, function (err, results) {
+
+        if (err || results.nModified < 1) {
+
+          closeDb(data);
+
+          callback(new exceptions.ServerException('Error updating question statistics', {
+            'quesitonId': data.session.quiz.serverData.currentQuestion._id,
+            'updateResults': results,
+            'dbError': err
+          }, 'error'));
+
+          return;
         }
 
-        var correctAnswers = question.correctAnswers;
-        var wrongAnswers = question.wrongAnswers;
-        if (data.clientResponse.question.correct) {
-            correctAnswers++;
-        }
-        else {
-            wrongAnswers++;
-        }
-        var correctRatio = correctAnswers / (correctAnswers + wrongAnswers);
+        checkToCloseDb(data);
 
-        var answered;
-        var answerRatio;
-        if (!question.answers[data.id].answered) {
-            answered = 0;
-        }
-        else {
-            answered = question.answers[data.id].answered;
-        }
-        answered++;
-        answerRatio = answered / (correctAnswers + wrongAnswers);
+        callback(null, data);
+      });
 
-        var setClause = {};
-        setClause.correctAnswers = correctAnswers;
-        setClause.wrongAnswers = wrongAnswers;
-        setClause.correctRatio = correctRatio;
-        setClause['answers.' + data.id + '.answered'] = answered;
-        setClause['answers.' + data.id + '.answerRatio'] = answerRatio;
-
-        questionsCollection.updateOne({'_id': ObjectId(data.session.quiz.serverData.currentQuestion._id)},
-            {
-                $set: setClause
-            }, function (err, results) {
-
-                if (err || results.nModified < 1) {
-
-                    closeDb(data);
-
-                    callback(new exceptions.ServerException('Error updating question statistics', {
-                        'quesitonId': data.session.quiz.serverData.currentQuestion._id,
-                        'updateResults': results,
-                        'dbError': err
-                    }, 'error'));
-
-                    return;
-                }
-
-                checkToCloseDb(data);
-
-                callback(null, data);
-            });
-
-    })
+  })
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -1197,44 +1209,44 @@ function updateQuestionStatistics(data, callback) {
 module.exports.insertPurchase = insertPurchase;
 function insertPurchase(data, callback) {
 
-    if (!data.DbHelper) {
+  if (!data.DbHelper) {
 
-        connect(function (err, connectData) {
+    connect(function (err, connectData) {
 
-            data.DbHelper = connectData.DbHelper;
+      data.DbHelper = connectData.DbHelper;
 
-            insertPurchase(data, callback);
-        });
-        return;
-    }
+      insertPurchase(data, callback);
+    });
+    return;
+  }
 
-    var purchasesCollection = data.DbHelper.getCollection('Purchases');
+  var purchasesCollection = data.DbHelper.getCollection('Purchases');
 
-    data.newPurchase.created = (new Date()).getTime();
+  data.newPurchase.created = (new Date()).getTime();
 
-    purchasesCollection.insert(data.newPurchase
-        , {}, function (err, insertResult) {
-            if (err) {
-                if (err.code !== 11000) {
+  purchasesCollection.insert(data.newPurchase
+    , {}, function (err, insertResult) {
+      if (err) {
+        if (err.code !== 11000) {
 
-                    closeDb(data);
+          closeDb(data);
 
-                    callback(new exceptions.ServerException('Error inserting purchase record', {
-                        'purchaseRecord': data.newPurchase,
-                        'dbError': err
-                    }, 'error'));
+          callback(new exceptions.ServerException('Error inserting purchase record', {
+            'purchaseRecord': data.newPurchase,
+            'dbError': err
+          }, 'error'));
 
-                    return;
-                }
-                else {
-                    data.duplicatePurchase = true;
-                }
-            }
+          return;
+        }
+        else {
+          data.duplicatePurchase = true;
+        }
+      }
 
-            checkToCloseDb(data);
+      checkToCloseDb(data);
 
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -1250,33 +1262,33 @@ function insertPurchase(data, callback) {
 module.exports.getContestTopParticipants = getContestTopParticipants;
 function getContestTopParticipants(data, callback) {
 
-    var contestsCollection = data.DbHelper.getCollection('Contests');
+  var contestsCollection = data.DbHelper.getCollection('Contests');
 
-    data.newPurchase.created = (new Date()).getTime();
+  data.newPurchase.created = (new Date()).getTime();
 
-    purchasesCollection.insert(data.newPurchase
-        , {}, function (err, insertResult) {
-            if (err) {
-                if (err.code !== 11000) {
+  purchasesCollection.insert(data.newPurchase
+    , {}, function (err, insertResult) {
+      if (err) {
+        if (err.code !== 11000) {
 
-                    closeDb(data);
+          closeDb(data);
 
-                    callback(new exceptions.ServerException('Error inserting purchase record', {
-                        'purchaseRecord': data.newPurchase,
-                        'dbError': err
-                    }, 'error'));
+          callback(new exceptions.ServerException('Error inserting purchase record', {
+            'purchaseRecord': data.newPurchase,
+            'dbError': err
+          }, 'error'));
 
-                    return;
-                }
-                else {
-                    data.duplicatePurchase = true;
-                }
-            }
+          return;
+        }
+        else {
+          data.duplicatePurchase = true;
+        }
+      }
 
-            checkToCloseDb(data);
+      checkToCloseDb(data);
 
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -1292,40 +1304,40 @@ function getContestTopParticipants(data, callback) {
 module.exports.insertQuestion = insertQuestion;
 function insertQuestion(data, callback) {
 
-    var questionsCollection = data.DbHelper.getCollection('Questions');
+  var questionsCollection = data.DbHelper.getCollection('Questions');
 
-    data.newQuestion.created = (new Date()).getTime();
-    data.newQuestion.userIdCreated = data.session.userId;
-    data.newQuestion.minAge = 0;
-    data.newQuestion.maxAge = 120;
-    data.newQuestion.correctAnswers = 0;
-    data.newQuestion.wrongAnswers = 0;
-    data.newQuestion.correctRatio = 0;
+  data.newQuestion.created = (new Date()).getTime();
+  data.newQuestion.userIdCreated = data.session.userId;
+  data.newQuestion.minAge = 0;
+  data.newQuestion.maxAge = 120;
+  data.newQuestion.correctAnswers = 0;
+  data.newQuestion.wrongAnswers = 0;
+  data.newQuestion.correctRatio = 0;
 
-    //Associate the question with a contest - if an existing contest in db (contest edit mode)
-    if (data.contest && data.contest._id) {
-        data.newQuestion.contests = {};
-        data.newQuestion.contests[data.contest._id] = true;
-    }
+  //Associate the question with a contest - if an existing contest in db (contest edit mode)
+  if (data.contest && data.contest._id) {
+    data.newQuestion.contests = {};
+    data.newQuestion.contests[data.contest._id] = true;
+  }
 
-    questionsCollection.insert(data.newQuestion
-        , {}, function (err, insertResult) {
-            if (err) {
+  questionsCollection.insert(data.newQuestion
+    , {}, function (err, insertResult) {
+      if (err) {
 
-                closeDb(data);
+        closeDb(data);
 
-                callback(new exceptions.ServerException('Error inserting question record', {
-                    'questionRecord': data.newQuestion,
-                    'dbError': err
-                }, 'error'));
+        callback(new exceptions.ServerException('Error inserting question record', {
+          'questionRecord': data.newQuestion,
+          'dbError': err
+        }, 'error'));
 
-                return;
-            }
+        return;
+      }
 
-            checkToCloseDb(data);
+      checkToCloseDb(data);
 
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 }
 
 //---------------------------------------------------------------------
@@ -1340,43 +1352,43 @@ function insertQuestion(data, callback) {
 //---------------------------------------------------------------------
 module.exports.setQuestion = function (data, callback) {
 
-    if (!data.setData && !data.unsetData) {
-        callback(new exceptions.ServerException('Cannot update question, setData or unsetData must be supplied', {}, 'error'));
+  if (!data.setData && !data.unsetData) {
+    callback(new exceptions.ServerException('Cannot update question, setData or unsetData must be supplied', {}, 'error'));
+    return;
+  }
+
+  var questionsCollection = data.DbHelper.getCollection('Questions');
+
+  var updateClause = {};
+  if (data.setData) {
+    updateClause['$set'] = data.setData;
+  }
+  if (data.unsetData) {
+    updateClause['$unset'] = data.unsetData;
+  }
+
+  var whereClause = {'_id': ObjectId(data.questionId)};
+
+
+  questionsCollection.updateOne(whereClause, updateClause,
+    function (err, results) {
+
+      if (err || results.nModified < 1) {
+
+        closeDb(data);
+
+        callback(new exceptions.ServerException('Error updating question', {
+          'setData': data.setData,
+          'dbError': err
+        }, 'error'));
+
         return;
-    }
+      }
 
-    var questionsCollection = data.DbHelper.getCollection('Questions');
+      checkToCloseDb(data);
 
-    var updateClause = {};
-    if (data.setData) {
-        updateClause['$set'] = data.setData;
-    }
-    if (data.unsetData) {
-        updateClause['$unset'] = data.unsetData;
-    }
-
-    var whereClause = {'_id': ObjectId(data.questionId)};
-
-
-    questionsCollection.updateOne(whereClause, updateClause,
-        function (err, results) {
-
-            if (err || results.nModified < 1) {
-
-                closeDb(data);
-
-                callback(new exceptions.ServerException('Error updating question', {
-                    'setData': data.setData,
-                    'dbError': err
-                }, 'error'));
-
-                return;
-            }
-
-            checkToCloseDb(data);
-
-            callback(null, data);
-        });
+      callback(null, data);
+    });
 };
 
 //------------------------------------------------------------------------------------------------
@@ -1391,35 +1403,35 @@ module.exports.setQuestion = function (data, callback) {
 //------------------------------------------------------------------------------------------------
 module.exports.getQuestionsByIds = getQuestionsByIds;
 function getQuestionsByIds(data, callback) {
-    var questionsCollection = data.DbHelper.getCollection('Questions');
+  var questionsCollection = data.DbHelper.getCollection('Questions');
 
-    for (var i = 0; i < data.userQuestions.length; i++) {
-        data.userQuestions[i] = ObjectId(data.userQuestions[i]);
+  for (var i = 0; i < data.userQuestions.length; i++) {
+    data.userQuestions[i] = ObjectId(data.userQuestions[i]);
+  }
+
+  questionsCollection.find({'_id': {$in: data.userQuestions}}, {}, function (err, questionsCursor) {
+    if (err || !questionsCursor) {
+
+      closeDb(data);
+
+      callback(new exceptions.ServerException('Error retrieving questions', {
+        'userQuestions': userQuestions,
+        'dbError': err
+      }, 'error'));
+
+      return;
     }
 
-    questionsCollection.find({'_id': {$in: data.userQuestions}}, {}, function (err, questionsCursor) {
-        if (err || !questionsCursor) {
+    questionsCursor.toArray(function (err, questions) {
 
-            closeDb(data);
+      data.questions = buildQuestionsResult(questions);
 
-            callback(new exceptions.ServerException('Error retrieving questions', {
-                'userQuestions': userQuestions,
-                'dbError': err
-            }, 'error'));
+      checkToCloseDb(data);
 
-            return;
-        }
-
-        questionsCursor.toArray(function (err, questions) {
-
-            data.questions = buildQuestionsResult(questions);
-
-            checkToCloseDb(data);
-
-            callback(null, data);
-        });
-
+      callback(null, data);
     });
+
+  });
 }
 
 //------------------------------------------------------------------------------------------------
@@ -1435,52 +1447,52 @@ function getQuestionsByIds(data, callback) {
 module.exports.searchMyQuestions = searchMyQuestions;
 function searchMyQuestions(data, callback) {
 
-    var questionsCollection = data.DbHelper.getCollection('Questions');
+  var questionsCollection = data.DbHelper.getCollection('Questions');
 
-    for (var i = 0; i < data.existingQuestionIds.length; i++) {
-        data.existingQuestionIds[i] = ObjectId(data.existingQuestionIds[i]);
+  for (var i = 0; i < data.existingQuestionIds.length; i++) {
+    data.existingQuestionIds[i] = ObjectId(data.existingQuestionIds[i]);
+  }
+
+  var criteria =
+  {
+    $and: [
+      {'userIdCreated': ObjectId(data.session.userId)},
+      {'_id': {'$nin': data.existingQuestionIds}},
+      {
+        $or: [
+          {'text': {$regex: '.*' + data.text + '.*'}},
+          {'answers.0.text': {$regex: '.*' + data.text + '.*'}},
+          {'answers.1.text': {$regex: '.*' + data.text + '.*'}},
+          {'answers.2.text': {$regex: '.*' + data.text + '.*'}},
+          {'answers.3.text': {$regex: '.*' + data.text + '.*'}}
+        ]
+      }
+    ]
+  };
+
+  var sort = [['created', 'desc']];  //order by participants descending
+
+  questionsCollection.find(criteria, {sort: sort}, function (err, questionsCursor) {
+    if (err || !questionsCursor) {
+
+      closeDb(data);
+
+      callback(new exceptions.ServerException('Error retrieving questions by search text', {
+        'text': data.text,
+        'dbError': err
+      }, 'error'));
+
+      return;
     }
 
-    var criteria =
-    {
-        $and: [
-            {'userIdCreated': ObjectId(data.session.userId)},
-            {'_id': {'$nin': data.existingQuestionIds}},
-            {
-                $or: [
-                    {'text': {$regex: '.*' + data.text + '.*'}},
-                    {'answers.0.text': {$regex: '.*' + data.text + '.*'}},
-                    {'answers.1.text': {$regex: '.*' + data.text + '.*'}},
-                    {'answers.2.text': {$regex: '.*' + data.text + '.*'}},
-                    {'answers.3.text': {$regex: '.*' + data.text + '.*'}}
-                ]
-            }
-        ]
-    };
+    questionsCursor.toArray(function (err, questions) {
 
-    var sort = [['created', 'desc']];  //order by participants descending
+      data.questions = buildQuestionsResult(questions);
 
-    questionsCollection.find(criteria, {sort: sort}, function (err, questionsCursor) {
-        if (err || !questionsCursor) {
+      checkToCloseDb(data);
 
-            closeDb(data);
-
-            callback(new exceptions.ServerException('Error retrieving questions by search text', {
-                'text': data.text,
-                'dbError': err
-            }, 'error'));
-
-            return;
-        }
-
-        questionsCursor.toArray(function (err, questions) {
-
-            data.questions = buildQuestionsResult(questions);
-
-            checkToCloseDb(data);
-
-            callback(null, data);
-        });
-
+      callback(null, data);
     });
+
+  });
 }

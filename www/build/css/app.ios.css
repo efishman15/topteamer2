@@ -9487,7 +9487,7 @@ body {
 .chart-type-title {
   position: absolute;
   top: 2px;
-  font-size: 18px;
+  font-size: 17px;
   color: #ffffff;
   white-space: pre; }
 
@@ -9499,9 +9499,14 @@ body {
 
 .chart-end-time {
   position: absolute;
-  color: #90a3e9;
-  font-size: 18px;
+  font-size: 17px;
   top: 2px; }
+
+.contest-end-time-running {
+  color: #90a3e9; }
+
+.contest-end-time-ended {
+  color: #f35e4a; }
 
 .chart-end-time-ltr {
   right: 11%; }

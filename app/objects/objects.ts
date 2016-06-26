@@ -353,6 +353,7 @@ export class Contest {
   subject:string;
   startDate:number;
   endDate:number;
+  status:string;
   myTeam:number;
   participants:number;
   manualParticipants;
@@ -366,6 +367,7 @@ export class Contest {
   dataSource:any;
   state:string;
   leadingTeam: number;
+  time: ContestTime;
 
   constructor(typeId:string, startDate: number, endDate: number, endOption: string) {
 
@@ -380,6 +382,16 @@ export class Contest {
     this.teams = [new Team(), new Team()];
     this.questions = new Questions();
   }
+}
+
+export class ContestTimeData {
+  text: string;
+  color: string;
+}
+
+export class ContestTime {
+  start: ContestTimeData;
+  end: ContestTimeData;
 }
 
 export class ContestName {

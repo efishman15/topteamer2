@@ -363,24 +363,16 @@ export class SetContestPage {
 
     if (this.params.data.mode === 'add' || (this.params.data.mode === 'edit' && JSON.stringify(this.params.data.contest) != JSON.stringify(this.contestLocalCopy))) {
 
-      this.contestLocalCopy.name = new ContestName();
-      this.contestLocalCopy.name.long = this.client.translate('CONTEST_NAME_LONG', {
-        'team0': this.contestLocalCopy.teams[0].name,
-        'team1': this.contestLocalCopy.teams[1].name,
-        'type': this.contestLocalCopy.subject
-      });
-      this.contestLocalCopy.name.short = this.client.translate('CONTEST_NAME_SHORT', {
-        'team0': this.contestLocalCopy.teams[0].name,
-        'team1': this.contestLocalCopy.teams[1].name
-      });
-
-      if (this.params.data.mode === 'edit' && (this.contestLocalCopy.name.short !== this.params.data.contest.name.short || this.contestLocalCopy.name.long !== this.params.data.contest.name.long)) {
+      if (this.params.data.mode === 'edit' &&
+        (this.contestLocalCopy.teams[0].name !== this.params.data.contest.teams[0].name ||
+        this.contestLocalCopy.teams[1].name !== this.params.data.contest.teams[1].name ||
+        this.contestLocalCopy.subject !== this.params.data.contest.subject)) {
         this.contestNameChanged = true;
       }
 
       contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then((contest) => {
 
-        //Report to Flurry
+        //Report to Analytics
         var contestParams = {
           'team0': this.contestLocalCopy.teams[0].name,
           'team1': this.contestLocalCopy.teams[1].name,

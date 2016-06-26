@@ -33,7 +33,7 @@ var SearchQuestionsPage = (function () {
         var existingQuestionIds = [];
         if (this.currentQuestions && this.currentQuestions.visibleCount > 0) {
             for (var i = 0; i < this.currentQuestions.list.length; i++) {
-                if (this.currentQuestions.list[i]._id && !this.currentQuestions.list[i].deleted) {
+                if (this.currentQuestions.list[i]._id && this.currentQuestions.list[i]._id !== 'new' && !this.currentQuestions.list[i].deleted) {
                     existingQuestionIds.push(this.currentQuestions.list[i]._id);
                 }
             }

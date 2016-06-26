@@ -27,7 +27,7 @@ export class ContestListComponent {
 
   refresh() {
     return new Promise( (resolve, reject) => {
-      contestsService.list(this.tab).then((contests) => {
+      contestsService.list(this.tab).then((contests: Array<Contest>) => {
         this.contests = contests;
         this.contestChartComponents.forEach( (contestChartComponent: ContestChartComponent) => {
           contestChartComponent.refresh();

@@ -116,7 +116,7 @@ export class TopTeamerApp {
         appId: '344342552056',
         xfbml: true,
         cookie: true,
-        version: 'v2.5'
+        version: 'v2.6'
       });
 
       this.initFacebook();

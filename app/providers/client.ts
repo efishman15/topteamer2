@@ -39,7 +39,7 @@ export class Client {
   _width:number;
   _chartWidth:number;
   _chartHeight:number;
-  _deepLinkContestId: string;
+  _deepLinkContestId:string;
 
   serverGateway:ServerGateway;
 
@@ -486,6 +486,9 @@ export class Client {
       myApp.style.marginLeft = (containerWidth - minWidth) / 2 + 'px';
     }
 
+    this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
+    this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
+
     //Invoke 'onResize' for each view that has it
     for (var i = 0; i < this.nav.length(); i++) {
       var viewController = this.nav.getByIndex(i);
@@ -510,14 +513,14 @@ export class Client {
   }
 
   get chartWidth():number {
-    if (this._chartWidth === undefined) {
+    if (!this._chartWidth) {
       this._chartWidth = this.width * this.settings.charts.contest.size.widthRatio;
     }
     return this._chartWidth;
   }
 
   get chartHeight():number {
-    if (this._chartHeight === undefined) {
+    if (!this._chartHeight) {
       this._chartHeight = this.width * this.settings.charts.contest.size.heightRatioFromWidth;
     }
     return this._chartHeight;
@@ -632,7 +635,7 @@ export class Client {
     return this._deepLinkContestId;
   }
 
-  set deepLinkContestId(value: string) {
+  set deepLinkContestId(value:string) {
     this._deepLinkContestId = value;
   }
 
