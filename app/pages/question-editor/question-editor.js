@@ -91,11 +91,8 @@ var QuestionEditorPage = (function () {
         }
         this.viewController.dismiss(result);
     };
-    QuestionEditorPage.prototype.inputFocus = function (fieldId) {
-        this.fieldInFocus = fieldId;
-    };
-    QuestionEditorPage.prototype.inputBlur = function () {
-        this.fieldInFocus = -1;
+    QuestionEditorPage.prototype.inputFocus = function (event) {
+        this.content.scrollTo(0, event.target['offsetParent']['offsetTop']);
     };
     __decorate([
         core_1.ViewChild(ionic_angular_1.Content), 

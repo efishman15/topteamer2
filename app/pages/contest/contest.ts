@@ -33,6 +33,9 @@ export class ContestPage {
 
     this.client.events.subscribe('topTeamer:quizFinished', (eventData) => {
 
+      //Prepare some client calculated fields on the contest
+      contestsService.setContestClientData(eventData[0].contest);
+
       //Refresh the contest chart and the contest details
       this.refreshContestChart(eventData[0].contest)
 
@@ -90,7 +93,7 @@ export class ContestPage {
 
   joinContest(team, source, action:string = 'join') {
 
-    contestsService.join(this.contest._id, team).then((data) => {
+    contestsService.join(this.contest._id, team).then((data: any) => {
 
       this.setPlayText();
 
@@ -125,6 +128,8 @@ export class ContestPage {
       else if (rankModal) {
         this.client.nav.present(rankModal);
       }
+
+    }, () => {
 
     });
   }

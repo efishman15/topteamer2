@@ -47,6 +47,8 @@ export class SearchQuestionsPage {
 
     contestsService.searchMyQuestions(this.searchText, existingQuestionIds).then ((questionsResult) => {
       this.questions = questionsResult;
+    }, () => {
+
     });
 
   }

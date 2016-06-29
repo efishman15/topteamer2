@@ -44,9 +44,9 @@ var LeaderboardsPage = (function () {
     LeaderboardsPage.prototype.onContestSelected = function (data) {
         this.client.displayContest(data.contest._id);
     };
-    LeaderboardsPage.prototype.refreshList = function () {
+    LeaderboardsPage.prototype.refreshList = function (forceRefresh) {
         if (this.mode === 'contests') {
-            this.contestList.refresh();
+            this.contestList.refresh(forceRefresh);
         }
     };
     LeaderboardsPage.prototype.onResize = function () {

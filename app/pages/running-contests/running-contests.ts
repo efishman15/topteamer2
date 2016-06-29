@@ -31,8 +31,8 @@ export class RunningContestsPage {
     this.client.displayContest(data.contest._id);
   }
 
-  refreshList() {
-    this.contestList.refresh();
+  refreshList(forceRefresh? : boolean) {
+    return this.contestList.refresh(forceRefresh);
   }
 
   onResize() {

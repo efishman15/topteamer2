@@ -30,7 +30,7 @@ var TopTeamerApp = (function () {
         var _this = this;
         this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent).then(function () {
             _this.initApp();
-        });
+        }, function (err) { return _this.ngAfterViewInit(); });
     };
     TopTeamerApp.prototype.initApp = function () {
         //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
@@ -192,6 +192,8 @@ var TopTeamerApp = (function () {
             if (result['connected']) {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
                     _this.client.setRootPage('MainTabsPage');
+                }, function (err) {
+                    _this.client.openPage('LoginPage');
                 });
             }
             else {
@@ -499,11 +501,19 @@ var ContestListComponent = (function () {
     function ContestListComponent() {
         this.contestSelected = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
+        this.lastRefreshTime = 0;
     }
-    ContestListComponent.prototype.refresh = function () {
+    ContestListComponent.prototype.refresh = function (forceRefresh) {
         var _this = this;
         return new Promise(function (resolve, reject) {
+            var now = (new Date()).getTime();
+            //Check if refresh frequency reached
+            if (now - _this.lastRefreshTime < _this.client.settings.lists.contests.refreshFrequencyInMilliseconds && !forceRefresh) {
+                resolve();
+                return;
+            }
             contestsService.list(_this.tab).then(function (contests) {
+                _this.lastRefreshTime = now;
                 _this.contests = contests;
                 _this.contestChartComponents.forEach(function (contestChartComponent) {
                     contestChartComponent.refresh();
@@ -755,11 +765,24 @@ var facebookService = require('../../providers/facebook');
 var LeadersComponent = (function () {
     function LeadersComponent() {
         this.client = client_1.Client.getInstance();
+        this.friendsLastRefreshTime = 0;
+        this.weeklyLastRefreshTime = 0;
+        this.generalContestLastRefreshTime = 0; //should apply only to the contest currently shown - when view closes and another contest appears - should refresh from server again
+        this.team0ContestLastRefreshTime = 0; //should apply only to the contest currently shown - when view closes and another contest appears - should refresh from server again
+        this.team1ContestLastRefreshTime = 0; //should apply only to the contest currently shown - when view closes and another contest appears - should refresh from server again
     }
     LeadersComponent.prototype.showFriends = function (friendsPermissionJustGranted) {
         var _this = this;
+        var now = (new Date()).getTime();
+        //Check if refresh frequency reached
+        if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !friendsPermissionJustGranted) {
+            this.leaders = this.lastFriendsLeaders;
+            return;
+        }
         leaderboardsService.friends(friendsPermissionJustGranted).then(function (leaders) {
+            _this.friendsLastRefreshTime = now;
             _this.leaders = leaders;
+            _this.lastFriendsLeaders = leaders;
         }, function (err) {
             if (err.type === 'SERVER_ERROR_MISSING_FRIENDS_PERMISSION' && err.additionalInfo && err.additionalInfo.confirmed) {
                 facebookService.login(_this.client.settings.facebook.friendsPermission, true).then(function (response) {
@@ -768,17 +791,63 @@ var LeadersComponent = (function () {
             }
         });
     };
-    LeadersComponent.prototype.showWeekly = function () {
+    LeadersComponent.prototype.showWeekly = function (forceRefresh) {
         var _this = this;
+        var now = (new Date()).getTime();
+        //Check if refresh frequency reached
+        if (now - this.weeklyLastRefreshTime < this.client.settings.lists.leaderboards.weekly.refreshFrequencyInMilliseconds && !forceRefresh) {
+            this.leaders = this.lastWeeklyLeaders;
+            return;
+        }
         leaderboardsService.weekly().then(function (leaders) {
+            _this.weeklyLastRefreshTime = now;
             _this.leaders = leaders;
+            _this.lastWeeklyLeaders = leaders;
+        }, function () {
         });
     };
     //If teamId is not passed - general contest leaderboard is shown
-    LeadersComponent.prototype.showContestParticipants = function (contestId, teamId) {
+    LeadersComponent.prototype.showContestParticipants = function (contestId, teamId, forceRefresh) {
         var _this = this;
+        var now = (new Date()).getTime();
+        var lastRefreshTime;
+        var lastLeaders;
+        switch (teamId) {
+            case 0:
+                lastRefreshTime = this.team0ContestLastRefreshTime;
+                lastLeaders = this.lastTeam0ContestLeaders;
+                break;
+            case 1:
+                lastRefreshTime = this.team1ContestLastRefreshTime;
+                lastLeaders = this.lastTeam1ContestLeaders;
+                break;
+            default:
+                lastRefreshTime = this.generalContestLastRefreshTime;
+                lastLeaders = this.lastGeneralContestLeaders;
+                break;
+        }
+        //Check if refresh frequency reached
+        if (now - lastRefreshTime < this.client.settings.lists.leaderboards.contest.refreshFrequencyInMilliseconds && !forceRefresh) {
+            this.leaders = lastLeaders;
+            return;
+        }
         leaderboardsService.contest(contestId, teamId).then(function (leaders) {
             _this.leaders = leaders;
+            switch (teamId) {
+                case 0:
+                    _this.lastTeam0ContestLeaders = leaders;
+                    _this.team0ContestLastRefreshTime = now;
+                    break;
+                case 1:
+                    _this.lastTeam1ContestLeaders = leaders;
+                    _this.team1ContestLastRefreshTime = now;
+                    break;
+                default:
+                    _this.lastGeneralContestLeaders = leaders;
+                    _this.generalContestLastRefreshTime = now;
+                    break;
+            }
+        }, function () {
         });
     };
     LeadersComponent = __decorate([
@@ -1044,6 +1113,32 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var BasicListSettings = (function () {
+    function BasicListSettings() {
+    }
+    return BasicListSettings;
+}());
+exports.BasicListSettings = BasicListSettings;
+var ContestsListSettings = (function (_super) {
+    __extends(ContestsListSettings, _super);
+    function ContestsListSettings() {
+        _super.apply(this, arguments);
+    }
+    return ContestsListSettings;
+}(BasicListSettings));
+exports.ContestsListSettings = ContestsListSettings;
+var LeaderboardListSettings = (function () {
+    function LeaderboardListSettings() {
+    }
+    return LeaderboardListSettings;
+}());
+exports.LeaderboardListSettings = LeaderboardListSettings;
+var ListSettings = (function () {
+    function ListSettings() {
+    }
+    return ListSettings;
+}());
+exports.ListSettings = ListSettings;
 var Settings = (function () {
     function Settings() {
     }
@@ -1373,15 +1468,17 @@ exports.CalendarCell = CalendarCell;
 var Contest = (function () {
     function Contest(typeId, startDate, endDate, endOption) {
         this.startDate = startDate;
-        this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
-        this.endOption = endOption;
+        if (endDate == null || endDate === undefined) {
+            this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
+        }
+        else {
+            this.endDate = endDate;
+        }
+        if (endOption !== undefined && endOption != null) {
+            this.endOption = endOption;
+        }
         this.type = new ContestType(typeId);
-        this.rating = 0;
-        this.manualRating = 0;
-        this.participants = 0;
-        this.manualParticipants = 0;
-        this.teams = [new Team(), new Team()];
-        this.questions = new Questions();
+        this.teams = [new Team(null), new Team(null)];
     }
     return Contest;
 }());
@@ -1405,10 +1502,8 @@ var ContestName = (function () {
 }());
 exports.ContestName = ContestName;
 var Team = (function () {
-    function Team() {
-        this.name = null;
-        this.score = 0;
-        this.chartValue = 0.5;
+    function Team(name) {
+        this.name = name;
     }
     return Team;
 }());
@@ -1538,6 +1633,10 @@ var ContestParticipantsPage = (function () {
             this.contestId = params.data.contestId;
             contestsService.getContest(params.data.contestId).then(function (contest) {
                 _this.contest = contest;
+            }, function () {
+                setTimeout(function () {
+                    _this.client.nav.pop();
+                }, 1000);
             });
         }
     }
@@ -1645,6 +1744,8 @@ var ContestPage = (function () {
         this.contest = params.data.contest;
         this.setPlayText();
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
+            //Prepare some client calculated fields on the contest
+            contestsService.setContestClientData(eventData[0].contest);
             //Refresh the contest chart and the contest details
             _this.refreshContestChart(eventData[0].contest);
             //Event data comes as an array of data objects - we expect only one (last quiz results)
@@ -1721,6 +1822,7 @@ var ContestPage = (function () {
             else if (rankModal) {
                 _this.client.nav.present(rankModal);
             }
+        }, function () {
         });
     };
     ContestPage.prototype.refreshContestChart = function (contest) {
@@ -1889,9 +1991,9 @@ var LeaderboardsPage = (function () {
     LeaderboardsPage.prototype.onContestSelected = function (data) {
         this.client.displayContest(data.contest._id);
     };
-    LeaderboardsPage.prototype.refreshList = function () {
+    LeaderboardsPage.prototype.refreshList = function (forceRefresh) {
         if (this.mode === 'contests') {
-            this.contestList.refresh();
+            this.contestList.refresh(forceRefresh);
         }
     };
     LeaderboardsPage.prototype.onResize = function () {
@@ -2046,8 +2148,8 @@ var MainTabsPage = (function () {
     MainTabsPage.prototype.refreshActiveTab = function () {
         if (this.needToRefreshList) {
             var selectedPage = this.mainTabs.getSelected().getActive();
-            if (selectedPage.instance.ionViewWillEnter) {
-                selectedPage.instance.ionViewWillEnter();
+            if (selectedPage.instance.refreshList) {
+                selectedPage.instance.refreshList(true);
             }
             this.needToRefreshList = false;
         }
@@ -2131,24 +2233,19 @@ var MyContestsPage = (function () {
         this.client.logEvent('page/myContests');
         if (this.contestList) {
             this.refreshList().then(function () {
+                if (_this.contestList.contests.length === 0 && !_this.pageLoaded) {
+                    //On load only - switch to "running contests" if no personal contests
+                    _this.client.events.publish('topTeamer:noPersonalContests');
+                }
                 _this.pageLoaded = true;
             });
         }
     };
-    MyContestsPage.prototype.ngAfterViewInit = function () {
-        var _this = this;
-        this.refreshList().then(function () {
-            if (_this.contestList.contests.length === 0) {
-                //On load only - switch to "running contests" if no personal contests
-                _this.client.events.publish('topTeamer:noPersonalContests');
-            }
-        });
-    };
     MyContestsPage.prototype.onContestSelected = function (data) {
         this.client.displayContest(data.contest._id);
     };
-    MyContestsPage.prototype.refreshList = function () {
-        return this.contestList.refresh();
+    MyContestsPage.prototype.refreshList = function (forceRefresh) {
+        return this.contestList.refresh(forceRefresh);
     };
     MyContestsPage.prototype.onResize = function () {
         this.contestList.onResize();
@@ -2343,11 +2440,8 @@ var QuestionEditorPage = (function () {
         }
         this.viewController.dismiss(result);
     };
-    QuestionEditorPage.prototype.inputFocus = function (fieldId) {
-        this.fieldInFocus = fieldId;
-    };
-    QuestionEditorPage.prototype.inputBlur = function () {
-        this.fieldInFocus = -1;
+    QuestionEditorPage.prototype.inputFocus = function (event) {
+        this.content.scrollTo(0, event.target['offsetParent']['offsetTop']);
     };
     __decorate([
         core_1.ViewChild(ionic_angular_1.Content), 
@@ -2525,7 +2619,7 @@ var QuizPage = (function () {
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
                 alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason));
             }
-        }, function (err) {
+        }, function () {
             //IonicBug - wait for the prev alert to be fully dismissed
             setTimeout(function () {
                 _this.client.nav.pop();
@@ -2587,6 +2681,7 @@ var QuizPage = (function () {
             _this.quizData.currentQuestion.doAnimation = true; //Animation end will trigger quiz proceed
             _this.drawQuizProgress();
             _this.client.logEvent('quiz/gotQuestion' + (_this.quizData.currentQuestionIndex + 1));
+        }, function () {
         });
     };
     QuizPage.prototype.questionTransitionEnd = function () {
@@ -2687,13 +2782,13 @@ var QuizPage = (function () {
                     switch (action) {
                         case 'hint':
                             _this.questionHistory[_this.quizData.currentQuestionIndex].hintUsed = true;
-                            _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.hintCost;
+                            _this.questionHistory[_this.quizData.currentQuestionIndex].score -= _this.quizData.currentQuestion.hintCost;
                             _this.drawQuizScores();
                             window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
                             break;
                         case 'answer':
                             _this.questionHistory[_this.quizData.currentQuestionIndex].answerUsed = true;
-                            _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.answerCost;
+                            _this.questionHistory[_this.quizData.currentQuestionIndex].score -= _this.quizData.currentQuestion.answerCost;
                             _this.drawQuizScores();
                             window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
                             break;
@@ -2921,6 +3016,7 @@ var QuizPage = (function () {
                 for (var i = 0; i < result.question.answers.length; i++) {
                     _this.quizData.currentQuestion.answers[i].text = result.question.answers[_this.quizData.currentQuestion.answers[i].originalIndex];
                 }
+            }, function () {
             });
         });
         this.client.nav.present(modal);
@@ -2980,8 +3076,8 @@ var RunningContestsPage = (function () {
     RunningContestsPage.prototype.onContestSelected = function (data) {
         this.client.displayContest(data.contest._id);
     };
-    RunningContestsPage.prototype.refreshList = function () {
-        this.contestList.refresh();
+    RunningContestsPage.prototype.refreshList = function (forceRefresh) {
+        return this.contestList.refresh(forceRefresh);
     };
     RunningContestsPage.prototype.onResize = function () {
         this.contestList.onResize();
@@ -3044,6 +3140,7 @@ var SearchQuestionsPage = (function () {
         }
         contestsService.searchMyQuestions(this.searchText, existingQuestionIds).then(function (questionsResult) {
             _this.questions = questionsResult;
+        }, function () {
         });
     };
     SearchQuestionsPage.prototype.dismiss = function (applyChanges) {
@@ -3151,6 +3248,8 @@ var ServerPopupPage = (function () {
                             _this.viewController.dismiss(button).then(function () {
                                 shareService.share('serverPopup', contest);
                             });
+                        }, function () {
+                            _this.viewController.dismiss(button);
                         });
                     }
                     else {
@@ -3247,6 +3346,7 @@ var SetContestAdminPage = (function () {
                 setTimeout(function () {
                     _this.client.nav.popToRoot({ animate: false });
                 }, 1000);
+            }, function () {
             });
         }, function () {
             //Do nothing on cancel
@@ -3307,13 +3407,7 @@ var SetContestPage = (function () {
         this.currentTimeOnlyInMilliseconds = nowWithTime.getTime() - nowWithoutTime.getTime();
         this.nowWithoutTimeEpoch = nowWithoutTime.getTime();
         if (this.params.data.mode === 'edit') {
-            this.contestLocalCopy = JSON.parse(JSON.stringify(this.params.data.contest));
-            if (this.contestLocalCopy.participants > 0) {
-                this.showStartDate = false;
-            }
-            else {
-                this.showStartDate = true;
-            }
+            this.contestLocalCopy = contestsService.cloneForEdit(this.params.data.contest);
             if (this.contestLocalCopy.type.id === 'userTrivia') {
                 this.retrieveUserQuestions();
             }
@@ -3327,15 +3421,15 @@ var SetContestPage = (function () {
                 }
             }
             if (!endOption) {
-                //If no default - set the last as defulat
+                //If no default - set the last as default
                 endOption = this.endOptionKeys[this.endOptionKeys.length - 1];
             }
-            var endDate = this.getEndDateAccordingToEndsIn(endOption);
-            this.contestLocalCopy = new objects_1.Contest(this.params.data.typeId, this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds, endDate, endOption);
+            this.contestLocalCopy = new objects_1.Contest(this.params.data.typeId, this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds, null, endOption);
             //Set contest subject
             this.contestLocalCopy.subject = this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name, { 'name': this.client.session.name });
-            this.showStartDate = true;
-            this.contestLocalCopy.type.questions = new objects_1.Questions();
+            if (this.contestLocalCopy.type.id === 'userTrivia') {
+                this.contestLocalCopy.type.questions = new objects_1.Questions();
+            }
         }
         this.client.session.features['newContest'].purchaseData.retrieved = false;
         //-------------------------------------------------------------------------------------------------------------
@@ -3375,8 +3469,6 @@ var SetContestPage = (function () {
         else {
             this.client.session.features['newContest'].purchaseData.retrieved = true;
         }
-        this.contestLocalCopy.totalParticipants = this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants;
-        this.showAdminInfo = false;
     }
     SetContestPage.prototype.ionViewWillEnter = function () {
         var eventData = { 'mode': this.params.data.mode };
@@ -3390,6 +3482,7 @@ var SetContestPage = (function () {
         var _this = this;
         contestsService.getQuestions(this.contestLocalCopy.type.userQuestions).then(function (questions) {
             _this.contestLocalCopy.type.questions = { 'visibleCount': questions.length, 'list': questions };
+        }, function () {
         });
     };
     SetContestPage.prototype.processAndroidPurchase = function (purchaseData) {
@@ -3415,6 +3508,7 @@ var SetContestPage = (function () {
                         reject();
                     }
                 }, purchaseData.productId);
+            }, function () {
             });
         });
     };
@@ -3433,7 +3527,7 @@ var SetContestPage = (function () {
                             //Update local assets
                             _this.buyInProgress = false;
                             paymentService.showPurchaseSuccess(serverPurchaseData);
-                        }, function (error) {
+                        }, function () {
                             _this.buyInProgress = false;
                         });
                     }
@@ -3454,7 +3548,7 @@ var SetContestPage = (function () {
                     });
                     break;
             }
-        }, function (error) {
+        }, function () {
             _this.buyInProgress = false;
         });
     };
@@ -3525,7 +3619,6 @@ var SetContestPage = (function () {
             //do nothing on cancel
         });
     };
-    ;
     SetContestPage.prototype.setContest = function () {
         var _this = this;
         this.client.logEvent('contest/set');
@@ -3533,6 +3626,7 @@ var SetContestPage = (function () {
         if (!this.contestForm.valid) {
             return;
         }
+        //Check min questions in user Trivia
         if (this.contestLocalCopy.type.id === 'userTrivia') {
             if (!this.contestLocalCopy.type.questions || this.contestLocalCopy.type.questions.visibleCount < this.client.settings['newContest'].privateQuestions.min) {
                 if (this.client.settings['newContest'].privateQuestions.min === 1) {
@@ -3544,20 +3638,41 @@ var SetContestPage = (function () {
                 return;
             }
         }
-        //Tweak the manual participants
-        if (this.contestLocalCopy.totalParticipants !== this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants) {
-            this.contestLocalCopy.manualParticipants += this.contestLocalCopy.totalParticipants - (this.contestLocalCopy.participants + this.contestLocalCopy.manualParticipants);
+        var isDirty = false;
+        var contestNameChanged = false;
+        if (this.params.data.mode === 'add') {
+            isDirty = true;
         }
-        delete this.contestLocalCopy['totalParticipants'];
-        delete this.contestLocalCopy['status'];
-        if (this.params.data.mode === 'add' || (this.params.data.mode === 'edit' && JSON.stringify(this.params.data.contest) != JSON.stringify(this.contestLocalCopy))) {
-            if (this.params.data.mode === 'edit' &&
-                (this.contestLocalCopy.teams[0].name !== this.params.data.contest.teams[0].name ||
-                    this.contestLocalCopy.teams[1].name !== this.params.data.contest.teams[1].name ||
-                    this.contestLocalCopy.subject !== this.params.data.contest.subject)) {
-                this.contestNameChanged = true;
+        else {
+            //edit mode
+            if (this.contestLocalCopy.teams[0].name !== this.params.data.contest.teams[0].name ||
+                this.contestLocalCopy.teams[1].name !== this.params.data.contest.teams[1].name ||
+                this.contestLocalCopy.subject !== this.params.data.contest.subject) {
+                isDirty = true;
+                contestNameChanged = true;
             }
-            contestsService.setContest(this.contestLocalCopy, this.params.data.mode, this.contestNameChanged).then(function (contest) {
+            if (!isDirty &&
+                (this.contestLocalCopy.startDate !== this.params.data.contest.startDate ||
+                    this.contestLocalCopy.endDate !== this.params.data.contest.endDate ||
+                    (this.contestLocalCopy.systemParticipants !== undefined && this.params.data.contest.systemParticipants !== undefined && this.contestLocalCopy.systemParticipants !== this.params.data.contest.systemParticipants) ||
+                    (this.contestLocalCopy.rating !== undefined && this.params.data.contest.rating !== undefined && this.contestLocalCopy.rating !== this.params.data.contest.rating))) {
+                isDirty = true;
+            }
+            if (!isDirty && this.contestLocalCopy.type.id === 'userTrivia' && JSON.stringify(this.contestLocalCopy.type) !== JSON.stringify(this.params.data.contest.type)) {
+                isDirty = true;
+            }
+        }
+        if (isDirty) {
+            if (this.client.session.isAdmin) {
+                //Check if scores have changed and update the deltas
+                if (this.contestLocalCopy.teams[0].score !== undefined && this.contestLocalCopy.teams[0].score !== this.params.data.contest.teams[0].score) {
+                    this.contestLocalCopy.teams[0].adminScoreAddition = this.contestLocalCopy.teams[0].score - this.params.data.contest.teams[0].score;
+                }
+                if (this.contestLocalCopy.teams[1].score !== undefined && this.contestLocalCopy.teams[1].score !== this.params.data.contest.teams[1].score) {
+                    this.contestLocalCopy.teams[1].adminScoreAddition = this.contestLocalCopy.teams[1].score - this.params.data.contest.teams[1].score;
+                }
+            }
+            contestsService.setContest(this.contestLocalCopy, this.params.data.mode, contestNameChanged).then(function (contest) {
                 //Report to Analytics
                 var contestParams = {
                     'team0': _this.contestLocalCopy.teams[0].name,
@@ -3589,6 +3704,7 @@ var SetContestPage = (function () {
                     _this.client.events.publish('topTeamer:contestUpdated', contest);
                     _this.client.nav.pop();
                 }
+            }, function () {
             });
         }
         else {
@@ -3628,6 +3744,20 @@ var SetContestPage = (function () {
         return endDate;
     };
     SetContestPage.prototype.setAdminInfo = function () {
+        if (this.contestLocalCopy.systemParticipants === undefined) {
+            this.contestLocalCopy.systemParticipants = 0;
+        }
+        if (this.contestLocalCopy.rating === undefined) {
+            this.contestLocalCopy.rating = 0;
+        }
+        if (this.contestLocalCopy.teams[0].score === undefined) {
+            this.contestLocalCopy.teams[0].score = this.params.data.contest.teams[0].score;
+            this.contestLocalCopy.teams[0].adminScoreAddition = 0;
+        }
+        if (this.contestLocalCopy.teams[1].score === undefined) {
+            this.contestLocalCopy.teams[1].score = this.params.data.contest.teams[1].score;
+            this.contestLocalCopy.teams[1].adminScoreAddition = 0;
+        }
         this.client.openPage('SetContestAdminPage', {
             'contestLocalCopy': this.contestLocalCopy,
             'mode': this.params.data.mode,
@@ -3695,11 +3825,18 @@ var SettingsPage = (function () {
         }
     };
     SettingsPage.prototype.toggleSound = function () {
+        var _this = this;
         this.client.logEvent('settings/sound/' + !this.client.session.settings.sound);
-        this.client.toggleSound();
+        this.client.toggleSound().then(function () {
+        }, function (err) {
+            //Revert GUI on server error
+            _this.client.session.settings.sound = !_this.client.session.settings.sound;
+        });
     };
     SettingsPage.prototype.switchLanguage = function () {
-        this.client.switchLanguage();
+        this.client.switchLanguage().then(function () {
+        }, function () {
+        });
     };
     SettingsPage.prototype.logout = function () {
         var _this = this;
@@ -3790,6 +3927,7 @@ var SystemToolsPage = (function () {
         var _this = this;
         systemService.clearCache().then(function () {
             _this.client.nav.pop();
+        }, function () {
         });
     };
     SystemToolsPage.prototype.restart = function () {
@@ -3797,6 +3935,7 @@ var SystemToolsPage = (function () {
         alertService.confirm('SYSTEM_RESTART_CONFIRM_TITLE', 'SYSTEM_RESTART_CONFIRM_TEMPLATE').then(function () {
             systemService.restart().then(function () {
                 _this.client.nav.pop();
+            }, function () {
             });
         }, function () {
             //Do nothing on cancel
@@ -4181,7 +4320,7 @@ var Client = (function () {
                     _this.user.settings.language = data['session'].settings.language;
                     _this.localSwitchLanguage(_this.user.settings.language);
                 }
-                _this.user.settings = data['session'].settings;
+                _this.user.settings = JSON.parse(JSON.stringify(data['session'].settings));
                 _this._session = data['session'];
                 _this.serverGateway.token = data['session'].token;
                 _this.setLoggedUserId(data['session'].userId);
@@ -4203,7 +4342,9 @@ var Client = (function () {
                         //Update the server with the registration id - if server has no registration or it has a different reg id
                         //Just submit and forget
                         if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
-                            _this.serverPost('user/setGcmRegistration', { 'registrationId': registrationData.registrationId });
+                            _this.serverPost('user/setGcmRegistration', { 'registrationId': registrationData.registrationId }).then(function () {
+                            }, function () {
+                            });
                         }
                     });
                     push.on('notification', function (notificationData) {
@@ -4216,10 +4357,14 @@ var Client = (function () {
                     });
                     var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
                     if (storedGcmRegistration && !_this.session.gcmRegistrationId) {
-                        _this.serverPost('user/setGcmRegistration', { 'registrationId': storedGcmRegistration });
+                        _this.serverPost('user/setGcmRegistration', { 'registrationId': storedGcmRegistration }).then(function () {
+                        }, function () {
+                        });
                     }
                 }
                 resolve();
+            }, function (err) {
+                reject(err);
             });
         });
     };
@@ -4301,9 +4446,7 @@ var Client = (function () {
         var modal = this.createModalPage('ContestTypePage');
         modal.onDismiss(function (contestTypeId) {
             if (contestTypeId) {
-                setTimeout(function () {
-                    _this.openPage('SetContestPage', { 'mode': 'add', 'typeId': contestTypeId });
-                }, 500);
+                _this.openPage('SetContestPage', { 'mode': 'add', 'typeId': contestTypeId });
             }
         });
         return this.nav.present(modal);
@@ -4312,6 +4455,7 @@ var Client = (function () {
         var _this = this;
         contestsService.getContest(contestId).then(function (contest) {
             _this.openPage('ContestPage', { 'contest': contest });
+        }, function () {
         });
     };
     Client.prototype.getPage = function (name) {
@@ -4506,7 +4650,7 @@ var Client = (function () {
     });
     Object.defineProperty(Client.prototype, "currentLanguage", {
         get: function () {
-            return this.settings.languages[this.user.settings.language];
+            return this.settings.languages[this.session ? this.session.settings.language : this.user.settings.language];
         },
         enumerable: true,
         configurable: true
@@ -4539,7 +4683,8 @@ var Client = (function () {
         configurable: true
     });
     Client.prototype.translate = function (key, params) {
-        var translatedValue = this.settings.ui[this.user.settings.language][key];
+        var language = (this.session ? this.session.settings.language : this.user.settings.language);
+        var translatedValue = this.settings.ui[language][key];
         if (params) {
             translatedValue = translatedValue.format(params);
         }
@@ -4555,14 +4700,15 @@ var Client = (function () {
     Client.prototype.switchLanguage = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.localSwitchLanguage(_this.user.settings.language);
             var postData = { 'language': _this.user.settings.language };
             _this.serverPost('user/switchLanguage', postData).then(function () {
+                _this.localSwitchLanguage(_this.user.settings.language);
                 _this.session.settings.language = _this.user.settings.language;
                 _this.logEvent('settings/language/change', { language: _this.user.settings.language });
                 resolve();
-            }, function () {
-                reject();
+            }, function (err) {
+                _this.user.settings.language = _this.session.settings.language;
+                reject(err);
             });
         });
     };
@@ -4696,16 +4842,106 @@ var InternalEvent = (function () {
 exports.InternalEvent = InternalEvent;
 },{"../objects/objects":12,"./alert":35,"./classes":36,"./contests":38,"./facebook":40,"@angular/core":179,"@angular/http":255,"ionic-angular":408,"ionic-native":432,"rxjs/add/operator/map":486,"rxjs/add/operator/timeout":487}],38:[function(require,module,exports){
 "use strict";
+var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
 //------------------------------------------------------
 //-- Private Functions
 //------------------------------------------------------
 //------------------------------------------------------
+//-- list
+//------------------------------------------------------
+exports.list = function (tab) {
+    var postData = { 'tab': tab };
+    return new Promise(function (resolve, reject) {
+        var client = client_1.Client.getInstance();
+        client.serverPost('contests/list', postData).then(function (contests) {
+            contests.forEach(function (contest) {
+                exports.setContestClientData(contest);
+            });
+            resolve(contests);
+        }, function (err) {
+            reject(err);
+        });
+    });
+};
+//------------------------------------------------------
+//-- join
+//------------------------------------------------------
+exports.join = function (contestId, teamId) {
+    var postData = { 'contestId': contestId, 'teamId': teamId };
+    var client = client_1.Client.getInstance();
+    return new Promise(function (resolve, reject) {
+        client.serverPost('contests/join', postData).then(function (data) {
+            exports.setContestClientData(data.contest);
+            resolve(data);
+        }, function (err) {
+            reject(err);
+        });
+    });
+};
+//------------------------------------------------------
+//-- getContest
+//------------------------------------------------------
+exports.getContest = function (contestId) {
+    var postData = { 'contestId': contestId };
+    var client = client_1.Client.getInstance();
+    return new Promise(function (resolve, reject) {
+        client.serverPost('contests/get', postData).then(function (contest) {
+            exports.setContestClientData(contest);
+            resolve(contest);
+        }, function (err) {
+            reject(err);
+        });
+    });
+};
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+exports.removeContest = function (contestId) {
+    var postData = { 'contestId': contestId };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/remove', postData);
+};
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+exports.setContest = function (contest, mode, nameChanged) {
+    var postData = { 'contest': contest, 'mode': mode };
+    if (nameChanged) {
+        postData['nameChanged'] = nameChanged;
+    }
+    var client = client_1.Client.getInstance();
+    return new Promise(function (resolve, reject) {
+        client.serverPost('contests/set', postData).then(function (contest) {
+            exports.setContestClientData(contest);
+            resolve(contest);
+        }, function (err) {
+            reject(err);
+        });
+    });
+};
+//------------------------------------------------------
+//-- searchMyQuestions
+//------------------------------------------------------
+exports.searchMyQuestions = function (text, existingQuestionIds) {
+    var postData = { 'text': text, 'existingQuestionIds': existingQuestionIds };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/searchMyQuestions', postData);
+};
+//------------------------------------------------------
+//-- getQuestions
+//------------------------------------------------------
+exports.getQuestions = function (userQuestions) {
+    var postData = { 'userQuestions': userQuestions };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/getQuestions', postData);
+};
+//------------------------------------------------------
 //-- setContestClientData
 //-- Sets the contest.time object, state, status
 //------------------------------------------------------
-function setContestClientData(contest) {
+exports.setContestClientData = function (contest) {
     var client = client_1.Client.getInstance();
     var now = (new Date()).getTime();
     //-------------------
@@ -4858,74 +5094,19 @@ function setContestClientData(contest) {
         'team0': contest.teams[0].name,
         'team1': contest.teams[1].name
     });
-}
-//------------------------------------------------------
-//-- list
-//------------------------------------------------------
-exports.list = function (tab) {
-    var postData = { 'tab': tab };
-    return new Promise(function (resolve, reject) {
-        var client = client_1.Client.getInstance();
-        client.serverPost('contests/list', postData).then(function (contests) {
-            contests.forEach(function (contest) {
-                setContestClientData(contest);
-            });
-            resolve(contests);
-        }, function (err) {
-            reject(err);
-        });
-    });
 };
-//------------------------------------------------------
-//-- join
-//------------------------------------------------------
-exports.join = function (contestId, teamId) {
-    var postData = { 'contestId': contestId, 'teamId': teamId };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/join', postData);
-};
-//------------------------------------------------------
-//-- getContest
-//------------------------------------------------------
-exports.getContest = function (contestId) {
-    var postData = { 'contestId': contestId };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/get', postData);
-};
-//------------------------------------------------------
-//-- openContest
-//------------------------------------------------------
-exports.removeContest = function (contestId) {
-    var postData = { 'contestId': contestId };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/remove', postData);
-};
-//------------------------------------------------------
-//-- openContest
-//------------------------------------------------------
-exports.setContest = function (contest, mode, nameChanged) {
-    var postData = { 'contest': contest, 'mode': mode };
-    if (nameChanged) {
-        postData['nameChanged'] = nameChanged;
+exports.cloneForEdit = function (contest) {
+    var newContest = new objects_1.Contest(contest.type.id, contest.startDate, contest.endDate);
+    newContest._id = contest._id;
+    newContest.teams = [new objects_1.Team(contest.teams[0].name), new objects_1.Team(contest.teams[1].name)];
+    if (_this.questions) {
+        newContest.questions = JSON.parse(JSON.stringify(contest.questions));
     }
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/set', postData);
-};
-//------------------------------------------------------
-//-- searchMyQuestions
-//------------------------------------------------------
-exports.searchMyQuestions = function (text, existingQuestionIds) {
-    var postData = { 'text': text, 'existingQuestionIds': existingQuestionIds };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/searchMyQuestions', postData);
-};
-//------------------------------------------------------
-//-- getQuestions
-//------------------------------------------------------
-exports.getQuestions = function (userQuestions) {
-    var postData = { 'userQuestions': userQuestions };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/getQuestions', postData);
+    newContest.subject = contest.subject;
+    if (contest.type.id === 'userTrivia') {
+        newContest.type = JSON.parse(JSON.stringify(contest.type));
+    }
+    return newContest;
 };
 },{"../objects/objects":12,"./client":37}],39:[function(require,module,exports){
 "use strict";
@@ -5290,15 +5471,6 @@ var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
 var emailRef = '?ref=shareEmail';
-function adjustUrl(url) {
-    var client = client_1.Client.getInstance();
-    if (client.user.clientInfo.mobile) {
-        return encodeURIComponent(url);
-    }
-    else {
-        return url;
-    }
-}
 exports.getVariables = function (contest) {
     var client = client_1.Client.getInstance();
     var shareVariables = new objects_1.ShareVariables();
@@ -5326,11 +5498,11 @@ exports.getVariables = function (contest) {
         }
     }
     else {
-        shareVariables.shareUrl = adjustUrl(client.settings.general.downloadUrl[client.user.settings.language]);
+        shareVariables.shareUrl = client.settings.general.downloadUrl[client.user.settings.language];
         shareVariables.shareSubject = client.translate('SHARE_SUBJECT');
         shareVariables.shareBody = client.translate('SHARE_BODY', { url: shareVariables.shareUrl });
         shareVariables.shareBodyEmail = client.translate('SHARE_BODY', { url: shareVariables.shareUrl + emailRef });
-        shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' - "' + client.translate('GAME_NAME') + '"';
+        shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' ' + client.translate('GAME_NAME');
     }
     return shareVariables;
 };

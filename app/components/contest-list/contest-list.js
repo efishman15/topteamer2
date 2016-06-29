@@ -16,11 +16,19 @@ var ContestListComponent = (function () {
     function ContestListComponent() {
         this.contestSelected = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
+        this.lastRefreshTime = 0;
     }
-    ContestListComponent.prototype.refresh = function () {
+    ContestListComponent.prototype.refresh = function (forceRefresh) {
         var _this = this;
         return new Promise(function (resolve, reject) {
+            var now = (new Date()).getTime();
+            //Check if refresh frequency reached
+            if (now - _this.lastRefreshTime < _this.client.settings.lists.contests.refreshFrequencyInMilliseconds && !forceRefresh) {
+                resolve();
+                return;
+            }
             contestsService.list(_this.tab).then(function (contests) {
+                _this.lastRefreshTime = now;
                 _this.contests = contests;
                 _this.contestChartComponents.forEach(function (contestChartComponent) {
                     contestChartComponent.refresh();

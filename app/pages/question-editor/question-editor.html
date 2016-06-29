@@ -26,8 +26,7 @@
           ngControl="questionControl"
           ngMaxlength="client.settings.quiz.question.maxLength"
           [attr.maxlength]="client.settings.quiz.question.maxLength"
-          (focus)="inputFocus(0)"
-          (blur)="inputBlur()"
+          (focus)="inputFocus($event)"
           required>
         </ion-textarea>
         <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}"
@@ -36,11 +35,11 @@
         </div>
         <div
           *ngIf="(questionControl.dirty || submitted) && (questionControl.errors && questionControl.errors.required || questionError)">
-          <div *ngIf="questionControl.errors && questionControl.errors.required" padding-left padding-right text-center
+          <div *ngIf="questionControl.errors && questionControl.errors.required" padding-left padding-right
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
           </div>
-          <div *ngIf="questionError" padding-left padding-right text-center
+          <div *ngIf="questionError" padding-left padding-right
                class="invalid-input">
             {{questionError}}
           </div>
@@ -57,8 +56,7 @@
           ngControl="answer0Control"
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
           [attr.maxlength]="client.settings.quiz.question.answer.maxLength"
-          (focus)="inputFocus(1)"
-          (blur)="inputBlur()"
+          (focus)="inputFocus($event)"
           required>
         </ion-textarea>
         <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}"
@@ -66,7 +64,7 @@
           {{question.answers[0] ? question.answers[0].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
         </div>
         <div *ngIf="(answer0Control.dirty || submitted) && answer0Control.errors && answer0Control.errors.required">
-          <div padding-left padding-right text-center
+          <div padding-left padding-right
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
           </div>
@@ -84,8 +82,7 @@
           ngControl="answer1Control"
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
           [attr.maxlength]="client.settings.quiz.question.answer.maxLength"
-          (focus)="inputFocus(2)"
-          (blur)="inputBlur()"
+          (focus)="inputFocus($event)"
           required>
         </ion-textarea>
         <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}"
@@ -93,7 +90,7 @@
           {{question.answers[1] ? question.answers[1].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
         </div>
         <div *ngIf="(answer1Control.dirty || submitted) && answer1Control.errors && answer1Control.errors.required">
-          <div padding-left padding-right text-center
+          <div padding-left padding-right
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
           </div>
@@ -111,8 +108,7 @@
           ngControl="answer2Control"
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
           [attr.maxlength]="client.settings.quiz.question.answer.maxLength"
-          (focus)="inputFocus(3)"
-          (blur)="inputBlur()"
+          (focus)="inputFocus($event)"
           required>
         </ion-textarea>
         <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}"
@@ -120,7 +116,7 @@
           {{question.answers[2] ? question.answers[2].length : 0}}/{{client.settings.quiz.question.answer.maxLength}}
         </div>
         <div *ngIf="(answer2Control.dirty || submitted) && answer2Control.errors && answer2Control.errors.required">
-          <div padding-left padding-right text-center
+          <div padding-left padding-right
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
           </div>
@@ -138,8 +134,7 @@
           ngControl="answer3Control"
           ngMaxlength="client.settings.quiz.question.answer.maxLength"
           [attr.maxlength]="client.settings.quiz.question.answer.maxLength"
-          (focus)="inputFocus(4)"
-          (blur)="inputBlur()"
+          (focus)="inputFocus($event)"
           required>
         </ion-textarea>
         <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}"

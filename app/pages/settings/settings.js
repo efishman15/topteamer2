@@ -24,11 +24,18 @@ var SettingsPage = (function () {
         }
     };
     SettingsPage.prototype.toggleSound = function () {
+        var _this = this;
         this.client.logEvent('settings/sound/' + !this.client.session.settings.sound);
-        this.client.toggleSound();
+        this.client.toggleSound().then(function () {
+        }, function (err) {
+            //Revert GUI on server error
+            _this.client.session.settings.sound = !_this.client.session.settings.sound;
+        });
     };
     SettingsPage.prototype.switchLanguage = function () {
-        this.client.switchLanguage();
+        this.client.switchLanguage().then(function () {
+        }, function () {
+        });
     };
     SettingsPage.prototype.logout = function () {
         var _this = this;

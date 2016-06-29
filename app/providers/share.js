@@ -2,15 +2,6 @@ var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
 var emailRef = '?ref=shareEmail';
-function adjustUrl(url) {
-    var client = client_1.Client.getInstance();
-    if (client.user.clientInfo.mobile) {
-        return encodeURIComponent(url);
-    }
-    else {
-        return url;
-    }
-}
 exports.getVariables = function (contest) {
     var client = client_1.Client.getInstance();
     var shareVariables = new objects_1.ShareVariables();
@@ -38,11 +29,11 @@ exports.getVariables = function (contest) {
         }
     }
     else {
-        shareVariables.shareUrl = adjustUrl(client.settings.general.downloadUrl[client.user.settings.language]);
+        shareVariables.shareUrl = client.settings.general.downloadUrl[client.user.settings.language];
         shareVariables.shareSubject = client.translate('SHARE_SUBJECT');
         shareVariables.shareBody = client.translate('SHARE_BODY', { url: shareVariables.shareUrl });
         shareVariables.shareBodyEmail = client.translate('SHARE_BODY', { url: shareVariables.shareUrl + emailRef });
-        shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' - "' + client.translate('GAME_NAME') + '"';
+        shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' ' + client.translate('GAME_NAME');
     }
     return shareVariables;
 };

@@ -6,13 +6,15 @@ var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var mathjs = require('mathjs');
 var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
-var ObjectId = require('mongodb').ObjectID;
+var jsonTransformer = require('jsonpath-object-transform');
 
 //---------------------------------------------------------------------
 // private functions
 //---------------------------------------------------------------------
 
-//setUserQuestions
+//----------------------------------------------------
+// setUserQuestions
+//----------------------------------------------------
 function setUserQuestions(questionIndex, data, callback) {
   //Check if finished recursion cycle
   if (questionIndex === data.contest.type.questions.list.length) {
@@ -91,7 +93,9 @@ function setUserQuestions(questionIndex, data, callback) {
   }
 }
 
-//setUserQuestionIds
+//----------------------------------------------------
+// setUserQuestionIds
+//----------------------------------------------------
 function setUserQuestionIds(data, callback) {
   data.contest.type.userQuestions = [];
   for (var i = 0; i < data.contest.type.questions.list.length; i++) {
@@ -261,23 +265,20 @@ function validateContestData(data, callback) {
     cleanContest.endDate = data.contest.endDate;
     cleanContest.endOption = data.contest.endOption;
     cleanContest.participants = 0;
-    if (data.contest.manualParticipants) {
-      cleanContest.manualParticipants = data.contest.manualParticipants;
+    if (data.contest.systemParticipants) {
+      cleanContest.systemParticipants = data.contest.systemParticipants;
     }
     else {
-      cleanContest.manualParticipants = 0;
+      cleanContest.systemParticipants = 0;
     }
-    cleanContest.totalParticipants = cleanContest.participants + cleanContest.manualParticipants;
-
-    if (data.contest.manualRating) {
-      cleanContest.manualRating = data.contest.manualRating;
+    if (data.contest.rating) {
+      cleanContest.rating = data.contest.rating;
     }
     else {
-      cleanContest.manualRating = 0;
+      cleanContest.rating = 0;
     }
 
     cleanContest.teams = data.contest.teams;
-    cleanContest.name = data.contest.name;
     cleanContest.subject = data.contest.subject;
 
     cleanContest.language = data.session.settings.language;
@@ -307,24 +308,22 @@ function validateContestData(data, callback) {
     data.contest = cleanContest;
   }
 
-  //Do not count on status from the client
-  if (data.contest.status) {
-    delete data.contest.status;
+  if (data.contest.systemParticipants && !data.session.isAdmin) {
+    //Allowed only for admins
+    delete data.contest.systemParticipants;
   }
 
-  if (data.contest.manualParticipants && !data.session.isAdmin) {
+  if (data.contest.rating && !data.session.isAdmin) {
     //Allowed only for admins
-    delete data.contest.manualParticipants;
-  }
-
-  if (data.contest.manualRating && !data.session.isAdmin) {
-    //Allowed only for admins
-    delete data.contest.manualRating;
+    delete data.contest.rating;
   }
 
   callback(null, data);
 }
 
+//----------------------------------------------------
+// updateContest
+//----------------------------------------------------
 function updateContest(data, callback) {
 
   data.checkOwner = true;
@@ -332,40 +331,31 @@ function updateContest(data, callback) {
   data.setData = {};
 
   //Non admin fields
-  data.setData['name'] = data.contest.name;
   data.setData['teams.0.name'] = data.contest.teams[0].name;
   data.setData['teams.1.name'] = data.contest.teams[1].name;
   data.setData['subject'] = data.contest.subject;
   data.setData.endDate = data.contest.endDate;
 
-  //If team names are changing - a new link is created in branch.io with the new contest teams /name
-  if (data.contest.link) {
-    data.setData['link'] = data.contest.link;
+  if (data.contest.type.id === 'userTrivia') {
+    data.setData['type.questions'] = data.contest.type.questions;
   }
-
-  data.setData.type = data.contest.type; //Including user question if type.id is 'userTrivia'
 
   //Admin fields
   if (data.session.isAdmin) {
 
     data.setData['startDate'] = data.contest.startDate;
 
-    data.setData['teams.0.score'] = data.contest.teams[0].score;
+    if (data.contest.teams[0].score != null && data.contest.teams[1].score != null) {
+      data.setData['$inc'] = {};
+      data.setData['$inc']['teams.0.score'] = data.contest.teams[0].adminScoreAddition;
+      data.setData['$inc']['teams.1.score'] = data.contest.teams[1].adminScoreAddition;
+    }
 
-    if (data.contest.teams[0].score != null) {
-      data.setData['teams.0.score'] = data.contest.teams[0].score;
+    if (data.contest.systemParticipants != null) {
+      data.setData['systemParticipants'] = data.contest.systemParticipants;
     }
-    if (data.contest.teams[1].score != null) {
-      data.setData['teams.1.score'] = data.contest.teams[1].score;
-    }
-    if (data.contest.manualParticipants != null) {
-      data.setData['manualParticipants'] = data.contest.manualParticipants;
-    }
-    if (data.contest.totalParticipants != null) {
-      data.setData['totalParticipants'] = data.contest.totalParticipants;
-    }
-    if (data.contest.manualRating != null) {
-      data.setData['manualRating'] = data.contest.manualRating;
+    if (data.contest.rating != null) {
+      data.setData['rating'] = data.contest.rating;
     }
   }
 
@@ -416,9 +406,7 @@ function joinContest(req, res, next) {
     //Store the session's xp progress in the db
     function (data, callback) {
 
-      prepareContestForClient(data.contest, data.session);
-
-      data.clientResponse = {'contest': data.contest};
+      data.clientResponse = {'contest': prepareContestForClient(data.contest, data.session)};
 
       if (data.newJoin) {
         commonBusinessLogic.addXp(data, 'joinContest');
@@ -485,7 +473,6 @@ function joinContestTeam(data, callback) {
   //Increment participants only if I did not join this contest yet
   if (joinToContestObject(data.contest, data.teamId, data.session)) {
     data.setData.participants = data.contest.participants;
-    data.setData.totalParticipants = data.contest.totalParticipants;
     data.newJoin = true;
     data.setData.lastParticipantJoinDate = (new Date()).getTime();
   }
@@ -514,7 +501,6 @@ function joinToContestObject(contest, teamId, session) {
   //Increment participants only if I did not join this contest yet
   if (!contest.users[session.userId]) {
     contest.participants++;
-    contest.totalParticipants++;
     contest.lastParticipantJoinDate = now;
     newJoin = true;
   }
@@ -614,12 +600,6 @@ module.exports.setContest = function (req, res, next) {
         dalDb.closeDb(data);
         callback(null, data);
       }
-    },
-
-    //Prepare contest for client
-    function (data, callback) {
-      prepareContestForClient(data.contest, data.session);
-      callback(null, data);
     }
   ];
 
@@ -758,14 +738,15 @@ module.exports.getContest = function (req, res, next) {
     //Retrieve the contest
     function (data, callback) {
       data.closeConnection = true;
+      data.clientFieldsOnly = true;
       dalDb.getContest(data, callback);
     },
 
-    //Prepare contest for client
+    //Transform to client
     function (data, callback) {
-      prepareContestForClient(data.contest, data.session);
+      data.contest = prepareContestForClient(data.contest, data.session);
       callback(null, data);
-    }
+    },
   ];
 
   async.waterfall(operations, function (err, data) {
@@ -880,3 +861,22 @@ module.exports.getTeamDistancePercent = function (contest, teamId) {
 
   return (inputTeamPercent - otherTeamPercent);
 };
+
+//---------------------------------------------------------------------
+// prepareContestForClient
+//---------------------------------------------------------------------
+module.exports.prepareContestForClient = prepareContestForClient;
+function prepareContestForClient(contest, session) {
+
+  var contestForClient = jsonTransformer(contest, session.isAdmin ? generalUtils.settings.server.contest.details.adminClientTemplate : generalUtils.settings.server.contest.details.clientTemplate);
+  if (contest.creator.id.toString() === session.userId.toString()) {
+    contestForClient.owner = true;
+  }
+
+  if (contest.users[session.userId.toString()]) {
+    contestForClient.myTeam = contest.users[session.userId.toString()].team;
+  }
+
+  return contestForClient;
+};
+

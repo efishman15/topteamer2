@@ -25,6 +25,8 @@ var ContestPage = (function () {
         this.contest = params.data.contest;
         this.setPlayText();
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
+            //Prepare some client calculated fields on the contest
+            contestsService.setContestClientData(eventData[0].contest);
             //Refresh the contest chart and the contest details
             _this.refreshContestChart(eventData[0].contest);
             //Event data comes as an array of data objects - we expect only one (last quiz results)
@@ -101,6 +103,7 @@ var ContestPage = (function () {
             else if (rankModal) {
                 _this.client.nav.present(rankModal);
             }
+        }, function () {
         });
     };
     ContestPage.prototype.refreshContestChart = function (contest) {

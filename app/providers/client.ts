@@ -300,7 +300,7 @@ export class Client {
           this.localSwitchLanguage(this.user.settings.language);
         }
 
-        this.user.settings = data['session'].settings;
+        this.user.settings = JSON.parse(JSON.stringify(data['session'].settings));
 
         this._session = data['session'];
         this.serverGateway.token = data['session'].token;
@@ -333,7 +333,9 @@ export class Client {
             //Update the server with the registration id - if server has no registration or it has a different reg id
             //Just submit and forget
             if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
-              this.serverPost('user/setGcmRegistration', {'registrationId': registrationData.registrationId});
+              this.serverPost('user/setGcmRegistration', {'registrationId': registrationData.registrationId}).then(() => {
+              }, () => {
+              });
             }
           });
 
@@ -349,12 +351,16 @@ export class Client {
 
           var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
           if (storedGcmRegistration && !this.session.gcmRegistrationId) {
-            this.serverPost('user/setGcmRegistration', {'registrationId': storedGcmRegistration});
+            this.serverPost('user/setGcmRegistration', {'registrationId': storedGcmRegistration}).then(() => {
+            }, () => {
+            });
           }
         }
 
         resolve();
 
+      }, (err) => {
+        reject(err);
       });
 
     })
@@ -439,9 +445,7 @@ export class Client {
     var modal = this.createModalPage('ContestTypePage');
     modal.onDismiss((contestTypeId) => {
       if (contestTypeId) {
-        setTimeout(() => {
-          this.openPage('SetContestPage', {'mode': 'add', 'typeId': contestTypeId});
-        }, 500);
+        this.openPage('SetContestPage', {'mode': 'add', 'typeId': contestTypeId});
       }
     });
     return this.nav.present(modal);
@@ -450,6 +454,7 @@ export class Client {
   displayContest(contestId:string) {
     contestsService.getContest(contestId).then((contest:Contest) => {
       this.openPage('ContestPage', {'contest': contest});
+    }, () => {
     });
   }
 
@@ -615,7 +620,7 @@ export class Client {
   }
 
   get currentLanguage():Language {
-    return this.settings.languages[this.user.settings.language];
+    return this.settings.languages[this.session ? this.session.settings.language : this.user.settings.language];
   }
 
   get languageKeys():Array < String > {
@@ -640,7 +645,8 @@ export class Client {
   }
 
   translate(key:string, params ?:Object) {
-    var translatedValue = this.settings.ui[this.user.settings.language][key];
+    var language = (this.session ? this.session.settings.language : this.user.settings.language);
+    var translatedValue = this.settings.ui[language][key];
     if (params) {
       translatedValue = translatedValue.format(params);
     }
@@ -659,14 +665,15 @@ export class Client {
 
   switchLanguage() {
     return new Promise((resolve, reject) => {
-      this.localSwitchLanguage(this.user.settings.language);
       var postData = {'language': this.user.settings.language};
       this.serverPost('user/switchLanguage', postData).then(() => {
+        this.localSwitchLanguage(this.user.settings.language);
         this.session.settings.language = this.user.settings.language;
         this.logEvent('settings/language/change', {language: this.user.settings.language});
         resolve();
-      }, () => {
-        reject();
+      }, (err) => {
+        this.user.settings.language = this.session.settings.language;
+        reject(err);
       });
     });
   }

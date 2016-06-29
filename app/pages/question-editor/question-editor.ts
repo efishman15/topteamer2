@@ -127,11 +127,7 @@ export class QuestionEditorPage {
     this.viewController.dismiss(result);
   }
 
-  inputFocus(fieldId: number) {
-    this.fieldInFocus = fieldId;
-  }
-
-  inputBlur() {
-    this.fieldInFocus = -1;
+  inputFocus(event: Event) {
+    this.content.scrollTo(0,event.target['offsetParent']['offsetTop']);
   }
 }

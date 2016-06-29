@@ -1,13 +1,103 @@
+var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
 //------------------------------------------------------
 //-- Private Functions
 //------------------------------------------------------
 //------------------------------------------------------
+//-- list
+//------------------------------------------------------
+exports.list = function (tab) {
+    var postData = { 'tab': tab };
+    return new Promise(function (resolve, reject) {
+        var client = client_1.Client.getInstance();
+        client.serverPost('contests/list', postData).then(function (contests) {
+            contests.forEach(function (contest) {
+                exports.setContestClientData(contest);
+            });
+            resolve(contests);
+        }, function (err) {
+            reject(err);
+        });
+    });
+};
+//------------------------------------------------------
+//-- join
+//------------------------------------------------------
+exports.join = function (contestId, teamId) {
+    var postData = { 'contestId': contestId, 'teamId': teamId };
+    var client = client_1.Client.getInstance();
+    return new Promise(function (resolve, reject) {
+        client.serverPost('contests/join', postData).then(function (data) {
+            exports.setContestClientData(data.contest);
+            resolve(data);
+        }, function (err) {
+            reject(err);
+        });
+    });
+};
+//------------------------------------------------------
+//-- getContest
+//------------------------------------------------------
+exports.getContest = function (contestId) {
+    var postData = { 'contestId': contestId };
+    var client = client_1.Client.getInstance();
+    return new Promise(function (resolve, reject) {
+        client.serverPost('contests/get', postData).then(function (contest) {
+            exports.setContestClientData(contest);
+            resolve(contest);
+        }, function (err) {
+            reject(err);
+        });
+    });
+};
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+exports.removeContest = function (contestId) {
+    var postData = { 'contestId': contestId };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/remove', postData);
+};
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+exports.setContest = function (contest, mode, nameChanged) {
+    var postData = { 'contest': contest, 'mode': mode };
+    if (nameChanged) {
+        postData['nameChanged'] = nameChanged;
+    }
+    var client = client_1.Client.getInstance();
+    return new Promise(function (resolve, reject) {
+        client.serverPost('contests/set', postData).then(function (contest) {
+            exports.setContestClientData(contest);
+            resolve(contest);
+        }, function (err) {
+            reject(err);
+        });
+    });
+};
+//------------------------------------------------------
+//-- searchMyQuestions
+//------------------------------------------------------
+exports.searchMyQuestions = function (text, existingQuestionIds) {
+    var postData = { 'text': text, 'existingQuestionIds': existingQuestionIds };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/searchMyQuestions', postData);
+};
+//------------------------------------------------------
+//-- getQuestions
+//------------------------------------------------------
+exports.getQuestions = function (userQuestions) {
+    var postData = { 'userQuestions': userQuestions };
+    var client = client_1.Client.getInstance();
+    return client.serverPost('contests/getQuestions', postData);
+};
+//------------------------------------------------------
 //-- setContestClientData
 //-- Sets the contest.time object, state, status
 //------------------------------------------------------
-function setContestClientData(contest) {
+exports.setContestClientData = function (contest) {
     var client = client_1.Client.getInstance();
     var now = (new Date()).getTime();
     //-------------------
@@ -160,73 +250,18 @@ function setContestClientData(contest) {
         'team0': contest.teams[0].name,
         'team1': contest.teams[1].name
     });
-}
-//------------------------------------------------------
-//-- list
-//------------------------------------------------------
-exports.list = function (tab) {
-    var postData = { 'tab': tab };
-    return new Promise(function (resolve, reject) {
-        var client = client_1.Client.getInstance();
-        client.serverPost('contests/list', postData).then(function (contests) {
-            contests.forEach(function (contest) {
-                setContestClientData(contest);
-            });
-            resolve(contests);
-        }, function (err) {
-            reject(err);
-        });
-    });
 };
-//------------------------------------------------------
-//-- join
-//------------------------------------------------------
-exports.join = function (contestId, teamId) {
-    var postData = { 'contestId': contestId, 'teamId': teamId };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/join', postData);
-};
-//------------------------------------------------------
-//-- getContest
-//------------------------------------------------------
-exports.getContest = function (contestId) {
-    var postData = { 'contestId': contestId };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/get', postData);
-};
-//------------------------------------------------------
-//-- openContest
-//------------------------------------------------------
-exports.removeContest = function (contestId) {
-    var postData = { 'contestId': contestId };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/remove', postData);
-};
-//------------------------------------------------------
-//-- openContest
-//------------------------------------------------------
-exports.setContest = function (contest, mode, nameChanged) {
-    var postData = { 'contest': contest, 'mode': mode };
-    if (nameChanged) {
-        postData['nameChanged'] = nameChanged;
+exports.cloneForEdit = function (contest) {
+    var newContest = new objects_1.Contest(contest.type.id, contest.startDate, contest.endDate);
+    newContest._id = contest._id;
+    newContest.teams = [new objects_1.Team(contest.teams[0].name), new objects_1.Team(contest.teams[1].name)];
+    if (_this.questions) {
+        newContest.questions = JSON.parse(JSON.stringify(contest.questions));
     }
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/set', postData);
-};
-//------------------------------------------------------
-//-- searchMyQuestions
-//------------------------------------------------------
-exports.searchMyQuestions = function (text, existingQuestionIds) {
-    var postData = { 'text': text, 'existingQuestionIds': existingQuestionIds };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/searchMyQuestions', postData);
-};
-//------------------------------------------------------
-//-- getQuestions
-//------------------------------------------------------
-exports.getQuestions = function (userQuestions) {
-    var postData = { 'userQuestions': userQuestions };
-    var client = client_1.Client.getInstance();
-    return client.serverPost('contests/getQuestions', postData);
+    newContest.subject = contest.subject;
+    if (contest.type.id === 'userTrivia') {
+        newContest.type = JSON.parse(JSON.stringify(contest.type));
+    }
+    return newContest;
 };
 //# sourceMappingURL=contests.js.map

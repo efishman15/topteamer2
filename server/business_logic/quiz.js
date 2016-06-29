@@ -654,9 +654,7 @@ module.exports.answer = function (req, res, next) {
           }
         }
 
-        data.clientResponse.results = {'contest': data.contest, 'data': {}};
-
-        contestsBusinessLogic.prepareContestForClient(data.clientResponse.results.contest, data.session);
+        data.clientResponse.results = {'contest': contestsBusinessLogic.prepareContestForClient(data.contest,data.session), 'data': {}};
 
         data.clientResponse.results.data.score = data.session.quiz.serverData.score;
 

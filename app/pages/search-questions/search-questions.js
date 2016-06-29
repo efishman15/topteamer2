@@ -40,6 +40,7 @@ var SearchQuestionsPage = (function () {
         }
         contestsService.searchMyQuestions(this.searchText, existingQuestionIds).then(function (questionsResult) {
             _this.questions = questionsResult;
+        }, function () {
         });
     };
     SearchQuestionsPage.prototype.dismiss = function (applyChanges) {

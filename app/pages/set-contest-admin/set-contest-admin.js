@@ -60,6 +60,7 @@ var SetContestAdminPage = (function () {
                 setTimeout(function () {
                     _this.client.nav.popToRoot({ animate: false });
                 }, 1000);
+            }, function () {
             });
         }, function () {
             //Do nothing on cancel

@@ -5,9 +5,9 @@
   </contest-chart>
   <div class="center-image-container">
     <img class="contests-play-image pointer"
-         [ngStyle]="{'margin-left': -(client.settings.contestList.playButton.size/2) + 'px', 'margin-top': -(client.chartHeight+client.settings.contestList.playButton.size+client.settings.contestList.playButton.size/2)/2 + 'px'}"
+         [ngStyle]="{'margin-left': -(client.settings.lists.contests.playButtonSize.width/2) + 'px', 'margin-top': -(client.chartHeight+client.settings.lists.contests.playButtonSize.height+client.settings.lists.contests.playButtonSize.height/2)/2 + 'px'}"
          src="images/go.png"
-         width="{{client.settings.contestList.playButton.size}}"
+         width="{{client.settings.lists.contests.playButtonSize.width}}"
          title="{{contest.name.long}}"
          (click)="onContestSelected({'contest': contests[i], 'source': 'go'})">
   </div>

@@ -20,14 +20,25 @@ export class ContestListComponent {
 
   contests:Array<Contest>;
   client:Client;
+  lastRefreshTime;
 
   constructor() {
     this.client = Client.getInstance();
+    this.lastRefreshTime = 0;
   }
 
-  refresh() {
+  refresh(forceRefresh?: boolean) {
     return new Promise( (resolve, reject) => {
+      var now = (new Date()).getTime();
+
+      //Check if refresh frequency reached
+      if (now - this.lastRefreshTime < this.client.settings.lists.contests.refreshFrequencyInMilliseconds && !forceRefresh) {
+        resolve();
+        return;
+      }
+
       contestsService.list(this.tab).then((contests: Array<Contest>) => {
+        this.lastRefreshTime = now;
         this.contests = contests;
         this.contestChartComponents.forEach( (contestChartComponent: ContestChartComponent) => {
           contestChartComponent.refresh();

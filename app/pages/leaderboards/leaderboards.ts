@@ -54,9 +54,9 @@ export class LeaderboardsPage {
     this.client.displayContest(data.contest._id);
   }
 
-  refreshList() {
+  refreshList(forceRefresh?: boolean) {
     if (this.mode === 'contests') {
-      this.contestList.refresh();
+      this.contestList.refresh(forceRefresh);
     }
   }
 

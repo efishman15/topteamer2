@@ -29,6 +29,10 @@ var ContestParticipantsPage = (function () {
             this.contestId = params.data.contestId;
             contestsService.getContest(params.data.contestId).then(function (contest) {
                 _this.contest = contest;
+            }, function () {
+                setTimeout(function () {
+                    _this.client.nav.pop();
+                }, 1000);
             });
         }
     }

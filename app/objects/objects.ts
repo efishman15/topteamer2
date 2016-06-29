@@ -1,3 +1,22 @@
+export class BasicListSettings {
+  refreshFrequencyInMilliseconds:number;
+}
+
+export class ContestsListSettings extends BasicListSettings {
+  playButtonSize:Size;
+}
+
+export class LeaderboardListSettings {
+  friends:BasicListSettings;
+  weekly:BasicListSettings;
+  contest:BasicListSettings;
+}
+
+export class ListSettings {
+  contests:ContestsListSettings;
+  leaderboards:LeaderboardListSettings;
+}
+
 export class Settings {
   general:GeneralSettings;
   facebook:FacebookSettings;
@@ -9,6 +28,7 @@ export class Settings {
   languages:Array<Language>;
   ui:Array<Array<Object>>;
   newContest:NewContestSettings;
+  lists:ListSettings;
 }
 
 export class NewContestSettings {
@@ -89,9 +109,9 @@ export class QuizCanvasFontsSettings {
 }
 
 export class QuizCanvasFontSettings {
-  bold: boolean;
-  size: string; //e.g 20px
-  name: string;
+  bold:boolean;
+  size:string; //e.g 20px
+  name:string;
 }
 
 export class QuizCanvasSizeSettings {
@@ -122,7 +142,7 @@ export class QuizCanvasCircleSettings {
 export class QuizCanvasCircleRadiusSettings {
   min:number;
   max:number;
-  spaceRatio: number;
+  spaceRatio:number;
   outerBorderRatio:number;
 }
 
@@ -174,8 +194,8 @@ export class ChartSettings {
   dataSource:any;
 }
 
-export class ContestChartSettings extends ChartSettings{
-  size: ChartSizeSettings;
+export class ContestChartSettings extends ChartSettings {
+  size:ChartSizeSettings;
 }
 
 export class QuestionStatsChartSettings extends ChartSettings {
@@ -195,7 +215,7 @@ export class Size {
 
 export class ChartSizeSettings extends Size {
   widthRatio:number;
-  heightRatio: number;
+  heightRatio:number;
   heightRatioFromWidth:number;
   topMarginPercent:number;
 }
@@ -219,8 +239,8 @@ export class Questions {
   visibleCount:number;
 
   constructor() {
-      this.visibleCount = 0;
-      this.list = [];
+    this.visibleCount = 0;
+    this.list = [];
   }
 }
 
@@ -356,42 +376,42 @@ export class Contest {
   status:string;
   myTeam:number;
   participants:number;
-  manualParticipants;
+  systemParticipants;
   rating:number;
-  manualRating:number;
   teams:Array<Team>;
   type:ContestType;
   endOption:string;
   questions:Questions;
-  totalParticipants:number;
   dataSource:any;
   state:string;
-  leadingTeam: number;
-  time: ContestTime;
+  leadingTeam:number;
+  time:ContestTime;
 
-  constructor(typeId:string, startDate: number, endDate: number, endOption: string) {
-
+  constructor(typeId:string, startDate:number, endDate?: number, endOption?:string) {
     this.startDate = startDate;
-    this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
-    this.endOption = endOption;
+    if (endDate == null || endDate === undefined) {
+      this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
+    }
+    else {
+      this.endDate = endDate;
+    }
+
+    if (endOption !== undefined && endOption != null) {
+      this.endOption = endOption;
+    }
     this.type = new ContestType(typeId);
-    this.rating = 0;
-    this.manualRating = 0;
-    this.participants = 0;
-    this.manualParticipants = 0;
-    this.teams = [new Team(), new Team()];
-    this.questions = new Questions();
+    this.teams = [new Team(null), new Team(null)];
   }
 }
 
 export class ContestTimeData {
-  text: string;
-  color: string;
+  text:string;
+  color:string;
 }
 
 export class ContestTime {
-  start: ContestTimeData;
-  end: ContestTimeData;
+  start:ContestTimeData;
+  end:ContestTimeData;
 }
 
 export class ContestName {
@@ -403,11 +423,10 @@ export class Team {
   name:string;
   score:number;
   chartValue:number;
+  adminScoreAddition:number;
 
-  constructor() {
-    this.name = null;
-    this.score = 0;
-    this.chartValue = 0.5;
+  constructor(name: string)  {
+    this.name = name;
   }
 }
 

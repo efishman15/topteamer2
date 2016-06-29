@@ -219,7 +219,7 @@ var Client = (function () {
                     _this.user.settings.language = data['session'].settings.language;
                     _this.localSwitchLanguage(_this.user.settings.language);
                 }
-                _this.user.settings = data['session'].settings;
+                _this.user.settings = JSON.parse(JSON.stringify(data['session'].settings));
                 _this._session = data['session'];
                 _this.serverGateway.token = data['session'].token;
                 _this.setLoggedUserId(data['session'].userId);
@@ -241,7 +241,9 @@ var Client = (function () {
                         //Update the server with the registration id - if server has no registration or it has a different reg id
                         //Just submit and forget
                         if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
-                            _this.serverPost('user/setGcmRegistration', { 'registrationId': registrationData.registrationId });
+                            _this.serverPost('user/setGcmRegistration', { 'registrationId': registrationData.registrationId }).then(function () {
+                            }, function () {
+                            });
                         }
                     });
                     push.on('notification', function (notificationData) {
@@ -254,10 +256,14 @@ var Client = (function () {
                     });
                     var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
                     if (storedGcmRegistration && !_this.session.gcmRegistrationId) {
-                        _this.serverPost('user/setGcmRegistration', { 'registrationId': storedGcmRegistration });
+                        _this.serverPost('user/setGcmRegistration', { 'registrationId': storedGcmRegistration }).then(function () {
+                        }, function () {
+                        });
                     }
                 }
                 resolve();
+            }, function (err) {
+                reject(err);
             });
         });
     };
@@ -339,9 +345,7 @@ var Client = (function () {
         var modal = this.createModalPage('ContestTypePage');
         modal.onDismiss(function (contestTypeId) {
             if (contestTypeId) {
-                setTimeout(function () {
-                    _this.openPage('SetContestPage', { 'mode': 'add', 'typeId': contestTypeId });
-                }, 500);
+                _this.openPage('SetContestPage', { 'mode': 'add', 'typeId': contestTypeId });
             }
         });
         return this.nav.present(modal);
@@ -350,6 +354,7 @@ var Client = (function () {
         var _this = this;
         contestsService.getContest(contestId).then(function (contest) {
             _this.openPage('ContestPage', { 'contest': contest });
+        }, function () {
         });
     };
     Client.prototype.getPage = function (name) {
@@ -544,7 +549,7 @@ var Client = (function () {
     });
     Object.defineProperty(Client.prototype, "currentLanguage", {
         get: function () {
-            return this.settings.languages[this.user.settings.language];
+            return this.settings.languages[this.session ? this.session.settings.language : this.user.settings.language];
         },
         enumerable: true,
         configurable: true
@@ -577,7 +582,8 @@ var Client = (function () {
         configurable: true
     });
     Client.prototype.translate = function (key, params) {
-        var translatedValue = this.settings.ui[this.user.settings.language][key];
+        var language = (this.session ? this.session.settings.language : this.user.settings.language);
+        var translatedValue = this.settings.ui[language][key];
         if (params) {
             translatedValue = translatedValue.format(params);
         }
@@ -593,14 +599,15 @@ var Client = (function () {
     Client.prototype.switchLanguage = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.localSwitchLanguage(_this.user.settings.language);
             var postData = { 'language': _this.user.settings.language };
             _this.serverPost('user/switchLanguage', postData).then(function () {
+                _this.localSwitchLanguage(_this.user.settings.language);
                 _this.session.settings.language = _this.user.settings.language;
                 _this.logEvent('settings/language/change', { language: _this.user.settings.language });
                 resolve();
-            }, function () {
-                reject();
+            }, function (err) {
+                _this.user.settings.language = _this.session.settings.language;
+                reject(err);
             });
         });
     };

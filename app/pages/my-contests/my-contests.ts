@@ -22,26 +22,21 @@ export class MyContestsPage {
     this.client.logEvent('page/myContests');
     if (this.contestList) {
       this.refreshList().then(() => {
+        if (this.contestList.contests.length === 0 && !this.pageLoaded) {
+          //On load only - switch to "running contests" if no personal contests
+          this.client.events.publish('topTeamer:noPersonalContests');
+        }
         this.pageLoaded = true;
       });
     }
-  }
-
-  ngAfterViewInit() {
-    this.refreshList().then(() => {
-      if (this.contestList.contests.length === 0) {
-        //On load only - switch to "running contests" if no personal contests
-        this.client.events.publish('topTeamer:noPersonalContests');
-      }
-    });
   }
 
   onContestSelected(data) {
     this.client.displayContest(data.contest._id);
   }
 
-  refreshList() {
-    return this.contestList.refresh();
+  refreshList(forceRefresh? : boolean) {
+    return this.contestList.refresh(forceRefresh);
   }
 
   onResize() {

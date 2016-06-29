@@ -1,5 +1,4 @@
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10908,"level":30,"msg":"One of the required fields not supplied: startDate, endDate, teams, type","time":"2016-06-10T10:56:44.721Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10908,"level":30,"msg":"One of the required fields not supplied: startDate, endDate, teams, type","time":"2016-06-10T10:57:53.893Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10908,"level":30,"msg":"One of the required fields not supplied: startDate, endDate, teams, type","time":"2016-06-10T11:00:57.474Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10908,"level":30,"msg":"Contest end date must be later than contest start date","time":"2016-06-10T11:17:44.861Z","v":0}
-{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10908,"level":30,"msg":"Contest end date must be later than contest start date","time":"2016-06-10T11:20:42.880Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":10908,"level":30,"options":{"url":"http://freegeoip.net/json/5.29.242.54","timeout":3000},"error":{"code":"ETIMEDOUT","connect":true},"msg":"Error during request from api","time":"2016-06-13T09:44:21.441Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":17548,"level":30,"msg":"server up!","time":"2016-06-13T10:22:00.769Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":17548,"level":30,"options":{"url":"http://freegeoip.net/json/5.29.242.54","timeout":3000},"error":{"code":"ETIMEDOUT","connect":true},"msg":"Error during request from api","time":"2016-06-13T13:23:31.700Z","v":0}
+{"name":"topTeamerServer","hostname":"EddyHomePC","pid":12948,"level":30,"msg":"server up!","time":"2016-06-13T14:08:12.748Z","v":0}

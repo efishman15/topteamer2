@@ -21,7 +21,7 @@
       <ion-select interface="action-sheet" multiple="false" [(ngModel)]="client.user.settings.language"
                   okText="{{client.translate('OK')}}"
                   cancelText="{{client.translate('CANCEL')}}"
-                  (ionChange)="client.switchLanguage()">
+                  (ionChange)="switchLanguage()">
         <ion-option *ngFor="let languageKey of client.languageKeys"
                     value="{{languageKey}}"
                     checked="languageKey===client.user.settings.language">

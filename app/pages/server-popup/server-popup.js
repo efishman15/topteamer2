@@ -55,6 +55,8 @@ var ServerPopupPage = (function () {
                             _this.viewController.dismiss(button).then(function () {
                                 shareService.share('serverPopup', contest);
                             });
+                        }, function () {
+                            _this.viewController.dismiss(button);
                         });
                     }
                     else {

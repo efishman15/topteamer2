@@ -22,6 +22,8 @@ export class SystemToolsPage {
   clearCache() {
     systemService.clearCache().then(() => {
       this.client.nav.pop();
+    },() => {
+
     });
   }
 
@@ -29,6 +31,8 @@ export class SystemToolsPage {
     alertService.confirm('SYSTEM_RESTART_CONFIRM_TITLE', 'SYSTEM_RESTART_CONFIRM_TEMPLATE').then(() => {
       systemService.restart().then(() => {
         this.client.nav.pop();
+      },() => {
+
       });
     }, () => {
       //Do nothing on cancel

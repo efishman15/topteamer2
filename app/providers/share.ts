@@ -3,18 +3,6 @@ import {ShareVariables} from '../objects/objects';
 
 var emailRef = '?ref=shareEmail';
 
-function adjustUrl(url) {
-
-  var client = Client.getInstance();
-
-  if (client.user.clientInfo.mobile) {
-    return encodeURIComponent(url);
-  }
-  else {
-    return url;
-  }
-}
-
 export let getVariables = (contest) => {
 
   var client = Client.getInstance();
@@ -45,11 +33,11 @@ export let getVariables = (contest) => {
     }
   }
   else {
-    shareVariables.shareUrl = adjustUrl(client.settings.general.downloadUrl[client.user.settings.language]);
+    shareVariables.shareUrl = client.settings.general.downloadUrl[client.user.settings.language];
     shareVariables.shareSubject = client.translate('SHARE_SUBJECT');
     shareVariables.shareBody = client.translate('SHARE_BODY', {url: shareVariables.shareUrl});
     shareVariables.shareBodyEmail = client.translate('SHARE_BODY', {url: shareVariables.shareUrl + emailRef});
-    shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' - "' + client.translate('GAME_NAME') + '"';
+    shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' ' + client.translate('GAME_NAME');
   }
 
   return shareVariables;

@@ -9,7 +9,7 @@ import * as facebookService from '../../providers/facebook';
 export class SettingsPage {
 
   client:Client;
-  originalLanguage: string;
+  originalLanguage:string;
 
   constructor() {
     this.client = Client.getInstance();
@@ -28,11 +28,17 @@ export class SettingsPage {
 
   toggleSound() {
     this.client.logEvent('settings/sound/' + !this.client.session.settings.sound);
-    this.client.toggleSound();
+    this.client.toggleSound().then(() => {
+    }, (err) => {
+      //Revert GUI on server error
+      this.client.session.settings.sound = !this.client.session.settings.sound;
+    });
   }
 
   switchLanguage() {
-    this.client.switchLanguage();
+    this.client.switchLanguage().then(()=> {
+    }, () => {
+    });
   }
 
   logout() {

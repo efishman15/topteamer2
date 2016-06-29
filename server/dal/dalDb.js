@@ -13,7 +13,6 @@ var mathjs = require('mathjs');
 // Cache variables
 //---------------------------------------------------------------------
 var topics = {};
-var contestListClientFields = null;
 
 //---------------------------------------------------------------------
 // Class DbHelper
@@ -987,7 +986,7 @@ function removeContest(data, callback) {
 // data:
 // -----
 // input: DbHelper, session, contestId
-// output: <NA>
+// output: contest
 //------------------------------------------------------------------------------------------------
 module.exports.getContest = getContest;
 function getContest(data, callback) {
@@ -1028,19 +1027,14 @@ function prepareContestsQuery(data, callback) {
   data.contestQuery = [];
   var whereClause = {'$match': {'language': data.session.settings.language}}
   var limitClause;
-  var sortClause = {'$sort' : {}};
+  var sortClause = {'$sort': {}};
 
-  if (!contestListClientFields) {
-    contestListClientFields = generalUtils.arrayToObject(generalUtils.settings.server.contestList.clientFields,1);
-  }
-
-  //Will return owner=true if I am the owner of the contest or null (to save JSON space) if not
-  contestListClientFields['owner'] = {$cond: [{$eq: ['$creator.id', ObjectId(data.session.userId)]},true,null]};
+  var clientFields = generalUtils.arrayToObject(generalUtils.settings.server.contest.list.clientFields, 1);
 
   //Will return the user's team if joined to a team or null if not
-  contestListClientFields['myTeam'] = {$cond: [{$eq: ['$users.' + data.session.userId + '.userId', ObjectId(data.session.userId)]},'$users.' + data.session.userId + '.team',null]};
+  clientFields['myTeam'] = {$cond: [{$eq: ['$users.' + data.session.userId + '.userId', ObjectId(data.session.userId)]}, '$users.' + data.session.userId + '.team', null]};
 
-  var fieldsClause = {'$project' : contestListClientFields};
+  var fieldsClause = {'$project': clientFields};
 
   var now = (new Date()).getTime();
 
@@ -1053,14 +1047,17 @@ function prepareContestsQuery(data, callback) {
 
     case 'running':
       whereClause['$match'].endDate = {$gte: now}; //not finished yet
-      limitClause = {'$limit': generalUtils.settings.server.contestList.pageSize};
+      limitClause = {'$limit': generalUtils.settings.server.contest.list.pageSize};
       sortClause['$sort'].participants = -1; //descending
       break;
 
     case 'recentlyFinished':
       //Finished between now and X days ago as set in settings
-      whereClause['$match'].endDate = {$lt: now, $gte: now - (generalUtils.settings.server.contestList.recentlyFinishedDays * 24 * 60 * 60 * 1000)};
-      limitClause = {'$limit': generalUtils.settings.server.contestList.pageSize};
+      whereClause['$match'].endDate = {
+        $lt: now,
+        $gte: now - (generalUtils.settings.server.contest.list.recentlyFinishedDays * 24 * 60 * 60 * 1000)
+      };
+      limitClause = {'$limit': generalUtils.settings.server.contest.list.pageSize};
       sortClause['$sort'].endDate = -1; //descending
       break;
 
@@ -1112,7 +1109,6 @@ function getContests(data, callback) {
 
     });
 }
-
 //------------------------------------------------------------------------------------------------
 // updateQuestionStatistics
 //

@@ -63,6 +63,8 @@ export class ServerPopupPage {
             this.viewController.dismiss(button).then(() => {
               shareService.share('serverPopup',contest);
             });
+          }, () => {
+            this.viewController.dismiss(button);
           });
         }
         else {

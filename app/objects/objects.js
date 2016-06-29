@@ -3,6 +3,32 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var BasicListSettings = (function () {
+    function BasicListSettings() {
+    }
+    return BasicListSettings;
+})();
+exports.BasicListSettings = BasicListSettings;
+var ContestsListSettings = (function (_super) {
+    __extends(ContestsListSettings, _super);
+    function ContestsListSettings() {
+        _super.apply(this, arguments);
+    }
+    return ContestsListSettings;
+})(BasicListSettings);
+exports.ContestsListSettings = ContestsListSettings;
+var LeaderboardListSettings = (function () {
+    function LeaderboardListSettings() {
+    }
+    return LeaderboardListSettings;
+})();
+exports.LeaderboardListSettings = LeaderboardListSettings;
+var ListSettings = (function () {
+    function ListSettings() {
+    }
+    return ListSettings;
+})();
+exports.ListSettings = ListSettings;
 var Settings = (function () {
     function Settings() {
     }
@@ -332,15 +358,17 @@ exports.CalendarCell = CalendarCell;
 var Contest = (function () {
     function Contest(typeId, startDate, endDate, endOption) {
         this.startDate = startDate;
-        this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
-        this.endOption = endOption;
+        if (endDate == null || endDate === undefined) {
+            this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
+        }
+        else {
+            this.endDate = endDate;
+        }
+        if (endOption !== undefined && endOption != null) {
+            this.endOption = endOption;
+        }
         this.type = new ContestType(typeId);
-        this.rating = 0;
-        this.manualRating = 0;
-        this.participants = 0;
-        this.manualParticipants = 0;
-        this.teams = [new Team(), new Team()];
-        this.questions = new Questions();
+        this.teams = [new Team(null), new Team(null)];
     }
     return Contest;
 })();
@@ -364,10 +392,8 @@ var ContestName = (function () {
 })();
 exports.ContestName = ContestName;
 var Team = (function () {
-    function Team() {
-        this.name = null;
-        this.score = 0;
-        this.chartValue = 0.5;
+    function Team(name) {
+        this.name = name;
     }
     return Team;
 })();

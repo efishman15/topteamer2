@@ -33,8 +33,12 @@ export class ContestParticipantsPage {
     }
     else {
       this.contestId = params.data.contestId;
-      contestsService.getContest(params.data.contestId).then((contest) => {
+      contestsService.getContest(params.data.contestId).then((contest: Contest) => {
         this.contest = contest;
+      }, () => {
+        setTimeout(() => {
+          this.client.nav.pop();
+        },1000)
       });
     }
   }

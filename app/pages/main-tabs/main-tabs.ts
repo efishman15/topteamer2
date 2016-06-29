@@ -85,8 +85,8 @@ export class MainTabsPage {
   refreshActiveTab() {
     if (this.needToRefreshList) {
       var selectedPage = this.mainTabs.getSelected().getActive();
-      if (selectedPage.instance.ionViewWillEnter) {
-        selectedPage.instance.ionViewWillEnter();
+      if (selectedPage.instance.refreshList) {
+        selectedPage.instance.refreshList(true);
       }
       this.needToRefreshList = false;
     }

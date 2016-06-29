@@ -72,6 +72,8 @@ export class SetContestAdminPage {
         setTimeout(() => {
           this.client.nav.popToRoot({animate: false});
         }, 1000);
+      }, () => {
+
       });
     }, () => {
       //Do nothing on cancel

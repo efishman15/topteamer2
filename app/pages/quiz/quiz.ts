@@ -121,7 +121,7 @@ export class QuizPage {
         alertService.alert(this.client.translate(this.quizData.reviewMode.reason));
       }
 
-    }, (err) => {
+    }, () => {
       //IonicBug - wait for the prev alert to be fully dismissed
       setTimeout(() => {
         this.client.nav.pop();
@@ -200,6 +200,8 @@ export class QuizPage {
       this.drawQuizProgress();
 
       this.client.logEvent('quiz/gotQuestion' + (this.quizData.currentQuestionIndex + 1));
+    },() => {
+
     });
   }
 
@@ -319,14 +321,14 @@ export class QuizPage {
           switch (action) {
             case 'hint':
               this.questionHistory[this.quizData.currentQuestionIndex].hintUsed = true;
-              this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.hintCost;
+              this.questionHistory[this.quizData.currentQuestionIndex].score -= this.quizData.currentQuestion.hintCost;
               this.drawQuizScores();
               window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
               break;
 
             case 'answer':
               this.questionHistory[this.quizData.currentQuestionIndex].answerUsed = true;
-              this.questionHistory[this.quizData.currentQuestionIndex].score = this.client.settings.quiz.questions.score[this.quizData.currentQuestionIndex] - this.quizData.currentQuestion.answerCost;
+              this.questionHistory[this.quizData.currentQuestionIndex].score -= this.quizData.currentQuestion.answerCost;
               this.drawQuizScores();
               window.open(this.client.currentLanguage.wiki + this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
               break;
@@ -599,6 +601,8 @@ export class QuizPage {
         for (var i = 0; i < result.question.answers.length; i++) {
           this.quizData.currentQuestion.answers[i].text = result.question.answers[this.quizData.currentQuestion.answers[i].originalIndex];
         }
+      }, () => {
+
       })
     })
     this.client.nav.present(modal);

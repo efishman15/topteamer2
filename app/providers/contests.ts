@@ -1,15 +1,114 @@
 import {Client} from './client';
-import {Contest, ContestName} from '../objects/objects';
+import {Contest, Team, ContestName} from '../objects/objects';
 
 //------------------------------------------------------
 //-- Private Functions
 //------------------------------------------------------
 
 //------------------------------------------------------
+//-- list
+//------------------------------------------------------
+export let list = (tab:String) => {
+  var postData = {'tab': tab};
+  return new Promise((resolve, reject) => {
+    var client = Client.getInstance();
+    client.serverPost('contests/list', postData).then((contests: Array<Contest>) => {
+      contests.forEach((contest:Contest) => {
+        setContestClientData(contest);
+      });
+      resolve(contests);
+    }, (err) => {
+      reject(err);
+    });
+  });
+}
+
+//------------------------------------------------------
+//-- join
+//------------------------------------------------------
+export let join = (contestId:string, teamId:number) => {
+  var postData = {'contestId': contestId, 'teamId': teamId};
+  var client = Client.getInstance();
+  return new Promise((resolve, reject) => {
+    client.serverPost('contests/join', postData).then((data : any) => {
+      setContestClientData(data.contest);
+      resolve(data);
+    }, (err) => {
+      reject(err);
+    })
+  });
+
+}
+
+//------------------------------------------------------
+//-- getContest
+//------------------------------------------------------
+export let getContest = (contestId:string) => {
+
+  var postData = {'contestId': contestId};
+  var client = Client.getInstance();
+  return new Promise((resolve, reject) => {
+    client.serverPost('contests/get', postData).then((contest: Contest) => {
+      setContestClientData(contest);
+      resolve(contest);
+    }, (err) => {
+      reject(err)
+    });
+  });
+}
+
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+export let removeContest = (contestId:string) => {
+  var postData = {'contestId': contestId};
+  var client = Client.getInstance();
+  return client.serverPost('contests/remove', postData);
+}
+
+//------------------------------------------------------
+//-- openContest
+//------------------------------------------------------
+export let setContest = (contest:Object, mode:string, nameChanged:Boolean) => {
+  var postData = {'contest': contest, 'mode': mode};
+  if (nameChanged) {
+    postData['nameChanged'] = nameChanged;
+  }
+
+  var client = Client.getInstance();
+  return new Promise((resolve, reject) => {
+    client.serverPost('contests/set', postData).then((contest : Contest) => {
+      setContestClientData(contest);
+      resolve(contest);
+    }, (err) => {
+      reject(err);
+    })
+  });
+}
+
+//------------------------------------------------------
+//-- searchMyQuestions
+//------------------------------------------------------
+export let searchMyQuestions = (text:String, existingQuestionIds:Array<String>) => {
+  var postData = {'text': text, 'existingQuestionIds': existingQuestionIds};
+  var client = Client.getInstance();
+  return client.serverPost('contests/searchMyQuestions', postData);
+};
+
+//------------------------------------------------------
+//-- getQuestions
+//------------------------------------------------------
+export let getQuestions = (userQuestions) => {
+  var postData = {'userQuestions': userQuestions};
+  var client = Client.getInstance();
+  return client.serverPost('contests/getQuestions', postData);
+};
+
+//------------------------------------------------------
 //-- setContestClientData
 //-- Sets the contest.time object, state, status
 //------------------------------------------------------
-function setContestClientData(contest:Contest) {
+export let setContestClientData = (contest:Contest) => {
 
   var client = Client.getInstance();
   var now = (new Date()).getTime();
@@ -180,79 +279,20 @@ function setContestClientData(contest:Contest) {
 
 }
 
-//------------------------------------------------------
-//-- list
-//------------------------------------------------------
-export let list = (tab:String) => {
-  var postData = {'tab': tab};
-  return new Promise((resolve, reject) => {
-    var client = Client.getInstance();
-    client.serverPost('contests/list', postData).then((contests: Array<Contest>) => {
-      contests.forEach((contest:Contest) => {
-        setContestClientData(contest);
-      });
-      resolve(contests);
-    }, (err) => {
-      reject(err);
-    });
-  });
-}
+export let cloneForEdit = (contest: Contest) => {
+  let newContest = new Contest(contest.type.id, contest.startDate, contest.endDate);
+  newContest._id = contest._id;
+  newContest.teams = [new Team(contest.teams[0].name), new Team(contest.teams[1].name)];
 
-//------------------------------------------------------
-//-- join
-//------------------------------------------------------
-export let join = (contestId:string, teamId:number) => {
-  var postData = {'contestId': contestId, 'teamId': teamId};
-  var client = Client.getInstance();
-  return client.serverPost('contests/join', postData);
-}
-
-//------------------------------------------------------
-//-- getContest
-//------------------------------------------------------
-export let getContest = (contestId:string) => {
-
-  var postData = {'contestId': contestId};
-  var client = Client.getInstance();
-  return client.serverPost('contests/get', postData);
-}
-
-//------------------------------------------------------
-//-- openContest
-//------------------------------------------------------
-export let removeContest = (contestId:string) => {
-  var postData = {'contestId': contestId};
-  var client = Client.getInstance();
-  return client.serverPost('contests/remove', postData);
-}
-
-//------------------------------------------------------
-//-- openContest
-//------------------------------------------------------
-export let setContest = (contest:Object, mode:string, nameChanged:Boolean) => {
-  var postData = {'contest': contest, 'mode': mode};
-  if (nameChanged) {
-    postData['nameChanged'] = nameChanged;
+  if (this.questions) {
+    newContest.questions = JSON.parse(JSON.stringify(contest.questions));
   }
 
-  var client = Client.getInstance();
-  return client.serverPost('contests/set', postData);
+  newContest.subject = contest.subject;
+
+  if (contest.type.id === 'userTrivia') {
+    newContest.type = JSON.parse(JSON.stringify(contest.type));
+  }
+
+  return newContest;
 }
-
-//------------------------------------------------------
-//-- searchMyQuestions
-//------------------------------------------------------
-export let searchMyQuestions = (text:String, existingQuestionIds:Array<String>) => {
-  var postData = {'text': text, 'existingQuestionIds': existingQuestionIds};
-  var client = Client.getInstance();
-  return client.serverPost('contests/searchMyQuestions', postData);
-};
-
-//------------------------------------------------------
-//-- getQuestions
-//------------------------------------------------------
-export let getQuestions = (userQuestions) => {
-  var postData = {'userQuestions': userQuestions};
-  var client = Client.getInstance();
-  return client.serverPost('contests/getQuestions', postData);
-};

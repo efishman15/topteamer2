@@ -28,7 +28,7 @@ var TopTeamerApp = (function () {
         var _this = this;
         this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent).then(function () {
             _this.initApp();
-        });
+        }, function (err) { return _this.ngAfterViewInit(); });
     };
     TopTeamerApp.prototype.initApp = function () {
         //TODO: navigate to PurchaseSuccess based on url params (if coming from paypal)
@@ -190,6 +190,8 @@ var TopTeamerApp = (function () {
             if (result['connected']) {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
                     _this.client.setRootPage('MainTabsPage');
+                }, function (err) {
+                    _this.client.openPage('LoginPage');
                 });
             }
             else {

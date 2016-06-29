@@ -36,7 +36,7 @@ export class TopTeamerApp {
   ngAfterViewInit() {
     this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent).then(() => {
       this.initApp();
-    });
+    },(err) => this.ngAfterViewInit());
   }
 
   initApp() {
@@ -233,6 +233,8 @@ export class TopTeamerApp {
       if (result['connected']) {
         this.client.facebookServerConnect(result['response'].authResponse).then(() => {
           this.client.setRootPage('MainTabsPage');
+        },(err) => {
+          this.client.openPage('LoginPage');
         })
       }
       else {

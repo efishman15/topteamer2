@@ -92,7 +92,7 @@ var QuizPage = (function () {
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
                 alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason));
             }
-        }, function (err) {
+        }, function () {
             //IonicBug - wait for the prev alert to be fully dismissed
             setTimeout(function () {
                 _this.client.nav.pop();
@@ -154,6 +154,7 @@ var QuizPage = (function () {
             _this.quizData.currentQuestion.doAnimation = true; //Animation end will trigger quiz proceed
             _this.drawQuizProgress();
             _this.client.logEvent('quiz/gotQuestion' + (_this.quizData.currentQuestionIndex + 1));
+        }, function () {
         });
     };
     QuizPage.prototype.questionTransitionEnd = function () {
@@ -254,13 +255,13 @@ var QuizPage = (function () {
                     switch (action) {
                         case 'hint':
                             _this.questionHistory[_this.quizData.currentQuestionIndex].hintUsed = true;
-                            _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.hintCost;
+                            _this.questionHistory[_this.quizData.currentQuestionIndex].score -= _this.quizData.currentQuestion.hintCost;
                             _this.drawQuizScores();
                             window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaHint, '_system', 'location=yes');
                             break;
                         case 'answer':
                             _this.questionHistory[_this.quizData.currentQuestionIndex].answerUsed = true;
-                            _this.questionHistory[_this.quizData.currentQuestionIndex].score = _this.client.settings.quiz.questions.score[_this.quizData.currentQuestionIndex] - _this.quizData.currentQuestion.answerCost;
+                            _this.questionHistory[_this.quizData.currentQuestionIndex].score -= _this.quizData.currentQuestion.answerCost;
                             _this.drawQuizScores();
                             window.open(_this.client.currentLanguage.wiki + _this.quizData.currentQuestion.wikipediaAnswer, '_system', 'location=yes');
                             break;
@@ -488,6 +489,7 @@ var QuizPage = (function () {
                 for (var i = 0; i < result.question.answers.length; i++) {
                     _this.quizData.currentQuestion.answers[i].text = result.question.answers[_this.quizData.currentQuestion.answers[i].originalIndex];
                 }
+            }, function () {
             });
         });
         this.client.nav.present(modal);
