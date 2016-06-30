@@ -20,7 +20,8 @@ export class SystemToolsPage {
   }
 
   clearCache() {
-    systemService.clearCache().then(() => {
+    systemService.clearCache().then((settings) => {
+      this.client.settings = settings;
       this.client.nav.pop();
     },() => {
 

@@ -615,6 +615,10 @@ export class Client {
     return this._settings;
   }
 
+  set settings(value: Settings) {
+    this._settings = value;
+  }
+
   get session():Session {
     return this._session;
   }

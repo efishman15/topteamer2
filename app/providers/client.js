@@ -537,6 +537,9 @@ var Client = (function () {
         get: function () {
             return this._settings;
         },
+        set: function (value) {
+            this._settings = value;
+        },
         enumerable: true,
         configurable: true
     });

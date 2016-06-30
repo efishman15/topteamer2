@@ -28,9 +28,11 @@ var SetContestAdminPage = (function () {
         this.client.logEvent('page/setContestAdmin', eventData);
     };
     SetContestAdminPage.prototype.ionViewDidLeave = function () {
-        //For some reason manipulating the numbers turns them to strings in the model
+        //For some reason manipulating the numbers and sliders turns them to strings in the model
         this.params.data.contestLocalCopy.teams[0].score = parseInt(this.params.data.contestLocalCopy.teams[0].score);
         this.params.data.contestLocalCopy.teams[1].score = parseInt(this.params.data.contestLocalCopy.teams[1].score);
+        this.params.data.contestLocalCopy.systemParticipants = parseInt(this.params.data.contestLocalCopy.systemParticipants);
+        this.params.data.contestLocalCopy.rating = parseInt(this.params.data.contestLocalCopy.rating);
     };
     SetContestAdminPage.prototype.startDateSelected = function (dateSelection) {
         var nowDateWithTime = new Date();
@@ -53,7 +55,7 @@ var SetContestAdminPage = (function () {
     SetContestAdminPage.prototype.removeContest = function () {
         var _this = this;
         this.client.logEvent('contest/remove/click', { 'contestId': this.params.data.contestLocalCopy._id });
-        alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.params.data.contestLocalCopy.name.long }).then(function () {
+        alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.params.data.contestName }).then(function () {
             _this.client.logEvent('contest/removed', { 'contestId': _this.params.data.contestLocalCopy._id });
             contestsService.removeContest(_this.params.data.contestLocalCopy._id).then(function () {
                 _this.client.events.publish('topTeamer:contestRemoved');

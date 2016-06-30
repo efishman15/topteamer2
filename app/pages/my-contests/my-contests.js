@@ -36,6 +36,13 @@ var MyContestsPage = (function () {
     MyContestsPage.prototype.onResize = function () {
         this.contestList.onResize();
     };
+    MyContestsPage.prototype.doRefresh = function (refresher) {
+        this.refreshList(true).then(function () {
+            refresher.complete();
+        }, function () {
+            refresher.complete();
+        });
+    };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 
         __metadata('design:type', contest_list_1.ContestListComponent)

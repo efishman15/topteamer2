@@ -68,25 +68,19 @@ function setUserQuestions(questionIndex, data, callback) {
     data.unsetData = null;
     data.setData = {};
 
-    if (data.contest.type.questions.list[questionIndex].isDirty) {
+    //Question text or answers text has been modified
+    data.setData.text = data.contest.type.questions.list[questionIndex].text;
+    for (j = 0; j < data.contest.type.questions.list[questionIndex].answers.length; j++) {
+      data.setData['answers.' + j + '.text'] = data.contest.type.questions.list[questionIndex].answers[j];
+    }
 
-      //Question text or answers text has been modified
-      data.setData.text = data.contest.type.questions.list[questionIndex].text;
-      for (j = 0; j < data.contest.type.questions.list[questionIndex].answers.length; j++) {
-        data.setData['answers.' + j + '.text'] = data.contest.type.questions.list[questionIndex].answers[j];
+    dalDb.setQuestion(data, function (err, result) {
+      if (err) {
+        callback(new exceptions.ServerException('Error updating question', data));
+        return;
       }
-
-      dalDb.setQuestion(data, function (err, result) {
-        if (err) {
-          callback(new exceptions.ServerException('Error updating question', data));
-          return;
-        }
-        setUserQuestions(questionIndex + 1, data, callback);
-      });
-    }
-    else {
       setUserQuestions(questionIndex + 1, data, callback);
-    }
+    });
   }
   else {
     setUserQuestions(questionIndex + 1, data, callback);
@@ -174,12 +168,6 @@ function validateContestData(data, callback) {
     return;
   }
 
-  //Only admins can set team scores
-  if ((data.contest.teams[0].score || data.contest.teams[1].score) && (!data.session.isAdmin)) {
-    callback(new exceptions.ServerException('Only admins are allowed to set team scores'));
-    return;
-  }
-
   //Contest _id must be supplied in edit mode
   if (data.mode === 'edit' && !data.contest._id) {
     callback(new exceptions.ServerException('Contest _id not supplied in edit mode'));
@@ -264,6 +252,20 @@ function validateContestData(data, callback) {
     cleanContest.startDate = data.contest.startDate;
     cleanContest.endDate = data.contest.endDate;
     cleanContest.endOption = data.contest.endOption;
+
+    cleanContest.teams = [
+      {
+        name: data.contest.teams[0].name,
+        score: data.session.isAdmin && data.contest.teams[0].adminScoreAddition ? data.contest.teams[0].adminScoreAddition : 0
+      },
+      {
+        name: data.contest.teams[1].name,
+        score: data.session.isAdmin && data.contest.teams[1].adminScoreAddition ? data.contest.teams[1].adminScoreAddition : 0
+      },
+    ];
+
+    cleanContest.subject = data.contest.subject;
+
     cleanContest.participants = 0;
     if (data.contest.systemParticipants) {
       cleanContest.systemParticipants = data.contest.systemParticipants;
@@ -277,9 +279,6 @@ function validateContestData(data, callback) {
     else {
       cleanContest.rating = 0;
     }
-
-    cleanContest.teams = data.contest.teams;
-    cleanContest.subject = data.contest.subject;
 
     cleanContest.language = data.session.settings.language;
     cleanContest.score = 0; //The total score gained for this contest
@@ -295,13 +294,7 @@ function validateContestData(data, callback) {
     cleanContest.type.id = data.contest.type.id;
     if (cleanContest.type.id === 'userTrivia') {
       cleanContest.type.questions = data.contest.type.questions;
-    }
-
-    if (!cleanContest.teams[0].score) {
-      cleanContest.teams[0].score = 0;
-    }
-    if (!cleanContest.teams[1].score) {
-      cleanContest.teams[1].score = 0;
+      cleanContest.type.randomOrder = data.contest.type.randomOrder ? true : false;
     }
 
     //Now the data.contest object is 'clean' and contains only fields that passed validation
@@ -337,7 +330,8 @@ function updateContest(data, callback) {
   data.setData.endDate = data.contest.endDate;
 
   if (data.contest.type.id === 'userTrivia') {
-    data.setData['type.questions'] = data.contest.type.questions;
+    data.setData['type.userQuestions'] = data.contest.type.userQuestions;
+    data.setData['type.randomOrder'] = data.contest.type.randomOrder ? true : false;
   }
 
   //Admin fields
@@ -345,10 +339,10 @@ function updateContest(data, callback) {
 
     data.setData['startDate'] = data.contest.startDate;
 
-    if (data.contest.teams[0].score != null && data.contest.teams[1].score != null) {
-      data.setData['$inc'] = {};
-      data.setData['$inc']['teams.0.score'] = data.contest.teams[0].adminScoreAddition;
-      data.setData['$inc']['teams.1.score'] = data.contest.teams[1].adminScoreAddition;
+    if (data.contest.teams[0].adminScoreAddition != null && data.contest.teams[1].adminScoreAddition != null) {
+      data.incData = {}
+      data.incData['teams.0.score'] = data.contest.teams[0].adminScoreAddition;
+      data.incData['teams.1.score'] = data.contest.teams[1].adminScoreAddition;
     }
 
     if (data.contest.systemParticipants != null) {
@@ -560,7 +554,7 @@ module.exports.setContest = function (req, res, next) {
 
     //Add/set the contest
     function (data, callback) {
-      if (data.mode == 'add') {
+      if (data.mode === 'add') {
         //Join by default to the first team (on screen appears as 'my team')
         joinToContestObject(data.contest, 0, data.session);
         dalDb.addContest(data, callback);
@@ -600,7 +594,14 @@ module.exports.setContest = function (req, res, next) {
         dalDb.closeDb(data);
         callback(null, data);
       }
-    }
+    },
+
+    //Transform to client
+    function (data, callback) {
+      data.contest = prepareContestForClient(data.contest, data.session);
+      callback(null, data);
+    },
+
   ];
 
   async.waterfall(operations, function (err, data) {
@@ -875,6 +876,11 @@ function prepareContestForClient(contest, session) {
 
   if (contest.users[session.userId.toString()]) {
     contestForClient.myTeam = contest.users[session.userId.toString()].team;
+  }
+
+  contestForClient.participants = contest.participants + contest.systemParticipants;
+  if (session.isAdmin) {
+    contestForClient.systemParticipants = contest.systemParticipants;
   }
 
   return contestForClient;

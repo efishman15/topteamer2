@@ -16,6 +16,12 @@
 
 <ion-content class="app-bg">
 
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingText="{{client.translate('PULL_TO_REFRESH')}}">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <contest-list tab="running"
                 (contestSelected)="onContestSelected($event)">
 

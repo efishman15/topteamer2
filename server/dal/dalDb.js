@@ -914,18 +914,19 @@ function setContest(data, callback) {
     whereClause['creator.id'] = ObjectId(data.session.userId);
   }
 
+  var updateFields = {$set: data.setData};
+  if (data.incData) {
+    updateFields['$inc'] = data.incData;
+  }
   contestsCollection.findAndModify(whereClause, {},
-    {
-      $set: data.setData
-    }, {w: 1, new: true}, function (err, contest) {
+    updateFields, {w: 1, new: true}, function (err, contest) {
 
       if (err || !contest || !contest.value) {
         closeDb(data);
 
         callback(new exceptions.ServerException('Error setting contest', {
           'whereClause': whereClause,
-          'session': data.session,
-          'setData': data.setData,
+          'updateFields': updateFields,
           'contestId': data.contestId,
           'dbError': err
         }, 'error'));
@@ -1034,6 +1035,9 @@ function prepareContestsQuery(data, callback) {
   //Will return the user's team if joined to a team or null if not
   clientFields['myTeam'] = {$cond: [{$eq: ['$users.' + data.session.userId + '.userId', ObjectId(data.session.userId)]}, '$users.' + data.session.userId + '.team', null]};
 
+  //Will return the total participants including the "system participants"
+  clientFields['participants'] = {$add: ['$participants','$systemParticipants']};
+
   var fieldsClause = {'$project': clientFields};
 
   var now = (new Date()).getTime();
@@ -1042,13 +1046,17 @@ function prepareContestsQuery(data, callback) {
     case 'mine':
       whereClause['$match'].endDate = {$gte: now}; //not finished yet
       whereClause['$match']['users.' + data.session.userId] = {$exists: true};
+      sortClause['$sort'].rating = -1; //descending
       sortClause['$sort'].participants = -1; //descending
+      sortClause['$sort'].startDate = 1; //ascending
       break;
 
     case 'running':
       whereClause['$match'].endDate = {$gte: now}; //not finished yet
       limitClause = {'$limit': generalUtils.settings.server.contest.list.pageSize};
+      sortClause['$sort'].rating = -1; //descending
       sortClause['$sort'].participants = -1; //descending
+      sortClause['$sort'].startDate = 1; //ascending
       break;
 
     case 'recentlyFinished':
@@ -1070,8 +1078,8 @@ function prepareContestsQuery(data, callback) {
   }
 
   data.contestQuery.push(whereClause);
-  data.contestQuery.push(sortClause);
   data.contestQuery.push(fieldsClause);
+  data.contestQuery.push(sortClause);
   if (limitClause) {
     data.contestQuery.push(limitClause);
   }

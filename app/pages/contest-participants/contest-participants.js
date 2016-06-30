@@ -14,54 +14,54 @@ var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var core_2 = require('@angular/core');
 var client_1 = require('../../providers/client');
-var contestsService = require('../../providers/contests');
 var ContestParticipantsPage = (function () {
     function ContestParticipantsPage(params) {
-        var _this = this;
-        // set the root pages for each tab
-        this.source = params.data.source;
         this.client = client_1.Client.getInstance();
-        if (params.data.contest) {
-            this.contest = params.data.contest;
-            this.contestId = params.data.contest._id;
-        }
-        else {
-            this.contestId = params.data.contestId;
-            contestsService.getContest(params.data.contestId).then(function (contest) {
-                _this.contest = contest;
-            }, function () {
-                setTimeout(function () {
-                    _this.client.nav.pop();
-                }, 1000);
-            });
-        }
+        this.params = params;
     }
     ContestParticipantsPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/contestParticipants', { 'contestId': this.contestId });
+        this.client.logEvent('page/contestParticipants', { 'contestId': this.params.data.contest._id });
         if (this.leadersComponent) {
-            this.showContestParticipants();
+            return this.tabGeneralParticipants();
         }
     };
-    ContestParticipantsPage.prototype.ngAfterViewInit = function () {
-        this.showContestParticipants();
+    ContestParticipantsPage.prototype.tabGeneralParticipants = function () {
+        this.tabId = -1;
+        return this.showContestParticipants(false);
     };
-    ContestParticipantsPage.prototype.showContestParticipants = function () {
-        var _this = this;
-        if (!this.contest) {
-            //In case contest has not been loaded yet
-            setTimeout(function () {
-                _this.showContestParticipants();
-            }, 500);
-            return;
+    ContestParticipantsPage.prototype.tabTeamParticipants = function (teamId) {
+        this.tabId = teamId;
+        return this.showTeamParticipants(teamId, false);
+    };
+    ContestParticipantsPage.prototype.showContestParticipants = function (forceRefresh) {
+        this.client.logEvent('contest/participants/' + this.params.data.source + '/leaderboard/all');
+        return this.leadersComponent.showContestParticipants(this.params.data.contest._id, null, forceRefresh);
+    };
+    ContestParticipantsPage.prototype.showTeamParticipants = function (teamId, forceRefresh) {
+        this.client.logEvent('contest/participants/' + this.params.data.source + '/leaderboard/team' + teamId);
+        return this.leadersComponent.showContestParticipants(this.params.data.contest._id, teamId, forceRefresh);
+    };
+    ContestParticipantsPage.prototype.doRefresh = function (refresher) {
+        switch (this.tabId) {
+            case -1:
+                this.showContestParticipants(true).then(function () {
+                    refresher.complete();
+                }, function () {
+                    refresher.complete();
+                });
+                break;
+            case 0:
+            case 1:
+                this.showTeamParticipants(this.tabId, true).then(function () {
+                    refresher.complete();
+                }, function () {
+                    refresher.complete();
+                });
+                break;
         }
-        this.client.logEvent('contest/participants/' + this.source + '/leaderboard/all');
-        this.leadersComponent.showContestParticipants(this.contest._id);
-    };
-    ContestParticipantsPage.prototype.showTeamParticipants = function (teamId) {
-        this.client.logEvent('contest/participants/' + this.source + '/leaderboard/team' + teamId);
-        this.leadersComponent.showContestParticipants(this.contest._id, teamId);
     };
     __decorate([
+        //-1=general contest, 0=team0, 1=team1
         core_2.ViewChild(leaders_1.LeadersComponent), 
         __metadata('design:type', leaders_1.LeadersComponent)
     ], ContestParticipantsPage.prototype, "leadersComponent", void 0);

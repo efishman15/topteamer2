@@ -38,9 +38,11 @@ export class SetContestAdminPage {
   }
 
   ionViewDidLeave() {
-    //For some reason manipulating the numbers turns them to strings in the model
+    //For some reason manipulating the numbers and sliders turns them to strings in the model
     this.params.data.contestLocalCopy.teams[0].score = parseInt(this.params.data.contestLocalCopy.teams[0].score);
     this.params.data.contestLocalCopy.teams[1].score = parseInt(this.params.data.contestLocalCopy.teams[1].score);
+    this.params.data.contestLocalCopy.systemParticipants = parseInt(this.params.data.contestLocalCopy.systemParticipants);
+    this.params.data.contestLocalCopy.rating = parseInt(this.params.data.contestLocalCopy.rating);
   }
 
   startDateSelected(dateSelection: CalendarCell) {
@@ -65,7 +67,7 @@ export class SetContestAdminPage {
 
   removeContest() {
     this.client.logEvent('contest/remove/click', {'contestId': this.params.data.contestLocalCopy._id});
-    alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.params.data.contestLocalCopy.name.long}).then(() => {
+    alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.params.data.contestName}).then(() => {
       this.client.logEvent('contest/removed', {'contestId': this.params.data.contestLocalCopy._id});
       contestsService.removeContest(this.params.data.contestLocalCopy._id).then(() => {
         this.client.events.publish('topTeamer:contestRemoved');

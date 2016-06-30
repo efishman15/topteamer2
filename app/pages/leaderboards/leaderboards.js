@@ -31,27 +31,52 @@ var LeaderboardsPage = (function () {
         this.mode = 'contests';
         this.contestList.refresh();
     };
-    LeaderboardsPage.prototype.showFriendsLeaderboard = function () {
+    LeaderboardsPage.prototype.showFriendsLeaderboard = function (forceRefresh) {
         this.client.logEvent('page/leaderboard/friends');
-        this.mode = 'leaders';
-        this.leadersComponent.showFriends(false);
+        this.mode = 'friends';
+        return this.leadersComponent.showFriends(false, forceRefresh);
     };
-    LeaderboardsPage.prototype.showWeeklyLeaderboard = function () {
+    LeaderboardsPage.prototype.showWeeklyLeaderboard = function (forceRefresh) {
         this.client.logEvent('page/leaderboard/weekly');
-        this.mode = 'leaders';
-        this.leadersComponent.showWeekly();
+        this.mode = 'weekly';
+        return this.leadersComponent.showWeekly(forceRefresh);
     };
     LeaderboardsPage.prototype.onContestSelected = function (data) {
         this.client.displayContest(data.contest._id);
     };
     LeaderboardsPage.prototype.refreshList = function (forceRefresh) {
         if (this.mode === 'contests') {
-            this.contestList.refresh(forceRefresh);
+            return this.contestList.refresh(forceRefresh);
         }
     };
     LeaderboardsPage.prototype.onResize = function () {
         if (this.mode === 'contests') {
             this.contestList.onResize();
+        }
+    };
+    LeaderboardsPage.prototype.doRefresh = function (refresher) {
+        switch (this.mode) {
+            case 'contests':
+                this.refreshList(true).then(function () {
+                    refresher.complete();
+                }, function () {
+                    refresher.complete();
+                });
+                break;
+            case 'friends':
+                this.showFriendsLeaderboard(true).then(function () {
+                    refresher.complete();
+                }, function () {
+                    refresher.complete();
+                });
+                break;
+            case 'weekly':
+                this.showWeeklyLeaderboard(true).then(function () {
+                    refresher.complete();
+                }, function () {
+                    refresher.complete();
+                });
+                break;
         }
     };
     __decorate([

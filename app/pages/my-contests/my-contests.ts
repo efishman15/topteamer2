@@ -1,4 +1,5 @@
 import {Component,ViewChild} from '@angular/core';
+import {Refresher} from 'ionic-angular'
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Client} from '../../providers/client';
 import {Contest} from '../../objects/objects';
@@ -41,5 +42,13 @@ export class MyContestsPage {
 
   onResize() {
     this.contestList.onResize();
+  }
+
+  doRefresh(refresher: Refresher) {
+    this.refreshList(true).then(() => {
+      refresher.complete();
+    }, () => {
+      refresher.complete();
+    })
   }
 }

@@ -21,83 +21,103 @@ var LeadersComponent = (function () {
         this.team0ContestLastRefreshTime = 0; //should apply only to the contest currently shown - when view closes and another contest appears - should refresh from server again
         this.team1ContestLastRefreshTime = 0; //should apply only to the contest currently shown - when view closes and another contest appears - should refresh from server again
     }
-    LeadersComponent.prototype.showFriends = function (friendsPermissionJustGranted) {
+    LeadersComponent.prototype.showFriends = function (friendsPermissionJustGranted, forceRefresh) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.innerShowFriends(resolve, reject, friendsPermissionJustGranted, forceRefresh);
+        });
+    };
+    LeadersComponent.prototype.innerShowFriends = function (resolve, reject, friendsPermissionJustGranted, forceRefresh) {
         var _this = this;
         var now = (new Date()).getTime();
         //Check if refresh frequency reached
-        if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !friendsPermissionJustGranted) {
+        if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !friendsPermissionJustGranted && !forceRefresh) {
             this.leaders = this.lastFriendsLeaders;
+            resolve();
             return;
         }
         leaderboardsService.friends(friendsPermissionJustGranted).then(function (leaders) {
             _this.friendsLastRefreshTime = now;
             _this.leaders = leaders;
             _this.lastFriendsLeaders = leaders;
+            resolve();
         }, function (err) {
             if (err.type === 'SERVER_ERROR_MISSING_FRIENDS_PERMISSION' && err.additionalInfo && err.additionalInfo.confirmed) {
-                facebookService.login(_this.client.settings.facebook.friendsPermission, true).then(function (response) {
-                    _this.showFriends(true);
+                facebookService.login(_this.client.settings.facebook.friendsPermission, true).then(function () {
+                    _this.innerShowFriends(resolve, reject, true, forceRefresh);
+                }, function () {
+                    reject();
                 });
             }
         });
     };
     LeadersComponent.prototype.showWeekly = function (forceRefresh) {
         var _this = this;
-        var now = (new Date()).getTime();
-        //Check if refresh frequency reached
-        if (now - this.weeklyLastRefreshTime < this.client.settings.lists.leaderboards.weekly.refreshFrequencyInMilliseconds && !forceRefresh) {
-            this.leaders = this.lastWeeklyLeaders;
-            return;
-        }
-        leaderboardsService.weekly().then(function (leaders) {
-            _this.weeklyLastRefreshTime = now;
-            _this.leaders = leaders;
-            _this.lastWeeklyLeaders = leaders;
-        }, function () {
+        return new Promise(function (resolve, reject) {
+            var now = (new Date()).getTime();
+            //Check if refresh frequency reached
+            if (now - _this.weeklyLastRefreshTime < _this.client.settings.lists.leaderboards.weekly.refreshFrequencyInMilliseconds && !forceRefresh) {
+                _this.leaders = _this.lastWeeklyLeaders;
+                resolve();
+                return;
+            }
+            leaderboardsService.weekly().then(function (leaders) {
+                _this.weeklyLastRefreshTime = now;
+                _this.leaders = leaders;
+                _this.lastWeeklyLeaders = leaders;
+                resolve();
+            }, function () {
+                reject();
+            });
         });
     };
     //If teamId is not passed - general contest leaderboard is shown
     LeadersComponent.prototype.showContestParticipants = function (contestId, teamId, forceRefresh) {
         var _this = this;
-        var now = (new Date()).getTime();
-        var lastRefreshTime;
-        var lastLeaders;
-        switch (teamId) {
-            case 0:
-                lastRefreshTime = this.team0ContestLastRefreshTime;
-                lastLeaders = this.lastTeam0ContestLeaders;
-                break;
-            case 1:
-                lastRefreshTime = this.team1ContestLastRefreshTime;
-                lastLeaders = this.lastTeam1ContestLeaders;
-                break;
-            default:
-                lastRefreshTime = this.generalContestLastRefreshTime;
-                lastLeaders = this.lastGeneralContestLeaders;
-                break;
-        }
-        //Check if refresh frequency reached
-        if (now - lastRefreshTime < this.client.settings.lists.leaderboards.contest.refreshFrequencyInMilliseconds && !forceRefresh) {
-            this.leaders = lastLeaders;
-            return;
-        }
-        leaderboardsService.contest(contestId, teamId).then(function (leaders) {
-            _this.leaders = leaders;
+        return new Promise(function (resolve, reject) {
+            var now = (new Date()).getTime();
+            var lastRefreshTime;
+            var lastLeaders;
             switch (teamId) {
                 case 0:
-                    _this.lastTeam0ContestLeaders = leaders;
-                    _this.team0ContestLastRefreshTime = now;
+                    lastRefreshTime = _this.team0ContestLastRefreshTime;
+                    lastLeaders = _this.lastTeam0ContestLeaders;
                     break;
                 case 1:
-                    _this.lastTeam1ContestLeaders = leaders;
-                    _this.team1ContestLastRefreshTime = now;
+                    lastRefreshTime = _this.team1ContestLastRefreshTime;
+                    lastLeaders = _this.lastTeam1ContestLeaders;
                     break;
                 default:
-                    _this.lastGeneralContestLeaders = leaders;
-                    _this.generalContestLastRefreshTime = now;
+                    lastRefreshTime = _this.generalContestLastRefreshTime;
+                    lastLeaders = _this.lastGeneralContestLeaders;
                     break;
             }
-        }, function () {
+            //Check if refresh frequency reached
+            if (now - lastRefreshTime < _this.client.settings.lists.leaderboards.contest.refreshFrequencyInMilliseconds && !forceRefresh) {
+                _this.leaders = lastLeaders;
+                resolve();
+                return;
+            }
+            leaderboardsService.contest(contestId, teamId).then(function (leaders) {
+                _this.leaders = leaders;
+                switch (teamId) {
+                    case 0:
+                        _this.lastTeam0ContestLeaders = leaders;
+                        _this.team0ContestLastRefreshTime = now;
+                        break;
+                    case 1:
+                        _this.lastTeam1ContestLeaders = leaders;
+                        _this.team1ContestLastRefreshTime = now;
+                        break;
+                    default:
+                        _this.lastGeneralContestLeaders = leaders;
+                        _this.generalContestLastRefreshTime = now;
+                        break;
+                }
+                resolve();
+            }, function () {
+                reject();
+            });
         });
     };
     LeadersComponent = __decorate([

@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {NavParams} from 'ionic-angular';
+import {NavParams, Refresher} from 'ionic-angular';
 import {LeadersComponent} from '../../components/leaders/leaders';
 import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
@@ -15,62 +15,60 @@ import {Contest} from '../../objects/objects';
 export class ContestParticipantsPage {
 
   client:Client;
+  params: NavParams;
+  tabId: number; //-1=general contest, 0=team0, 1=team1
 
   @ViewChild(LeadersComponent) leadersComponent : LeadersComponent;
 
-  contest:Contest;
-  source:string;
-  contestId: String;
-
   constructor(params:NavParams) {
-    // set the root pages for each tab
-    this.source = params.data.source;
     this.client = Client.getInstance();
-
-    if (params.data.contest) {
-      this.contest = params.data.contest;
-      this.contestId = params.data.contest._id;
-    }
-    else {
-      this.contestId = params.data.contestId;
-      contestsService.getContest(params.data.contestId).then((contest: Contest) => {
-        this.contest = contest;
-      }, () => {
-        setTimeout(() => {
-          this.client.nav.pop();
-        },1000)
-      });
-    }
+    this.params = params;
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/contestParticipants',{'contestId' : this.contestId});
+    this.client.logEvent('page/contestParticipants',{'contestId' : this.params.data.contest._id});
     if (this.leadersComponent) {
-      this.showContestParticipants();
+      return this.tabGeneralParticipants();
     }
   }
 
-  ngAfterViewInit() {
-    this.showContestParticipants();
+  tabGeneralParticipants() {
+    this.tabId = -1;
+    return this.showContestParticipants(false);
   }
 
-  showContestParticipants() {
+  tabTeamParticipants(teamId: number) {
+    this.tabId = teamId;
+    return this.showTeamParticipants(teamId, false);
+  }
 
-    if (!this.contest) {
-      //In case contest has not been loaded yet
-      setTimeout(() => {
-        this.showContestParticipants();
-      },500)
-      return;
+  showContestParticipants(forceRefresh? : boolean) {
+    this.client.logEvent('contest/participants/' + this.params.data.source + '/leaderboard/all');
+    return this.leadersComponent.showContestParticipants(this.params.data.contest._id, null, forceRefresh)
+  }
+
+  showTeamParticipants(teamId, forceRefresh? :boolean) {
+    this.client.logEvent('contest/participants/' + this.params.data.source + '/leaderboard/team' + teamId);
+    return this.leadersComponent.showContestParticipants(this.params.data.contest._id, teamId, forceRefresh);
+  }
+
+  doRefresh(refresher: Refresher) {
+    switch(this.tabId) {
+      case -1:
+        this.showContestParticipants(true).then(() => {
+          refresher.complete();
+        }, () => {
+          refresher.complete();
+        });
+        break;
+      case 0:
+      case 1:
+        this.showTeamParticipants(this.tabId, true).then (() => {
+          refresher.complete();
+        },() => {
+          refresher.complete();
+        });
+        break;
     }
-
-    this.client.logEvent('contest/participants/' + this.source + '/leaderboard/all');
-    this.leadersComponent.showContestParticipants(this.contest._id)
-
-  }
-
-  showTeamParticipants(teamId) {
-    this.client.logEvent('contest/participants/' + this.source + '/leaderboard/team' + teamId);
-    this.leadersComponent.showContestParticipants(this.contest._id, teamId);
   }
 }

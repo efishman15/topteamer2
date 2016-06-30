@@ -26,7 +26,6 @@ export let alert = (message) => new Promise((resolve, reject) => {
   }
 
   alert = Alert.create({
-    cssClass: client.currentLanguage.direction,
     message: messageText,
     buttons: [
       {
@@ -38,7 +37,7 @@ export let alert = (message) => new Promise((resolve, reject) => {
   });
 
   if (title) {
-    alert.setTitle('<span style="float: ' + client.currentLanguage.align + '">' + title + '</span>');
+    alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');
   }
 
   client.nav.present(alert);
@@ -51,12 +50,11 @@ export let alert = (message) => new Promise((resolve, reject) => {
 export let confirm = (title, message, params?) => new Promise((resolve, reject) => {
 
   var client = Client.getInstance();
-  var alignedTitle = '<span style="float: ' + client.currentLanguage.align + '">' + client.translate(title, params) + '</span>';
+  var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
 
   var alert = Alert.create({
     title: alignedTitle,
     message: client.translate(message, params),
-    cssClass: client.currentLanguage.direction,
     buttons: [
       {
         text: client.translate('OK'),

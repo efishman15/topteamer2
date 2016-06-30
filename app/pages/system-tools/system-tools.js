@@ -20,7 +20,8 @@ var SystemToolsPage = (function () {
     };
     SystemToolsPage.prototype.clearCache = function () {
         var _this = this;
-        systemService.clearCache().then(function () {
+        systemService.clearCache().then(function (settings) {
+            _this.client.settings = settings;
             _this.client.nav.pop();
         }, function () {
         });

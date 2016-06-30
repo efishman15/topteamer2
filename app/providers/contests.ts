@@ -290,6 +290,14 @@ export let cloneForEdit = (contest: Contest) => {
 
   newContest.subject = contest.subject;
 
+  if (contest.systemParticipants) {
+    newContest.systemParticipants = contest.systemParticipants;
+  }
+
+  if (contest.rating) {
+    newContest.rating = contest.rating;
+  }
+
   if (contest.type.id === 'userTrivia') {
     newContest.type = JSON.parse(JSON.stringify(contest.type));
   }

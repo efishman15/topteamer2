@@ -61,6 +61,7 @@ var SetContestPage = (function () {
             this.contestLocalCopy = new objects_1.Contest(this.params.data.typeId, this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds, null, endOption);
             //Set contest subject
             this.contestLocalCopy.subject = this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name, { 'name': this.client.session.name });
+            //Set user questions
             if (this.contestLocalCopy.type.id === 'userTrivia') {
                 this.contestLocalCopy.type.questions = new objects_1.Questions();
             }
@@ -288,6 +289,8 @@ var SetContestPage = (function () {
             if (!isDirty &&
                 (this.contestLocalCopy.startDate !== this.params.data.contest.startDate ||
                     this.contestLocalCopy.endDate !== this.params.data.contest.endDate ||
+                    (this.contestLocalCopy.teams[0].score !== undefined && this.params.data.contest.teams[0].score !== undefined && this.contestLocalCopy.teams[0].score !== this.params.data.contest.teams[0].score) ||
+                    (this.contestLocalCopy.teams[1].score !== undefined && this.params.data.contest.teams[1].score !== undefined && this.contestLocalCopy.teams[1].score !== this.params.data.contest.teams[1].score) ||
                     (this.contestLocalCopy.systemParticipants !== undefined && this.params.data.contest.systemParticipants !== undefined && this.contestLocalCopy.systemParticipants !== this.params.data.contest.systemParticipants) ||
                     (this.contestLocalCopy.rating !== undefined && this.params.data.contest.rating !== undefined && this.contestLocalCopy.rating !== this.params.data.contest.rating))) {
                 isDirty = true;
@@ -299,11 +302,23 @@ var SetContestPage = (function () {
         if (isDirty) {
             if (this.client.session.isAdmin) {
                 //Check if scores have changed and update the deltas
-                if (this.contestLocalCopy.teams[0].score !== undefined && this.contestLocalCopy.teams[0].score !== this.params.data.contest.teams[0].score) {
-                    this.contestLocalCopy.teams[0].adminScoreAddition = this.contestLocalCopy.teams[0].score - this.params.data.contest.teams[0].score;
+                if (this.contestLocalCopy.teams[0].score !== undefined) {
+                    if (this.params.data.mode === 'edit' && this.contestLocalCopy.teams[0].score !== this.params.data.contest.teams[0].score) {
+                        this.contestLocalCopy.teams[0].adminScoreAddition = this.contestLocalCopy.teams[0].score - this.params.data.contest.teams[0].score;
+                    }
+                    else if (this.params.data.mode === 'add') {
+                        this.contestLocalCopy.teams[0].adminScoreAddition = this.contestLocalCopy.teams[0].score;
+                    }
+                    delete this.contestLocalCopy.teams[0].score;
                 }
-                if (this.contestLocalCopy.teams[1].score !== undefined && this.contestLocalCopy.teams[1].score !== this.params.data.contest.teams[1].score) {
-                    this.contestLocalCopy.teams[1].adminScoreAddition = this.contestLocalCopy.teams[1].score - this.params.data.contest.teams[1].score;
+                if (this.contestLocalCopy.teams[1].score !== undefined) {
+                    if (this.params.data.mode === 'edit' && this.contestLocalCopy.teams[1].score !== this.params.data.contest.teams[1].score) {
+                        this.contestLocalCopy.teams[1].adminScoreAddition = this.contestLocalCopy.teams[1].score - this.params.data.contest.teams[1].score;
+                    }
+                    else if (this.params.data.mode === 'add') {
+                        this.contestLocalCopy.teams[1].adminScoreAddition = this.contestLocalCopy.teams[1].score;
+                    }
+                    delete this.contestLocalCopy.teams[1].score;
                 }
             }
             contestsService.setContest(this.contestLocalCopy, this.params.data.mode, contestNameChanged).then(function (contest) {
@@ -378,24 +393,46 @@ var SetContestPage = (function () {
         return endDate;
     };
     SetContestPage.prototype.setAdminInfo = function () {
-        if (this.contestLocalCopy.systemParticipants === undefined) {
+        if (!this.contestLocalCopy.systemParticipants) {
             this.contestLocalCopy.systemParticipants = 0;
         }
-        if (this.contestLocalCopy.rating === undefined) {
+        if (!this.contestLocalCopy.rating) {
             this.contestLocalCopy.rating = 0;
         }
-        if (this.contestLocalCopy.teams[0].score === undefined) {
-            this.contestLocalCopy.teams[0].score = this.params.data.contest.teams[0].score;
+        if (!this.contestLocalCopy.teams[0].score && this.contestLocalCopy.teams[0].score !== 0) {
+            if (this.params.data.mode === 'edit') {
+                this.contestLocalCopy.teams[0].score = this.params.data.contest.teams[0].score;
+            }
+            else {
+                this.contestLocalCopy.teams[0].score = 0;
+            }
             this.contestLocalCopy.teams[0].adminScoreAddition = 0;
         }
-        if (this.contestLocalCopy.teams[1].score === undefined) {
-            this.contestLocalCopy.teams[1].score = this.params.data.contest.teams[1].score;
+        if (!this.contestLocalCopy.teams[1].score && this.contestLocalCopy.teams[1].score !== 0) {
+            if (this.params.data.mode === 'edit') {
+                this.contestLocalCopy.teams[1].score = this.params.data.contest.teams[1].score;
+            }
+            else {
+                this.contestLocalCopy.teams[1].score = 0;
+            }
             this.contestLocalCopy.teams[1].adminScoreAddition = 0;
+        }
+        var contestName;
+        if (this.params.data.mode === 'edit') {
+            contestName = this.params.data.contest.name.long;
+        }
+        else {
+            contestName = this.client.translate('CONTEST_NAME_LONG', {
+                'team0': this.contestLocalCopy.teams[0].name,
+                'team1': this.contestLocalCopy.teams[1].name,
+                'type': this.contestLocalCopy.subject
+            });
         }
         this.client.openPage('SetContestAdminPage', {
             'contestLocalCopy': this.contestLocalCopy,
             'mode': this.params.data.mode,
-            'title': this.title
+            'title': this.title,
+            'contestName': contestName
         });
     };
     SetContestPage.prototype.endDateSelected = function (dateSelection) {

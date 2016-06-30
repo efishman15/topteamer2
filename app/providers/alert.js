@@ -20,7 +20,6 @@ exports.alert = function (message) { return new Promise(function (resolve, rejec
         messageText = message;
     }
     alert = ionic_angular_1.Alert.create({
-        cssClass: client.currentLanguage.direction,
         message: messageText,
         buttons: [
             {
@@ -31,7 +30,7 @@ exports.alert = function (message) { return new Promise(function (resolve, rejec
         ]
     });
     if (title) {
-        alert.setTitle('<span style="float: ' + client.currentLanguage.align + '">' + title + '</span>');
+        alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');
     }
     client.nav.present(alert);
 }); };
@@ -40,11 +39,10 @@ exports.alert = function (message) { return new Promise(function (resolve, rejec
 //------------------------------------------------------
 exports.confirm = function (title, message, params) { return new Promise(function (resolve, reject) {
     var client = client_1.Client.getInstance();
-    var alignedTitle = '<span style="float: ' + client.currentLanguage.align + '">' + client.translate(title, params) + '</span>';
+    var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
     var alert = ionic_angular_1.Alert.create({
         title: alignedTitle,
         message: client.translate(message, params),
-        cssClass: client.currentLanguage.direction,
         buttons: [
             {
                 text: client.translate('OK'),
