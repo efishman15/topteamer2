@@ -23,11 +23,6 @@ plugins/android.json
 plugins/ios.json
 $RECYCLE.BIN/
 server/logs/
-server/logs/server.log.*
-server/logs/facebook/facebookIPN.log.*
-server/logs/facebook/facebookIPN.log
-server/logs/paypal/paypalIPN.log
-server/logs/paypal/paypalIPN.log.*
 server/node_modules/
 .DS_Store
 Thumbs.db
