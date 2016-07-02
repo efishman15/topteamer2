@@ -17,18 +17,14 @@ var MyContestsPage = (function () {
     MyContestsPage.prototype.ionViewWillEnter = function () {
         var _this = this;
         this.client.logEvent('page/myContests');
-        if (this.contestList) {
-            this.refreshList().then(function () {
-                if (_this.contestList.contests.length === 0 && !_this.pageLoaded) {
-                    //On load only - switch to "running contests" if no personal contests
-                    _this.client.events.publish('topTeamer:noPersonalContests');
-                }
-                _this.pageLoaded = true;
-            });
-        }
-    };
-    MyContestsPage.prototype.onContestSelected = function (data) {
-        this.client.displayContest(data.contest._id);
+        this.refreshList().then(function () {
+            if (_this.contestList.contests.length === 0 && !_this.pageLoaded) {
+                //On load only - switch to "running contests" if no personal contests
+                _this.client.events.publish('topTeamer:noPersonalContests');
+            }
+            _this.pageLoaded = true;
+        }, function () {
+        });
     };
     MyContestsPage.prototype.refreshList = function (forceRefresh) {
         return this.contestList.refresh(forceRefresh);

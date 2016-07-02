@@ -444,25 +444,12 @@ var ContestDetailsComponent = (function () {
         this.contestSelected = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
     }
-    ContestDetailsComponent.prototype.ngOnInit = function () {
-        this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-    };
     ContestDetailsComponent.prototype.onContestSelected = function () {
         this.contestSelected.emit({ 'contest': this.contest, 'source': 'contest-details' });
     };
     ContestDetailsComponent.prototype.refresh = function (contest) {
         this.contest = contest;
     };
-    ContestDetailsComponent.prototype.onResize = function () {
-        var newWidth = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-        if (this.width !== newWidth) {
-            this.width = newWidth;
-        }
-    };
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', Number)
-    ], ContestDetailsComponent.prototype, "id", void 0);
     __decorate([
         core_1.Input(), 
         __metadata('design:type', objects_1.Contest)
@@ -499,7 +486,6 @@ var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestListComponent = (function () {
     function ContestListComponent() {
-        this.contestSelected = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
         this.lastRefreshTime = 0;
     }
@@ -515,31 +501,43 @@ var ContestListComponent = (function () {
             contestsService.list(_this.tab).then(function (contests) {
                 _this.lastRefreshTime = now;
                 _this.contests = contests;
-                _this.contestChartComponents.forEach(function (contestChartComponent) {
-                    contestChartComponent.refresh();
-                });
-                var i = 0;
-                _this.contestDetailsComponents.forEach(function (contestDetailsComponent) {
-                    contestDetailsComponent.refresh(contests[i]);
-                    i++;
-                });
                 resolve();
             }), function () {
                 reject();
             };
         });
     };
-    ContestListComponent.prototype.onContestSelected = function (event) {
-        this.contestSelected.emit(event);
+    ContestListComponent.prototype.onContestSelected = function (data) {
+        this.client.logEvent('displayContest', { 'contestId': data.contest._id, 'source': data.source });
+        this.client.displayContest(data.contest._id);
     };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {
             this.contestChartComponents.forEach(function (contestChartComponent) {
                 contestChartComponent.onResize();
             });
-            this.contestDetailsComponents.forEach(function (contestDetailsComponent) {
-                contestDetailsComponent.onResize();
-            });
+        }
+    };
+    ContestListComponent.prototype.findContestIndex = function (contestId) {
+        if (this.contests && this.contests.length > 0) {
+            for (var i = 0; i < this.contests.length; i++) {
+                if (this.contests[i]._id === contestId) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    };
+    ContestListComponent.prototype.updateContest = function (contest) {
+        var index = this.findContestIndex(contest._id);
+        if (index > -1) {
+            this.contests[index] = contest;
+        }
+    };
+    ContestListComponent.prototype.removeContest = function (contestId) {
+        var index = this.findContestIndex(contestId);
+        if (index > -1) {
+            this.contests.splice(index, 1);
         }
     };
     __decorate([
@@ -547,17 +545,9 @@ var ContestListComponent = (function () {
         __metadata('design:type', String)
     ], ContestListComponent.prototype, "tab", void 0);
     __decorate([
-        core_1.Output(), 
-        __metadata('design:type', Object)
-    ], ContestListComponent.prototype, "contestSelected", void 0);
-    __decorate([
         core_1.ViewChildren(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', core_1.QueryList)
     ], ContestListComponent.prototype, "contestChartComponents", void 0);
-    __decorate([
-        core_1.ViewChildren(contest_details_1.ContestDetailsComponent), 
-        __metadata('design:type', core_1.QueryList)
-    ], ContestListComponent.prototype, "contestDetailsComponents", void 0);
     ContestListComponent = __decorate([
         core_1.Component({
             selector: 'contest-list',
@@ -1982,49 +1972,59 @@ var leaders_1 = require('../../components/leaders/leaders');
 var client_1 = require('../../providers/client');
 var LeaderboardsPage = (function () {
     function LeaderboardsPage() {
-        this.mode = 'contests';
         this.client = client_1.Client.getInstance();
     }
     LeaderboardsPage.prototype.ionViewWillEnter = function () {
-        if (this.simpleTabsComponent) {
-            this.simpleTabsComponent.switchToTab(0);
-        }
-    };
-    LeaderboardsPage.prototype.ngAfterViewInit = function () {
         this.simpleTabsComponent.switchToTab(0);
     };
-    LeaderboardsPage.prototype.showRecentlyFinishedContests = function () {
+    LeaderboardsPage.prototype.displayRecentlyFinishedContestsTab = function () {
         this.client.logEvent('page/leaderboard/contests');
         this.mode = 'contests';
-        this.contestList.refresh();
+        this.showRecentlyFinishedContests(false).then(function () {
+        }, function () {
+        });
+    };
+    LeaderboardsPage.prototype.showRecentlyFinishedContests = function (forceRefresh) {
+        this.client.logEvent('page/leaderboard/contests');
+        this.mode = 'contests';
+        return this.contestList.refresh(forceRefresh);
+    };
+    LeaderboardsPage.prototype.displayFriendsLeaderboardTab = function () {
+        this.client.logEvent('page/leaderboard/friends');
+        this.mode = 'friends';
+        this.showFriendsLeaderboard(false).then(function () {
+        }, function () {
+        });
     };
     LeaderboardsPage.prototype.showFriendsLeaderboard = function (forceRefresh) {
         this.client.logEvent('page/leaderboard/friends');
         this.mode = 'friends';
         return this.leadersComponent.showFriends(false, forceRefresh);
     };
+    LeaderboardsPage.prototype.displayWeeklyLeaderboardTab = function () {
+        this.client.logEvent('page/leaderboard/weekly');
+        this.mode = 'weekly';
+        this.showWeeklyLeaderboard(false).then(function () {
+        }, function () {
+        });
+    };
     LeaderboardsPage.prototype.showWeeklyLeaderboard = function (forceRefresh) {
         this.client.logEvent('page/leaderboard/weekly');
         this.mode = 'weekly';
         return this.leadersComponent.showWeekly(forceRefresh);
-    };
-    LeaderboardsPage.prototype.onContestSelected = function (data) {
-        this.client.displayContest(data.contest._id);
-    };
-    LeaderboardsPage.prototype.refreshList = function (forceRefresh) {
-        if (this.mode === 'contests') {
-            return this.contestList.refresh(forceRefresh);
-        }
     };
     LeaderboardsPage.prototype.onResize = function () {
         if (this.mode === 'contests') {
             this.contestList.onResize();
         }
     };
+    LeaderboardsPage.prototype.refreshList = function (forceRefresh) {
+        return this.contestList.refresh(forceRefresh);
+    };
     LeaderboardsPage.prototype.doRefresh = function (refresher) {
         switch (this.mode) {
             case 'contests':
-                this.refreshList(true).then(function () {
+                this.contestList.refresh(true).then(function () {
                     refresher.complete();
                 }, function () {
                     refresher.complete();
@@ -2146,28 +2146,29 @@ var MainTabsPage = (function () {
         this.rootMyContestsPage = this.client.getPage('MyContestsPage');
         this.rootRunningContestsPage = this.client.getPage('RunningContestsPage');
         this.rootLeaderboardsPage = this.client.getPage('LeaderboardsPage');
-        this.client.events.subscribe('topTeamer:contestCreated', function (eventData) {
-            _this.needToRefreshList = true;
-        });
-        this.client.events.subscribe('topTeamer:contestRemoved', function () {
-            _this.needToRefreshList = true;
+        this.client.events.subscribe('topTeamer:contestCreated', function () {
+            setTimeout(_this.handleContestCreated, 300);
         });
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
-            _this.needToRefreshList = true;
+            setTimeout(function () {
+                _this.handleContestUpdated(eventData[0], eventData[1], eventData[2]);
+            }, 300);
         });
-        this.client.events.subscribe('topTeamer:languageChanged', function (eventData) {
+        this.client.events.subscribe('topTeamer:contestRemoved', function (eventData) {
+            setTimeout(function () {
+                _this.handleContestRemoved(eventData[0], eventData[1]);
+            }, 300);
+        });
+        this.client.events.subscribe('topTeamer:languageChanged', function () {
             window.location.reload();
         });
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
             _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
         });
-        this.client.events.subscribe('topTeamer:noPersonalContests', function (eventData) {
+        this.client.events.subscribe('topTeamer:noPersonalContests', function () {
             _this.mainTabs.select(1); //Switch to "Running contests"
         });
     }
-    MainTabsPage.prototype.ionViewWillEnter = function () {
-        this.refreshActiveTab();
-    };
     MainTabsPage.prototype.ionViewDidEnter = function () {
         //Should occur only once - and AFTER top toolbar received it's height
         if (!this.playerInfoInitiated) {
@@ -2185,18 +2186,111 @@ var MainTabsPage = (function () {
         }
     };
     MainTabsPage.prototype.onResize = function () {
-        var selectedPage = this.mainTabs.getSelected().getActive();
+        var selectedPage = this.mainTabs.getSelected().first();
         if (selectedPage.instance && selectedPage.instance.onResize) {
             selectedPage.instance.onResize();
         }
     };
-    MainTabsPage.prototype.refreshActiveTab = function () {
-        if (this.needToRefreshList) {
-            var selectedPage = this.mainTabs.getSelected().getActive();
-            if (selectedPage.instance.refreshList) {
-                selectedPage.instance.refreshList(true);
+    MainTabsPage.prototype.getTabPage = function (index) {
+        return this.mainTabs.getByIndex(index).first().instance;
+    };
+    MainTabsPage.prototype.handleContestCreated = function () {
+        //Force refresh my contests
+        this.getTabPage(0).refreshList(true).then(function () {
+        }, function () {
+        });
+    };
+    MainTabsPage.prototype.handleContestUpdated = function (contest, previousStatus, currentStatus) {
+        if (previousStatus === currentStatus) {
+            //Was finished and remained finished, or was running and still running...
+            switch (currentStatus) {
+                case 'starting':
+                    //For admins - future contests - appear only in "my Contests"
+                    this.getTabPage(0).contestList.updateContest(contest);
+                    break;
+                case 'running':
+                    //Appears in my contests / running contests
+                    this.getTabPage(0).contestList.updateContest(contest);
+                    this.getTabPage(1).contestList.updateContest(contest);
+                    break;
+                case 'finished':
+                    //Appears in recently finished contests
+                    this.getTabPage(2).contestList.updateContest(contest);
+                    break;
             }
-            this.needToRefreshList = false;
+        }
+        else {
+            switch (previousStatus) {
+                case 'starting':
+                    if (currentStatus === 'running') {
+                        //Update my contests
+                        this.getTabPage(0).contestList.updateContest(contest);
+                        //Refresh running contests - might appear there
+                        this.getTabPage(1).refreshList(true).then(function () {
+                        }, function () {
+                        });
+                    }
+                    else {
+                        //finished
+                        //Remove from my contests
+                        this.getTabPage(0).contestList.removeContest(contest._id);
+                        //Refresh recently finished contests
+                        this.getTabPage(2).refreshList(true).then(function () {
+                        }, function () {
+                        });
+                    }
+                    break;
+                case 'running':
+                    if (currentStatus === 'starting') {
+                        //Update my contests
+                        this.getTabPage(0).contestList.updateContest(contest);
+                        //Remove from running contests
+                        this.getTabPage(1).contestList.removeContest(contest._id);
+                    }
+                    else {
+                        //finished
+                        //Remove from my contests and from running contests
+                        this.getTabPage(0).contestList.removeContest(contest._id);
+                        this.getTabPage(1).contestList.removeContest(contest._id);
+                        //Refresh recently finished contests
+                        this.getTabPage(2).refreshList(true).then(function () {
+                        }, function () {
+                        });
+                    }
+                    break;
+                case 'finished':
+                    //Remove from finished contests
+                    this.getTabPage(2).contestList.removeContest(contest._id);
+                    if (currentStatus === 'starting') {
+                        //Refresh my contests
+                        this.getTabPage(0).refreshList(true).then(function () {
+                        }, function () {
+                        });
+                    }
+                    else {
+                        //running
+                        //Refresh my contests
+                        this.getTabPage(0).refreshList(true).then(function () {
+                        }, function () {
+                        });
+                        //Refresh running contests
+                        this.getTabPage(1).refreshList(true).then(function () {
+                        }, function () {
+                        });
+                    }
+                    break;
+            }
+        }
+    };
+    MainTabsPage.prototype.handleContestRemoved = function (contestId, finishedContest) {
+        if (!finishedContest) {
+            //Try to remove it from 'my contests' and 'running contests' tabs
+            this.getTabPage(0).contestList.removeContest(contestId);
+            this.getTabPage(1).contestList.removeContest(contestId);
+        }
+        else {
+            //Try to remove it from the recently finished tab
+            this.getTabPage(2).contestList.removeContest(contestId);
         }
     };
     __decorate([
@@ -2276,18 +2370,14 @@ var MyContestsPage = (function () {
     MyContestsPage.prototype.ionViewWillEnter = function () {
         var _this = this;
         this.client.logEvent('page/myContests');
-        if (this.contestList) {
-            this.refreshList().then(function () {
-                if (_this.contestList.contests.length === 0 && !_this.pageLoaded) {
-                    //On load only - switch to "running contests" if no personal contests
-                    _this.client.events.publish('topTeamer:noPersonalContests');
-                }
-                _this.pageLoaded = true;
-            });
-        }
-    };
-    MyContestsPage.prototype.onContestSelected = function (data) {
-        this.client.displayContest(data.contest._id);
+        this.refreshList().then(function () {
+            if (_this.contestList.contests.length === 0 && !_this.pageLoaded) {
+                //On load only - switch to "running contests" if no personal contests
+                _this.client.events.publish('topTeamer:noPersonalContests');
+            }
+            _this.pageLoaded = true;
+        }, function () {
+        });
     };
     MyContestsPage.prototype.refreshList = function (forceRefresh) {
         return this.contestList.refresh(forceRefresh);
@@ -3118,15 +3208,9 @@ var RunningContestsPage = (function () {
     }
     RunningContestsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/runningContests');
-        if (this.contestList) {
-            this.refreshList();
-        }
-    };
-    RunningContestsPage.prototype.ngAfterViewInit = function () {
-        this.refreshList();
-    };
-    RunningContestsPage.prototype.onContestSelected = function (data) {
-        this.client.displayContest(data.contest._id);
+        this.refreshList().then(function () {
+        }, function () {
+        });
     };
     RunningContestsPage.prototype.refreshList = function (forceRefresh) {
         return this.contestList.refresh(forceRefresh);
@@ -3403,7 +3487,9 @@ var SetContestAdminPage = (function () {
         alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.params.data.contestName }).then(function () {
             _this.client.logEvent('contest/removed', { 'contestId': _this.params.data.contestLocalCopy._id });
             contestsService.removeContest(_this.params.data.contestLocalCopy._id).then(function () {
-                _this.client.events.publish('topTeamer:contestRemoved');
+                var now = (new Date()).getTime();
+                var finishedContest = (_this.params.data.contestLocalCopy.endDate < now);
+                _this.client.events.publish('topTeamer:contestRemoved', _this.params.data.contestLocalCopy._id, finishedContest);
                 setTimeout(function () {
                     _this.client.nav.popToRoot({ animate: false });
                 }, 1000);
@@ -3777,7 +3863,10 @@ var SetContestPage = (function () {
                 }
                 else {
                     _this.client.logEvent('contest/updated', contestParams);
-                    _this.client.events.publish('topTeamer:contestUpdated', contest);
+                    var now = (new Date).getTime();
+                    var currentStatus = contestsService.getContestStatus(_this.contestLocalCopy);
+                    var previousStatus = contestsService.getContestStatus(_this.params.data.contest);
+                    _this.client.events.publish('topTeamer:contestUpdated', contest, previousStatus, currentStatus);
                     _this.client.nav.pop();
                 }
             }, function () {
@@ -5047,17 +5136,11 @@ exports.setContestClientData = function (contest) {
     //-------------------
     // status, state
     //-------------------
-    if (contest.endDate < now) {
-        contest.status = 'finished';
+    contest.status = exports.getContestStatus(contest, now);
+    if (contest.status === 'finished') {
         contest.state = 'finished';
     }
     else {
-        if (contest.startDate > now) {
-            contest.status = 'starting';
-        }
-        else {
-            contest.status = 'running';
-        }
         if (contest.myTeam === 0 || contest.myTeam === 1) {
             contest.state = 'play';
         }
@@ -5213,6 +5296,25 @@ exports.cloneForEdit = function (contest) {
         newContest.type = JSON.parse(JSON.stringify(contest.type));
     }
     return newContest;
+};
+//-------------------
+// status
+//-------------------
+exports.getContestStatus = function (contest, now) {
+    if (now === undefined) {
+        now = (new Date()).getTime();
+    }
+    if (contest.endDate < now) {
+        return 'finished';
+    }
+    else {
+        if (contest.startDate > now) {
+            return 'starting';
+        }
+        else {
+            return 'running';
+        }
+    }
 };
 },{"../objects/objects":12,"./client":37}],39:[function(require,module,exports){
 "use strict";

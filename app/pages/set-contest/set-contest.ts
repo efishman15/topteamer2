@@ -83,7 +83,7 @@ export class SetContestPage {
         endOption = this.endOptionKeys[this.endOptionKeys.length - 1];
       }
 
-      this.contestLocalCopy = new Contest(this.params.data.typeId, this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds,null, endOption);
+      this.contestLocalCopy = new Contest(this.params.data.typeId, this.nowWithoutTimeEpoch + this.currentTimeOnlyInMilliseconds, null, endOption);
 
       //Set contest subject
       this.contestLocalCopy.subject = this.client.translate(this.client.settings.newContest.contestTypes[this.contestLocalCopy.type.id].text.name, {'name': this.client.session.name});
@@ -345,8 +345,8 @@ export class SetContestPage {
       }
     }
 
-    let isDirty : boolean = false;
-    let contestNameChanged : boolean = false;
+    let isDirty:boolean = false;
+    let contestNameChanged:boolean = false;
     if (this.params.data.mode === 'add') {
       isDirty = true;
     }
@@ -427,7 +427,10 @@ export class SetContestPage {
         }
         else {
           this.client.logEvent('contest/updated', contestParams);
-          this.client.events.publish('topTeamer:contestUpdated', contest);
+          let now:number = (new Date).getTime();
+          let currentStatus: string = contestsService.getContestStatus(this.contestLocalCopy);
+          let previousStatus: string = contestsService.getContestStatus(this.params.data.contest);
+          this.client.events.publish('topTeamer:contestUpdated', contest, previousStatus, currentStatus);
           this.client.nav.pop();
         }
       }, () => {

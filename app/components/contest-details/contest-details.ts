@@ -9,19 +9,13 @@ import {Contest} from '../../objects/objects';
 
 export class ContestDetailsComponent {
 
-  @Input() id:Number;
   @Input() contest:Contest;
-  width: number;
 
   client:Client;
   @Output() contestSelected = new EventEmitter();
 
   constructor() {
     this.client = Client.getInstance();
-  }
-
-  ngOnInit() {
-    this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
   }
 
   onContestSelected() {
@@ -32,10 +26,4 @@ export class ContestDetailsComponent {
     this.contest = contest;
   }
 
-  onResize() {
-    var newWidth = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-    if (this.width !== newWidth) {
-      this.width = newWidth;
-    }
-  }
 }

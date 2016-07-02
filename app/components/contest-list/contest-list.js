@@ -14,7 +14,6 @@ var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestListComponent = (function () {
     function ContestListComponent() {
-        this.contestSelected = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
         this.lastRefreshTime = 0;
     }
@@ -30,31 +29,43 @@ var ContestListComponent = (function () {
             contestsService.list(_this.tab).then(function (contests) {
                 _this.lastRefreshTime = now;
                 _this.contests = contests;
-                _this.contestChartComponents.forEach(function (contestChartComponent) {
-                    contestChartComponent.refresh();
-                });
-                var i = 0;
-                _this.contestDetailsComponents.forEach(function (contestDetailsComponent) {
-                    contestDetailsComponent.refresh(contests[i]);
-                    i++;
-                });
                 resolve();
             }), function () {
                 reject();
             };
         });
     };
-    ContestListComponent.prototype.onContestSelected = function (event) {
-        this.contestSelected.emit(event);
+    ContestListComponent.prototype.onContestSelected = function (data) {
+        this.client.logEvent('displayContest', { 'contestId': data.contest._id, 'source': data.source });
+        this.client.displayContest(data.contest._id);
     };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {
             this.contestChartComponents.forEach(function (contestChartComponent) {
                 contestChartComponent.onResize();
             });
-            this.contestDetailsComponents.forEach(function (contestDetailsComponent) {
-                contestDetailsComponent.onResize();
-            });
+        }
+    };
+    ContestListComponent.prototype.findContestIndex = function (contestId) {
+        if (this.contests && this.contests.length > 0) {
+            for (var i = 0; i < this.contests.length; i++) {
+                if (this.contests[i]._id === contestId) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    };
+    ContestListComponent.prototype.updateContest = function (contest) {
+        var index = this.findContestIndex(contest._id);
+        if (index > -1) {
+            this.contests[index] = contest;
+        }
+    };
+    ContestListComponent.prototype.removeContest = function (contestId) {
+        var index = this.findContestIndex(contestId);
+        if (index > -1) {
+            this.contests.splice(index, 1);
         }
     };
     __decorate([
@@ -62,17 +73,9 @@ var ContestListComponent = (function () {
         __metadata('design:type', String)
     ], ContestListComponent.prototype, "tab", void 0);
     __decorate([
-        core_1.Output(), 
-        __metadata('design:type', Object)
-    ], ContestListComponent.prototype, "contestSelected", void 0);
-    __decorate([
         core_1.ViewChildren(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', core_1.QueryList)
     ], ContestListComponent.prototype, "contestChartComponents", void 0);
-    __decorate([
-        core_1.ViewChildren(contest_details_1.ContestDetailsComponent), 
-        __metadata('design:type', core_1.QueryList)
-    ], ContestListComponent.prototype, "contestDetailsComponents", void 0);
     ContestListComponent = __decorate([
         core_1.Component({
             selector: 'contest-list',

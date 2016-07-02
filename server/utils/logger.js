@@ -1,14 +1,6 @@
 var path = require('path');
 var logger = require('bunyan');
 
-module.exports.console = logger.createLogger({
-  name: 'topTeamerConsole',
-  streams: [{
-    stream: process.stderr
-    // `type: 'stream'` is implied
-  }]
-});
-
 //Server log is dual - both to a file and to the console
 module.exports.server = logger.createLogger({
   name: 'topTeamerServer',

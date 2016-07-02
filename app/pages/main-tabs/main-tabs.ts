@@ -1,16 +1,16 @@
 import {Component,ViewChild} from '@angular/core';
 import {Tabs} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import {Contest} from "../../objects/objects";
 
 @Component({
   templateUrl: 'build/pages/main-tabs/main-tabs.html'
 })
 export class MainTabsPage {
 
-  client: Client;
+  client:Client;
   @ViewChild(Tabs) mainTabs:Tabs;
-  needToRefreshList:boolean;
-  playerInfoInitiated: boolean
+  playerInfoInitiated:boolean;
 
   private rootMyContestsPage;
   private rootRunningContestsPage;
@@ -26,19 +26,23 @@ export class MainTabsPage {
     this.rootLeaderboardsPage = this.client.getPage('LeaderboardsPage');
 
 
-    this.client.events.subscribe('topTeamer:contestCreated', (eventData) => {
-      this.needToRefreshList = true;
-    });
-
-    this.client.events.subscribe('topTeamer:contestRemoved', () => {
-      this.needToRefreshList = true;
+    this.client.events.subscribe('topTeamer:contestCreated', () => {
+      setTimeout(this.handleContestCreated, 300);
     });
 
     this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
-      this.needToRefreshList = true;
+      setTimeout(() => {
+        this.handleContestUpdated(eventData[0], eventData[1], eventData[2])
+      },300);
     });
 
-    this.client.events.subscribe('topTeamer:languageChanged', (eventData) => {
+    this.client.events.subscribe('topTeamer:contestRemoved', (eventData) => {
+      setTimeout(() => {
+        this.handleContestRemoved(eventData[0], eventData[1])
+      }, 300);
+    });
+
+    this.client.events.subscribe('topTeamer:languageChanged', () => {
       window.location.reload();
     });
 
@@ -46,14 +50,10 @@ export class MainTabsPage {
       this.client.showModalPage('ServerPopupPage', {'serverPopup': eventData[0]});
     });
 
-    this.client.events.subscribe('topTeamer:noPersonalContests', (eventData) => {
+    this.client.events.subscribe('topTeamer:noPersonalContests', () => {
       this.mainTabs.select(1); //Switch to "Running contests"
     });
 
-  }
-
-  ionViewWillEnter() {
-    this.refreshActiveTab();
   }
 
   ionViewDidEnter() {
@@ -76,19 +76,129 @@ export class MainTabsPage {
   }
 
   onResize() {
-    var selectedPage = this.mainTabs.getSelected().getActive();
+    var selectedPage = this.mainTabs.getSelected().first();
     if (selectedPage.instance && selectedPage.instance.onResize) {
       selectedPage.instance.onResize();
     }
   }
 
-  refreshActiveTab() {
-    if (this.needToRefreshList) {
-      var selectedPage = this.mainTabs.getSelected().getActive();
-      if (selectedPage.instance.refreshList) {
-        selectedPage.instance.refreshList(true);
+  getTabPage(index:number) {
+    return this.mainTabs.getByIndex(index).first().instance;
+  }
+
+  handleContestCreated() {
+    //Force refresh my contests
+    this.getTabPage(0).refreshList(true).then(()=> {
+    }, ()=> {
+    });
+  }
+
+  handleContestUpdated(contest:Contest, previousStatus:string, currentStatus:string) {
+    if (previousStatus === currentStatus) {
+      //Was finished and remained finished, or was running and still running...
+      switch (currentStatus) {
+        case 'starting':
+          //For admins - future contests - appear only in "my Contests"
+          this.getTabPage(0).contestList.updateContest(contest);
+          break;
+        case 'running':
+          //Appears in my contests / running contests
+          this.getTabPage(0).contestList.updateContest(contest);
+          this.getTabPage(1).contestList.updateContest(contest);
+          break;
+        case 'finished':
+          //Appears in recently finished contests
+          this.getTabPage(2).contestList.updateContest(contest);
+          break;
       }
-      this.needToRefreshList = false;
+    }
+    else {
+      switch (previousStatus) {
+        case 'starting':
+          if (currentStatus === 'running') {
+
+            //Update my contests
+            this.getTabPage(0).contestList.updateContest(contest);
+
+            //Refresh running contests - might appear there
+            this.getTabPage(1).refreshList(true).then(()=> {
+            }, () => {
+            });
+          }
+          else {
+            //finished
+
+            //Remove from my contests
+            this.getTabPage(0).contestList.removeContest(contest._id);
+
+            //Refresh recently finished contests
+            this.getTabPage(2).refreshList(true).then(() => {
+            }, () => {
+            });
+          }
+          break;
+        case 'running':
+          if (currentStatus === 'starting') {
+
+            //Update my contests
+            this.getTabPage(0).contestList.updateContest(contest);
+
+            //Remove from running contests
+            this.getTabPage(1).contestList.removeContest(contest._id);
+          }
+          else {
+            //finished
+
+            //Remove from my contests and from running contests
+            this.getTabPage(0).contestList.removeContest(contest._id);
+            this.getTabPage(1).contestList.removeContest(contest._id);
+
+            //Refresh recently finished contests
+            this.getTabPage(2).refreshList(true).then(()=> {
+            }, ()=> {
+            });
+          }
+          break;
+        case 'finished':
+          //Remove from finished contests
+          this.getTabPage(2).contestList.removeContest(contest._id);
+
+          if (currentStatus === 'starting') {
+
+            //Refresh my contests
+            this.getTabPage(0).refreshList(true).then(()=> {
+            }, ()=> {
+            });
+          }
+          else {
+            //running
+
+            //Refresh my contests
+            this.getTabPage(0).refreshList(true).then(()=> {
+            }, () => {
+            });
+
+            //Refresh running contests
+            this.getTabPage(1).refreshList(true).then(()=> {
+            }, () => {
+            });
+
+          }
+          break;
+      }
+    }
+
+  }
+
+  handleContestRemoved(contestId:string, finishedContest:boolean) {
+    if (!finishedContest) {
+      //Try to remove it from 'my contests' and 'running contests' tabs
+      this.getTabPage(0).contestList.removeContest(contestId);
+      this.getTabPage(1).contestList.removeContest(contestId);
+    }
+    else {
+      //Try to remove it from the recently finished tab
+      this.getTabPage(2).contestList.removeContest(contestId);
     }
   }
 }

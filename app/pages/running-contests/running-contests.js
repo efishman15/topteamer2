@@ -16,15 +16,9 @@ var RunningContestsPage = (function () {
     }
     RunningContestsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/runningContests');
-        if (this.contestList) {
-            this.refreshList();
-        }
-    };
-    RunningContestsPage.prototype.ngAfterViewInit = function () {
-        this.refreshList();
-    };
-    RunningContestsPage.prototype.onContestSelected = function (data) {
-        this.client.displayContest(data.contest._id);
+        this.refreshList().then(function () {
+        }, function () {
+        });
     };
     RunningContestsPage.prototype.refreshList = function (forceRefresh) {
         return this.contestList.refresh(forceRefresh);

@@ -24,16 +24,15 @@
 
   <simple-tabs>
     <simple-tab simpleTabTitle="{{client.translate('RECENTLY_FINISHED_CONTESTS')}}"
-                (selected)="showRecentlyFinishedContests()"></simple-tab>
-    <simple-tab simpleTabTitle="{{client.translate('FRIENDS')}}" (selected)="showFriendsLeaderboard()"></simple-tab>
-    <simple-tab simpleTabTitle="{{client.translate('WEEKLY')}}" (selected)="showWeeklyLeaderboard()"></simple-tab>
+                (selected)="displayRecentlyFinishedContestsTab()"></simple-tab>
+    <simple-tab simpleTabTitle="{{client.translate('FRIENDS')}}" (selected)="displayFriendsLeaderboardTab()"></simple-tab>
+    <simple-tab simpleTabTitle="{{client.translate('WEEKLY')}}" (selected)="displayWeeklyLeaderboardTab()"></simple-tab>
   </simple-tabs>
 
-  <contest-list [hidden]="mode !== 'contests'" tab="recentlyFinished"
-                (contestSelected)="onContestSelected($event)">
+  <contest-list [hidden]="mode !== 'contests'" tab="recentlyFinished">
   </contest-list>
 
-  <leaders [hidden]="mode !== 'leaders'">
+  <leaders [hidden]="mode === 'contests'">
 
   </leaders>
 

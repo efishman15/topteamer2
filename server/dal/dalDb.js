@@ -912,6 +912,7 @@ function setContest(data, callback) {
   //Only contest owners or admins can update the contest
   if (data.checkOwner && !data.session.isAdmin) {
     whereClause['creator.id'] = ObjectId(data.session.userId);
+    whereClause['endDate'] = {$gt: (new Date()).getTime()}; //Non admin owner can't update a finished contest
   }
 
   var updateFields = {$set: data.setData};
@@ -1036,7 +1037,7 @@ function prepareContestsQuery(data, callback) {
   clientFields['myTeam'] = {$cond: [{$eq: ['$users.' + data.session.userId + '.userId', ObjectId(data.session.userId)]}, '$users.' + data.session.userId + '.team', null]};
 
   //Will return the total participants including the "system participants"
-  clientFields['participants'] = {$add: ['$participants','$systemParticipants']};
+  clientFields['participants'] = {$add: ['$participants', '$systemParticipants']};
 
   var fieldsClause = {'$project': clientFields};
 

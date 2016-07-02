@@ -21,22 +21,18 @@ export class MyContestsPage {
 
   ionViewWillEnter() {
     this.client.logEvent('page/myContests');
-    if (this.contestList) {
-      this.refreshList().then(() => {
-        if (this.contestList.contests.length === 0 && !this.pageLoaded) {
-          //On load only - switch to "running contests" if no personal contests
-          this.client.events.publish('topTeamer:noPersonalContests');
-        }
-        this.pageLoaded = true;
-      });
-    }
+    this.refreshList().then(() => {
+      if (this.contestList.contests.length === 0 && !this.pageLoaded) {
+        //On load only - switch to "running contests" if no personal contests
+        this.client.events.publish('topTeamer:noPersonalContests');
+      }
+      this.pageLoaded = true;
+    }, () => {
+
+    });
   }
 
-  onContestSelected(data) {
-    this.client.displayContest(data.contest._id);
-  }
-
-  refreshList(forceRefresh? : boolean) {
+  refreshList(forceRefresh?:boolean) {
     return this.contestList.refresh(forceRefresh);
   }
 
@@ -44,7 +40,7 @@ export class MyContestsPage {
     this.contestList.onResize();
   }
 
-  doRefresh(refresher: Refresher) {
+  doRefresh(refresher:Refresher) {
     this.refreshList(true).then(() => {
       refresher.complete();
     }, () => {

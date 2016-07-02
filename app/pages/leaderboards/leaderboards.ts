@@ -14,7 +14,7 @@ import {Client} from '../../providers/client';
 export class LeaderboardsPage {
 
   client:Client;
-  mode:String = 'contests';
+  mode:string;
   @ViewChild(SimpleTabsComponent) simpleTabsComponent:SimpleTabsComponent;
   @ViewChild(ContestListComponent) contestList:ContestListComponent;
   @ViewChild(LeadersComponent) leadersComponent:LeadersComponent;
@@ -24,41 +24,49 @@ export class LeaderboardsPage {
   }
 
   ionViewWillEnter() {
-    if (this.simpleTabsComponent) {
-      this.simpleTabsComponent.switchToTab(0);
-    }
-  }
-
-  ngAfterViewInit() {
     this.simpleTabsComponent.switchToTab(0);
   }
 
-  showRecentlyFinishedContests() {
+  displayRecentlyFinishedContestsTab() {
     this.client.logEvent('page/leaderboard/contests');
     this.mode = 'contests';
-    this.contestList.refresh();
+    this.showRecentlyFinishedContests(false).then(()=> {
+    },()=> {
+    })
   }
 
-  showFriendsLeaderboard(forceRefresh? :boolean) {
+  showRecentlyFinishedContests(forceRefresh? : boolean) {
+    this.client.logEvent('page/leaderboard/contests');
+    this.mode = 'contests';
+    return this.contestList.refresh(forceRefresh);
+  }
+
+  displayFriendsLeaderboardTab() {
+    this.client.logEvent('page/leaderboard/friends');
+    this.mode = 'friends';
+    this.showFriendsLeaderboard(false).then(()=> {
+    }, ()=> {
+    })
+  }
+
+  showFriendsLeaderboard(forceRefresh?:boolean) {
     this.client.logEvent('page/leaderboard/friends');
     this.mode = 'friends';
     return this.leadersComponent.showFriends(false, forceRefresh);
   }
 
-  showWeeklyLeaderboard(forceRefresh? : boolean) {
+  displayWeeklyLeaderboardTab() {
+    this.client.logEvent('page/leaderboard/weekly');
+    this.mode = 'weekly';
+    this.showWeeklyLeaderboard(false).then(() => {
+    }, ()=> {
+    });
+  }
+
+  showWeeklyLeaderboard(forceRefresh?:boolean) {
     this.client.logEvent('page/leaderboard/weekly');
     this.mode = 'weekly';
     return this.leadersComponent.showWeekly(forceRefresh);
-  }
-
-  onContestSelected(data) {
-    this.client.displayContest(data.contest._id);
-  }
-
-  refreshList(forceRefresh?:boolean) {
-    if (this.mode === 'contests') {
-      return this.contestList.refresh(forceRefresh);
-    }
   }
 
   onResize() {
@@ -67,10 +75,14 @@ export class LeaderboardsPage {
     }
   }
 
+  refreshList(forceRefresh?:boolean) {
+    return this.contestList.refresh(forceRefresh);
+  }
+
   doRefresh(refresher:Refresher) {
     switch (this.mode) {
       case 'contests':
-        this.refreshList(true).then(() => {
+        this.contestList.refresh(true).then(() => {
           refresher.complete();
         }, () => {
           refresher.complete();
@@ -92,5 +104,4 @@ export class LeaderboardsPage {
         break;
     }
   }
-
 }

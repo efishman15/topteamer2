@@ -15,49 +15,59 @@ var leaders_1 = require('../../components/leaders/leaders');
 var client_1 = require('../../providers/client');
 var LeaderboardsPage = (function () {
     function LeaderboardsPage() {
-        this.mode = 'contests';
         this.client = client_1.Client.getInstance();
     }
     LeaderboardsPage.prototype.ionViewWillEnter = function () {
-        if (this.simpleTabsComponent) {
-            this.simpleTabsComponent.switchToTab(0);
-        }
-    };
-    LeaderboardsPage.prototype.ngAfterViewInit = function () {
         this.simpleTabsComponent.switchToTab(0);
     };
-    LeaderboardsPage.prototype.showRecentlyFinishedContests = function () {
+    LeaderboardsPage.prototype.displayRecentlyFinishedContestsTab = function () {
         this.client.logEvent('page/leaderboard/contests');
         this.mode = 'contests';
-        this.contestList.refresh();
+        this.showRecentlyFinishedContests(false).then(function () {
+        }, function () {
+        });
+    };
+    LeaderboardsPage.prototype.showRecentlyFinishedContests = function (forceRefresh) {
+        this.client.logEvent('page/leaderboard/contests');
+        this.mode = 'contests';
+        return this.contestList.refresh(forceRefresh);
+    };
+    LeaderboardsPage.prototype.displayFriendsLeaderboardTab = function () {
+        this.client.logEvent('page/leaderboard/friends');
+        this.mode = 'friends';
+        this.showFriendsLeaderboard(false).then(function () {
+        }, function () {
+        });
     };
     LeaderboardsPage.prototype.showFriendsLeaderboard = function (forceRefresh) {
         this.client.logEvent('page/leaderboard/friends');
         this.mode = 'friends';
         return this.leadersComponent.showFriends(false, forceRefresh);
     };
+    LeaderboardsPage.prototype.displayWeeklyLeaderboardTab = function () {
+        this.client.logEvent('page/leaderboard/weekly');
+        this.mode = 'weekly';
+        this.showWeeklyLeaderboard(false).then(function () {
+        }, function () {
+        });
+    };
     LeaderboardsPage.prototype.showWeeklyLeaderboard = function (forceRefresh) {
         this.client.logEvent('page/leaderboard/weekly');
         this.mode = 'weekly';
         return this.leadersComponent.showWeekly(forceRefresh);
-    };
-    LeaderboardsPage.prototype.onContestSelected = function (data) {
-        this.client.displayContest(data.contest._id);
-    };
-    LeaderboardsPage.prototype.refreshList = function (forceRefresh) {
-        if (this.mode === 'contests') {
-            return this.contestList.refresh(forceRefresh);
-        }
     };
     LeaderboardsPage.prototype.onResize = function () {
         if (this.mode === 'contests') {
             this.contestList.onResize();
         }
     };
+    LeaderboardsPage.prototype.refreshList = function (forceRefresh) {
+        return this.contestList.refresh(forceRefresh);
+    };
     LeaderboardsPage.prototype.doRefresh = function (refresher) {
         switch (this.mode) {
             case 'contests':
-                this.refreshList(true).then(function () {
+                this.contestList.refresh(true).then(function () {
                     refresher.complete();
                 }, function () {
                     refresher.complete();

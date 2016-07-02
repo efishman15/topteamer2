@@ -19,17 +19,9 @@ export class RunningContestsPage {
 
   ionViewWillEnter() {
     this.client.logEvent('page/runningContests');
-    if (this.contestList) {
-      this.refreshList();
-    }
-  }
-
-  ngAfterViewInit() {
-    this.refreshList();
-  }
-
-  onContestSelected(data) {
-    this.client.displayContest(data.contest._id);
+    this.refreshList().then (() => {
+    }, () => {
+    });
   }
 
   refreshList(forceRefresh? : boolean) {

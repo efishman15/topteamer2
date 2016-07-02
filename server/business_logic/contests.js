@@ -147,7 +147,8 @@ function validateContestData(data, callback) {
 
   //Cannot edit an ended contest
   if (data.contest.endDate < now && !data.session.isAdmin) {
-    callback(new exceptions.ServerException('You cannot edit a contest that has already been finished', data));
+    callback(new exceptions.ServerException('You cannot edit a contest that has already been finished', {'contestId': data.contest._id}));
+    return;
   }
 
   //Only 2 teams are allowed
@@ -230,6 +231,7 @@ function validateContestData(data, callback) {
       if (!data.contest.type.questions.list[i].deleted) {
         if (questionHash[data.contest.type.questions.list[i].text.trim()]) {
           callback(new exceptions.ServerMessageException('SERVER_ERROR_QUESTION_ALREADY_EXISTS', {'question': data.contest.type.questions.list[i]}));
+          return;
         }
         questionHash[data.contest.type.questions.list[i].text.trim()] = true;
       }

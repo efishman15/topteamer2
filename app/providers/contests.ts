@@ -116,17 +116,11 @@ export let setContestClientData = (contest:Contest) => {
   //-------------------
   // status, state
   //-------------------
-  if (contest.endDate < now) {
-    contest.status = 'finished';
+  contest.status = getContestStatus(contest, now);
+  if (contest.status === 'finished') {
     contest.state = 'finished';
   }
   else {
-    if (contest.startDate > now) {
-      contest.status = 'starting';
-    }
-    else {
-      contest.status = 'running';
-    }
     if (contest.myTeam === 0 || contest.myTeam === 1) {
       contest.state = 'play';
     }
@@ -303,4 +297,26 @@ export let cloneForEdit = (contest: Contest) => {
   }
 
   return newContest;
+}
+
+//-------------------
+// status
+//-------------------
+export let getContestStatus = (contest: Contest, now?: number) => {
+
+  if (now === undefined) {
+    now = (new Date()).getTime();
+  }
+
+  if (contest.endDate < now) {
+    return 'finished';
+  }
+  else {
+    if (contest.startDate > now) {
+      return 'starting';
+    }
+    else {
+      return 'running';
+    }
+  }
 }

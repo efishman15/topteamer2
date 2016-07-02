@@ -58,7 +58,9 @@ var SetContestAdminPage = (function () {
         alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.params.data.contestName }).then(function () {
             _this.client.logEvent('contest/removed', { 'contestId': _this.params.data.contestLocalCopy._id });
             contestsService.removeContest(_this.params.data.contestLocalCopy._id).then(function () {
-                _this.client.events.publish('topTeamer:contestRemoved');
+                var now = (new Date()).getTime();
+                var finishedContest = (_this.params.data.contestLocalCopy.endDate < now);
+                _this.client.events.publish('topTeamer:contestRemoved', _this.params.data.contestLocalCopy._id, finishedContest);
                 setTimeout(function () {
                     _this.client.nav.popToRoot({ animate: false });
                 }, 1000);

@@ -70,7 +70,9 @@ export class SetContestAdminPage {
     alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.params.data.contestName}).then(() => {
       this.client.logEvent('contest/removed', {'contestId': this.params.data.contestLocalCopy._id});
       contestsService.removeContest(this.params.data.contestLocalCopy._id).then(() => {
-        this.client.events.publish('topTeamer:contestRemoved');
+        let now: number = (new Date()).getTime();
+        let finishedContest: boolean = (this.params.data.contestLocalCopy.endDate < now);
+        this.client.events.publish('topTeamer:contestRemoved', this.params.data.contestLocalCopy._id, finishedContest);
         setTimeout(() => {
           this.client.nav.popToRoot({animate: false});
         }, 1000);

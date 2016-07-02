@@ -103,17 +103,11 @@ exports.setContestClientData = function (contest) {
     //-------------------
     // status, state
     //-------------------
-    if (contest.endDate < now) {
-        contest.status = 'finished';
+    contest.status = exports.getContestStatus(contest, now);
+    if (contest.status === 'finished') {
         contest.state = 'finished';
     }
     else {
-        if (contest.startDate > now) {
-            contest.status = 'starting';
-        }
-        else {
-            contest.status = 'running';
-        }
         if (contest.myTeam === 0 || contest.myTeam === 1) {
             contest.state = 'play';
         }
@@ -269,5 +263,24 @@ exports.cloneForEdit = function (contest) {
         newContest.type = JSON.parse(JSON.stringify(contest.type));
     }
     return newContest;
+};
+//-------------------
+// status
+//-------------------
+exports.getContestStatus = function (contest, now) {
+    if (now === undefined) {
+        now = (new Date()).getTime();
+    }
+    if (contest.endDate < now) {
+        return 'finished';
+    }
+    else {
+        if (contest.startDate > now) {
+            return 'starting';
+        }
+        else {
+            return 'running';
+        }
+    }
 };
 //# sourceMappingURL=contests.js.map

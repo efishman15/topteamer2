@@ -350,7 +350,10 @@ var SetContestPage = (function () {
                 }
                 else {
                     _this.client.logEvent('contest/updated', contestParams);
-                    _this.client.events.publish('topTeamer:contestUpdated', contest);
+                    var now = (new Date).getTime();
+                    var currentStatus = contestsService.getContestStatus(_this.contestLocalCopy);
+                    var previousStatus = contestsService.getContestStatus(_this.params.data.contest);
+                    _this.client.events.publish('topTeamer:contestUpdated', contest, previousStatus, currentStatus);
                     _this.client.nav.pop();
                 }
             }, function () {

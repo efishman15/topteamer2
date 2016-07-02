@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, ViewChildren, QueryList} from '@angular/core';
+import {Component, Input, EventEmitter, ViewChildren, QueryList} from '@angular/core';
 import {ContestChartComponent} from '../contest-chart/contest-chart';
 import {ContestDetailsComponent} from '../contest-details/contest-details';
 import {Client} from '../../providers/client';
@@ -13,10 +13,8 @@ import {Contest} from "../../objects/objects";
 
 export class ContestListComponent {
   @Input() tab:String;
-  @Output() contestSelected = new EventEmitter();
 
   @ViewChildren(ContestChartComponent) contestChartComponents:QueryList<ContestChartComponent>;
-  @ViewChildren(ContestDetailsComponent) contestDetailsComponents:QueryList<ContestDetailsComponent>;
 
   contests:Array<Contest>;
   client:Client;
@@ -27,8 +25,8 @@ export class ContestListComponent {
     this.lastRefreshTime = 0;
   }
 
-  refresh(forceRefresh?: boolean) {
-    return new Promise( (resolve, reject) => {
+  refresh(forceRefresh?:boolean) {
+    return new Promise((resolve, reject) => {
       var now = (new Date()).getTime();
 
       //Check if refresh frequency reached
@@ -37,17 +35,9 @@ export class ContestListComponent {
         return;
       }
 
-      contestsService.list(this.tab).then((contests: Array<Contest>) => {
+      contestsService.list(this.tab).then((contests:Array<Contest>) => {
         this.lastRefreshTime = now;
         this.contests = contests;
-        this.contestChartComponents.forEach( (contestChartComponent: ContestChartComponent) => {
-          contestChartComponent.refresh();
-        });
-        var i = 0;
-        this.contestDetailsComponents.forEach( (contestDetailsComponent: ContestDetailsComponent) => {
-          contestDetailsComponent.refresh(contests[i]);
-          i++;
-        });
         resolve();
       }), () => {
         reject();
@@ -55,20 +45,41 @@ export class ContestListComponent {
     });
   }
 
-  onContestSelected(event: Event) {
-    this.contestSelected.emit(event);
+  onContestSelected(data: any) {
+    this.client.logEvent('displayContest',{'contestId' : data.contest._id, 'source': data.source});
+    this.client.displayContest(data.contest._id);
   }
 
   onResize() {
     if (this.contestChartComponents && this.contestChartComponents.length > 0) {
-      this.contestChartComponents.forEach( (contestChartComponent: ContestChartComponent) => {
+      this.contestChartComponents.forEach((contestChartComponent:ContestChartComponent) => {
         contestChartComponent.onResize();
-      });
-      this.contestDetailsComponents.forEach( (contestDetailsComponent: ContestDetailsComponent) => {
-        contestDetailsComponent.onResize();
       });
     }
   }
+
+  findContestIndex(contestId:string) {
+    if (this.contests && this.contests.length > 0) {
+      for (var i = 0; i < this.contests.length; i++) {
+        if (this.contests[i]._id === contestId) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  updateContest(contest:Contest) {
+    var index = this.findContestIndex(contest._id);
+    if (index > -1) {
+      this.contests[index] = contest;
+    }
+  }
+
+  removeContest(contestId:string) {
+    var index = this.findContestIndex(contestId);
+    if (index > -1) {
+      this.contests.splice(index, 1);
+    }
+  }
 }
-
-

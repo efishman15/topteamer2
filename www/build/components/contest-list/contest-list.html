@@ -13,6 +13,6 @@
   </div>
   <contest-details id="{{tab}}-{{contest._id}}-details"
                    [(contest)]="contests[i]"
-                   (contestSelected)="onContestSelected($event)">
+                   (contestSelected)="onContestSelected({'contest': contests[i], 'source': 'list-details'})">
   </contest-details>
 </div>

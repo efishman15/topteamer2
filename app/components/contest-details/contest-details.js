@@ -15,25 +15,12 @@ var ContestDetailsComponent = (function () {
         this.contestSelected = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
     }
-    ContestDetailsComponent.prototype.ngOnInit = function () {
-        this.width = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-    };
     ContestDetailsComponent.prototype.onContestSelected = function () {
         this.contestSelected.emit({ 'contest': this.contest, 'source': 'contest-details' });
     };
     ContestDetailsComponent.prototype.refresh = function (contest) {
         this.contest = contest;
     };
-    ContestDetailsComponent.prototype.onResize = function () {
-        var newWidth = this.client.width * this.client.settings.charts.contest.size.widthRatio;
-        if (this.width !== newWidth) {
-            this.width = newWidth;
-        }
-    };
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', Number)
-    ], ContestDetailsComponent.prototype, "id", void 0);
     __decorate([
         core_1.Input(), 
         __metadata('design:type', objects_1.Contest)
