@@ -2147,17 +2147,13 @@ var MainTabsPage = (function () {
         this.rootRunningContestsPage = this.client.getPage('RunningContestsPage');
         this.rootLeaderboardsPage = this.client.getPage('LeaderboardsPage');
         this.client.events.subscribe('topTeamer:contestCreated', function () {
-            setTimeout(_this.handleContestCreated, 300);
+            _this.handleContestCreated();
         });
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
-            setTimeout(function () {
-                _this.handleContestUpdated(eventData[0], eventData[1], eventData[2]);
-            }, 300);
+            _this.handleContestUpdated(eventData[0], eventData[1], eventData[2]);
         });
         this.client.events.subscribe('topTeamer:contestRemoved', function (eventData) {
-            setTimeout(function () {
-                _this.handleContestRemoved(eventData[0], eventData[1]);
-            }, 300);
+            _this.handleContestRemoved(eventData[0], eventData[1]);
         });
         this.client.events.subscribe('topTeamer:languageChanged', function () {
             window.location.reload();
@@ -2192,7 +2188,8 @@ var MainTabsPage = (function () {
         }
     };
     MainTabsPage.prototype.getTabPage = function (index) {
-        return this.mainTabs.getByIndex(index).first().instance;
+        var viewController = this.mainTabs.getByIndex(index).first();
+        return viewController.instance;
     };
     MainTabsPage.prototype.handleContestCreated = function () {
         //Force refresh my contests

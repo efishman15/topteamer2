@@ -1,5 +1,5 @@
 import {Component,ViewChild} from '@angular/core';
-import {Tabs} from 'ionic-angular';
+import {Tabs, ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import {Contest} from "../../objects/objects";
 
@@ -25,21 +25,16 @@ export class MainTabsPage {
     this.rootRunningContestsPage = this.client.getPage('RunningContestsPage');
     this.rootLeaderboardsPage = this.client.getPage('LeaderboardsPage');
 
-
     this.client.events.subscribe('topTeamer:contestCreated', () => {
-      setTimeout(this.handleContestCreated, 300);
+      this.handleContestCreated();
     });
 
     this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
-      setTimeout(() => {
-        this.handleContestUpdated(eventData[0], eventData[1], eventData[2])
-      },300);
+      this.handleContestUpdated(eventData[0], eventData[1], eventData[2])
     });
 
     this.client.events.subscribe('topTeamer:contestRemoved', (eventData) => {
-      setTimeout(() => {
-        this.handleContestRemoved(eventData[0], eventData[1])
-      }, 300);
+      this.handleContestRemoved(eventData[0], eventData[1])
     });
 
     this.client.events.subscribe('topTeamer:languageChanged', () => {
@@ -83,7 +78,8 @@ export class MainTabsPage {
   }
 
   getTabPage(index:number) {
-    return this.mainTabs.getByIndex(index).first().instance;
+    let viewController: ViewController = this.mainTabs.getByIndex(index).first();
+    return viewController.instance;
   }
 
   handleContestCreated() {

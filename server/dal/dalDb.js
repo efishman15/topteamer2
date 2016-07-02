@@ -609,43 +609,9 @@ module.exports.createOrUpdateSession = function (data, callback) {
             return;
           }
 
-          if (session.lastErrorObject.upserted) {
+          checkToCloseDb(data);
+          callback(null, data);
 
-            var closeConnection = data.closeConnection;
-
-            data.closeConnection = false;
-
-            //Do not close connection on an inner logAction
-            data.logAction = {
-              'action': 'login',
-              'userId': data.session.userId,
-              'sessionId': data.session.userToken
-            };
-
-            logAction(data, function (err, data) {
-
-              if (err) {
-                closeDb(data);
-
-                callback(new exceptions.ServerException('Error inserting log record', {
-                  'action': data.action,
-                  'session': data.session,
-                  'dbError': err
-                }, 'error'));
-                return;
-              }
-
-              data.closeConnection = closeConnection;
-
-              checkToCloseDb(data);
-
-              callback(null, data);
-            })
-          }
-          else {
-            checkToCloseDb(data);
-            callback(null, data);
-          }
         });
     })
 };

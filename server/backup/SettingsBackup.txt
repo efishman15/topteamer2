@@ -373,25 +373,21 @@
       "pageSize" : 10,
       "friendsAboveMePageSize" : 2
     },
-    "contestList" : {
-      "recentlyFinishedDays" : 180,
-      "pageSize" : 10
-    },
     "text" : {
       "he" : {
-        "gameDescription" : "מי יותר חכם הינו משחק המאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם (לדוגמא: 'מי יותר חכם -   הבנים או הבנות',  'אוהדי כדורגל או אוהדי כדורסל'), לענות על שאלות טריוויה ולעזור לקבוצתכם לנצח",
+        "gameDescription" : "המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם (לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
         "teamTitle" : "קבוצת %s בתחרות '%s'",
-        "gameTitle" : "מי יותר חכם: הצטרפו לתחרויות ועזרו לקבוצתכם לנצח"
+        "gameTitle" : "הצטרפו לתחרויות ועזרו לקבוצתכם לנצח"
       },
       "es" : {
-        "gameDescription" : "¿Quién es más inteligente es un juego que le permite unirse o crear un concurso (por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto) , invita a tus amigos y descubrir quién es el equipo más inteligente respondiendo preguntas de trivia divertidas",
+        "gameDescription" : "topTeamer es un juego que le permite unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
         "teamTitle" : "Equipo %s en el concurso '%s'",
-        "gameTitle" : "¿Quién es más inteligente : se unen a uno o más concursos y averiguar quién equipo es más inteligente"
+        "gameTitle" : "topTeamer : unirse a uno o más concursos y averiguar quién es el mejor equipo"
       },
       "en" : {
-        "gameDescription" : "Who is smarter is a game which enables you to join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the smartest team by answering fun trivia questions",
+        "gameDescription" : "topTeamer is a game which enables you to join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
         "teamTitle" : "%s team in the contest '%s'",
-        "gameTitle" : "Who is smarter: join one or more contests and find out who's team is smarter"
+        "gameTitle" : "topTeamer: join one or more contests and find out who's the best team"
       }
     },
     "branch" : {
@@ -409,7 +405,57 @@
         "url" : "http://geoip.nekudo.com/api/%s",
         "countryCodeField" : ["country,code"],
         "timeout" : 3000
-      }]
+      }],
+    "contest" : {
+      "list" : {
+        "recentlyFinishedDays" : 180,
+        "pageSize" : 10,
+        "clientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.avatar"]
+      },
+      "details" : {
+        "clientTemplate" : {
+          "_id" : "$._id",
+          "subject" : "$.subject",
+          "type" : "$.type",
+          "startDate" : "$.startDate",
+          "endDate" : "$.endDate",
+          "teams" : ["$.teams", {
+              "name" : "$.name",
+              "score" : "$.score"
+            }],
+          "creator" : {
+            "name" : "$.creator.name",
+            "avatar" : "$.creator.avatar"
+          },
+          "leader" : {
+            "name" : "$.leader.name",
+            "avatar" : "$.leader.avatar"
+          },
+          "link" : "$.link"
+        },
+        "adminClientTemplate" : {
+          "_id" : "$._id",
+          "subject" : "$.subject",
+          "type" : "$.type",
+          "startDate" : "$.startDate",
+          "endDate" : "$.endDate",
+          "teams" : ["$.teams", {
+              "name" : "$.name",
+              "score" : "$.score"
+            }],
+          "creator" : {
+            "name" : "$.creator.name",
+            "avatar" : "$.creator.avatar"
+          },
+          "leader" : {
+            "name" : "$.leader.name",
+            "avatar" : "$.leader.avatar"
+          },
+          "rating" : "$.rating",
+          "link" : "$.link"
+        }
+      }
+    }
   },
   "client" : {
     "languages" : {
@@ -610,13 +656,8 @@
         },
         "size" : {
           "widthRatio" : 0.9,
-          "heightRatio" : 0.5
+          "heightRatio" : 0.4
         }
-      }
-    },
-    "contestList" : {
-      "playButton" : {
-        "size" : 60
       }
     },
     "xpControl" : {
@@ -797,7 +838,7 @@
     "newContest" : {
       "privateQuestions" : {
         "min" : 1,
-        "max" : 30
+        "max" : 20
       },
       "contestTypes" : {
         "systemTrivia" : {
@@ -869,7 +910,7 @@
         "HOME_WELCOME" : "Play for your team",
         "FACEBOOK_CONNECT" : "Connect with Facebook",
         "CONTEST_ENDS_IN" : "{{number}} {{units}}",
-        "CONTEST_ENDED" : "Contest ended {{number}} {{units}} ago",
+        "CONTEST_ENDED" : "{{number}} {{units}}",
         "CONTEST_STARTED" : "Started {{number}} {{units}} ago",
         "CONTEST_STARTING" : "Starting in {{number}} {{units}}",
         "CONTEST_PARTICIPANTS" : "Participants: {{participants}}",
@@ -893,8 +934,8 @@
         "NEW_CONTEST" : "New Contest",
         "EDIT_CONTEST" : "Edit",
         "REMOVE_CONTEST" : "Remove contest",
-        "CONFIRM_REMOVE_TITLE" : "Remove '{{name}}'",
-        "CONFIRM_REMOVE_TEMPLATE" : "Are you sure you want to remove '{{name}}'",
+        "CONFIRM_REMOVE_TITLE" : "Remove '{{name}}'?",
+        "CONFIRM_REMOVE_TEMPLATE" : "Are you sure you want to remove '{{name}}'?",
         "PLAY_CONTEST" : "Play Contest",
         "TOOLS" : "Tools",
         "TEAM0" : "My team",
@@ -1037,7 +1078,7 @@
         "REVIEW_MODE_PLAY_AGAIN_MESSAGE" : "For fair play only your first results will contribute smartpoints to your team",
         "SELECT_CONTEST_TYPE" : "Select contest type:",
         "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "Trivia questions",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.systemTrivia.levels.length + ' random trivia questions generated by the system'",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "Random trivia questions generated by the system",
         "CONTEST_TYPE_TRIVIA_USER_TITLE" : "Your questions",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'You can enter ' + eval:settings.client.newContest.privateQuestions.min + '-' + eval:settings.client.newContest.privateQuestions.max + ' questions of your own'",
         "SEARCH" : "Search",
@@ -1061,7 +1102,7 @@
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "{{name}}'s questions",
         "CONTEST_VIEW_TITLE" : "Who's the best?",
         "QUIZ_VIEW_TITLE" : "Leaders: {{Team}}",
-        "SHOW_IN_RANDOM_ORDER" : "Show in random order",
+        "SHOW_IN_RANDOM_ORDER" : "Display questions in random order",
         "RUNNING_CONTESTS_TAB_TEXT" : "Leading",
         "SWITCH_TEAMS_ALERT_TITLE" : "Switch Team",
         "SWITCH_TEAMS_ALERT_MESSAGE" : "You started playing for {{team}} team",
@@ -1069,13 +1110,14 @@
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_TITLE" : "Changing subject",
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "For system trivia contests the subject can not be changed. You can create a new contest and choose 'Your questions' and then enter a subject describing those questions",
         "CONFIRM_EXIT_QUIZ_TITLE" : "Confirm exit",
-        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "The points you gained will not credit your team. Are you sure you would like to exit?"
+        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "The points you gained will not credit your team. Are you sure you would like to exit?",
+        "SYSTEM_PARTICIPANTS" : "System participants"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
         "FACEBOOK_CONNECT" : "התחברו עם פייסבוק",
         "CONTEST_ENDS_IN" : "{{number}} {{units}}",
-        "CONTEST_ENDED" : "הסתיימה לפני {{number}} {{units}}",
+        "CONTEST_ENDED" : "{{number}} {{units}}",
         "CONTEST_STARTED" : "התחילה לפני {{number}} {{units}}",
         "CONTEST_STARTING" : "מתחילה בעוד {{number}} {{units}}",
         "CONTEST_PARTICIPANTS" : "משתתפים: {{participants}}",
@@ -1099,8 +1141,8 @@
         "NEW_CONTEST" : "תחרות חדשה",
         "EDIT_CONTEST" : "עדכון",
         "REMOVE_CONTEST" : "הסרת תחרות",
-        "CONFIRM_REMOVE_TITLE" : "הסירו את '{{name}}'",
-        "CONFIRM_REMOVE_TEMPLATE" : "האם אתם בטוחים שברצונכם להסיר את '{{name}}'",
+        "CONFIRM_REMOVE_TITLE" : "הסירו את '{{name}}'?",
+        "CONFIRM_REMOVE_TEMPLATE" : "האם אתם בטוחים שברצונכם להסיר את?",
         "WELCOME_NAME" : "שלום {{name}}",
         "PLAY_CONTEST" : "שחקו בתחרות",
         "TOOLS" : "כלים",
@@ -1240,7 +1282,7 @@
         "REVIEW_MODE_PLAY_AGAIN" : "על מנת לשמור על משחק הוגן, רק תוצאות המשחק הראשון יזכו את קבוצתכם בנקודות",
         "SELECT_CONTEST_TYPE" : "בחרו את סוג התחרות",
         "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "שאלות טריוויה",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.systemTrivia.levels.length + ' שאלות טריוויה מתחלפות מתוך מאגר המערכת'",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "שאלות טריוויה מתחלפות מתוך מאגר המערכת",
         "CONTEST_TYPE_TRIVIA_USER_TITLE" : "שאלות שלכם",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'הזינו בעצמכם עד ' + eval:settings.client.newContest.privateQuestions.max + ' שאלות לתחרות'",
         "SEARCH" : "חיפוש",
@@ -1264,7 +1306,7 @@
         "CONTEST_NAME_SHORT" : "{{team0}} נגד {{team1}}",
         "CONTEST_VIEW_TITLE" : "מי יותר שווה?",
         "QUIZ_VIEW_TITLE" : "מובילים: {{Team}}",
-        "SHOW_IN_RANDOM_ORDER" : "הציגו בסדר אקראי",
+        "SHOW_IN_RANDOM_ORDER" : "הצגת השאלות בסדר אקראי",
         "RUNNING_CONTESTS_TAB_TEXT" : "המובילות",
         "SWITCH_TEAMS_ALERT_TITLE" : "החלפת קבוצה",
         "SWITCH_TEAMS_ALERT_MESSAGE" : "עברתם לשחק עבור קבוצת {{team}}",
@@ -1272,13 +1314,14 @@
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_TITLE" : "שינוי נושא",
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "לתחרויות טריוויה לא ניתן לשנות את הנושא. תוכלו ליצור תחרות חדשה עם השאלות שלכם ובה תוכלו להזין נושא המתאר את השאלות שהזנתם",
         "CONFIRM_EXIT_QUIZ_TITLE" : "יציאה באמצע",
-        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "הניקוד שצברתם לא ייזכה את קבוצתכם. האם אתם בטוחים שברצונכם לצאת?"
+        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "הניקוד שצברתם לא ייזכה את קבוצתכם. האם אתם בטוחים שברצונכם לצאת?",
+        "SYSTEM_PARTICIPANTS" : "משתתפי מערכת"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
         "FACEBOOK_CONNECT" : "Conectarse con Facebook",
         "CONTEST_ENDS_IN" : "{{number}} {{units}}",
-        "CONTEST_ENDED" : "Concurso terminó hace {{number}} {{units}}",
+        "CONTEST_ENDED" : "{{number}} {{units}}",
         "CONTEST_STARTED" : "Inició Hace {{number}} {{units}}",
         "CONTEST_STARTING" : "A partir de {{number}} {{units}}",
         "CONTEST_PARTICIPANTS" : "Participantes: {{participants}}",
@@ -1448,7 +1491,7 @@
         "REVIEW_MODE_PLAY_AGAIN" : "Para el juego limpio sólo sus primeros resultados contribuirán SmartPoints a su equipo",
         "SELECT_CONTEST_TYPE" : "Seleccione el tipo de concurso:",
         "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "preguntas de trivia",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "eval:settings.server.quiz.questions.systemTrivia.levels.length + ' generados por el sistema preguntas de trivia'",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "Generados por el sistema preguntas de trivia",
         "CONTEST_TYPE_TRIVIA_USER_TITLE" : "preguntas de {{name}}",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'Puede introducir ' + eval:settings.client.newContest.privateQuestions.min + '-'  + eval:settings.client.newContest.privateQuestions.max + ' preguntas de su propio'",
         "SEARCH" : "Buscar",
@@ -1472,7 +1515,7 @@
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "Concurso de conocimiento",
         "CONTEST_VIEW_TITLE" : "¿Quién es el mejor?",
         "QUIZ_VIEW_TITLE" : "Líderes: {{Team}} equipo",
-        "SHOW_IN_RANDOM_ORDER" : "Mostrar en orden aleatorio",
+        "SHOW_IN_RANDOM_ORDER" : "Mostrar preguntas en orden aleatorio",
         "RUNNING_CONTESTS_TAB_TEXT" : "Líder",
         "SWITCH_TEAMS_ALERT_TITLE" : "interruptor equipo",
         "SWITCH_TEAMS_ALERT_MESSAGE" : "Empezó a jugar para el equipo de {{team}}",
@@ -1480,7 +1523,8 @@
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_TITLE" : "Cambio de tema",
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "Para trivia concursos sistema el sujeto no puede ser cambiado . Puede crear un nuevo concurso y elegir 'Tus preguntas' y luego introduzca un asunto que describe aquellas preguntas",
         "CONFIRM_EXIT_QUIZ_TITLE" : "confirmar la salida",
-        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "Los puntos que adquirió no acreditar su equipo . ¿Está seguro de que desea salir?"
+        "CONFIRM_EXIT_QUIZ_TEMPLATE" : "Los puntos que adquirió no acreditar su equipo . ¿Está seguro de que desea salir?",
+        "SYSTEM_PARTICIPANTS" : "los participantes del sistema"
       }
     },
     "platforms" : {
@@ -1492,6 +1536,26 @@
       },
       "web" : {
         "storeLink" : "https://play.google.com/store/apps/details?id=com.fplabs.topteamer"
+      }
+    },
+    "lists" : {
+      "contests" : {
+        "playButtonSize" : {
+          "width" : 60,
+          "height" : 60
+        },
+        "refreshFrequencyInMilliseconds" : 60000
+      },
+      "leaderboards" : {
+        "friends" : {
+          "refreshFrequencyInMilliseconds" : 60000
+        },
+        "weekly" : {
+          "refreshFrequencyInMilliseconds" : 60000
+        },
+        "contest" : {
+          "refreshFrequencyInMilliseconds" : 60000
+        }
       }
     }
   }
