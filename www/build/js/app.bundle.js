@@ -52,28 +52,22 @@ var TopTeamerApp = (function () {
                 window.StatusBar.styleDefault();
             }
             //Handle hardware back button
-            document.addEventListener('backbutton', function (event) {
-                event.cancelBubble = true;
-                event.preventDefault();
+            _this.client.platform.registerBackButtonAction(function () {
                 var client = client_1.Client.getInstance();
                 var activeNav = client.nav;
-                var activeView = activeNav.getActive();
-                if (activeView) {
-                    if (!activeView.isRoot()) {
-                        return activeView.dismiss();
-                    }
-                    var page = activeView.instance;
-                    if (page instanceof client.getPage('MainTabsPage') && page['mainTabs']) {
-                        activeNav = page['mainTabs'].getSelected();
-                    }
+                //Modal - dismiss
+                var portalNav = activeNav.getPortal();
+                if (portalNav.hasOverlay()) {
+                    var activeView = portalNav.getActive();
+                    return activeView.dismiss();
                 }
-                if (activeNav.canGoBack()) {
-                    // Detected a back button press outside of tabs page - popping a view from a navigation stack.
-                    return activeNav.pop();
+                //Root screen - confirm exit app
+                if (!activeNav.canGoBack()) {
+                    return alertService.confirmExitApp();
                 }
-                // Exiting app due to back button press at the root view
-                return alertService.confirmExitApp();
-            }, false);
+                //Go back
+                return activeNav.pop();
+            });
             _this.client.hideLoader();
             console.log('platform ready');
         });

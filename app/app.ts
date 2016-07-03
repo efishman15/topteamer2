@@ -1,6 +1,6 @@
 import {Component,provide,ExceptionHandler,ViewChild} from '@angular/core';
 import {MyExceptionHandler} from './providers/exceptions';
-import {ionicBootstrap, App, Platform, Config, Events, Nav} from 'ionic-angular';
+import {ionicBootstrap, App, Platform, Config, Events, Nav, ViewController, NavController} from 'ionic-angular';
 import {Client} from './providers/client';
 import * as facebookService from './providers/facebook';
 import * as shareService from './providers/share';
@@ -66,32 +66,28 @@ export class TopTeamerApp {
       }
 
       //Handle hardware back button
-      document.addEventListener('backbutton', (event: Event) => {
-
-        event.cancelBubble = true;
-        event.preventDefault();
+      this.client.platform.registerBackButtonAction( () => {
 
         var client = Client.getInstance();
         var activeNav = client.nav;
 
-        var activeView = activeNav.getActive();
-        if (activeView) {
-          if (!activeView.isRoot()) {
-            return activeView.dismiss();
-          }
-          var page = activeView.instance;
-          if (page instanceof client.getPage('MainTabsPage') && page['mainTabs']) {
-            activeNav = page['mainTabs'].getSelected();
-          }
+        //Modal - dismiss
+        let portalNav : NavController = activeNav.getPortal();
+        if (portalNav.hasOverlay()) {
+          let activeView : ViewController = portalNav.getActive();
+          return activeView.dismiss();
         }
 
-        if (activeNav.canGoBack()) {
-          // Detected a back button press outside of tabs page - popping a view from a navigation stack.
-          return activeNav.pop();
+        //Root screen - confirm exit app
+        if (!activeNav.canGoBack()) {
+          return alertService.confirmExitApp();
         }
-        // Exiting app due to back button press at the root view
-        return alertService.confirmExitApp();
-      }, false);
+
+        //Go back
+        return activeNav.pop();
+
+      });
+
       this.client.hideLoader();
       console.log('platform ready');
 
