@@ -5,7 +5,6 @@ var facebook_post_1 = require('../pages/facebook-post/facebook-post');
 var leaderboards_1 = require('../pages/leaderboards/leaderboards');
 var login_1 = require('../pages/login/login');
 var main_tabs_1 = require('../pages/main-tabs/main-tabs');
-var mobile_share_1 = require('../pages/mobile-share/mobile-share');
 var my_contests_1 = require('../pages/my-contests/my-contests');
 var new_rank_1 = require('../pages/new-rank/new-rank');
 var purchase_success_1 = require('../pages/purchase-success/purchase-success');
@@ -39,8 +38,6 @@ exports.get = function (className) {
             return login_1.LoginPage;
         case 'MainTabsPage':
             return main_tabs_1.MainTabsPage;
-        case 'MobileSharePage':
-            return mobile_share_1.MobileSharePage;
         case 'MyContestsPage':
             return my_contests_1.MyContestsPage;
         case 'NewRankPage':

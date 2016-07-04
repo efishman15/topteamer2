@@ -34,7 +34,6 @@
     "app/pages/leaderboards/leaderboards.ts",
     "app/pages/login/login.ts",
     "app/pages/main-tabs/main-tabs.ts",
-    "app/pages/mobile-share/mobile-share.ts",
     "app/pages/my-contests/my-contests.ts",
     "app/pages/new-rank/new-rank.ts",
     "app/pages/purchase-success/purchase-success.ts",

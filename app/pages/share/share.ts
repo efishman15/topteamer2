@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as shareService from '../../providers/share';
-import {Contest,ShareVariables} from '../../objects/objects';
+import {Contest,ShareVariables,ShareWebNetwork} from '../../objects/objects';
 
 @Component({
   templateUrl: 'build/pages/share/share.html'
@@ -11,29 +11,30 @@ import {Contest,ShareVariables} from '../../objects/objects';
 export class SharePage {
 
   client:Client;
-  contest:Contest;
+  params: NavParams;
   shareVariables:ShareVariables;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
-    if (params && params.data) {
-      this.contest = params.data.contest;
-    }
-
-    this.shareVariables = shareService.getVariables(this.contest);
+    this.params = params;
+    this.shareVariables = shareService.getVariables(this.params.data.contest);
   }
 
   ionViewWillEnter() {
-    if (this.contest) {
-      this.client.logEvent('page/share', {'contestId': this.contest._id});
+    if (this.params.data.contest) {
+      this.client.logEvent('page/share', {'contestId': this.params.data.contest._id, 'source': this.params.data.source});
     }
     else {
-      this.client.logEvent('page/share');
+      this.client.logEvent('page/share', {'source': this.params.data.source});
     }
   }
 
-  share(network) {
+  webShare(network: any) {
     window.open(network.url.format({url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail}),'_blank');
     this.client.logEvent('share/web/' + network.name);
+  }
+
+  mobileShare(appName?: string) {
+    shareService.mobileShare(appName, this.params.data.contest);
   }
 }

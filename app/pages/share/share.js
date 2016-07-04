@@ -14,22 +14,23 @@ var shareService = require('../../providers/share');
 var SharePage = (function () {
     function SharePage(params) {
         this.client = client_1.Client.getInstance();
-        if (params && params.data) {
-            this.contest = params.data.contest;
-        }
-        this.shareVariables = shareService.getVariables(this.contest);
+        this.params = params;
+        this.shareVariables = shareService.getVariables(this.params.data.contest);
     }
     SharePage.prototype.ionViewWillEnter = function () {
-        if (this.contest) {
-            this.client.logEvent('page/share', { 'contestId': this.contest._id });
+        if (this.params.data.contest) {
+            this.client.logEvent('page/share', { 'contestId': this.params.data.contest._id, 'source': this.params.data.source });
         }
         else {
-            this.client.logEvent('page/share');
+            this.client.logEvent('page/share', { 'source': this.params.data.source });
         }
     };
-    SharePage.prototype.share = function (network) {
+    SharePage.prototype.webShare = function (network) {
         window.open(network.url.format({ url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail }), '_blank');
         this.client.logEvent('share/web/' + network.name);
+    };
+    SharePage.prototype.mobileShare = function (appName) {
+        shareService.mobileShare(appName, this.params.data.contest);
     };
     SharePage = __decorate([
         core_1.Component({

@@ -5,6 +5,7 @@ var emailRef = '?ref=shareEmail';
 exports.getVariables = function (contest) {
     var client = client_1.Client.getInstance();
     var shareVariables = new objects_1.ShareVariables();
+    shareVariables.shareImage = client.settings.general.baseUrl + client.settings.general.logoUrl;
     if (contest) {
         shareVariables.shareUrl = contest.link;
         shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', { name: contest.name.long });
@@ -37,30 +38,77 @@ exports.getVariables = function (contest) {
     }
     return shareVariables;
 };
-exports.mobileShare = function (contest) {
+exports.mobileDiscoverSharingOptions = function () {
     var client = client_1.Client.getInstance();
-    var shareVariables = _this.getVariables(contest);
-    client.showLoader();
-    window.plugins.socialsharing.share(shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl, function () {
-        client.hideLoader();
-    }, function (result) {
-        client.hideLoader();
-        window.myLogError('Mobile Share', JSON.stringify(result));
+    client.shareApps = JSON.parse(JSON.stringify(client.settings.share.mobile.apps));
+    var shareVariables = _this.getVariables();
+    client.shareApps.forEach(function (shareApp) {
+        if (shareApp.discover) {
+            window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl, function (result) {
+                if (result === 'OK') {
+                    shareApp.installed = true;
+                }
+            }, function (err) {
+                window.myLogError('mobileDiscoverSharingOptions', err);
+            });
+        }
     });
 };
-exports.share = function (source, contest) {
+exports.mobileShare = function (appName, contest) {
     var client = client_1.Client.getInstance();
-    if (contest) {
-        client.logEvent('share/' + source, { 'contestId': contest._id });
-    }
-    else {
-        client.logEvent('share/' + source);
-    }
-    if (client.user.clientInfo.mobile) {
-        _this.mobileShare(contest);
-    }
-    else {
-        client.openPage('SharePage', { 'contest': contest });
+    var shareVariables = _this.getVariables(contest);
+    switch (appName) {
+        case 'whatsapp':
+            window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+            }, function (err) {
+                window.myLogError('WhatsApp Share', err);
+            });
+            break;
+        case 'facebook':
+            window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+            }, function (err) {
+                window.myLogError('Facebook Share', err);
+            });
+            break;
+        case 'instagram':
+            window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+            }, function (err) {
+                window.myLogError('Facebook Share', err);
+            });
+            break;
+        case 'twitter':
+            window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+            }, function (err) {
+                window.myLogError('Facebook Share', err);
+            });
+            break;
+        case 'sms':
+            window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBodyNoUrl }, null, //Phone numbers - user will type
+            function () {
+            }, function (err) {
+                window.myLogError('SMS Share', err);
+            });
+            break;
+        case 'email':
+            window.plugins.socialsharing.shareViaEmail(shareVariables.shareBodyEmail, shareVariables.shareSubject, null, //To
+            null, //Cc
+            null, //Bcc
+            shareVariables.shareImage, function () {
+            }, function (err) {
+                window.myLogError('SMS Share', err);
+            });
+            break;
+        default:
+            var options = {};
+            options.message = shareVariables.shareBodyNoUrl;
+            options.subject = shareVariables.shareSubject;
+            options.files = [shareVariables.shareImage];
+            options.url = shareVariables.shareUrl;
+            window.plugins.socialsharing.shareWithOptions(options, function () {
+            }, function (err) {
+                window.myLogError('General Mobile Share', err);
+            });
+            break;
     }
 };
 //# sourceMappingURL=share.js.map

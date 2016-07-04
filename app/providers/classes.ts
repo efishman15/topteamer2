@@ -5,7 +5,6 @@ import {FacebookPostPage} from '../pages/facebook-post/facebook-post';
 import {LeaderboardsPage} from '../pages/leaderboards/leaderboards';
 import {LoginPage} from '../pages/login/login';
 import {MainTabsPage} from '../pages/main-tabs/main-tabs';
-import {MobileSharePage} from '../pages/mobile-share/mobile-share';
 import {MyContestsPage} from '../pages/my-contests/my-contests';
 import {NewRankPage} from '../pages/new-rank/new-rank';
 import {PurchaseSuccessPage} from '../pages/purchase-success/purchase-success';
@@ -42,8 +41,6 @@ export let get = (className:string) => {
       return <any>LoginPage;
     case 'MainTabsPage':
       return <any>MainTabsPage;
-    case 'MobileSharePage':
-      return <any>MobileSharePage;
     case 'MyContestsPage':
       return <any>MyContestsPage;
     case 'NewRankPage':

@@ -35,6 +35,30 @@ var Settings = (function () {
     return Settings;
 })();
 exports.Settings = Settings;
+var ShareSettings = (function () {
+    function ShareSettings() {
+    }
+    return ShareSettings;
+})();
+exports.ShareSettings = ShareSettings;
+var ShareWebSettings = (function () {
+    function ShareWebSettings() {
+    }
+    return ShareWebSettings;
+})();
+exports.ShareWebSettings = ShareWebSettings;
+var ShareWebNetwork = (function () {
+    function ShareWebNetwork() {
+    }
+    return ShareWebNetwork;
+})();
+exports.ShareWebNetwork = ShareWebNetwork;
+var ShareMobileSettings = (function () {
+    function ShareMobileSettings() {
+    }
+    return ShareMobileSettings;
+})();
+exports.ShareMobileSettings = ShareMobileSettings;
 var NewContestSettings = (function () {
     function NewContestSettings() {
     }
@@ -299,6 +323,18 @@ var Session = (function () {
     return Session;
 })();
 exports.Session = Session;
+var ClientShareApp = (function () {
+    function ClientShareApp() {
+    }
+    return ClientShareApp;
+})();
+exports.ClientShareApp = ClientShareApp;
+var ClientShareAppPackage = (function () {
+    function ClientShareAppPackage() {
+    }
+    return ClientShareAppPackage;
+})();
+exports.ClientShareAppPackage = ClientShareAppPackage;
 var SessionSettings = (function () {
     function SessionSettings() {
     }

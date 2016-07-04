@@ -14,7 +14,6 @@ var transition_listener_1 = require('../../directives/transition-listener/transi
 var client_1 = require('../../providers/client');
 var quizService = require('../../providers/quiz');
 var soundService = require('../../providers/sound');
-var shareService = require('../../providers/share');
 var alertService = require('../../providers/alert');
 var objects_1 = require('../../objects/objects');
 var QuizPage = (function () {
@@ -495,7 +494,7 @@ var QuizPage = (function () {
         this.client.nav.present(modal);
     };
     QuizPage.prototype.share = function () {
-        shareService.share('quiz-fab', this.params.data.contest);
+        this.client.openPage('SharePage', { 'contest': this.params.data.contest, 'source': 'quiz' });
     };
     QuizPage.prototype.onResize = function () {
         this.clearQuizProgress();

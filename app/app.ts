@@ -131,6 +131,10 @@ export class TopTeamerApp {
   }
 
   initMobile() {
+
+    //Will discover which apps are installed (from a server list) and support sharing
+    shareService.mobileDiscoverSharingOptions();
+
     if (window.cordova.plugins.Keyboard) {
       window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       window.cordova.plugins.Keyboard.disableScroll(false);
@@ -309,7 +313,7 @@ export class TopTeamerApp {
 
   share() {
     this.client.logEvent('menu/share');
-    shareService.share('menu');
+    this.client.openPage('SharePage', {'source': 'menu'});
   }
 
   settings() {

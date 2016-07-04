@@ -5,7 +5,6 @@ import {ContestDetailsComponent} from '../../components/contest-details/contest-
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
-import * as shareService from '../../providers/share';
 import * as soundService from '../../providers/sound';
 import {Contest,QuizResults} from '../../objects/objects';
 
@@ -150,7 +149,7 @@ export class ContestPage {
   }
 
   share(source) {
-    shareService.share(source, this.contest);
+    this.client.openPage('SharePage', {'contest': this.contest, 'source': source});
   }
 
   like() {

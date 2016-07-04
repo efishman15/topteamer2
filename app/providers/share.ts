@@ -1,12 +1,14 @@
 import {Client} from './client';
-import {ShareVariables} from '../objects/objects';
+import {ShareVariables,ClientShareApp,Contest} from '../objects/objects';
 
 var emailRef = '?ref=shareEmail';
 
-export let getVariables = (contest) => {
+export let getVariables = (contest? : Contest) => {
 
   var client = Client.getInstance();
   var shareVariables = new ShareVariables();
+
+  shareVariables.shareImage = client.settings.general.baseUrl + client.settings.general.logoUrl;
 
   if (contest) {
     shareVariables.shareUrl = contest.link;
@@ -44,41 +46,119 @@ export let getVariables = (contest) => {
 
 }
 
-export let mobileShare = (contest) => {
+export let mobileDiscoverSharingOptions = () => {
 
   var client = Client.getInstance();
-  var shareVariables = this.getVariables(contest);
-
-  client.showLoader();
-  window.plugins.socialsharing.share(shareVariables.shareBodyNoUrl,
-    shareVariables.shareSubject,
-    client.settings.general.baseUrl + client.settings.general.logoUrl,
-    shareVariables.shareUrl,
-    () => {
-      client.hideLoader();
-    },
-    (result) => {
-      client.hideLoader();
-      window.myLogError('Mobile Share', JSON.stringify(result));
+  client.shareApps = JSON.parse(JSON.stringify(client.settings.share.mobile.apps));
+  let shareVariables : ShareVariables = this.getVariables();
+  client.shareApps.forEach((shareApp:ClientShareApp) => {
+    if (shareApp.discover) {
+      window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl,
+        shareVariables.shareSubject,
+        client.settings.general.baseUrl + client.settings.general.logoUrl,
+        shareVariables.shareUrl,
+        (result) => {
+          if (result === 'OK') {
+            shareApp.installed = true;
+          }
+        },
+        (err) => {
+          window.myLogError('mobileDiscoverSharingOptions', err);
+        }
+      );
     }
-  );
+  });
 }
 
-export let share = (source, contest?) => {
+export let mobileShare = (appName?: string, contest?: Contest) => {
 
   var client = Client.getInstance();
+  let shareVariables : ShareVariables = this.getVariables(contest);
+  switch (appName) {
+    case 'whatsapp':
+      window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl,
+        shareVariables.shareImage,
+        shareVariables.shareUrl,
+        () => {
+        },
+        (err) => {
+          window.myLogError('WhatsApp Share', err);
+        }
+      )
+      break;
+    case 'facebook':
+      window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl,
+        shareVariables.shareImage,
+        shareVariables.shareUrl,
+        () => {
+        },
+        (err) => {
+          window.myLogError('Facebook Share', err);
+        }
+      )
+      break;
+    case 'instagram':
+      window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl,
+        shareVariables.shareImage,
+        shareVariables.shareUrl,
+        () => {
+        },
+        (err) => {
+          window.myLogError('Facebook Share', err);
+        }
+      )
+      break;
+    case 'twitter':
+      window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl,
+        shareVariables.shareImage,
+        shareVariables.shareUrl,
+        () => {
+        },
+        (err) => {
+          window.myLogError('Facebook Share', err);
+        }
+      )
+      break;
+    case 'sms':
+      window.plugins.socialsharing.shareViaSMS({'message': shareVariables.shareBodyNoUrl},
+        null, //Phone numbers - user will type
+        () => {
+        },
+        (err) => {
+          window.myLogError('SMS Share', err);
+        }
+      )
+      break;
+    case 'email':
+      window.plugins.socialsharing.shareViaEmail(shareVariables.shareBodyEmail,
+        shareVariables.shareSubject,
+        null, //To
+        null, //Cc
+        null, //Bcc
+        shareVariables.shareImage,
+        () => {
+        },
+        (err) => {
+          window.myLogError('SMS Share', err);
+        }
+      )
+      break;
 
-  if (contest) {
-    client.logEvent('share/' + source, {'contestId' : contest._id});
-  }
-  else {
-    client.logEvent('share/' + source);
-  }
+    default:
+      let options : any = {};
+      options.message = shareVariables.shareBodyNoUrl;
+      options.subject = shareVariables.shareSubject;
+      options.files = [shareVariables.shareImage];
+      options.url = shareVariables.shareUrl;
 
-  if (client.user.clientInfo.mobile) {
-    this.mobileShare(contest);
-  }
-  else {
-    client.openPage('SharePage', {'contest' : contest});
-  }
+      window.plugins.socialsharing.shareWithOptions(options,
+        () => {
+        },
+        (err) => {
+          window.myLogError('General Mobile Share', err);
+        }
+      )
+      break;
+
+    }
 }

@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
-import * as shareService from '../../providers/share';
 import {ServerPopup} from '../../objects/objects';
 
 @Component({
@@ -61,7 +60,7 @@ export class ServerPopupPage {
         if (button.contestId) {
           contestsService.getContest(button.contestId).then ((contest) => {
             this.viewController.dismiss(button).then(() => {
-              shareService.share('serverPopup',contest);
+              this.client.openPage('SharePage', {'contest' : contest, 'source': 'serverPopup'});
             });
           }, () => {
             this.viewController.dismiss(button);
@@ -69,7 +68,7 @@ export class ServerPopupPage {
         }
         else {
           this.viewController.dismiss(button).then(() => {
-            shareService.share('serverPopup');
+            this.client.openPage('SharePage', {'source': 'serverPopup'});
           });
         }
         break;

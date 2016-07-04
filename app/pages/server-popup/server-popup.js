@@ -11,7 +11,6 @@ var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
-var shareService = require('../../providers/share');
 var ServerPopupPage = (function () {
     function ServerPopupPage(params, viewController) {
         this.client = client_1.Client.getInstance();
@@ -53,7 +52,7 @@ var ServerPopupPage = (function () {
                     if (button.contestId) {
                         contestsService.getContest(button.contestId).then(function (contest) {
                             _this.viewController.dismiss(button).then(function () {
-                                shareService.share('serverPopup', contest);
+                                _this.client.openPage('SharePage', { 'contest': contest, 'source': 'serverPopup' });
                             });
                         }, function () {
                             _this.viewController.dismiss(button);
@@ -61,7 +60,7 @@ var ServerPopupPage = (function () {
                     }
                     else {
                         this.viewController.dismiss(button).then(function () {
-                            shareService.share('serverPopup');
+                            _this.client.openPage('SharePage', { 'source': 'serverPopup' });
                         });
                     }
                     break;

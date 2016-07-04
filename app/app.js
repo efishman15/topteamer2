@@ -103,6 +103,8 @@ var TopTeamerApp = (function () {
     };
     TopTeamerApp.prototype.initMobile = function () {
         var _this = this;
+        //Will discover which apps are installed (from a server list) and support sharing
+        shareService.mobileDiscoverSharingOptions();
         if (window.cordova.plugins.Keyboard) {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             window.cordova.plugins.Keyboard.disableScroll(false);
@@ -252,7 +254,7 @@ var TopTeamerApp = (function () {
     };
     TopTeamerApp.prototype.share = function () {
         this.client.logEvent('menu/share');
-        shareService.share('menu');
+        this.client.openPage('SharePage', { 'source': 'menu' });
     };
     TopTeamerApp.prototype.settings = function () {
         this.client.logEvent('menu/settings');

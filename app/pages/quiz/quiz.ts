@@ -5,7 +5,6 @@ import {TransitionListener} from '../../directives/transition-listener/transitio
 import {Client} from '../../providers/client';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
-import * as shareService from '../../providers/share';
 import * as alertService from '../../providers/alert';
 import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings,ChartSettings} from '../../objects/objects';
 
@@ -609,7 +608,7 @@ export class QuizPage {
   }
 
   share() {
-    shareService.share('quiz-fab', this.params.data.contest);
+    this.client.openPage('SharePage', {'contest': this.params.data.contest, 'source': 'quiz'});
   }
 
   onResize() {

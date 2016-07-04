@@ -29,6 +29,27 @@ export class Settings {
   ui:Array<Array<Object>>;
   newContest:NewContestSettings;
   lists:ListSettings;
+  share: ShareSettings;
+}
+
+export class ShareSettings {
+  web: ShareWebSettings;
+  mobile: ShareMobileSettings;
+  iconSize: Size;
+}
+
+export class ShareWebSettings {
+  networks: Array<Array<ShareWebNetwork>>;
+}
+
+export class ShareWebNetwork {
+  name: string;
+  url: string;
+  image: string;
+}
+
+export class ShareMobileSettings {
+  apps: Array<ClientShareApp>;
 }
 
 export class NewContestSettings {
@@ -294,6 +315,21 @@ export class Session {
   gcmRegistrationId:string;
 }
 
+export class ClientShareApp {
+  discover:boolean;
+  packages:Array<ClientShareAppPackage>;
+  shareViaFunction:string;
+  name:string;
+  title:string;
+  image:string;
+  installed:boolean;
+}
+
+export class ClientShareAppPackage {
+  android:string;
+  ios:string;
+}
+
 export class SessionSettings {
   sound:boolean;
   language:string;
@@ -374,6 +410,7 @@ export class Contest {
   startDate:number;
   endDate:number;
   status:string;
+  link:string;
   myTeam:number;
   participants:number;
   systemParticipants;
@@ -387,7 +424,7 @@ export class Contest {
   leadingTeam:number;
   time:ContestTime;
 
-  constructor(typeId:string, startDate:number, endDate?: number, endOption?:string) {
+  constructor(typeId:string, startDate:number, endDate?:number, endOption?:string) {
     this.startDate = startDate;
     if (endDate == null || endDate === undefined) {
       this.endDate = this.startDate + 1 * 24 * 60 * 60 * 1000;
@@ -425,7 +462,7 @@ export class Team {
   chartValue:number;
   adminScoreAddition:number;
 
-  constructor(name: string)  {
+  constructor(name:string) {
     this.name = name;
   }
 }
@@ -551,4 +588,5 @@ export class ShareVariables {
   shareBody:string;
   shareBodyEmail:string;
   shareBodyNoUrl:string;
+  shareImage:string;
 }

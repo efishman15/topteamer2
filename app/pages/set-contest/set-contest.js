@@ -15,7 +15,6 @@ var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
 var alertService = require('../../providers/alert');
-var shareService = require('../../providers/share');
 var objects_1 = require('../../objects/objects');
 var SetContestPage = (function () {
     function SetContestPage(params, formBuilder) {
@@ -332,20 +331,10 @@ var SetContestPage = (function () {
                 if (_this.params.data.mode === 'add') {
                     _this.client.logEvent('contest/created', contestParams);
                     _this.client.events.publish('topTeamer:contestCreated', contest);
-                    var options = { animate: false };
-                    _this.client.nav.pop(options).then(function () {
-                        if (!_this.client.user.clientInfo.mobile) {
-                            //For web - no animation - the share screen will be on top with its animation
-                            _this.client.openPage('ContestPage', { 'contest': contest }).then(function () {
-                                shareService.share('newContestWebPopup', contest);
-                            });
-                        }
-                        else {
-                            //Mobile - open the share mobile modal - with one button - to share or skip
-                            _this.client.openPage('ContestPage', { 'contest': contest }).then(function () {
-                                _this.client.showModalPage('MobileSharePage', { 'contest': contest });
-                            });
-                        }
+                    _this.client.nav.pop({ animate: false }).then(function () {
+                        _this.client.openPage('ContestPage', { 'contest': contest }).then(function () {
+                            _this.client.openPage('SharePage', { 'contest': contest, 'source': 'newContest' });
+                        });
                     });
                 }
                 else {

@@ -6,7 +6,6 @@ import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
-import * as shareService from '../../providers/share';
 import {Contest,ContestName, Questions, Team, PaymentData} from '../../objects/objects';
 
 @Component({
@@ -409,20 +408,10 @@ export class SetContestPage {
         if (this.params.data.mode === 'add') {
           this.client.logEvent('contest/created', contestParams);
           this.client.events.publish('topTeamer:contestCreated', contest);
-          var options = {animate: false};
-          this.client.nav.pop(options).then(() => {
-            if (!this.client.user.clientInfo.mobile) {
-              //For web - no animation - the share screen will be on top with its animation
-              this.client.openPage('ContestPage', {'contest': contest}).then(() => {
-                shareService.share('newContestWebPopup', contest);
-              });
-            }
-            else {
-              //Mobile - open the share mobile modal - with one button - to share or skip
-              this.client.openPage('ContestPage', {'contest': contest}).then(() => {
-                this.client.showModalPage('MobileSharePage', {'contest': contest});
-              });
-            }
+          this.client.nav.pop({animate: false}).then(() => {
+            this.client.openPage('ContestPage', {'contest': contest}).then(() => {
+              this.client.openPage('SharePage', {'contest': contest, 'source': 'newContest'});
+            });
           });
         }
         else {

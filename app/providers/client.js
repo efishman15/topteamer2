@@ -461,6 +461,16 @@ var Client = (function () {
             }, 100);
         }
     };
+    Object.defineProperty(Client.prototype, "shareApps", {
+        get: function () {
+            return this._shareApps;
+        },
+        set: function (value) {
+            this._shareApps = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Client.prototype.popToRoot = function () {
         if (this.nav.canGoBack()) {
             this.nav.popToRoot();

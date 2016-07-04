@@ -14,7 +14,6 @@ var contest_details_1 = require('../../components/contest-details/contest-detail
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var alertService = require('../../providers/alert');
-var shareService = require('../../providers/share');
 var soundService = require('../../providers/sound');
 var ContestPage = (function () {
     function ContestPage(params) {
@@ -119,7 +118,7 @@ var ContestPage = (function () {
         this.client.openPage('SetContestPage', { 'mode': 'edit', 'contest': this.contest });
     };
     ContestPage.prototype.share = function (source) {
-        shareService.share(source, this.contest);
+        this.client.openPage('SharePage', { 'contest': this.contest, 'source': source });
     };
     ContestPage.prototype.like = function () {
         this.client.logEvent('like/click');

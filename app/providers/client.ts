@@ -7,7 +7,7 @@ import {App,Platform,Config, Nav, Alert, Modal, Events} from 'ionic-angular';
 import * as contestsService from './contests';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
-import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo,Contest} from '../objects/objects';
+import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo,Contest,ClientShareApp} from '../objects/objects';
 import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
 import * as classesService from './classes';
 
@@ -40,6 +40,7 @@ export class Client {
   _chartWidth:number;
   _chartHeight:number;
   _deepLinkContestId:string;
+  _shareApps: Array<ClientShareApp>;
 
   serverGateway:ServerGateway;
 
@@ -558,6 +559,14 @@ export class Client {
         this.loadingModalComponent.hide();
       }, 100);
     }
+  }
+
+  get shareApps():Array<ClientShareApp> {
+    return this._shareApps;
+  }
+
+  set shareApps(value: Array<ClientShareApp>) {
+    this._shareApps = value;
   }
 
   popToRoot() {
