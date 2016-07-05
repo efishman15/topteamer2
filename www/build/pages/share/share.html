@@ -16,7 +16,7 @@
     <ion-list *ngIf="!client.user.clientInfo.mobile">
       <div padding *ngFor="let row of client.settings.share.web.networks, let i=index">
         <a padding *ngFor="let network of client.settings.share.web.networks[i]" (click)="webShare(network)"
-           title="{{network.name}}">
+           title="{{network.name}}" class="pointer">
           <img src="{{network.image}}" width="{{client.settings.share.iconSize.width}}"
                height="{{client.settings.share.iconSize.height}}">
         </a>
