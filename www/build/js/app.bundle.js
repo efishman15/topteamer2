@@ -5735,6 +5735,7 @@ exports.getVariables = function (contest) {
         shareVariables.shareUrl = contest.link;
         shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', { name: contest.name.long });
         if (contest.myTeam === 0 || contest.myTeam === 1) {
+            //I am playing for one of the teams
             shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
                 team: contest.teams[contest.myTeam].name,
                 url: shareVariables.shareUrl
@@ -5749,6 +5750,7 @@ exports.getVariables = function (contest) {
             });
         }
         else {
+            //I did not join this contest yet
             shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
                 name: contest.name.long,
                 url: shareVariables.shareUrl
@@ -5757,8 +5759,7 @@ exports.getVariables = function (contest) {
                 name: contest.name.long,
                 url: shareVariables.shareUrl + emailRef
             });
-            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST', {
-                team: contest.teams[contest.myTeam].name,
+            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM', {
                 name: contest.name.long
             });
         }
