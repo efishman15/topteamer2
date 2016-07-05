@@ -20,8 +20,9 @@
 
   <div no-margin text-center>
     <ion-row *ngFor="let row of client.settings.newContest.selectableContestTypes, let i=index">
-      <ion-col class="pointer" (click)="selectContestContent(contestTypeId)"
-               *ngFor="let contestTypeId of client.settings.newContest.selectableContestTypes[i]">
+      <ion-col *ngFor="let contestTypeId of client.settings.newContest.selectableContestTypes[i]"
+               class="pointer"
+               (click)="selectContestContent(contestTypeId)">
         <div class="contest-type-title"
              [ngStyle]="{'color': client.settings.newContest.contestTypes[contestTypeId].text.titleColor}">
           {{client.translate(client.settings.newContest.contestTypes[contestTypeId].text.title)}}

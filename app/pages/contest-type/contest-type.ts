@@ -21,6 +21,9 @@ export class ContestTypePage {
   }
 
   selectContestContent(contestTypeId) {
+    if (contestTypeId && this.client.settings.newContest.contestTypes[contestTypeId].disabled) {
+      return;
+    }
     this.client.logEvent('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
     this.viewController.dismiss(contestTypeId);
   }

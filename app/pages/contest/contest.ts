@@ -77,6 +77,12 @@ export class ContestPage {
   }
 
   playContest(source) {
+
+    if (this.contest.myTeam !== 0 && this.contest.myTeam !== 1) {
+      alertService.alert({'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST'});
+      return;
+    }
+
     this.client.logEvent('contest/play', {
       'contestId': this.contest._id,
       'team': '' + this.contest.myTeam,
@@ -188,12 +194,7 @@ export class ContestPage {
   }
 
   onContestSelected(data) {
-    if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
-      this.playContest(data.source);
-    }
-    else {
-      alertService.alert({'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST'});
-    }
+    this.playContest(data.source);
   }
 
   onResize() {

@@ -72,7 +72,7 @@ export let mobileDiscoverSharingApps = () => {
       if (client.settings.share.mobile.discoverApps[i].package[client.clientInfo.platform].installed && client.shareApps.length < client.settings.share.mobile.maxApps) {
         client.shareApps.push(new ClientShareApp(client.settings.share.mobile.discoverApps[i].name, client.settings.share.mobile.discoverApps[i].title, client.settings.share.mobile.discoverApps[i].image));
       }
-      else {
+      else if (client.shareApps.length === client.settings.share.mobile.maxApps) {
         break;
       }
     }
@@ -139,13 +139,12 @@ export let mobileShare = (appName?:string, contest?:Contest) => {
       )
       break;
     case 'instagram':
-      window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl,
+      window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody,
         shareVariables.shareImage,
-        shareVariables.shareUrl,
         () => {
         },
         (err) => {
-          window.myLogError('Facebook Share', err);
+          window.myLogError('Instagram Share', err);
         }
       )
       break;
@@ -156,7 +155,7 @@ export let mobileShare = (appName?:string, contest?:Contest) => {
         () => {
         },
         (err) => {
-          window.myLogError('Facebook Share', err);
+          window.myLogError('Twitter Share', err);
         }
       )
       break;
@@ -180,7 +179,7 @@ export let mobileShare = (appName?:string, contest?:Contest) => {
         () => {
         },
         (err) => {
-          window.myLogError('SMS Share', err);
+          window.myLogError('Email Share', err);
         }
       )
       break;

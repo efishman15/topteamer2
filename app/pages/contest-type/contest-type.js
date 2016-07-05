@@ -20,6 +20,9 @@ var ContestTypePage = (function () {
         this.client.logEvent('page/contestType');
     };
     ContestTypePage.prototype.selectContestContent = function (contestTypeId) {
+        if (contestTypeId && this.client.settings.newContest.contestTypes[contestTypeId].disabled) {
+            return;
+        }
         this.client.logEvent('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
         this.viewController.dismiss(contestTypeId);
     };

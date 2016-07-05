@@ -1762,6 +1762,9 @@ var ContestTypePage = (function () {
         this.client.logEvent('page/contestType');
     };
     ContestTypePage.prototype.selectContestContent = function (contestTypeId) {
+        if (contestTypeId && this.client.settings.newContest.contestTypes[contestTypeId].disabled) {
+            return;
+        }
         this.client.logEvent('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
         this.viewController.dismiss(contestTypeId);
     };
@@ -1837,6 +1840,10 @@ var ContestPage = (function () {
         this.lastQuizResults = null;
     };
     ContestPage.prototype.playContest = function (source) {
+        if (this.contest.myTeam !== 0 && this.contest.myTeam !== 1) {
+            alertService.alert({ 'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST' });
+            return;
+        }
         this.client.logEvent('contest/play', {
             'contestId': this.contest._id,
             'team': '' + this.contest.myTeam,
@@ -1931,12 +1938,7 @@ var ContestPage = (function () {
         }
     };
     ContestPage.prototype.onContestSelected = function (data) {
-        if (this.contest.myTeam === 0 || this.contest.myTeam === 1) {
-            this.playContest(data.source);
-        }
-        else {
-            alertService.alert({ 'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST' });
-        }
+        this.playContest(data.source);
     };
     ContestPage.prototype.onResize = function () {
         this.contestChartComponent.onResize();
@@ -5785,7 +5787,7 @@ exports.mobileDiscoverSharingApps = function () {
             if (client.settings.share.mobile.discoverApps[i].package[client.clientInfo.platform].installed && client.shareApps.length < client.settings.share.mobile.maxApps) {
                 client.shareApps.push(new objects_1.ClientShareApp(client.settings.share.mobile.discoverApps[i].name, client.settings.share.mobile.discoverApps[i].title, client.settings.share.mobile.discoverApps[i].image));
             }
-            else {
+            else if (client.shareApps.length === client.settings.share.mobile.maxApps) {
                 break;
             }
         }
@@ -5831,15 +5833,15 @@ exports.mobileShare = function (appName, contest) {
             });
             break;
         case 'instagram':
-            window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+            window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody, shareVariables.shareImage, function () {
             }, function (err) {
-                window.myLogError('Facebook Share', err);
+                window.myLogError('Instagram Share', err);
             });
             break;
         case 'twitter':
             window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
             }, function (err) {
-                window.myLogError('Facebook Share', err);
+                window.myLogError('Twitter Share', err);
             });
             break;
         case 'sms':
@@ -5855,7 +5857,7 @@ exports.mobileShare = function (appName, contest) {
             null, //Bcc
             shareVariables.shareImage, function () {
             }, function (err) {
-                window.myLogError('SMS Share', err);
+                window.myLogError('Email Share', err);
             });
             break;
         default:
