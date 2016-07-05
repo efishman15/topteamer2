@@ -330,12 +330,17 @@ export class ClientShareApp {
 }
 
 export class ClientShareDiscoverApp extends ClientShareApp {
-  packages:Array<ClientShareAppPackage>;
+  package:ClientShareAppPackage;
 }
 
 export class ClientShareAppPackage {
-  android:string;
-  ios:string;
+  android:ClientShareAppPlatformPackage;
+  ios:ClientShareAppPlatformPackage;
+}
+
+export class ClientShareAppPlatformPackage {
+  name:string;
+  installed:boolean;
 }
 
 export class SessionSettings {

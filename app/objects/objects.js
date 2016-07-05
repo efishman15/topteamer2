@@ -346,6 +346,12 @@ var ClientShareAppPackage = (function () {
     return ClientShareAppPackage;
 })();
 exports.ClientShareAppPackage = ClientShareAppPackage;
+var ClientShareAppPlatformPackage = (function () {
+    function ClientShareAppPlatformPackage() {
+    }
+    return ClientShareAppPlatformPackage;
+})();
+exports.ClientShareAppPlatformPackage = ClientShareAppPlatformPackage;
 var SessionSettings = (function () {
     function SessionSettings() {
     }

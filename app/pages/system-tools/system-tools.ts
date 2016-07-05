@@ -31,7 +31,10 @@ export class SystemToolsPage {
   restart() {
     alertService.confirm('SYSTEM_RESTART_CONFIRM_TITLE', 'SYSTEM_RESTART_CONFIRM_TEMPLATE').then(() => {
       systemService.restart().then(() => {
-        this.client.nav.pop();
+        //Ionic bug - let the confirm dialog properly close
+        setTimeout(() => {
+          this.client.nav.pop();
+        },500)
       },() => {
 
       });

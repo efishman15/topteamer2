@@ -30,7 +30,10 @@ var SystemToolsPage = (function () {
         var _this = this;
         alertService.confirm('SYSTEM_RESTART_CONFIRM_TITLE', 'SYSTEM_RESTART_CONFIRM_TEMPLATE').then(function () {
             systemService.restart().then(function () {
-                _this.client.nav.pop();
+                //Ionic bug - let the confirm dialog properly close
+                setTimeout(function () {
+                    _this.client.nav.pop();
+                }, 500);
             }, function () {
             });
         }, function () {

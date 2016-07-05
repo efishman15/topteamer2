@@ -10,23 +10,33 @@ exports.getVariables = function (contest) {
         shareVariables.shareUrl = contest.link;
         shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', { name: contest.name.long });
         if (contest.myTeam === 0 || contest.myTeam === 1) {
-            shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST', {
+            //I am playing for one of the teams
+            shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
                 team: contest.teams[contest.myTeam].name,
                 url: shareVariables.shareUrl
             });
-            shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST', {
+            shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
                 team: contest.teams[contest.myTeam].name,
                 url: shareVariables.shareUrl + emailRef
             });
-            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST', {
+            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM', {
                 team: contest.teams[contest.myTeam].name,
                 name: contest.name.long
             });
         }
         else {
-            shareVariables.shareBody = client.translate('SHARE_BODY', { url: shareVariables.shareUrl });
-            shareVariables.shareBodyEmail = client.translate('SHARE_BODY', { url: shareVariables.shareUrl + emailRef });
-            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL');
+            //I did not join this contest yet
+            shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
+                name: contest.name.long,
+                url: shareVariables.shareUrl
+            });
+            shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
+                name: contest.name.long,
+                url: shareVariables.shareUrl + emailRef
+            });
+            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM', {
+                name: contest.name.long
+            });
         }
     }
     else {
@@ -46,6 +56,14 @@ exports.mobileDiscoverSharingApps = function () {
         promises.push(_this.mobileDiscoverApp(client, shareApp, shareVariables));
     });
     Promise.all(promises).then(function () {
+        for (var i = 0; i < client.settings.share.mobile.discoverApps.length; i++) {
+            if (client.settings.share.mobile.discoverApps[i].package[client.clientInfo.platform].installed && client.shareApps.length < client.settings.share.mobile.maxApps) {
+                client.shareApps.push(new objects_1.ClientShareApp(client.settings.share.mobile.discoverApps[i].name, client.settings.share.mobile.discoverApps[i].title, client.settings.share.mobile.discoverApps[i].image));
+            }
+            else {
+                break;
+            }
+        }
         if (client.shareApps.length < client.settings.share.mobile.maxApps) {
             for (var i = 0; i < client.settings.share.mobile.extraApps.length; i++) {
                 if (client.shareApps.length < client.settings.share.mobile.maxApps) {
@@ -60,9 +78,11 @@ exports.mobileDiscoverSharingApps = function () {
 };
 exports.mobileDiscoverApp = function (client, shareApp, shareVariables) {
     return new Promise(function (resolve, reject) {
-        window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl, shareVariables.shareSubject, shareVariables.shareImage, shareVariables.shareUrl, function (result) {
+        window.plugins.socialsharing.canShareVia(shareApp.package[client.clientInfo.platform].name, shareVariables.shareBodyNoUrl, shareVariables.shareSubject, shareVariables.shareImage, shareVariables.shareUrl, function (result) {
             if (result === 'OK' && client.shareApps.length < client.settings.share.mobile.maxApps) {
-                client.shareApps.push(new objects_1.ClientShareApp(shareApp.name, shareApp.title, shareApp.image));
+                //Not inserting directly to client.shareApps because it might be inserted not in the same
+                //order (async) of apps as was determined by the server
+                shareApp.package[client.clientInfo.platform].installed = true;
             }
             resolve();
         }, function () {
