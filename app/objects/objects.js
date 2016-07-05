@@ -324,11 +324,22 @@ var Session = (function () {
 })();
 exports.Session = Session;
 var ClientShareApp = (function () {
-    function ClientShareApp() {
+    function ClientShareApp(name, title, image) {
+        this.name = name;
+        this.title = title;
+        this.image = image;
     }
     return ClientShareApp;
 })();
 exports.ClientShareApp = ClientShareApp;
+var ClientShareDiscoverApp = (function (_super) {
+    __extends(ClientShareDiscoverApp, _super);
+    function ClientShareDiscoverApp() {
+        _super.apply(this, arguments);
+    }
+    return ClientShareDiscoverApp;
+})(ClientShareApp);
+exports.ClientShareDiscoverApp = ClientShareDiscoverApp;
 var ClientShareAppPackage = (function () {
     function ClientShareAppPackage() {
     }

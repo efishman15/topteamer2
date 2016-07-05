@@ -1,7 +1,11 @@
 import {Component,ViewChild} from '@angular/core';
-import {Tabs, ViewController} from 'ionic-angular';
+import {Tabs, Tab, ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import {Contest} from "../../objects/objects";
+
+const ACTION_UPDATE_CONTEST:string = 'contestUpdated';
+const ACTION_REMOVE_CONTEST:string = 'contestRemoved';
+const ACTION_FORCE_REFRESH:string = 'forceRefresh';
 
 @Component({
   templateUrl: 'build/pages/main-tabs/main-tabs.html'
@@ -77,16 +81,34 @@ export class MainTabsPage {
     }
   }
 
-  getTabPage(index:number) {
-    let viewController: ViewController = this.mainTabs.getByIndex(index).first();
-    return viewController.instance;
+  publishActionToTab(index:number, action: string, param?: any) {
+
+    let eventName: string = 'topTeamer:';
+    switch (index) {
+      case 0:
+            eventName += 'myContests';
+            break;
+      case 1:
+        eventName += 'runningContests';
+        break;
+      case 2:
+        eventName += 'recentlyFinishedContests';
+        break;
+    }
+
+    eventName += ':' + action;
+
+    if (param) {
+      this.client.events.publish(eventName, param);
+    }
+    else {
+      this.client.events.publish(eventName);
+    }
   }
 
   handleContestCreated() {
     //Force refresh my contests
-    this.getTabPage(0).refreshList(true).then(()=> {
-    }, ()=> {
-    });
+    this.publishActionToTab(0,ACTION_FORCE_REFRESH);
   }
 
   handleContestUpdated(contest:Contest, previousStatus:string, currentStatus:string) {
@@ -95,16 +117,16 @@ export class MainTabsPage {
       switch (currentStatus) {
         case 'starting':
           //For admins - future contests - appear only in "my Contests"
-          this.getTabPage(0).contestList.updateContest(contest);
+          this.publishActionToTab(0,ACTION_UPDATE_CONTEST,contest);
           break;
         case 'running':
           //Appears in my contests / running contests
-          this.getTabPage(0).contestList.updateContest(contest);
-          this.getTabPage(1).contestList.updateContest(contest);
+          this.publishActionToTab(0,ACTION_UPDATE_CONTEST,contest);
+          this.publishActionToTab(1,ACTION_UPDATE_CONTEST,contest);
           break;
         case 'finished':
           //Appears in recently finished contests
-          this.getTabPage(2).contestList.updateContest(contest);
+          this.publishActionToTab(2,ACTION_UPDATE_CONTEST,contest);
           break;
       }
     }
@@ -114,70 +136,58 @@ export class MainTabsPage {
           if (currentStatus === 'running') {
 
             //Update my contests
-            this.getTabPage(0).contestList.updateContest(contest);
+            this.publishActionToTab(0,ACTION_UPDATE_CONTEST,contest);
 
             //Refresh running contests - might appear there
-            this.getTabPage(1).refreshList(true).then(()=> {
-            }, () => {
-            });
+            this.publishActionToTab(1,ACTION_FORCE_REFRESH);
           }
           else {
             //finished
 
             //Remove from my contests
-            this.getTabPage(0).contestList.removeContest(contest._id);
+            this.publishActionToTab(0,ACTION_REMOVE_CONTEST,contest._id);
 
             //Refresh recently finished contests
-            this.getTabPage(2).refreshList(true).then(() => {
-            }, () => {
-            });
+            this.publishActionToTab(2,ACTION_FORCE_REFRESH);
           }
           break;
         case 'running':
           if (currentStatus === 'starting') {
 
             //Update my contests
-            this.getTabPage(0).contestList.updateContest(contest);
+            this.publishActionToTab(0,ACTION_UPDATE_CONTEST,contest);
 
             //Remove from running contests
-            this.getTabPage(1).contestList.removeContest(contest._id);
+            this.publishActionToTab(1,ACTION_REMOVE_CONTEST,contest._id);
           }
           else {
             //finished
 
             //Remove from my contests and from running contests
-            this.getTabPage(0).contestList.removeContest(contest._id);
-            this.getTabPage(1).contestList.removeContest(contest._id);
+            this.publishActionToTab(0,ACTION_REMOVE_CONTEST,contest._id);
+            this.publishActionToTab(1,ACTION_REMOVE_CONTEST,contest._id);
 
             //Refresh recently finished contests
-            this.getTabPage(2).refreshList(true).then(()=> {
-            }, ()=> {
-            });
+            this.publishActionToTab(2,ACTION_FORCE_REFRESH);
           }
           break;
         case 'finished':
           //Remove from finished contests
-          this.getTabPage(2).contestList.removeContest(contest._id);
+          this.publishActionToTab(2,ACTION_REMOVE_CONTEST,contest._id);
 
           if (currentStatus === 'starting') {
 
             //Refresh my contests
-            this.getTabPage(0).refreshList(true).then(()=> {
-            }, ()=> {
-            });
+            this.publishActionToTab(0,ACTION_FORCE_REFRESH);
           }
           else {
             //running
 
             //Refresh my contests
-            this.getTabPage(0).refreshList(true).then(()=> {
-            }, () => {
-            });
+            this.publishActionToTab(0,ACTION_FORCE_REFRESH);
 
             //Refresh running contests
-            this.getTabPage(1).refreshList(true).then(()=> {
-            }, () => {
-            });
+            this.publishActionToTab(1,ACTION_FORCE_REFRESH);
 
           }
           break;
@@ -189,12 +199,12 @@ export class MainTabsPage {
   handleContestRemoved(contestId:string, finishedContest:boolean) {
     if (!finishedContest) {
       //Try to remove it from 'my contests' and 'running contests' tabs
-      this.getTabPage(0).contestList.removeContest(contestId);
-      this.getTabPage(1).contestList.removeContest(contestId);
+      this.publishActionToTab(0,ACTION_REMOVE_CONTEST, contestId);
+      this.publishActionToTab(1,ACTION_REMOVE_CONTEST, contestId);
     }
     else {
       //Try to remove it from the recently finished tab
-      this.getTabPage(2).contestList.removeContest(contestId);
+      this.publishActionToTab(2,ACTION_REMOVE_CONTEST, contestId);
     }
   }
 }

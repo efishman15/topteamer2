@@ -12,7 +12,19 @@ var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
 var MyContestsPage = (function () {
     function MyContestsPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:myContests:contestUpdated', function (eventData) {
+            _this.contestList.updateContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:myContests:contestRemoved', function (eventData) {
+            _this.contestList.removeContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:myContests:forceRefresh', function () {
+            _this.refreshList(true).then(function () {
+            }, function () {
+            });
+        });
     }
     MyContestsPage.prototype.ionViewWillEnter = function () {
         var _this = this;

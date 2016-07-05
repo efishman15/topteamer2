@@ -89,6 +89,7 @@ export class Client {
         this.loadingModalComponent = loadingModalComponent;
 
         if (this.clientInfo.mobile) {
+          this._shareApps = new Array<ClientShareApp>();
           if (platform.is('android')) {
             this.clientInfo.platform = 'android';
           }

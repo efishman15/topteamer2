@@ -106,7 +106,7 @@ var TopTeamerApp = (function () {
     TopTeamerApp.prototype.initMobile = function () {
         var _this = this;
         //Will discover which apps are installed (from a server list) and support sharing
-        shareService.mobileDiscoverSharingOptions();
+        shareService.mobileDiscoverSharingApps();
         if (window.cordova.plugins.Keyboard) {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             window.cordova.plugins.Keyboard.disableScroll(false);
@@ -1440,11 +1440,22 @@ var Session = (function () {
 }());
 exports.Session = Session;
 var ClientShareApp = (function () {
-    function ClientShareApp() {
+    function ClientShareApp(name, title, image) {
+        this.name = name;
+        this.title = title;
+        this.image = image;
     }
     return ClientShareApp;
 }());
 exports.ClientShareApp = ClientShareApp;
+var ClientShareDiscoverApp = (function (_super) {
+    __extends(ClientShareDiscoverApp, _super);
+    function ClientShareDiscoverApp() {
+        _super.apply(this, arguments);
+    }
+    return ClientShareDiscoverApp;
+}(ClientShareApp));
+exports.ClientShareDiscoverApp = ClientShareDiscoverApp;
 var ClientShareAppPackage = (function () {
     function ClientShareAppPackage() {
     }
@@ -1879,7 +1890,12 @@ var ContestPage = (function () {
         this.client.openPage('SetContestPage', { 'mode': 'edit', 'contest': this.contest });
     };
     ContestPage.prototype.share = function (source) {
-        this.client.openPage('SharePage', { 'contest': this.contest, 'source': source });
+        if (this.contest.status !== 'finished') {
+            this.client.openPage('SharePage', { 'contest': this.contest, 'source': source });
+        }
+        else {
+            this.client.openPage('SharePage', { 'source': source });
+        }
     };
     ContestPage.prototype.like = function () {
         this.client.logEvent('like/click');
@@ -2003,7 +2019,19 @@ var leaders_1 = require('../../components/leaders/leaders');
 var client_1 = require('../../providers/client');
 var LeaderboardsPage = (function () {
     function LeaderboardsPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestUpdated', function (eventData) {
+            _this.contestList.updateContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestRemoved', function (eventData) {
+            _this.contestList.removeContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:recentlyFinishedContests:forceRefresh', function () {
+            _this.refreshList(true).then(function () {
+            }, function () {
+            });
+        });
     }
     LeaderboardsPage.prototype.ionViewWillEnter = function () {
         this.simpleTabsComponent.switchToTab(0);
@@ -2169,6 +2197,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var ACTION_UPDATE_CONTEST = 'contestUpdated';
+var ACTION_REMOVE_CONTEST = 'contestRemoved';
+var ACTION_FORCE_REFRESH = 'forceRefresh';
 var MainTabsPage = (function () {
     function MainTabsPage() {
         var _this = this;
@@ -2218,15 +2249,30 @@ var MainTabsPage = (function () {
             selectedPage.instance.onResize();
         }
     };
-    MainTabsPage.prototype.getTabPage = function (index) {
-        var viewController = this.mainTabs.getByIndex(index).first();
-        return viewController.instance;
+    MainTabsPage.prototype.publishActionToTab = function (index, action, param) {
+        var eventName = 'topTeamer:';
+        switch (index) {
+            case 0:
+                eventName += 'myContests';
+                break;
+            case 1:
+                eventName += 'runningContests';
+                break;
+            case 2:
+                eventName += 'recentlyFinishedContests';
+                break;
+        }
+        eventName += ':' + action;
+        if (param) {
+            this.client.events.publish(eventName, param);
+        }
+        else {
+            this.client.events.publish(eventName);
+        }
     };
     MainTabsPage.prototype.handleContestCreated = function () {
         //Force refresh my contests
-        this.getTabPage(0).refreshList(true).then(function () {
-        }, function () {
-        });
+        this.publishActionToTab(0, ACTION_FORCE_REFRESH);
     };
     MainTabsPage.prototype.handleContestUpdated = function (contest, previousStatus, currentStatus) {
         if (previousStatus === currentStatus) {
@@ -2234,16 +2280,16 @@ var MainTabsPage = (function () {
             switch (currentStatus) {
                 case 'starting':
                     //For admins - future contests - appear only in "my Contests"
-                    this.getTabPage(0).contestList.updateContest(contest);
+                    this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
                     break;
                 case 'running':
                     //Appears in my contests / running contests
-                    this.getTabPage(0).contestList.updateContest(contest);
-                    this.getTabPage(1).contestList.updateContest(contest);
+                    this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
+                    this.publishActionToTab(1, ACTION_UPDATE_CONTEST, contest);
                     break;
                 case 'finished':
                     //Appears in recently finished contests
-                    this.getTabPage(2).contestList.updateContest(contest);
+                    this.publishActionToTab(2, ACTION_UPDATE_CONTEST, contest);
                     break;
             }
         }
@@ -2252,59 +2298,47 @@ var MainTabsPage = (function () {
                 case 'starting':
                     if (currentStatus === 'running') {
                         //Update my contests
-                        this.getTabPage(0).contestList.updateContest(contest);
+                        this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
                         //Refresh running contests - might appear there
-                        this.getTabPage(1).refreshList(true).then(function () {
-                        }, function () {
-                        });
+                        this.publishActionToTab(1, ACTION_FORCE_REFRESH);
                     }
                     else {
                         //finished
                         //Remove from my contests
-                        this.getTabPage(0).contestList.removeContest(contest._id);
+                        this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contest._id);
                         //Refresh recently finished contests
-                        this.getTabPage(2).refreshList(true).then(function () {
-                        }, function () {
-                        });
+                        this.publishActionToTab(2, ACTION_FORCE_REFRESH);
                     }
                     break;
                 case 'running':
                     if (currentStatus === 'starting') {
                         //Update my contests
-                        this.getTabPage(0).contestList.updateContest(contest);
+                        this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
                         //Remove from running contests
-                        this.getTabPage(1).contestList.removeContest(contest._id);
+                        this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contest._id);
                     }
                     else {
                         //finished
                         //Remove from my contests and from running contests
-                        this.getTabPage(0).contestList.removeContest(contest._id);
-                        this.getTabPage(1).contestList.removeContest(contest._id);
+                        this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contest._id);
+                        this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contest._id);
                         //Refresh recently finished contests
-                        this.getTabPage(2).refreshList(true).then(function () {
-                        }, function () {
-                        });
+                        this.publishActionToTab(2, ACTION_FORCE_REFRESH);
                     }
                     break;
                 case 'finished':
                     //Remove from finished contests
-                    this.getTabPage(2).contestList.removeContest(contest._id);
+                    this.publishActionToTab(2, ACTION_REMOVE_CONTEST, contest._id);
                     if (currentStatus === 'starting') {
                         //Refresh my contests
-                        this.getTabPage(0).refreshList(true).then(function () {
-                        }, function () {
-                        });
+                        this.publishActionToTab(0, ACTION_FORCE_REFRESH);
                     }
                     else {
                         //running
                         //Refresh my contests
-                        this.getTabPage(0).refreshList(true).then(function () {
-                        }, function () {
-                        });
+                        this.publishActionToTab(0, ACTION_FORCE_REFRESH);
                         //Refresh running contests
-                        this.getTabPage(1).refreshList(true).then(function () {
-                        }, function () {
-                        });
+                        this.publishActionToTab(1, ACTION_FORCE_REFRESH);
                     }
                     break;
             }
@@ -2313,12 +2347,12 @@ var MainTabsPage = (function () {
     MainTabsPage.prototype.handleContestRemoved = function (contestId, finishedContest) {
         if (!finishedContest) {
             //Try to remove it from 'my contests' and 'running contests' tabs
-            this.getTabPage(0).contestList.removeContest(contestId);
-            this.getTabPage(1).contestList.removeContest(contestId);
+            this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contestId);
+            this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contestId);
         }
         else {
             //Try to remove it from the recently finished tab
-            this.getTabPage(2).contestList.removeContest(contestId);
+            this.publishActionToTab(2, ACTION_REMOVE_CONTEST, contestId);
         }
     };
     __decorate([
@@ -2350,7 +2384,19 @@ var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
 var MyContestsPage = (function () {
     function MyContestsPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:myContests:contestUpdated', function (eventData) {
+            _this.contestList.updateContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:myContests:contestRemoved', function (eventData) {
+            _this.contestList.removeContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:myContests:forceRefresh', function () {
+            _this.refreshList(true).then(function () {
+            }, function () {
+            });
+        });
     }
     MyContestsPage.prototype.ionViewWillEnter = function () {
         var _this = this;
@@ -3188,7 +3234,19 @@ var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
 var RunningContestsPage = (function () {
     function RunningContestsPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:runningContests:contestUpdated', function (eventData) {
+            _this.contestList.updateContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:runningContests:contestRemoved', function (eventData) {
+            _this.contestList.removeContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:runningContests:forceRefresh', function () {
+            _this.refreshList(true).then(function () {
+            }, function () {
+            });
+        });
     }
     RunningContestsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/runningContests');
@@ -4314,6 +4372,7 @@ var Client = (function () {
             _this._nav = nav;
             _this.loadingModalComponent = loadingModalComponent;
             if (_this.clientInfo.mobile) {
+                _this._shareApps = new Array();
                 if (platform.is('android')) {
                     _this.clientInfo.platform = 'android';
                 }
@@ -5695,24 +5754,39 @@ exports.getVariables = function (contest) {
     }
     return shareVariables;
 };
-exports.mobileDiscoverSharingOptions = function () {
+exports.mobileDiscoverSharingApps = function () {
     var client = client_1.Client.getInstance();
-    client.shareApps = JSON.parse(JSON.stringify(client.settings.share.mobile.apps));
     var shareVariables = _this.getVariables();
-    client.shareApps.forEach(function (shareApp) {
-        if (shareApp.discover) {
-            window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl, function (result) {
-                if (result === 'OK') {
-                    shareApp.installed = true;
+    var promises = [];
+    client.settings.share.mobile.discoverApps.forEach(function (shareApp) {
+        promises.push(_this.mobileDiscoverApp(client, shareApp, shareVariables));
+    });
+    Promise.all(promises).then(function () {
+        if (client.shareApps.length < client.settings.share.mobile.maxApps) {
+            for (var i = 0; i < client.settings.share.mobile.extraApps.length; i++) {
+                if (client.shareApps.length < client.settings.share.mobile.maxApps) {
+                    client.shareApps.push(client.settings.share.mobile.extraApps[i]);
                 }
-            }, function (err) {
-                window.myLogError('mobileDiscoverSharingOptions', err);
-            });
+                else {
+                    break;
+                }
+            }
         }
     });
 };
+exports.mobileDiscoverApp = function (client, shareApp, shareVariables) {
+    return new Promise(function (resolve, reject) {
+        window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl, shareVariables.shareSubject, shareVariables.shareImage, shareVariables.shareUrl, function (result) {
+            if (result === 'OK' && client.shareApps.length < client.settings.share.mobile.maxApps) {
+                client.shareApps.push(new objects_1.ClientShareApp(shareApp.name, shareApp.title, shareApp.image));
+            }
+            resolve();
+        }, function () {
+            resolve();
+        });
+    });
+};
 exports.mobileShare = function (appName, contest) {
-    var client = client_1.Client.getInstance();
     var shareVariables = _this.getVariables(contest);
     switch (appName) {
         case 'whatsapp':
@@ -5740,7 +5814,7 @@ exports.mobileShare = function (appName, contest) {
             });
             break;
         case 'sms':
-            window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBodyNoUrl }, null, //Phone numbers - user will type
+            window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBody }, null, //Phone numbers - user will type
             function () {
             }, function (err) {
                 window.myLogError('SMS Share', err);

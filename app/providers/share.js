@@ -38,24 +38,39 @@ exports.getVariables = function (contest) {
     }
     return shareVariables;
 };
-exports.mobileDiscoverSharingOptions = function () {
+exports.mobileDiscoverSharingApps = function () {
     var client = client_1.Client.getInstance();
-    client.shareApps = JSON.parse(JSON.stringify(client.settings.share.mobile.apps));
     var shareVariables = _this.getVariables();
-    client.shareApps.forEach(function (shareApp) {
-        if (shareApp.discover) {
-            window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl, shareVariables.shareSubject, client.settings.general.baseUrl + client.settings.general.logoUrl, shareVariables.shareUrl, function (result) {
-                if (result === 'OK') {
-                    shareApp.installed = true;
+    var promises = [];
+    client.settings.share.mobile.discoverApps.forEach(function (shareApp) {
+        promises.push(_this.mobileDiscoverApp(client, shareApp, shareVariables));
+    });
+    Promise.all(promises).then(function () {
+        if (client.shareApps.length < client.settings.share.mobile.maxApps) {
+            for (var i = 0; i < client.settings.share.mobile.extraApps.length; i++) {
+                if (client.shareApps.length < client.settings.share.mobile.maxApps) {
+                    client.shareApps.push(client.settings.share.mobile.extraApps[i]);
                 }
-            }, function (err) {
-                window.myLogError('mobileDiscoverSharingOptions', err);
-            });
+                else {
+                    break;
+                }
+            }
         }
     });
 };
+exports.mobileDiscoverApp = function (client, shareApp, shareVariables) {
+    return new Promise(function (resolve, reject) {
+        window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl, shareVariables.shareSubject, shareVariables.shareImage, shareVariables.shareUrl, function (result) {
+            if (result === 'OK' && client.shareApps.length < client.settings.share.mobile.maxApps) {
+                client.shareApps.push(new objects_1.ClientShareApp(shareApp.name, shareApp.title, shareApp.image));
+            }
+            resolve();
+        }, function () {
+            resolve();
+        });
+    });
+};
 exports.mobileShare = function (appName, contest) {
-    var client = client_1.Client.getInstance();
     var shareVariables = _this.getVariables(contest);
     switch (appName) {
         case 'whatsapp':
@@ -83,7 +98,7 @@ exports.mobileShare = function (appName, contest) {
             });
             break;
         case 'sms':
-            window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBodyNoUrl }, null, //Phone numbers - user will type
+            window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBody }, null, //Phone numbers - user will type
             function () {
             }, function (err) {
                 window.myLogError('SMS Share', err);

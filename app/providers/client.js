@@ -57,6 +57,7 @@ var Client = (function () {
             _this._nav = nav;
             _this.loadingModalComponent = loadingModalComponent;
             if (_this.clientInfo.mobile) {
+                _this._shareApps = new Array();
                 if (platform.is('android')) {
                     _this.clientInfo.platform = 'android';
                 }

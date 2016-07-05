@@ -784,10 +784,6 @@
     },
     "share" : {
       "web" : {
-        "iconSize" : {
-          "width" : 45,
-          "height" : 45
-        },
         "networks" : [[{
               "name" : "facebook",
               "url" : "https://www.facebook.com/sharer.php?u={{url}}?ref=shareFacebook",
@@ -821,6 +817,57 @@
               "url" : "https://www.reddit.com/submit?url={{url}}&title={{subject}}",
               "image" : "images/social/reddit.png"
             }]]
+      },
+      "iconSize" : {
+        "width" : 45,
+        "height" : 45
+      },
+      "mobile" : {
+        "apps" : [{
+            "discover" : true,
+            "packages" : {
+              "android" : "com.whatsapp"
+            },
+            "shareViaFunction" : "shareViaWhatsApp",
+            "name" : "whatsapp",
+            "title" : "WhatsApp",
+            "image" : "images/social/whatsapp.png"
+          }, {
+            "discover" : true,
+            "packages" : {
+              "android" : "com.facebook.katana"
+            },
+            "shareViaFunction" : "shareViaFacebook",
+            "name" : "facebook",
+            "title" : "Facebook",
+            "image" : "images/social/facebook.png"
+          }, {
+            "discover" : true,
+            "packages" : {
+              "android" : "com.instagram.android"
+            },
+            "shareViaFunction" : "shareViaInstagram",
+            "name" : "instagram",
+            "title" : "Instagram",
+            "image" : "images/social/instagram.png"
+          }, {
+            "discover" : true,
+            "packages" : {
+              "android" : "com.twitter.android"
+            },
+            "shareViaFunction" : "shareViaFacebook",
+            "name" : "twitter",
+            "title" : "Twitter",
+            "image" : "images/social/twitter.png"
+          }, {
+            "name" : "sms",
+            "title" : "Sms",
+            "image" : "images/social/sms.png"
+          }, {
+            "name" : "email",
+            "title" : "Email",
+            "image" : "images/social/email.png"
+          }]
       }
     },
     "facebook" : {
@@ -1111,7 +1158,8 @@
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "For system trivia contests the subject can not be changed. You can create a new contest and choose 'Your questions' and then enter a subject describing those questions",
         "CONFIRM_EXIT_QUIZ_TITLE" : "Confirm exit",
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "The points you gained will not credit your team. Are you sure you would like to exit?",
-        "SYSTEM_PARTICIPANTS" : "System participants"
+        "SYSTEM_PARTICIPANTS" : "System participants",
+        "SHARE_OTHER_OPTIONS" : "Other options..."
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1169,7 +1217,7 @@
         "SERVER_ERROR_INVALID_FACEBOOK_ACCESS_TOKEN_TITLE" : "התחברות עם פייסבוק",
         "SERVER_ERROR_INVALID_FACEBOOK_ACCESS_TOKEN_MESSAGE" : "שגיאה בנסיון התחברות עם פייסבוק - אנא נסו שנית",
         "SERVER_ERROR_NOT_JOINED_TO_CONTEST_TITLE" : "הצטרפות לתחרות",
-        "SERVER_ERROR_NOT_JOINED_TO_CONTEST_MESSAGE" : "אנא הצטרפו לקבוצה על ידי לחיצה על שמה או על הטור שלה בגרף",
+        "SERVER_ERROR_NOT_JOINED_TO_CONTEST_MESSAGE" : "אנא הצטרפו על ידי לחיצה על שם הקבוצה או על הטור שלה בגרף",
         "SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ_TITLE" : "ניתוק עקב אי פעילות",
         "SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ_MESSAGE" : "המערכת התנתקה לאחר אי פעילות. לחצו אישור להתחלת התחרות מחדש",
         "SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES_TITLE" : "קבוצות שונות",
@@ -1281,7 +1329,7 @@
         "REVIEW_MODE_OWNER" : "על מנת לשמור על משחק הוגן, יוצרי התחרות לא יכולים לזכות את קבוצתם בנקודות",
         "REVIEW_MODE_PLAY_AGAIN" : "על מנת לשמור על משחק הוגן, רק תוצאות המשחק הראשון יזכו את קבוצתכם בנקודות",
         "SELECT_CONTEST_TYPE" : "בחרו את סוג התחרות",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "שאלות טריוויה",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_TITLE" : "טריוויה",
         "CONTEST_TYPE_TRIVIA_SYSTEM_DESCRIPTION" : "שאלות טריוויה מתחלפות מתוך מאגר המערכת",
         "CONTEST_TYPE_TRIVIA_USER_TITLE" : "שאלות שלכם",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "'הזינו בעצמכם עד ' + eval:settings.client.newContest.privateQuestions.max + ' שאלות לתחרות'",
@@ -1299,7 +1347,7 @@
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ניצחו",
         "AGAINST" : "נגד",
         "TIE" : "תיקו בתחרות",
-        "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "שאלות טריוויה",
+        "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "טריוויה",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "השאלות של {{name}}",
         "PLAY_FOR_TEAM" : "שחקו עבור {{team}}",
         "CONTEST_NAME_LONG" : "{{team0}} נגד {{team1}}: {{type}}",
@@ -1315,7 +1363,8 @@
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "לתחרויות טריוויה לא ניתן לשנות את הנושא. תוכלו ליצור תחרות חדשה עם השאלות שלכם ובה תוכלו להזין נושא המתאר את השאלות שהזנתם",
         "CONFIRM_EXIT_QUIZ_TITLE" : "יציאה באמצע",
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "הניקוד שצברתם לא ייזכה את קבוצתכם. האם אתם בטוחים שברצונכם לצאת?",
-        "SYSTEM_PARTICIPANTS" : "משתתפי מערכת"
+        "SYSTEM_PARTICIPANTS" : "משתתפי מערכת",
+        "SHARE_OTHER_OPTIONS" : "אפשרויות נוספות..."
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1524,7 +1573,8 @@
         "SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA_MESSAGE" : "Para trivia concursos sistema el sujeto no puede ser cambiado . Puede crear un nuevo concurso y elegir 'Tus preguntas' y luego introduzca un asunto que describe aquellas preguntas",
         "CONFIRM_EXIT_QUIZ_TITLE" : "confirmar la salida",
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "Los puntos que adquirió no acreditar su equipo . ¿Está seguro de que desea salir?",
-        "SYSTEM_PARTICIPANTS" : "los participantes del sistema"
+        "SYSTEM_PARTICIPANTS" : "los participantes del sistema",
+        "SHARE_OTHER_OPTIONS" : "Otras opciones"
       }
     },
     "platforms" : {

@@ -1,9 +1,9 @@
 import {Client} from './client';
-import {ShareVariables,ClientShareApp,Contest} from '../objects/objects';
+import {ShareVariables,ClientShareApp,ClientShareDiscoverApp,Contest} from '../objects/objects';
 
-var emailRef = '?ref=shareEmail';
+let emailRef:string = '?ref=shareEmail';
 
-export let getVariables = (contest? : Contest) => {
+export let getVariables = (contest?:Contest) => {
 
   var client = Client.getInstance();
   var shareVariables = new ShareVariables();
@@ -46,34 +46,53 @@ export let getVariables = (contest? : Contest) => {
 
 }
 
-export let mobileDiscoverSharingOptions = () => {
+export let mobileDiscoverSharingApps = () => {
 
   var client = Client.getInstance();
-  client.shareApps = JSON.parse(JSON.stringify(client.settings.share.mobile.apps));
-  let shareVariables : ShareVariables = this.getVariables();
-  client.shareApps.forEach((shareApp:ClientShareApp) => {
-    if (shareApp.discover) {
-      window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl,
-        shareVariables.shareSubject,
-        client.settings.general.baseUrl + client.settings.general.logoUrl,
-        shareVariables.shareUrl,
-        (result) => {
-          if (result === 'OK') {
-            shareApp.installed = true;
-          }
-        },
-        (err) => {
-          window.myLogError('mobileDiscoverSharingOptions', err);
+  let shareVariables:ShareVariables = this.getVariables();
+
+  var promises = [];
+  client.settings.share.mobile.discoverApps.forEach((shareApp:ClientShareDiscoverApp) => {
+    promises.push(this.mobileDiscoverApp(client, shareApp, shareVariables));
+  });
+
+  Promise.all(promises).then(() => {
+    if (client.shareApps.length < client.settings.share.mobile.maxApps) {
+      for (let i:number = 0; i < client.settings.share.mobile.extraApps.length; i++) {
+        if (client.shareApps.length < client.settings.share.mobile.maxApps) {
+          client.shareApps.push(client.settings.share.mobile.extraApps[i])
         }
-      );
+        else {
+          break;
+        }
+      }
     }
   });
 }
 
-export let mobileShare = (appName?: string, contest?: Contest) => {
+export let mobileDiscoverApp = (client: any, shareApp:ClientShareDiscoverApp, shareVariables:ShareVariables) => {
+  return new Promise((resolve:any, reject:any) => {
 
-  var client = Client.getInstance();
-  let shareVariables : ShareVariables = this.getVariables(contest);
+    window.plugins.socialsharing.canShareVia(shareApp.packages[client.clientInfo.platform], shareVariables.shareBodyNoUrl,
+      shareVariables.shareSubject,
+      shareVariables.shareImage,
+      shareVariables.shareUrl,
+      (result) => {
+        if (result === 'OK' && client.shareApps.length < client.settings.share.mobile.maxApps) {
+          client.shareApps.push(new ClientShareApp(shareApp.name, shareApp.title, shareApp.image));
+        }
+        resolve();
+      },
+      () => {
+        resolve();
+      }
+    );
+  });
+}
+
+export let mobileShare = (appName?:string, contest?:Contest) => {
+
+  let shareVariables:ShareVariables = this.getVariables(contest);
   switch (appName) {
     case 'whatsapp':
       window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl,
@@ -120,7 +139,7 @@ export let mobileShare = (appName?: string, contest?: Contest) => {
       )
       break;
     case 'sms':
-      window.plugins.socialsharing.shareViaSMS({'message': shareVariables.shareBodyNoUrl},
+      window.plugins.socialsharing.shareViaSMS({'message': shareVariables.shareBody},
         null, //Phone numbers - user will type
         () => {
         },
@@ -145,7 +164,7 @@ export let mobileShare = (appName?: string, contest?: Contest) => {
       break;
 
     default:
-      let options : any = {};
+      let options:any = {};
       options.message = shareVariables.shareBodyNoUrl;
       options.subject = shareVariables.shareSubject;
       options.files = [shareVariables.shareImage];
@@ -160,5 +179,5 @@ export let mobileShare = (appName?: string, contest?: Contest) => {
       )
       break;
 
-    }
+  }
 }

@@ -118,7 +118,12 @@ var ContestPage = (function () {
         this.client.openPage('SetContestPage', { 'mode': 'edit', 'contest': this.contest });
     };
     ContestPage.prototype.share = function (source) {
-        this.client.openPage('SharePage', { 'contest': this.contest, 'source': source });
+        if (this.contest.status !== 'finished') {
+            this.client.openPage('SharePage', { 'contest': this.contest, 'source': source });
+        }
+        else {
+            this.client.openPage('SharePage', { 'source': source });
+        }
     };
     ContestPage.prototype.like = function () {
         this.client.logEvent('like/click');

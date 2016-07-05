@@ -17,6 +17,20 @@ export class MyContestsPage {
 
   constructor() {
     this.client = Client.getInstance();
+
+    this.client.events.subscribe('topTeamer:myContests:contestUpdated', (eventData) => {
+      this.contestList.updateContest(eventData[0]);
+    });
+
+    this.client.events.subscribe('topTeamer:myContests:contestRemoved', (eventData) => {
+      this.contestList.removeContest(eventData[0]);
+    });
+
+    this.client.events.subscribe('topTeamer:myContests:forceRefresh', () => {
+      this.refreshList(true).then(()=> {
+      }, ()=> {
+      });
+    });
   }
 
   ionViewWillEnter() {

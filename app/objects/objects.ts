@@ -29,27 +29,29 @@ export class Settings {
   ui:Array<Array<Object>>;
   newContest:NewContestSettings;
   lists:ListSettings;
-  share: ShareSettings;
+  share:ShareSettings;
 }
 
 export class ShareSettings {
-  web: ShareWebSettings;
-  mobile: ShareMobileSettings;
-  iconSize: Size;
+  web:ShareWebSettings;
+  mobile:ShareMobileSettings;
+  iconSize:Size;
 }
 
 export class ShareWebSettings {
-  networks: Array<Array<ShareWebNetwork>>;
+  networks:Array<Array<ShareWebNetwork>>;
 }
 
 export class ShareWebNetwork {
-  name: string;
-  url: string;
-  image: string;
+  name:string;
+  url:string;
+  image:string;
 }
 
 export class ShareMobileSettings {
-  apps: Array<ClientShareApp>;
+  discoverApps:Array<ClientShareDiscoverApp>;
+  extraApps:Array<ClientShareApp>;
+  maxsApps:number;
 }
 
 export class NewContestSettings {
@@ -316,13 +318,19 @@ export class Session {
 }
 
 export class ClientShareApp {
-  discover:boolean;
-  packages:Array<ClientShareAppPackage>;
-  shareViaFunction:string;
   name:string;
   title:string;
   image:string;
-  installed:boolean;
+
+  constructor(name:string, title:string, image:string) {
+    this.name = name;
+    this.title = title;
+    this.image = image;
+  }
+}
+
+export class ClientShareDiscoverApp extends ClientShareApp {
+  packages:Array<ClientShareAppPackage>;
 }
 
 export class ClientShareAppPackage {

@@ -104,7 +104,7 @@ var TopTeamerApp = (function () {
     TopTeamerApp.prototype.initMobile = function () {
         var _this = this;
         //Will discover which apps are installed (from a server list) and support sharing
-        shareService.mobileDiscoverSharingOptions();
+        shareService.mobileDiscoverSharingApps();
         if (window.cordova.plugins.Keyboard) {
             window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             window.cordova.plugins.Keyboard.disableScroll(false);

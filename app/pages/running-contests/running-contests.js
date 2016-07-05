@@ -12,7 +12,19 @@ var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
 var RunningContestsPage = (function () {
     function RunningContestsPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:runningContests:contestUpdated', function (eventData) {
+            _this.contestList.updateContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:runningContests:contestRemoved', function (eventData) {
+            _this.contestList.removeContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:runningContests:forceRefresh', function () {
+            _this.refreshList(true).then(function () {
+            }, function () {
+            });
+        });
     }
     RunningContestsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/runningContests');

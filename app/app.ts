@@ -133,7 +133,7 @@ export class TopTeamerApp {
   initMobile() {
 
     //Will discover which apps are installed (from a server list) and support sharing
-    shareService.mobileDiscoverSharingOptions();
+    shareService.mobileDiscoverSharingApps();
 
     if (window.cordova.plugins.Keyboard) {
       window.cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);

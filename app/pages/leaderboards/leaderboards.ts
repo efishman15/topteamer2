@@ -21,6 +21,20 @@ export class LeaderboardsPage {
 
   constructor() {
     this.client = Client.getInstance();
+
+    this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestUpdated', (eventData) => {
+      this.contestList.updateContest(eventData[0]);
+    });
+
+    this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestRemoved', (eventData) => {
+      this.contestList.removeContest(eventData[0]);
+    });
+
+    this.client.events.subscribe('topTeamer:recentlyFinishedContests:forceRefresh', () => {
+      this.refreshList(true).then(()=> {
+      }, ()=> {
+      });
+    });
   }
 
   ionViewWillEnter() {

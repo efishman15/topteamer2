@@ -9952,19 +9952,6 @@ loading-modal .container {
 .facebook-relax-message {
   font-size: 14px; }
 
-.ltr {
-  direction: ltr;
-  text-align: left; }
-
-.rtl {
-  direction: rtl;
-  text-align: right; }
-
-.tabs-bg {
-  background-image: url("../../images/bottom_bar_bg.png");
-  background-repeat: no-repeat;
-  background-size: 100% 100%; }
-
 .no-contests-message {
   color: #ffffff; }
 
@@ -10238,3 +10225,6 @@ ion-col[width-5] {
   font: normal 700 20px/1 "Calibri", sans-serif;
   text-align: center;
   text-shadow: 1px 1px 0 #2c2c52; }
+
+.share-more-options {
+  padding-top: 40px; }

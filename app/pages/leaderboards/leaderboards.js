@@ -15,7 +15,19 @@ var leaders_1 = require('../../components/leaders/leaders');
 var client_1 = require('../../providers/client');
 var LeaderboardsPage = (function () {
     function LeaderboardsPage() {
+        var _this = this;
         this.client = client_1.Client.getInstance();
+        this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestUpdated', function (eventData) {
+            _this.contestList.updateContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestRemoved', function (eventData) {
+            _this.contestList.removeContest(eventData[0]);
+        });
+        this.client.events.subscribe('topTeamer:recentlyFinishedContests:forceRefresh', function () {
+            _this.refreshList(true).then(function () {
+            }, function () {
+            });
+        });
     }
     LeaderboardsPage.prototype.ionViewWillEnter = function () {
         this.simpleTabsComponent.switchToTab(0);
