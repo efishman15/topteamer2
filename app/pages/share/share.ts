@@ -30,11 +30,12 @@ export class SharePage {
   }
 
   webShare(network: any) {
-    window.open(network.url.format({url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail}),'_blank');
     this.client.logEvent('share/web/' + network.name);
+    window.open(network.url.format({url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail}),'_blank');
   }
 
   mobileShare(appName?: string) {
+    this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
     shareService.mobileShare(appName, this.params.data.contest);
   }
 }

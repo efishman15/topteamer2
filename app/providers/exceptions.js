@@ -42,7 +42,10 @@ var MyExceptionHandler = (function (_super) {
             window.myLogError('UnhandledException', errorMessage);
         }
         var client = client_1.Client.getInstance();
-        if (client && client.settings.general && client.settings.general.debugMode) {
+        if (client &&
+            ((client.settings.general && client.settings.general.debugMode) ||
+                (client.session && client.session.isAdmin))) {
+            //Will also log the error to the console
             _super.prototype.call.call(this, exception, stackTrace, reason);
         }
     };

@@ -42,7 +42,12 @@ export class MyExceptionHandler extends ExceptionHandler {
 
     var client = Client.getInstance();
 
-    if (client && client.settings.general && client.settings.general.debugMode) {
+    if (client &&
+      (
+        (client.settings.general && client.settings.general.debugMode) ||
+        (client.session && client.session.isAdmin)
+      )) {
+      //Will also log the error to the console
       super.call(exception, stackTrace, reason);
     }
   }

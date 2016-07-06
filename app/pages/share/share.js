@@ -26,10 +26,11 @@ var SharePage = (function () {
         }
     };
     SharePage.prototype.webShare = function (network) {
-        window.open(network.url.format({ url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail }), '_blank');
         this.client.logEvent('share/web/' + network.name);
+        window.open(network.url.format({ url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail }), '_blank');
     };
     SharePage.prototype.mobileShare = function (appName) {
+        this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
         shareService.mobileShare(appName, this.params.data.contest);
     };
     SharePage = __decorate([
