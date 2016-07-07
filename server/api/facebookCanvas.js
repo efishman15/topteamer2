@@ -29,6 +29,18 @@ function getContestName(contest) {
   return contestName;
 }
 
+function isCrawlerUserAgent(req) {
+  var userAgent = req.get('User-Agent');
+  var match = false;
+  for (var i=0; i<generalUtils.settings.facebook.openGraphCrawlerUserAgents.length; i++) {
+    if (userAgent.match(new RegExp(generalUtils.settings.facebook.openGraphCrawlerUserAgents[i],'g'))) {
+      match = true;
+      break;
+    }
+  }
+  return match;
+}
+
 //----------------------------------------------------
 // renderContest
 //
@@ -87,29 +99,17 @@ function renderTeam(viewName, req, res, next) {
 
     dalDb.getContest(data, function (err, data) {
 
-      var userAgent = req.get('User-Agent');
-      if (
-        (userAgent.match(/Branch-Passthrough/)) ||
-        (userAgent.match(/facebookexternalhit/)) ||
-        (userAgent.match(/facebot/))
-      ) {
-
-        res.render(viewName,
-          {
-            'appId': generalUtils.settings.server.facebook.appId,
-            'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, getContestName(data.contest)),
-            'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
-            'contestId': req.params.contestId,
-            'teamId': req.params.teamId
-          });
-      }
-      else {
-        //Deep linking to this contest via browser/mobile
-        res.redirect(data.contest.link);
-      }
+      res.render(viewName,
+        {
+          'appId': generalUtils.settings.server.facebook.appId,
+          'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, getContestName(data.contest)),
+          'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
+          'contestId': req.params.contestId,
+          'teamId': req.params.teamId,
+          'redirectLink': data.contest.link
+        });
+      })
     });
-  });
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
