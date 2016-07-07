@@ -112,8 +112,8 @@ export let post = (story) => new Promise((resolve, reject) => {
     var mobilePostObject = {
       'method': 'share_open_graph',
       'action': story.action,
-      'previewPropertyName': story.object.name,
-      'previewPropertyValue': story.object.value
+      'action_properties': '{"' + story.object.name + '":"' + story.object.value + '"}',
+      'object': '{"og:type" : "topteamer:team"}',
     };
 
     window.facebookConnectPlugin.showDialog(mobilePostObject, (response) => {

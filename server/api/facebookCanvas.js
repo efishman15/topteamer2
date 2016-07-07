@@ -93,7 +93,8 @@ function renderTeam(viewName, req, res, next) {
           'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, getContestName(data.contest)),
           'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
           'contestId': req.params.contestId,
-          'teamId': req.params.teamId
+          'teamId': req.params.teamId,
+          'url' : data.contest.link
         });
     });
   });
