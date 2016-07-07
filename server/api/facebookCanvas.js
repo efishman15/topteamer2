@@ -87,7 +87,7 @@ function renderTeam(viewName, req, res, next) {
 
     dalDb.getContest(data, function (err, data) {
 
-      console.log('userAgent:' + res.userAgent);
+      console.log('userAgent:' + req.headers['user-agent']);
       res.render(viewName,
         {
           'appId': generalUtils.settings.server.facebook.appId,
