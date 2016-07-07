@@ -6,3 +6,6 @@ html
         meta(property="og:description",content="#{description}")
         meta(property="og:url",content="https://www.topteamer.com/facebook/product/#{productId}/#{language}")
         meta(property="og:image" content="https://www.topteamer.com/images/trophy.png")
+body
+  script.
+    document.location.replace("#{redirectLink}");

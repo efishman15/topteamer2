@@ -29,18 +29,6 @@ function getContestName(contest) {
   return contestName;
 }
 
-function isCrawlerUserAgent(req) {
-  var userAgent = req.get('User-Agent');
-  var match = false;
-  for (var i=0; i<generalUtils.settings.facebook.openGraphCrawlerUserAgents.length; i++) {
-    if (userAgent.match(new RegExp(generalUtils.settings.facebook.openGraphCrawlerUserAgents[i],'g'))) {
-      match = true;
-      break;
-    }
-  }
-  return match;
-}
-
 //----------------------------------------------------
 // renderContest
 //
@@ -64,7 +52,8 @@ function renderContest(viewName, req, res, next) {
           'appId': generalUtils.settings.server.facebook.appId,
           'title': getContestName(data.contest),
           'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
-          'contestId': req.params.contestId
+          'contestId': req.params.contestId,
+          'redirectLink': data.contest.link
         });
     });
   });
@@ -108,8 +97,8 @@ function renderTeam(viewName, req, res, next) {
           'teamId': req.params.teamId,
           'redirectLink': data.contest.link
         });
-      })
-    });
+    })
+  });
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -164,7 +153,8 @@ module.exports.getProductDetails = function (req, res, next) {
           'description': product.displayNames[language],
           'productUrl': generalUtils.settings.client.general.baseUrlSecured + 'fb/payments?productId=' + productId + '&language=' + language,
           'language': language,
-          'productId': productId
+          'productId': productId,
+          'redirectLink': generalUtils.settings.client.general.downloadUrl[language]
         });
     }
     else {
@@ -195,7 +185,8 @@ module.exports.getGameDetails = function (req, res, next) {
       'appId': generalUtils.settings.server.facebook.appId,
       'title': generalUtils.settings.server.text[req.params.language].gameTitle,
       'description': generalUtils.settings.server.text[req.params.language].gameDescription,
-      'language': req.params.language
+      'language': req.params.language,
+      'redirectLink': generalUtils.settings.client.general.downloadUrl[req.params.language]
     });
 };
 
