@@ -87,15 +87,26 @@ function renderTeam(viewName, req, res, next) {
 
     dalDb.getContest(data, function (err, data) {
 
-      console.log('userAgent:' + req.get('User-Agent'));
-      res.render(viewName,
-        {
-          'appId': generalUtils.settings.server.facebook.appId,
-          'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, getContestName(data.contest)),
-          'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
-          'contestId': req.params.contestId,
-          'teamId': req.params.teamId
-        });
+      var userAgent = req.get('User-Agent');
+      if (
+        (userAgent.match(/Branch-Passthrough/)) ||
+        (userAgent.match(/facebookexternalhit/)) ||
+        (userAgent.match(/facebot/))
+      ) {
+
+        res.render(viewName,
+          {
+            'appId': generalUtils.settings.server.facebook.appId,
+            'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, getContestName(data.contest)),
+            'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
+            'contestId': req.params.contestId,
+            'teamId': req.params.teamId
+          });
+      }
+      else {
+        //Deep linking to this contest via browser/mobile
+        res.redirect(data.contest.link);
+      }
     });
   });
 
