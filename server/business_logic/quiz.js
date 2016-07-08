@@ -431,7 +431,7 @@ module.exports.answer = function (req, res, next) {
             setPostStory(data, 'gotPerfectScore',
               {
                 'contest': data.contest,
-                'teamId': myTeam,
+                'team': myTeam,
                 'url': data.contest.teams[myTeam].link
               }
             );
@@ -572,7 +572,7 @@ module.exports.answer = function (req, res, next) {
         setPostStory(data, 'becameTeamLeader',
           {
             'contest': data.contest,
-            'teamId': myTeam,
+            'team': myTeam,
             'url': data.contest.teams[myTeam].leaderLink
           }
         );
@@ -590,7 +590,7 @@ module.exports.answer = function (req, res, next) {
           setPostStory(data, 'madeMyTeamLead',
             {
               'contest': data.contest,
-              'teamId': myTeam,
+              'team': myTeam,
               'url': data.contest.teams[myTeam].link
             }
           );
@@ -600,7 +600,7 @@ module.exports.answer = function (req, res, next) {
           setPostStory(data, 'myTeamIsCloseToLead',
             {
               'contest': data.contest,
-              'teamId': myTeam,
+              'team': myTeam,
               'url': data.contest.teams[myTeam].link
             }
           );

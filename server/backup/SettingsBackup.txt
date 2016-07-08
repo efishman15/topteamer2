@@ -86,8 +86,45 @@
       "appAccessToken" : "344342552056|QiE5jBhMjOyz7XxV93voCQf553A",
       "friendsPageSize" : 25,
       "appId" : "344342552056",
-      "contestImageUrl" : "http://www.topteamer.com/images/facebook/contest.png",
-      "userOpenGraphProfileUrl" : "http://www.topteamer.com/facebook/profile/%s/%s"
+      "contestImageUrl" : "http://www.topteamer.com/images/trophy.png",
+      "userOpenGraphProfileUrl" : "http://www.topteamer.com/facebook/profile/%s/%s",
+      "openGraphObjects" : {
+        "contest" : {
+          "og:type" : "topteamer:contest",
+          "og:url" : "http://www.topteamer.com/facebook/contest/{{contestId}}",
+          "og:image" : "http://www.topteamer.com/images/winner1.jpg",
+          "og:image:width" : 512,
+          "og:image:height" : 512
+        },
+        "contestLeader" : {
+          "og:type" : "topteamer:contestleader",
+          "og:url" : "http://www.topteamer.com/facebook/contestLeader/{{contestId}}",
+          "og:image" : "http://www.topteamer.com/images/winner1.jpg",
+          "og:image:width" : 512,
+          "og:image:height" : 512
+        },
+        "teamLeader" : {
+          "og:type" : "topteamer:teamleader",
+          "og:url" : "http://www.topteamer.com/facebook/team/{{contestId}}/{{teamId}}",
+          "og:image" : "http://www.topteamer.com/images/winner2.jpg",
+          "og:image:width" : 1200,
+          "og:image:height" : 630
+        },
+        "profile1" : {
+          "og:type" : "profile",
+          "og:url" : "http://www.topteamer.com/facebook/profile/{{facebookUserId}}/{{language}}",
+          "og:image" : "https://graph.facebook.com/{{facebookUserId}/picture?width=400&height=210",
+          "og:image:width" : 400,
+          "og:image:height" : 210
+        },
+        "team" : {
+          "og:type" : "topteamer:team",
+          "og:url" : "http://www.topteamer.com/facebook/team/{{contestId}}/{{teamId}}",
+          "og:image" : "http://www.topteamer.com/images/winner2.jpg",
+          "og:image:width" : 512,
+          "og:image:height" : 512
+        }
+      }
     },
     "versions" : {
       "mustUpdate" : {
@@ -772,7 +809,7 @@
       "baseUrl" : "http://www.topteamer.com/",
       "baseUrlSecured" : "https://www.topteamer.com/",
       "baseUrlWithoutProtocol" : "//www.topteamer.com/",
-      "logoUrl" : "images/logo.png",
+      "logoUrl" : "images/trophy.png",
       "facebookFanPage" : "https://www.facebook.com/392678080828378",
       "webCanvasWidth" : 780,
       "downloadUrl" : {
@@ -780,7 +817,7 @@
         "he" : "https://bnc.lt/m/MpHMrSo20n",
         "es" : "https://bnc.lt/m/Rxi4rSo20n"
       },
-      "debugMode" : true
+      "debugMode" : false
     },
     "share" : {
       "web" : {
@@ -823,43 +860,45 @@
         "height" : 45
       },
       "mobile" : {
-        "apps" : [{
-            "discover" : true,
-            "packages" : {
-              "android" : "com.whatsapp"
+        "maxApps" : 4,
+        "discoverApps" : [{
+            "package" : {
+              "android" : {
+                "name" : "com.whatsapp"
+              }
             },
-            "shareViaFunction" : "shareViaWhatsApp",
             "name" : "whatsapp",
             "title" : "WhatsApp",
             "image" : "images/social/whatsapp.png"
           }, {
-            "discover" : true,
-            "packages" : {
-              "android" : "com.facebook.katana"
+            "package" : {
+              "android" : {
+                "name" : "com.facebook.katana"
+              }
             },
-            "shareViaFunction" : "shareViaFacebook",
             "name" : "facebook",
             "title" : "Facebook",
             "image" : "images/social/facebook.png"
           }, {
-            "discover" : true,
-            "packages" : {
-              "android" : "com.instagram.android"
+            "package" : {
+              "android" : {
+                "name" : "com.instagram.android"
+              }
             },
-            "shareViaFunction" : "shareViaInstagram",
             "name" : "instagram",
             "title" : "Instagram",
             "image" : "images/social/instagram.png"
           }, {
-            "discover" : true,
-            "packages" : {
-              "android" : "com.twitter.android"
+            "package" : {
+              "android" : {
+                "name" : "com.twitter.android"
+              }
             },
-            "shareViaFunction" : "shareViaFacebook",
             "name" : "twitter",
             "title" : "Twitter",
             "image" : "images/social/twitter.png"
-          }, {
+          }],
+        "extraApps" : [{
             "name" : "sms",
             "title" : "Sms",
             "image" : "images/social/sms.png"
@@ -1067,8 +1106,6 @@
         "SHARE_SUBJECT_WITH_CONTEST" : "Come play with me - '{{name}}'",
         "SHARE_BODY" : "I want you to see this cool game: {{url}}",
         "SHARE_BODY_NO_URL" : "I want you to see this cool game",
-        "SHARE_BODY_WITH_CONTEST" : "I am playing for {{team}} team. Please help: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST" : "I am playing for {{team}} team in the contest '{{name}}' - please help",
         "JOIN_A_CONTEST_MESSAGE" : "Please join one of the leading contests so it will appear in my contests list",
         "LEADERBOARDS" : "Leaderboards",
         "FRIENDS" : "Friends",
@@ -1159,7 +1196,11 @@
         "CONFIRM_EXIT_QUIZ_TITLE" : "Confirm exit",
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "The points you gained will not credit your team. Are you sure you would like to exit?",
         "SYSTEM_PARTICIPANTS" : "System participants",
-        "SHARE_OTHER_OPTIONS" : "Other options..."
+        "SHARE_OTHER_OPTIONS" : "More...",
+        "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "Join the contest: {{name}} and help your team win: {{url}}",
+        "SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM" : "Join the contest: {{name}} and help your team win",
+        "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team. Please help: {{url}}",
+        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team in the contest '{{name}}' - please help"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1273,8 +1314,6 @@
         "SHARE_SUBJECT_WITH_CONTEST" : "בואו לשחק איתי - '{{name}}'",
         "SHARE_BODY" : "אתם חייבים להסתכל על המשחק המגניב הזה: {{url}}",
         "SHARE_BODY_NO_URL" : "אתם חייבים להסתכל על המשחק המגניב הזה",
-        "SHARE_BODY_WITH_CONTEST" : "הצטרפתי לשחק עבור קבוצת {{team}}. בואו לעזור: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות '{{name}}' - בואו לעזור",
         "JOIN_A_CONTEST_MESSAGE" : "אנא הצטרפו לאחת התחרויות המובילות על מנת שתופיע בתחרויות שלי",
         "LEADERBOARDS" : "היכל התהילה",
         "FRIENDS" : "חברים",
@@ -1364,7 +1403,11 @@
         "CONFIRM_EXIT_QUIZ_TITLE" : "יציאה באמצע",
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "הניקוד שצברתם לא ייזכה את קבוצתכם. האם אתם בטוחים שברצונכם לצאת?",
         "SYSTEM_PARTICIPANTS" : "משתתפי מערכת",
-        "SHARE_OTHER_OPTIONS" : "אפשרויות נוספות..."
+        "SHARE_OTHER_OPTIONS" : "עוד...",
+        "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "הצטרפו לתחרות: {{name}} ועזרו לקבוצתכם לנצח: {{url}}",
+        "SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM" : "הצטרפו לתחרות: {{name}} ועזרו לקבוצתכם לנצח",
+        "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}}. בואו לעזור: {{url}}",
+        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות '{{name}}' - בואו לעזור"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1480,8 +1523,6 @@
         "SHARE_SUBJECT_WITH_CONTEST" : "Ven a jugar conmigo - '{{name}}'",
         "SHARE_BODY" : "Yo quiero que veas a este divertido juego : {{url}}",
         "SHARE_BODY_NO_URL" : "Quiero que vea este juego fresco",
-        "SHARE_BODY_WITH_CONTEST" : "Estoy jugando para el equipo {{team}}. Por favor ayuda: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST" : "Estoy jugando para el equipo {{team}} en el concurso de '{{name}}' - por favor ayuda",
         "JOIN_A_CONTEST_MESSAGE" : "Por favor unirse a uno de los principales concursos por lo que aparecerá en mi lista de los concursos",
         "LEADERBOARDS" : "tablas de clasificación",
         "FRIENDS" : "Amigos",
@@ -1574,7 +1615,10 @@
         "CONFIRM_EXIT_QUIZ_TITLE" : "confirmar la salida",
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "Los puntos que adquirió no acreditar su equipo . ¿Está seguro de que desea salir?",
         "SYSTEM_PARTICIPANTS" : "los participantes del sistema",
-        "SHARE_OTHER_OPTIONS" : "Otras opciones"
+        "SHARE_OTHER_OPTIONS" : "Más...",
+        "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "Participar en el concurso : {{name}} y ayudar a su equipo a ganar : {{url}}",
+        "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}}. Por favor ayuda: {{url}}",
+        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}} en el concurso de '{{name}}' - por favor ayuda"
       }
     },
     "platforms" : {
@@ -1586,7 +1630,8 @@
       },
       "web" : {
         "storeLink" : "https://play.google.com/store/apps/details?id=com.fplabs.topteamer"
-      }
+      },
+      "SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM" : "Participar en el concurso : {{name}} y ayudar a su equipo a ganar"
     },
     "lists" : {
       "contests" : {
