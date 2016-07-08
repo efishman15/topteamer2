@@ -5522,8 +5522,7 @@ exports.post = function (story) { return new Promise(function (resolve, reject) 
         var mobilePostObject = {
             'method': 'share_open_graph',
             'action': story.action,
-            'action_properties': '{"' + story.object.name + '":"' + story.object.value + '"}',
-            'object': '{"og:type" : "topteamer:team"}',
+            'object': JSON.stringify(story.object)
         };
         window.facebookConnectPlugin.showDialog(mobilePostObject, function (response) {
             resolve(response);
@@ -5535,9 +5534,8 @@ exports.post = function (story) { return new Promise(function (resolve, reject) 
         var webPostObject = {
             'method': 'share_open_graph',
             'action_type': story.action,
-            'action_properties': {}
+            'action_properties': story.object
         };
-        webPostObject.action_properties[story.object.name] = story.object.value;
         try {
             window.FB.ui(webPostObject, function (response) {
                 resolve(response);

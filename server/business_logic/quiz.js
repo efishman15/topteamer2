@@ -1,14 +1,15 @@
 var path = require('path');
-var sessionUtils = require(path.resolve(__dirname, '../business_logic/session'));
+var util = require('util');
 var async = require('async');
+var sessionUtils = require(path.resolve(__dirname, '../business_logic/session'));
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var random = require(path.resolve(__dirname, '../utils/random'));
 var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
+var dalFacebook = require(path.resolve(__dirname, '../dal/dalFacebook'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var contestsBusinessLogic = require(path.resolve(__dirname, '../business_logic/contests'));
 var dalLeaderboard = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
 var commonBusinessLogic = require(path.resolve(__dirname, './common'));
-var util = require('util');
 
 //--------------------------------------------------------------------------
 //Private functions
@@ -181,7 +182,7 @@ function setQuestionDirection(data, callback) {
 // determines if the given story has a higher post priority than the current story and
 // replaces if necessary
 //----------------------------------------------------------------------------------------
-function setPostStory(data, story, objectValue) {
+function setPostStory(data, story, objectData) {
 
   var replaced = false;
 
@@ -195,8 +196,8 @@ function setPostStory(data, story, objectValue) {
     replaced = true;
   }
 
-  if (replaced && data.session.quiz.serverData.share.story.facebookPost && data.session.quiz.serverData.share.story.facebookPost.object && objectValue) {
-    data.session.quiz.serverData.share.story.facebookPost.object.value = objectValue;
+  if (replaced && data.session.quiz.serverData.share.story.facebookPost && data.session.quiz.serverData.share.story.facebookPost.object && objectData) {
+    data.session.quiz.serverData.share.story.facebookPost.object = commonBusinessLogic.getOpenGraphObject(data.session.quiz.serverData.share.story.facebookPost, objectData, false, data.session.clientInfo.mobile);
   }
 
   return replaced;
@@ -426,7 +427,13 @@ module.exports.answer = function (req, res, next) {
           var myTeam = data.contest.users[data.session.userId].team;
           commonBusinessLogic.addXp(data, 'quizFullScore');
           if (!data.session.quiz.clientData.reviewMode) {
-            setPostStory(data, 'gotPerfectScore', data.contest.teams[myTeam].link);
+            setPostStory(data, 'gotPerfectScore',
+              {
+                'contest': data.contest,
+                'teamId': myTeam,
+                'url': data.contest.teams[myTeam].link
+              }
+            );
           }
         }
 
@@ -547,7 +554,12 @@ module.exports.answer = function (req, res, next) {
         data.setData['leader.userId'] = data.session.userId;
         data.setData['leader.avatar'] = data.session.avatar;
         data.setData['leader.name'] = data.session.name;
-        setPostStory(data, 'becameContestLeader', data.contest.leaderLink);
+        setPostStory(data, 'becameContestLeader',
+          {
+            'contest': data.contest,
+            'url': data.contest.leaderLink
+          }
+        );
       }
 
       // Check if need to replace the my team's leader
@@ -556,7 +568,13 @@ module.exports.answer = function (req, res, next) {
         data.setData['teams.' + myTeam + '.leader.userId'] = data.session.userId;
         data.setData['teams.' + myTeam + '.leader.avatar'] = data.session.avatar;
         data.setData['teams.' + myTeam + '.leader.name'] = data.session.name;
-        setPostStory(data, 'becameTeamLeader', data.contest.teams[myTeam].leaderLink);
+        setPostStory(data, 'becameTeamLeader',
+          {
+            'contest': data.contest,
+            'teamId': myTeam,
+            'url': data.contest.teams[myTeam].leaderLink
+          }
+        );
       }
 
       //Update the team score
@@ -568,11 +586,23 @@ module.exports.answer = function (req, res, next) {
       // 2. My team is very close to lead
       if (data.session.quiz.serverData.share.data.myTeamStartedBehind) {
         if (data.contest.teams[myTeam].score > data.contest.teams[1 - myTeam].score) {
-          setPostStory(data, 'madeMyTeamLead', data.contest.teams[myTeam].link);
+          setPostStory(data, 'madeMyTeamLead',
+            {
+              'contest': data.contest,
+              'teamId': myTeam,
+              'url': data.contest.teams[myTeam].link
+            }
+          );
         }
         else if (data.contest.teams[myTeam].score < data.contest.teams[1 - myTeam].score &&
           contestsBusinessLogic.getTeamDistancePercent(data.contest, 1 - myTeam) < generalUtils.settings.server.quiz.teamPercentDistanceForShare) {
-          setPostStory(data, 'myTeamIsCloseToLead', data.contest.teams[myTeam].link);
+          setPostStory(data, 'myTeamIsCloseToLead',
+            {
+              'contest': data.contest,
+              'teamId': myTeam,
+              'url': data.contest.teams[myTeam].link
+            }
+          );
         }
       }
 
@@ -610,10 +640,46 @@ module.exports.answer = function (req, res, next) {
 
       if (data.passedFriends && data.passedFriends.length > 0) {
         data.session.quiz.serverData.share.data.clientData.friend = data.passedFriends[0].name;
-        var replaced = setPostStory(data, 'passedFriendInLeaderboard', util.format(generalUtils.settings.server.facebook.userOpenGraphProfileUrl, data.passedFriends[0].id, data.session.settings.language));
-        if (replaced) {
+        var replaced = setPostStory(data, 'passedFriendInLeaderboard',
+          {
+            'facebookUserId': data.passedFriends[0].id,
+            'language': data.contest.language,
+            'url': util.format(generalUtils.settings.server.facebook.userOpenGraphProfileUrl, data.passedFriends[0].id, data.contest.language)
+          }
+        );
+
+        if (replaced && data.session.clientInfo.mobile) {
+          //Adding extra info for the client - for mobile post: name, first name, last name
           data.session.quiz.serverData.share.story.facebookPost.dialogImage.url = util.format(data.session.quiz.serverData.share.story.facebookPost.dialogImage.url, data.passedFriends[0].id, data.session.quiz.serverData.share.story.facebookPost.dialogImage.width, data.session.quiz.serverData.share.story.facebookPost.dialogImage.height);
+          //Complete facebook user details
+          dalFacebook.getGeneralProfile(data.passedFriends[0].id, function (err, facebookData) {
+            if (err) {
+              dalDb.closeDb(data);
+              callback(new exceptions.ServerMessageException('SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ', null, 403));
+              return;
+            }
+
+            data.session.quiz.serverData.share.story.facebookPost.object['og:title'] = facebookData.name;
+            data.session.quiz.serverData.share.story.facebookPost.object['og:first_name'] = facebookData.first_name;
+            data.session.quiz.serverData.share.story.facebookPost.object['og:last_name'] = facebookData.last_name;
+
+            callback(null, data);
+          });
         }
+        else {
+          callback(null, data);
+        }
+      }
+      else {
+        callback(null, data);
+      }
+    },
+
+    function (data, callback) {
+      if (!data.session.quiz.clientData.finished || data.session.quiz.clientData.reviewMode) {
+        dalDb.closeDb(data);
+        callback(null, data);
+        return;
       }
 
       if (data.session.quiz.serverData.score > 0) {
@@ -626,6 +692,7 @@ module.exports.answer = function (req, res, next) {
       data.closeConnection = true;
 
       dalDb.setContest(data, callback);
+
     },
 
     //Set contest result fields (required for client only),
@@ -654,7 +721,10 @@ module.exports.answer = function (req, res, next) {
           }
         }
 
-        data.clientResponse.results = {'contest': contestsBusinessLogic.prepareContestForClient(data.contest,data.session), 'data': {}};
+        data.clientResponse.results = {
+          'contest': contestsBusinessLogic.prepareContestForClient(data.contest, data.session),
+          'data': {}
+        };
 
         data.clientResponse.results.data.score = data.session.quiz.serverData.score;
 

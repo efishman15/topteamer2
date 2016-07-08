@@ -887,4 +887,3 @@ function prepareContestForClient(contest, session) {
 
   return contestForClient;
 };
-

@@ -1,39 +1,20 @@
 var path = require('path');
 var async = require('async');
+var util = require('util');
 var dalFacebook = require(path.resolve(__dirname, '../dal/dalFacebook'));
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var sessionUtils = require(path.resolve(__dirname, '../business_logic/session'));
 var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
 var paymentUtils = require(path.resolve(__dirname, '../business_logic/payments'));
+var commonBusinessLogic = require(path.resolve(__dirname, '../common'));
 var logger = require(path.resolve(__dirname, '../utils/logger'));
-var util = require('util');
-
-//------------------------------------------------------------------------------------------------
-// Private functions
-//------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------
-// getContestName
-//
-//----------------------------------------------------
-function getContestName(contest) {
-
-  var contestName = generalUtils.translate(contest.language, 'CONTEST_NAME_LONG',
-    {
-      'team0': contest.teams[0].name,
-      'team1': contest.teams[1].name,
-      'type': contest.subject
-    });
-
-  return contestName;
-}
 
 //----------------------------------------------------
 // renderContest
 //
 //----------------------------------------------------
-function renderContest(viewName, req, res, next) {
+function renderContest(viewName, objectName, req, res, next) {
 
   if (!req.params.contestId) {
     new exceptions.ServerResponseException(res, 'contestId is required', {}, 'warn', 403);
@@ -47,14 +28,10 @@ function renderContest(viewName, req, res, next) {
 
     dalDb.getContest(data, function (err, data) {
 
-      res.render(viewName,
-        {
-          'appId': generalUtils.settings.server.facebook.appId,
-          'title': getContestName(data.contest),
-          'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
-          'contestId': req.params.contestId,
-          'redirectLink': data.contest.link
-        });
+      var facebookObject = commonBusinessLogic.getOpenGraphObject(objectName,{'contest': data.contest}, true, false);
+
+      res.render(viewName, facebookObject);
+
     });
   });
 };
@@ -63,7 +40,7 @@ function renderContest(viewName, req, res, next) {
 // renderTeam
 //
 //----------------------------------------------------
-function renderTeam(viewName, req, res, next) {
+function renderTeam(viewName, objectName, req, res, next) {
 
   if (!req.params.contestId) {
     new exceptions.ServerResponseException(res, 'contestId is required', {}, 'warn', 403);
@@ -87,16 +64,8 @@ function renderTeam(viewName, req, res, next) {
     data.closeConnection = true;
 
     dalDb.getContest(data, function (err, data) {
-
-      res.render(viewName,
-        {
-          'appId': generalUtils.settings.server.facebook.appId,
-          'title': util.format(generalUtils.settings.server.text[data.contest.language].teamTitle, data.contest.teams[teamId].name, getContestName(data.contest)),
-          'description': generalUtils.settings.server.text[data.contest.language].gameDescription,
-          'contestId': req.params.contestId,
-          'teamId': req.params.teamId,
-          'redirectLink': data.contest.link
-        });
+      var facebookObject = commonBusinessLogic.getOpenGraphObject(objectName,{'contest': data.contest, 'team' : teamId}, true, false);
+      res.render(viewName, facebookObject);
     })
   });
 }
@@ -154,7 +123,7 @@ module.exports.getProductDetails = function (req, res, next) {
           'productUrl': generalUtils.settings.client.general.baseUrlSecured + 'fb/payments?productId=' + productId + '&language=' + language,
           'language': language,
           'productId': productId,
-          'redirectLink': generalUtils.settings.client.general.downloadUrl[language]
+          'redirectUrl': generalUtils.settings.client.general.downloadUrl[language]
         });
     }
     else {
@@ -186,7 +155,7 @@ module.exports.getGameDetails = function (req, res, next) {
       'title': generalUtils.settings.server.text[req.params.language].gameTitle,
       'description': generalUtils.settings.server.text[req.params.language].gameDescription,
       'language': req.params.language,
-      'redirectLink': generalUtils.settings.client.general.downloadUrl[req.params.language]
+      'redirectUrl': generalUtils.settings.client.general.downloadUrl[req.params.language]
     });
 };
 
@@ -213,17 +182,13 @@ module.exports.getProfileDetails = function (req, res, next) {
       return;
     }
 
-    res.render('fbprofile',
-      {
-        'appId': generalUtils.settings.server.facebook.appId,
-        'id': facebookData.id,
-        'name': facebookData.name,
-        'firstName': facebookData.first_name,
-        'lastName': facebookData.last_name,
-        'description': generalUtils.settings.server.text[req.params.language].gameDescription,
-        'language': req.params.language,
-        'redirectLink': generalUtils.settings.client.general.downloadUrl[req.params.language]
-      });
+    var facebookObject = commonBusinessLogic.getOpenGraphObject('profile',{'facebookUserId': req.params.id, 'language' : req.params.language}, true, false);
+    facebookObject['og:title'] = facebookData.name;
+    facebookObject['og:first_name'] = facebookData.first_name;
+    facebookObject['og:last_name'] = facebookData.last_name;
+    facebookObject
+
+    res.render('fbprofile', facebookObject);
 
   });
 
@@ -234,7 +199,7 @@ module.exports.getProfileDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getContestDetails = function (req, res, next) {
-  renderContest('fbcontest', req, res, next);
+  renderContest('fbcontest', 'contest', req, res, next);
 };
 
 //----------------------------------------------------
@@ -242,7 +207,7 @@ module.exports.getContestDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getContestLeaderDetails = function (req, res, next) {
-  renderContest('fbcontestleader', req, res, next);
+  renderContest('fbcontestleader', 'contestLeader', req, res, next);
 };
 
 //----------------------------------------------------
@@ -250,7 +215,7 @@ module.exports.getContestLeaderDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getTeamDetails = function (req, res, next) {
-  renderTeam('fbteam', req, res, next);
+  renderTeam('fbteam', 'team', req, res, next);
 };
 
 //----------------------------------------------------
@@ -258,7 +223,7 @@ module.exports.getTeamDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getTeamLeaderDetails = function (req, res, next) {
-  renderTeam('fbteamleader', req, res, next);
+  renderTeam('fbteamleader', 'teamLeader', req, res, next);
 };
 
 
