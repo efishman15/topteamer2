@@ -41,13 +41,13 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
     case 'contest':
     case 'contestLeader':
       facebookObject['og:title'] = getContestName(objectData.contest);
-      facebookObject['og:url'] = openGraphObject['og:url'].format({'contestId': objectData.contest._id.toString()});
+      facebookObject['og:url'] = facebookObject['og:url'].format({'contestId': objectData.contest._id.toString()});
       redirectUrl = objectData.contest.link;
       break;
     case 'team':
     case 'teamLeader':
       facebookObject['og:title'] = util.format(generalUtils.settings.server.text[objectData.contest.language].teamTitle, objectData.contest.teams[objectData.team].name, getContestName(objectData.contest)),
-      facebookObject['og:url'] = openGraphObject['og:url'].format({'contestId': objectData.contest._id.toString(), 'teamId' : objectData.team});
+      facebookObject['og:url'] = facebookObject['og:url'].format({'contestId': objectData.contest._id.toString(), 'teamId' : objectData.team});
       redirectUrl = objectData.contest.link;
       break;
     case 'profile':
