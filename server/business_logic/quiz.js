@@ -273,7 +273,7 @@ module.exports.start = function (req, res, next) {
 
       //Number of questions (either entered by user or X random questions from the system
       if (data.contest.type.id !== 'userTrivia') {
-        quiz.clientData.totalQuestions = 1; //generalUtils.settings.server.quiz.questions.systemTrivia.levels.length;
+        quiz.clientData.totalQuestions = generalUtils.settings.server.quiz.questions.systemTrivia.levels.length;
         quiz.serverData.previousQuestions = [];
       }
       else {
