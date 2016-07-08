@@ -628,7 +628,6 @@ module.exports.answer = function (req, res, next) {
     function (data, callback) {
 
       if (!data.session.quiz.clientData.finished || data.session.quiz.clientData.reviewMode) {
-        dalDb.closeDb(data);
         callback(null, data);
         return;
       }
@@ -677,6 +676,12 @@ module.exports.answer = function (req, res, next) {
     },
 
     function (data, callback) {
+
+      if (!data.session.quiz.clientData.finished || data.session.quiz.clientData.reviewMode) {
+        dalDb.closeDb(data);
+        callback(null, data);
+        return;
+      }
 
       if (data.session.quiz.serverData.score > 0) {
         setPostStory(data, 'gotScore');
