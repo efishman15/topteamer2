@@ -198,6 +198,7 @@ function setPostStory(data, story, objectData) {
 
   if (replaced && data.session.quiz.serverData.share.story.facebookPost && data.session.quiz.serverData.share.story.facebookPost.object && objectData) {
     var openGraphObject = commonBusinessLogic.getOpenGraphObject(data.session.quiz.serverData.share.story.facebookPost.object.name, objectData, false, data.session.clientInfo.mobile);
+    console.log('objectType:' + data.session.quiz.serverData.share.story.facebookPost.object.name + ', openGraphObject=' + openGraphObject);
     data.session.quiz.serverData.share.story.facebookPost.object = openGraphObject.facebookObject;
   }
 
