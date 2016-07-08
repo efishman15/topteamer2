@@ -197,7 +197,7 @@ module.exports.getProfileDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getContestDetails = function (req, res, next) {
-  renderContest('fbcontest', 'contest', req, res, next);
+  renderContest('fbcontestobjects', 'contest', req, res, next);
 };
 
 //----------------------------------------------------
@@ -205,7 +205,7 @@ module.exports.getContestDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getContestLeaderDetails = function (req, res, next) {
-  renderContest('fbcontestleader', 'contestLeader', req, res, next);
+  renderContest('fbcontestobjects', 'contestLeader', req, res, next);
 };
 
 //----------------------------------------------------
@@ -213,7 +213,7 @@ module.exports.getContestLeaderDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getTeamDetails = function (req, res, next) {
-  renderTeam('fbteam', 'team', req, res, next);
+  renderTeam('fbcontestobjects', 'team', req, res, next);
 };
 
 //----------------------------------------------------
@@ -221,7 +221,7 @@ module.exports.getTeamDetails = function (req, res, next) {
 //
 //----------------------------------------------------
 module.exports.getTeamLeaderDetails = function (req, res, next) {
-  renderTeam('fbteamleader', 'teamLeader', req, res, next);
+  renderTeam('fbcontestobjects', 'teamLeader', req, res, next);
 };
 
 

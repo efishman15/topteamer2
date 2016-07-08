@@ -9,8 +9,6 @@ html
     meta(property="og:image" content="#{facebookObject['og:image']}")
     meta(property="og:image:width" content="#{facebookObject['og:image:width']}")
     meta(property="og:image:height" content="#{facebookObject['og:image:height']}")
-    meta(property="og:first_name" content="#{facebookObject['og:first_name']}")
-    meta(property="og:last_name" content="#{facebookObject['last_name']}")
-  body
-    script.
-      document.location.replace("#{redirectUrl}");
+body
+  script.
+    document.location.replace("#{facebookObject.redirectUrl}");
