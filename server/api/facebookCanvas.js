@@ -7,7 +7,7 @@ var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var sessionUtils = require(path.resolve(__dirname, '../business_logic/session'));
 var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
 var paymentUtils = require(path.resolve(__dirname, '../business_logic/payments'));
-var commonBusinessLogic = require(path.resolve(__dirname, '../common'));
+var commonBusinessLogic = require(path.resolve(__dirname, '../business_login/common'));
 var logger = require(path.resolve(__dirname, '../utils/logger'));
 
 //----------------------------------------------------
