@@ -28,9 +28,8 @@ function renderContest(viewName, objectName, req, res, next) {
 
     dalDb.getContest(data, function (err, data) {
 
-      var facebookObject = commonBusinessLogic.getOpenGraphObject(objectName,{'contest': data.contest}, true, false);
-
-      res.render(viewName, facebookObject);
+      var openGraphObject = commonBusinessLogic.getOpenGraphObject(objectName,{'contest': data.contest}, true, false);
+      res.render(viewName, openGraphObject);
 
     });
   });
@@ -64,8 +63,8 @@ function renderTeam(viewName, objectName, req, res, next) {
     data.closeConnection = true;
 
     dalDb.getContest(data, function (err, data) {
-      var facebookObject = commonBusinessLogic.getOpenGraphObject(objectName,{'contest': data.contest, 'team' : teamId}, true, false);
-      res.render(viewName, facebookObject);
+      var openGraphObject = commonBusinessLogic.getOpenGraphObject(objectName,{'contest': data.contest, 'team' : teamId}, true, false);
+      res.render(viewName, openGraphObject);
     })
   });
 }
@@ -182,13 +181,12 @@ module.exports.getProfileDetails = function (req, res, next) {
       return;
     }
 
-    var facebookObject = commonBusinessLogic.getOpenGraphObject('profile',{'facebookUserId': req.params.id, 'language' : req.params.language}, true, false);
-    facebookObject['og:title'] = facebookData.name;
-    facebookObject['og:first_name'] = facebookData.first_name;
-    facebookObject['og:last_name'] = facebookData.last_name;
-    facebookObject
+    var openGraphObject = commonBusinessLogic.getOpenGraphObject('profile',{'facebookUserId': req.params.id, 'language' : req.params.language}, true, false);
+    openGraphObject.facebookObject['og:title'] = facebookData.name;
+    openGraphObject.facebookObject['og:first_name'] = facebookData.first_name;
+    openGraphObject.facebookObject['og:last_name'] = facebookData.last_name;
 
-    res.render('fbprofile', facebookObject);
+    res.render('fbprofile', data);
 
   });
 

@@ -24,11 +24,10 @@ module.exports.addXp = function (data, action) {
 module.exports.getOpenGraphObject = getOpenGraphObject;
 function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
 
-  var facebookObject;
+  var facebookObject = {};
 
   if (!isCrawlerMode && !isMobile) {
     //Web mode - post will have a single "object" property like this: {"team" : "some Url"}
-    facebookObject = {};
     facebookObject[objectType] = objectData.url;
     return facebookObject;
   }
@@ -62,7 +61,7 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
     facebookObject['redirectUrl'] = redirectUrl;
   }
 
-  return facebookObject;
+  return {'facebookObject' : facebookObject};
 
 };
 

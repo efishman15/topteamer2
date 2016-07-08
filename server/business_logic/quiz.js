@@ -197,7 +197,8 @@ function setPostStory(data, story, objectData) {
   }
 
   if (replaced && data.session.quiz.serverData.share.story.facebookPost && data.session.quiz.serverData.share.story.facebookPost.object && objectData) {
-    data.session.quiz.serverData.share.story.facebookPost.object = commonBusinessLogic.getOpenGraphObject(data.session.quiz.serverData.share.story.facebookPost, objectData, false, data.session.clientInfo.mobile);
+    var openGraphObject = commonBusinessLogic.getOpenGraphObject(data.session.quiz.serverData.share.story.facebookPost, objectData, false, data.session.clientInfo.mobile);
+    data.session.quiz.serverData.share.story.facebookPost.object = openGraphObject.facebookObject;
   }
 
   return replaced;
