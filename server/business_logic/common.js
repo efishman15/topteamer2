@@ -29,7 +29,7 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
   if (!isCrawlerMode && !isMobile) {
     //Web mode - post will have a single "object" property like this: {"team" : "some Url"}
     facebookObject[objectType] = objectData.url;
-    return facebookObject;
+    return {'facebookObject': facebookObject};
   }
 
   var redirectUrl;
