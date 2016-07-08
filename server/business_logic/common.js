@@ -59,7 +59,7 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
 
   if (isCrawlerMode) {
     facebookObject['fb:app_id'] = generalUtils.settings.server.facebook.appId;
-    facebookObject['redirectUrl'] = generalUtils.settings.server.facebook.appId;
+    facebookObject['redirectUrl'] = redirectUrl;
   }
 
   return facebookObject;
