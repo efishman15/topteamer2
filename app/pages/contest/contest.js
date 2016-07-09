@@ -122,12 +122,7 @@ var ContestPage = (function () {
         this.client.openPage('SetContestPage', { 'mode': 'edit', 'contest': this.contest });
     };
     ContestPage.prototype.share = function (source) {
-        if (this.contest.status !== 'finished') {
-            this.client.openPage('SharePage', { 'contest': this.contest, 'source': source });
-        }
-        else {
-            this.client.openPage('SharePage', { 'source': source });
-        }
+        this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
     };
     ContestPage.prototype.like = function () {
         this.client.logEvent('like/click');

@@ -155,12 +155,7 @@ export class ContestPage {
   }
 
   share(source) {
-    if (this.contest.status !== 'finished') {
-      this.client.openPage('SharePage', {'contest': this.contest, 'source': source});
-    }
-    else {
-      this.client.openPage('SharePage', {'source': source});
-    }
+    this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
   }
 
   like() {

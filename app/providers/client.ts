@@ -460,6 +460,11 @@ export class Client {
     });
   }
 
+  share(contest:Contest, source) {
+    this.logEvent('share', {'source': source});
+    this.openPage('SharePage', {'contest': contest, 'source': source});
+  }
+
   getPage(name:string) {
     return classesService.get(name);
   }

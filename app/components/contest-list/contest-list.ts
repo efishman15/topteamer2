@@ -1,4 +1,4 @@
-import {Component, Input, EventEmitter, ViewChildren, QueryList} from '@angular/core';
+import {Component, Input, ViewChildren, QueryList} from '@angular/core';
 import {ContestChartComponent} from '../contest-chart/contest-chart';
 import {ContestDetailsComponent} from '../contest-details/contest-details';
 import {Client} from '../../providers/client';
@@ -47,6 +47,11 @@ export class ContestListComponent {
 
   onContestSelected(data: any) {
     this.client.logEvent('displayContest',{'contestId' : data.contest._id, 'source': data.source});
+    this.client.displayContest(data.contest._id);
+  }
+
+  onContestShare(data: any) {
+    this.client.logEvent('contestShare',{'contestId' : data.contest._id, 'source': data.source});
     this.client.displayContest(data.contest._id);
   }
 

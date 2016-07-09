@@ -253,8 +253,7 @@ var TopTeamerApp = (function () {
         }
     };
     TopTeamerApp.prototype.share = function () {
-        this.client.logEvent('menu/share');
-        this.client.openPage('SharePage', { 'source': 'menu' });
+        this.client.share(null, 'menu');
     };
     TopTeamerApp.prototype.settings = function () {
         this.client.logEvent('menu/settings');

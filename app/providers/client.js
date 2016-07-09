@@ -358,6 +358,10 @@ var Client = (function () {
         }, function () {
         });
     };
+    Client.prototype.share = function (contest, source) {
+        this.logEvent('share', { 'source': source });
+        this.openPage('SharePage', { 'contest': contest, 'source': source });
+    };
     Client.prototype.getPage = function (name) {
         return classesService.get(name);
     };

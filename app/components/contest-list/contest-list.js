@@ -39,6 +39,10 @@ var ContestListComponent = (function () {
         this.client.logEvent('displayContest', { 'contestId': data.contest._id, 'source': data.source });
         this.client.displayContest(data.contest._id);
     };
+    ContestListComponent.prototype.onContestShare = function (data) {
+        this.client.logEvent('contestShare', { 'contestId': data.contest._id, 'source': data.source });
+        this.client.displayContest(data.contest._id);
+    };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {
             this.contestChartComponents.forEach(function (contestChartComponent) {

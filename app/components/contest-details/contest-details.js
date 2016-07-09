@@ -18,6 +18,9 @@ var ContestDetailsComponent = (function () {
     ContestDetailsComponent.prototype.onContestSelected = function () {
         this.contestSelected.emit({ 'contest': this.contest, 'source': 'contest-details' });
     };
+    ContestDetailsComponent.prototype.share = function () {
+        this.client.share(this.contest, 'contest-details');
+    };
     ContestDetailsComponent.prototype.refresh = function (contest) {
         this.contest = contest;
     };

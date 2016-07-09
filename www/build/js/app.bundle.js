@@ -255,8 +255,7 @@ var TopTeamerApp = (function () {
         }
     };
     TopTeamerApp.prototype.share = function () {
-        this.client.logEvent('menu/share');
-        this.client.openPage('SharePage', { 'source': 'menu' });
+        this.client.share(null, 'menu');
     };
     TopTeamerApp.prototype.settings = function () {
         this.client.logEvent('menu/settings');
@@ -443,6 +442,9 @@ var ContestDetailsComponent = (function () {
     ContestDetailsComponent.prototype.onContestSelected = function () {
         this.contestSelected.emit({ 'contest': this.contest, 'source': 'contest-details' });
     };
+    ContestDetailsComponent.prototype.share = function () {
+        this.client.share(this.contest, 'contest-details');
+    };
     ContestDetailsComponent.prototype.refresh = function (contest) {
         this.contest = contest;
     };
@@ -505,6 +507,10 @@ var ContestListComponent = (function () {
     };
     ContestListComponent.prototype.onContestSelected = function (data) {
         this.client.logEvent('displayContest', { 'contestId': data.contest._id, 'source': data.source });
+        this.client.displayContest(data.contest._id);
+    };
+    ContestListComponent.prototype.onContestShare = function (data) {
+        this.client.logEvent('contestShare', { 'contestId': data.contest._id, 'source': data.source });
         this.client.displayContest(data.contest._id);
     };
     ContestListComponent.prototype.onResize = function () {
@@ -1903,12 +1909,7 @@ var ContestPage = (function () {
         this.client.openPage('SetContestPage', { 'mode': 'edit', 'contest': this.contest });
     };
     ContestPage.prototype.share = function (source) {
-        if (this.contest.status !== 'finished') {
-            this.client.openPage('SharePage', { 'contest': this.contest, 'source': source });
-        }
-        else {
-            this.client.openPage('SharePage', { 'source': source });
-        }
+        this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
     };
     ContestPage.prototype.like = function () {
         this.client.logEvent('like/click');
@@ -4684,6 +4685,10 @@ var Client = (function () {
             _this.openPage('ContestPage', { 'contest': contest });
         }, function () {
         });
+    };
+    Client.prototype.share = function (contest, source) {
+        this.logEvent('share', { 'source': source });
+        this.openPage('SharetPage', { 'contest': contest, 'source': source });
     };
     Client.prototype.getPage = function (name) {
         return classesService.get(name);

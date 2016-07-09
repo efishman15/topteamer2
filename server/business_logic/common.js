@@ -98,7 +98,7 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
       break;
     case 'team':
     case 'teamLeader':
-      facebookObject['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[contest.language].teamTitle.format({'name': objectData.contest.teams[objectData.team].name});
+      facebookObject['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[objectData.contest.language].teamTitle.format({'name': objectData.contest.teams[objectData.team].name});
       facebookObject['og:description'] = getTeamDescription(objectData.contest, objectData.team);
       facebookObject['og:url'] = facebookObject['og:url'].format({
         'contestId': objectData.contest._id.toString(),

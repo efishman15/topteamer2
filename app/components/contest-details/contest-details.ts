@@ -22,6 +22,10 @@ export class ContestDetailsComponent {
     this.contestSelected.emit({'contest': this.contest, 'source': 'contest-details'});
   }
 
+  share() {
+    this.client.share(this.contest, 'contest-details');
+  }
+
   refresh(contest: Contest) {
     this.contest = contest;
   }

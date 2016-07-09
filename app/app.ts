@@ -312,8 +312,7 @@ export class TopTeamerApp {
   }
 
   share() {
-    this.client.logEvent('menu/share');
-    this.client.openPage('SharePage', {'source': 'menu'});
+    this.client.share(null, 'menu');
   }
 
   settings() {
