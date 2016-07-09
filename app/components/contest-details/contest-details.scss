@@ -50,3 +50,22 @@
   font-size: 12px !important;
 }
 
+.contest-details-share-button-column {
+  flex: 0 0 35px;
+}
+
+.contest-details-share-button-column-ltr {
+  padding-left: 10px;
+  padding-right: 0px;
+}
+
+.contest-details-share-button-column-rtl {
+  padding-left: 0px;
+  padding-right: 10px;
+}
+
+.contest-details-share-button {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}

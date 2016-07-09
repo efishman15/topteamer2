@@ -9,9 +9,9 @@
 <ion-content class="app-bg">
 
   <div class="base-font" padding text-center>
-    <h3 padding *ngIf="params.data.contest">{{params.data.contest.name.long}}</h3>
-    <h3 padding *ngIf="!params.data.contest">{{client.translate('GAME_NAME')}}</h3>
-    <h5 padding-bottom>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h5>
+    <h3 padding-bottom>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h3>
+    <h5 padding *ngIf="params.data.contest">{{params.data.contest.name.long}}</h5>
+    <h5 padding *ngIf="!params.data.contest">{{client.translate('GAME_NAME')}}</h5>
 
     <ion-list *ngIf="!client.user.clientInfo.mobile">
       <div padding *ngFor="let row of client.settings.share.web.networks, let i=index">

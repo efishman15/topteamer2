@@ -417,7 +417,7 @@ var SetContestPage = (function () {
             contestName = this.client.translate('CONTEST_NAME_LONG', {
                 'team0': this.contestLocalCopy.teams[0].name,
                 'team1': this.contestLocalCopy.teams[1].name,
-                'type': this.contestLocalCopy.subject
+                'subject': this.contestLocalCopy.subject
             });
         }
         this.client.openPage('SetContestAdminPage', {

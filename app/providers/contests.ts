@@ -264,7 +264,7 @@ export let setContestClientData = (contest:Contest) => {
   contest.name.long = client.translate('CONTEST_NAME_LONG', {
     'team0': contest.teams[0].name,
     'team1': contest.teams[1].name,
-    'type': contest.subject
+    'subject': contest.subject
   });
   contest.name.short = client.translate('CONTEST_NAME_SHORT', {
     'team0': contest.teams[0].name,

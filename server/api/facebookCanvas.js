@@ -151,8 +151,8 @@ module.exports.getGameDetails = function (req, res, next) {
   res.render('fbgame',
     {
       'appId': generalUtils.settings.server.facebook.appId,
-      'title': generalUtils.settings.server.text[req.params.language].gameTitle,
-      'description': generalUtils.settings.server.text[req.params.language].gameDescription,
+      'title': generalUtils.settings.server.facebook.openGraphStories.text[req.params.language].gameTitle,
+      'description': generalUtils.settings.server.facebook.openGraphStories.text[req.params.language].gameDescription,
       'language': req.params.language,
       'redirectUrl': generalUtils.settings.client.general.downloadUrl[req.params.language]
     });

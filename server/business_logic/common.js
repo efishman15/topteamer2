@@ -1,6 +1,59 @@
 var path = require('path');
 var util = require('util');
-var generalUtils = require(path.resolve(__dirname,'../utils/general'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+
+//----------------------------------------------------
+// Private functions
+//
+//----------------------------------------------------
+
+//----------------------------------------------------
+// getContestTitle
+//
+//----------------------------------------------------
+function getContestTitle(contest) {
+
+  var contestTitle = generalUtils.settings.server.facebook.openGraphStories.text[contest.language].contestTitle.format(
+    {
+      'team0': contest.teams[0].name,
+      'team1': contest.teams[1].name,
+      'subject': contest.subject
+    });
+
+  return contestTitle;
+}
+
+//----------------------------------------------------
+// getTeamTitle
+//
+//----------------------------------------------------
+function getTeamTitle(contest, team) {
+
+
+}
+
+//----------------------------------------------------
+// getOtherTeamDescription
+//
+//----------------------------------------------------
+function getTeamDescription(contest, myTeam) {
+
+  var propertyName;
+  if (contest.teams[myTeam].score <= contest.teams[1 - myTeam].score) {
+    propertyName = 'teamDescriptionWinning';
+  }
+  else {
+    propertyName = 'teamDescriptionLosing';
+  }
+
+  var description = generalUtils.settings.server.facebook.openGraphStories.text[contest.language][propertyName];
+  description = description.format({
+    'name': contest.teams[1 - myTeam].name,
+    'subject': contest.subject
+  });
+
+  return description;
+}
 
 //---------------------------------------------------------------------------------
 // addXp
@@ -10,11 +63,11 @@ var generalUtils = require(path.resolve(__dirname,'../utils/general'));
 //---------------------------------------------------------------------------------
 module.exports.addXp = function (data, action) {
 
-    if (!data.xpProgress) {
-        data.xpProgress = new generalUtils.XpProgress(data.session.xp, data.session.rank);
-    }
+  if (!data.xpProgress) {
+    data.xpProgress = new generalUtils.XpProgress(data.session.xp, data.session.rank);
+  }
 
-    data.xpProgress.addXp(data.session, action);
+  data.xpProgress.addXp(data.session, action);
 
 }
 
@@ -33,25 +86,33 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
   }
 
   var redirectUrl;
-  facebookObject  = JSON.parse(JSON.stringify(generalUtils.settings.server.facebook.openGraphObjects[objectType]));
-  facebookObject['og:description'] = generalUtils.settings.server.text[objectData.contest.language].gameDescription;
+  facebookObject = JSON.parse(JSON.stringify(generalUtils.settings.server.facebook.openGraphStories.objects[objectType]));
 
   switch (objectType) {
     case 'contest':
     case 'contestLeader':
-      facebookObject['og:title'] = getContestName(objectData.contest);
+      facebookObject['og:title'] = getContestTitle(objectData.contest);
       facebookObject['og:url'] = facebookObject['og:url'].format({'contestId': objectData.contest._id.toString()});
+      facebookObject['og:description'] = generalUtils.settings.server.facebook.openGraphStories.text[objectData.contest.language].gameDescription;
       redirectUrl = objectData.contest.link;
       break;
     case 'team':
     case 'teamLeader':
-      facebookObject['og:title'] = util.format(generalUtils.settings.server.text[objectData.contest.language].teamTitle, objectData.contest.teams[objectData.team].name, getContestName(objectData.contest)),
-      facebookObject['og:url'] = facebookObject['og:url'].format({'contestId': objectData.contest._id.toString(), 'teamId' : objectData.team});
+      facebookObject['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[contest.language].teamTitle.format({'name': objectData.contest.teams[objectData.team].name});
+      facebookObject['og:description'] = getTeamDescription(objectData.contest, objectData.team);
+      facebookObject['og:url'] = facebookObject['og:url'].format({
+        'contestId': objectData.contest._id.toString(),
+        'teamId': objectData.team
+      });
       redirectUrl = objectData.contest.link;
       break;
     case 'profile':
-      facebookObject['og:url'] = facebookObject['og:url'].format({'facebookUserId': objectData.facebookUserId, 'language' : objectData.language});
+      facebookObject['og:url'] = facebookObject['og:url'].format({
+        'facebookUserId': objectData.facebookUserId,
+        'language': objectData.language
+      });
       facebookObject['og:image'] = facebookObject['og:image'].format({'facebookUserId': objectData.facebookUserId});
+      facebookObject['og:description'] = generalUtils.settings.server.facebook.openGraphStories.text[objectData.language].gameDescription;
       redirectUrl = generalUtils.settings.client.general.downloadUrl[objectData.language];
       break;
   }
@@ -61,23 +122,7 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
     facebookObject['redirectUrl'] = redirectUrl;
   }
 
-  return {'facebookObject' : facebookObject};
+  return {'facebookObject': facebookObject};
 
 };
 
-//----------------------------------------------------
-// getContestName
-//
-//----------------------------------------------------
-module.exports.getContestName = getContestName;
-function getContestName(contest) {
-
-  var contestName = generalUtils.translate(contest.language, 'CONTEST_NAME_LONG',
-    {
-      'team0': contest.teams[0].name,
-      'team1': contest.teams[1].name,
-      'type': contest.subject
-    });
-
-  return contestName;
-}

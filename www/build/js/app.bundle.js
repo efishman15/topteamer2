@@ -1865,7 +1865,7 @@ var ContestPage = (function () {
                 'sourceClick': source
             });
             //Should also cause refresh internally to our contest chart as well as notifying the tabs outside
-            _this.client.events.publish('topTeamer:contestUpdated', data.contest);
+            _this.client.events.publish('topTeamer:contestUpdated', data.contest, data.contest.status, data.contest.status);
             //Should get xp if fresh join
             var rankModal;
             if (data.xpProgress && data.xpProgress.addition > 0) {
@@ -3979,7 +3979,7 @@ var SetContestPage = (function () {
             contestName = this.client.translate('CONTEST_NAME_LONG', {
                 'team0': this.contestLocalCopy.teams[0].name,
                 'team1': this.contestLocalCopy.teams[1].name,
-                'type': this.contestLocalCopy.subject
+                'subject': this.contestLocalCopy.subject
             });
         }
         this.client.openPage('SetContestAdminPage', {
@@ -5322,7 +5322,7 @@ exports.setContestClientData = function (contest) {
     contest.name.long = client.translate('CONTEST_NAME_LONG', {
         'team0': contest.teams[0].name,
         'team1': contest.teams[1].name,
-        'type': contest.subject
+        'subject': contest.subject
     });
     contest.name.short = client.translate('CONTEST_NAME_SHORT', {
         'team0': contest.teams[0].name,

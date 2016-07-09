@@ -9596,6 +9596,25 @@ body {
   color: #00457f;
   font-size: 12px !important; }
 
+.contest-details-share-button-column {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 35px;
+  -ms-flex: 0 0 35px;
+  flex: 0 0 35px; }
+
+.contest-details-share-button-column-ltr {
+  padding-left: 10px;
+  padding-right: 0px; }
+
+.contest-details-share-button-column-rtl {
+  padding-left: 0px;
+  padding-right: 10px; }
+
+.contest-details-share-button {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%; }
+
 .center-image-container {
   transform: translateX(50%);
   -moz-transform: translateX(50%);

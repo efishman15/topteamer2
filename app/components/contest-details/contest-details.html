@@ -31,6 +31,11 @@
               </span>
         </div>
       </ion-col>
+      <ion-col class="contest-details-share-button-column contest-details-share-button-column-{{client.currentLanguage.direction}}">
+        <button light-blue (click)="share()" class="contest-details-share-button">
+          <ion-icon name="share"></ion-icon>
+        </button>
+      </ion-col>
     </ion-row>
   </div>
 </div>

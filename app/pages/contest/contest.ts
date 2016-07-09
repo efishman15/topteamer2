@@ -109,7 +109,7 @@ export class ContestPage {
       });
 
       //Should also cause refresh internally to our contest chart as well as notifying the tabs outside
-      this.client.events.publish('topTeamer:contestUpdated', data.contest);
+      this.client.events.publish('topTeamer:contestUpdated', data.contest, data.contest.status, data.contest.status);
 
       //Should get xp if fresh join
       var rankModal;

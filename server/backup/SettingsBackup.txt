@@ -88,41 +88,69 @@
       "appId" : "344342552056",
       "contestImageUrl" : "http://www.topteamer.com/images/trophy.png",
       "userOpenGraphProfileUrl" : "http://www.topteamer.com/facebook/profile/%s/%s",
-      "openGraphObjects" : {
-        "contest" : {
-          "og:type" : "topteamer:contest",
-          "og:url" : "http://www.topteamer.com/facebook/contest/{{contestId}}",
-          "og:image" : "http://www.topteamer.com/images/winner1.jpg",
-          "og:image:width" : 512,
-          "og:image:height" : 512
+      "openGraphStories" : {
+        "objects" : {
+          "contest" : {
+            "og:type" : "topteamer:contest",
+            "og:url" : "http://www.topteamer.com/facebook/contest/{{contestId}}",
+            "og:image" : "http://www.topteamer.com/images/winner1.jpg",
+            "og:image:width" : 1200,
+            "og:image:height" : 630
+          },
+          "contestLeader" : {
+            "og:type" : "topteamer:contestleader",
+            "og:url" : "http://www.topteamer.com/facebook/contestLeader/{{contestId}}",
+            "og:image" : "http://www.topteamer.com/images/winner1.jpg",
+            "og:image:width" : 1200,
+            "og:image:height" : 630
+          },
+          "teamLeader" : {
+            "og:type" : "topteamer:teamleader",
+            "og:url" : "http://www.topteamer.com/facebook/team/{{contestId}}/{{teamId}}",
+            "og:image" : "http://www.topteamer.com/images/winner2.jpg",
+            "og:image:width" : 1200,
+            "og:image:height" : 630
+          },
+          "team" : {
+            "og:type" : "topteamer:team",
+            "og:url" : "http://www.topteamer.com/facebook/team/{{contestId}}/{{teamId}}",
+            "og:image" : "http://www.topteamer.com/images/winner2.jpg",
+            "og:image:width" : 1200,
+            "og:image:height" : 630
+          },
+          "profile" : {
+            "og:type" : "profile",
+            "og:url" : "http://www.topteamer.com/facebook/profile/{{facebookUserId}}/{{language}}",
+            "og:image" : "https://graph.facebook.com/{{facebookUserId}/picture?width=400&height=210",
+            "og:image:width" : 400,
+            "og:image:height" : 210
+          }
         },
-        "contestLeader" : {
-          "og:type" : "topteamer:contestleader",
-          "og:url" : "http://www.topteamer.com/facebook/contestLeader/{{contestId}}",
-          "og:image" : "http://www.topteamer.com/images/winner1.jpg",
-          "og:image:width" : 512,
-          "og:image:height" : 512
-        },
-        "teamLeader" : {
-          "og:type" : "topteamer:teamleader",
-          "og:url" : "http://www.topteamer.com/facebook/team/{{contestId}}/{{teamId}}",
-          "og:image" : "http://www.topteamer.com/images/winner2.jpg",
-          "og:image:width" : 1200,
-          "og:image:height" : 630
-        },
-        "profile1" : {
-          "og:type" : "profile",
-          "og:url" : "http://www.topteamer.com/facebook/profile/{{facebookUserId}}/{{language}}",
-          "og:image" : "https://graph.facebook.com/{{facebookUserId}/picture?width=400&height=210",
-          "og:image:width" : 400,
-          "og:image:height" : 210
-        },
-        "team" : {
-          "og:type" : "topteamer:team",
-          "og:url" : "http://www.topteamer.com/facebook/team/{{contestId}}/{{teamId}}",
-          "og:image" : "http://www.topteamer.com/images/winner2.jpg",
-          "og:image:width" : 512,
-          "og:image:height" : 512
+        "text" : {
+          "he" : {
+            "gameDescription" : "בואו לשחק במשחק החדש: \"מי יותר שווה\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
+            "gameTitle" : "מי יותר שווה: הצטרפו לתחרויות ועזרו לקבוצתכם לנצח",
+            "contestTitle" : "{{team0}} או {{team1}}??? בתחרות {{subject}}",
+            "teamTitle" : "אני בקבוצת {{name}}. איפה אתם?",
+            "teamDescriptionWinning" : "קבוצת {{name}} קורעת לנו את הצורה ב{{subject}}. בואו לשחק במשחק החדש: \"מי יותר שווה\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
+            "teamDescriptionLosing" : "קבוצת {{name}} מפסידה לנו בגדול ב{{subject}}. בואו לשחק במשחק החדש: \"מי יותר שווה\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח"
+          },
+          "es" : {
+            "gameDescription" : "Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
+            "gameTitle" : "Quien es mejor: unirse a uno o más concursos y averiguar quién es el mejor equipo",
+            "contestTitle" : "{{team0}} or {{team1}}??? Compitiendo en {{subject}}}",
+            "teamTitle" : "Estoy a favor de {{name}}. ¿Dónde estás?",
+            "teamDescriptionWinning" : "{{name}} nos están matando en {{subject}}. Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
+            "teamDescriptionLosing" : "{{name}} están perdiendo a lo grande en {{subject}}. Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión"
+          },
+          "en" : {
+            "gameDescription" : "Play our new and exciting game: \"Who's better\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
+            "gameTitle" : "Who's better: join one or more contests and find out who's the best team",
+            "contestTitle" : "{{team0}} or {{team1}}??? Competing in {{subject}}",
+            "teamTitle" : "I'm for {{name}}. Where are you?",
+            "teamDescriptionWinning" : "{{name}} are killing us in {{subject}}",
+            "teamDescriptionLosing" : "{{name}} are losing big time in {{subject}}. Play our new and exciting game: \"Who's better\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions"
+          }
         }
       }
     },
@@ -409,23 +437,6 @@
     "leaderboard" : {
       "pageSize" : 10,
       "friendsAboveMePageSize" : 2
-    },
-    "text" : {
-      "he" : {
-        "gameDescription" : "המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם (לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
-        "teamTitle" : "קבוצת %s בתחרות '%s'",
-        "gameTitle" : "הצטרפו לתחרויות ועזרו לקבוצתכם לנצח"
-      },
-      "es" : {
-        "gameDescription" : "topTeamer es un juego que le permite unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
-        "teamTitle" : "Equipo %s en el concurso '%s'",
-        "gameTitle" : "topTeamer : unirse a uno o más concursos y averiguar quién es el mejor equipo"
-      },
-      "en" : {
-        "gameDescription" : "topTeamer is a game which enables you to join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
-        "teamTitle" : "%s team in the contest '%s'",
-        "gameTitle" : "topTeamer: join one or more contests and find out who's the best team"
-      }
     },
     "branch" : {
       "key" : "key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE",
@@ -1175,12 +1186,12 @@
         "CONTEST_CREATED_ON" : "On {{month}} {{day}}, {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["S", "M", "T", "W", "T", "F", "S"],
         "DATE_PICKER_MONTH_NAMES" : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        "GAME_NAME" : "Top Teamer",
+        "GAME_NAME" : "Who's better",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} won",
         "AGAINST" : "vs.",
         "TIE" : "Draw contest",
         "PLAY_FOR_TEAM" : "Play for {{team}}",
-        "CONTEST_NAME_LONG" : "{{team0}} vs. {{team1}}: {{type}}",
+        "CONTEST_NAME_LONG" : "{{team0}} vs. {{team1}} competing in {{subject}}",
         "CONTEST_NAME_SHORT" : "{{team0}} vs. {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivia questions",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "{{name}}'s questions",
@@ -1382,14 +1393,14 @@
         "CONTEST_CREATED_ON" : "ב {{day}} ל {{month}}, {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["א", "ב", "ג", "ד", "ה", "ו", "ש"],
         "DATE_PICKER_MONTH_NAMES" : ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"],
-        "GAME_NAME" : "Top Teamer",
+        "GAME_NAME" : "מי יותר שווה",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ניצחו",
         "AGAINST" : "נגד",
         "TIE" : "תיקו בתחרות",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "טריוויה",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "השאלות של {{name}}",
         "PLAY_FOR_TEAM" : "שחקו עבור {{team}}",
-        "CONTEST_NAME_LONG" : "{{team0}} נגד {{team1}}: {{type}}",
+        "CONTEST_NAME_LONG" : "{{team0}} נגד {{team1}} בתחרות {{subject}}",
         "CONTEST_NAME_SHORT" : "{{team0}} נגד {{team1}}",
         "CONTEST_VIEW_TITLE" : "מי יותר שווה?",
         "QUIZ_VIEW_TITLE" : "מובילים: {{Team}}",
@@ -1594,12 +1605,12 @@
         "CONTEST_CREATED_ON" : "El {{day}} de {{month}} {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["D", "L", "M", "M", "J", "V", "S"],
         "DATE_PICKER_MONTH_NAMES" : ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-        "GAME_NAME" : "Top Teamer",
+        "GAME_NAME" : "Quien es mejor",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ganadas",
         "AGAINST" : "frente a",
         "TIE" : "Dibuje la competencia",
         "PLAY_FOR_TEAM" : "Jugar para {{team}}",
-        "CONTEST_NAME_LONG" : "{{team0}} frente a {{team1}}: {{type}}",
+        "CONTEST_NAME_LONG" : "{{team0}} frente a {{team1}} que compiten en {{subject}}",
         "CONTEST_NAME_SHORT" : "{{team0}} frente a {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivialidades",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "Concurso de conocimiento",

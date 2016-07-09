@@ -84,7 +84,7 @@ var ContestPage = (function () {
                 'sourceClick': source
             });
             //Should also cause refresh internally to our contest chart as well as notifying the tabs outside
-            _this.client.events.publish('topTeamer:contestUpdated', data.contest);
+            _this.client.events.publish('topTeamer:contestUpdated', data.contest, data.contest.status, data.contest.status);
             //Should get xp if fresh join
             var rankModal;
             if (data.xpProgress && data.xpProgress.addition > 0) {
