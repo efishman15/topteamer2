@@ -494,7 +494,7 @@ var QuizPage = (function () {
         this.client.nav.present(modal);
     };
     QuizPage.prototype.share = function () {
-        this.client.openPage('SharePage', { 'contest': this.params.data.contest, 'source': 'quiz' });
+        this.client.share(this.params.data.contest, 'quiz');
     };
     QuizPage.prototype.onResize = function () {
         this.clearQuizProgress();

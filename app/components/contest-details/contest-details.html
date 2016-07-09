@@ -1,10 +1,10 @@
-<div [ngStyle]="{'width': client.chartWidth + 'px'}" class="contest-details-container pointer">
+<div [ngStyle]="{'width': client.chartWidth + 'px'}" class="contest-details-container">
   <div text-center class="chart-bottom-line-separator">
   </div>
-  <div (click)="onContestSelected({'contest': contest, 'source': 'details'})" class="contest-chart-bottom-container">
+  <div class="contest-chart-bottom-container">
     <ion-row class="no-padding">
       <ion-col class="no-padding">
-        <ion-item no-lines class="no-padding">
+        <ion-item no-lines class="no-padding pointer" (click)="onContestSelected({'contest': contest, 'source': 'details'})">
           <ion-avatar item-left class="no-padding no-margin">
             <img src="{{contest.creator.avatar}}">
           </ion-avatar>
@@ -15,13 +15,12 @@
               </span>
             <p class="contest-started">{{contest.time.start.text}}</p>
           </div>
-
         </ion-item>
       </ion-col>
       <ion-col width-5>
       </ion-col>
       <ion-col class="no-padding">
-        <div class="contest-participants-area" [ngStyle]="{'float': client.currentLanguage.oppositeAlign}">
+        <div class="contest-participants-area pointer" [ngStyle]="{'float': client.currentLanguage.oppositeAlign}" (click)="onContestSelected({'contest': contest, 'source': 'details'})">
               <span [ngStyle]="{'float': client.currentLanguage.align}"
                     class="contest-chart-bottom-ribbon-participants-text">
               <span [ngStyle]="{'float': client.currentLanguage.align}"
@@ -31,7 +30,7 @@
               </span>
         </div>
       </ion-col>
-      <ion-col class="contest-details-share-button-column contest-details-share-button-column-{{client.currentLanguage.direction}}">
+      <ion-col class="pointer contest-details-share-button-column contest-details-share-button-column-{{client.currentLanguage.direction}}">
         <button light-blue (click)="share()" class="contest-details-share-button">
           <ion-icon name="share"></ion-icon>
         </button>

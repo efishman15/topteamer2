@@ -608,7 +608,7 @@ export class QuizPage {
   }
 
   share() {
-    this.client.openPage('SharePage', {'contest': this.params.data.contest, 'source': 'quiz'});
+    this.client.share(this.params.data.contest, 'quiz');
   }
 
   onResize() {

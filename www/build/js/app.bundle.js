@@ -3203,7 +3203,7 @@ var QuizPage = (function () {
         this.client.nav.present(modal);
     };
     QuizPage.prototype.share = function () {
-        this.client.openPage('SharePage', { 'contest': this.params.data.contest, 'source': 'quiz' });
+        this.client.share(this.params.data.contest, 'quiz');
     };
     QuizPage.prototype.onResize = function () {
         this.clearQuizProgress();
@@ -4688,7 +4688,7 @@ var Client = (function () {
     };
     Client.prototype.share = function (contest, source) {
         this.logEvent('share', { 'source': source });
-        this.openPage('SharetPage', { 'contest': contest, 'source': source });
+        this.openPage('SharePage', { 'contest': contest, 'source': source });
     };
     Client.prototype.getPage = function (name) {
         return classesService.get(name);
