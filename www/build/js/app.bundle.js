@@ -4657,7 +4657,7 @@ var Client = (function () {
                     if (!err.additionalInfo || !err.additionalInfo.confirm) {
                         alertService.alert(err).then(function () {
                             reject(err);
-                        }, function (alertError) {
+                        }, function () {
                             reject(err);
                         });
                     }
@@ -4675,7 +4675,7 @@ var Client = (function () {
                 else {
                     alertService.alert({ 'type': 'SERVER_ERROR_GENERAL' }).then(function () {
                         reject(err);
-                    }, function (alertError) {
+                    }, function () {
                         reject(err);
                     });
                 }

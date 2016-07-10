@@ -423,8 +423,8 @@ module.exports.answer = function (req, res, next) {
         commonBusinessLogic.addXp(data, 'correctAnswer');
 
         //PerfectScore story
-        if (data.session.quiz.serverData.correctAnswers === data.session.quiz.clientData.totalQuestions) {
-          //Contest object is retrieved if reached all questions => quiz finished
+        if (data.session.quiz.clientData.finished &&& data.session.quiz.serverData.correctAnswers === data.session.quiz.clientData.totalQuestions) {
+          //Contest object is retrieved if quiz finished
           var myTeam = data.contest.users[data.session.userId].team;
           commonBusinessLogic.addXp(data, 'quizFullScore');
           if (!data.session.quiz.clientData.reviewMode) {
