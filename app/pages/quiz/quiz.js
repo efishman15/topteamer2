@@ -142,6 +142,10 @@ var QuizPage = (function () {
                 case 'SERVER_ERROR_GENERAL':
                     _this.client.nav.pop();
                     break;
+                default:
+                    //Allow the user to answer again - probably timeout error
+                    _this.quizData.currentQuestion.answered = false;
+                    break;
             }
         });
     };

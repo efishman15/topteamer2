@@ -90,23 +90,26 @@ export let showPurchaseSuccess = (serverPurchaseData) => {
 //------------------------------------------------------
 //-- processPayment
 //------------------------------------------------------
-export let processPayment = (method, purchaseData, extraPurchaseData) => new Promise((resolve, reject) => {
+export let processPayment = (method, purchaseData, extraPurchaseData) => {
 
-  var client = Client.getInstance();
+  return new Promise((resolve, reject) => {
 
-  var postData = {'method': method, 'purchaseData': purchaseData};
-  if (extraPurchaseData) {
-    postData['extraPurchaseData'] = extraPurchaseData;
-  }
+    var client = Client.getInstance();
 
-  client.serverPost('payments/process', postData).then((serverPuchaseData) => {
-    if (resolve) {
-      resolve(serverPuchaseData);
+    var postData = {'method': method, 'purchaseData': purchaseData};
+    if (extraPurchaseData) {
+      postData['extraPurchaseData'] = extraPurchaseData;
     }
-  }, (error) => {
-    if (reject) {
-      reject(error);
-    }
-  })
-});
+
+    client.serverPost('payments/process', postData).then((serverPuchaseData) => {
+      if (resolve) {
+        resolve(serverPuchaseData);
+      }
+    }, (error) => {
+      if (reject) {
+        reject(error);
+      }
+    })
+  });
+}
 

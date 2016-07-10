@@ -91,6 +91,7 @@ export let mobileDiscoverSharingApps = () => {
 }
 
 export let mobileDiscoverApp = (client: any, shareApp:ClientShareDiscoverApp, shareVariables:ShareVariables) => {
+
   return new Promise((resolve:any, reject:any) => {
 
     window.plugins.socialsharing.canShareVia(shareApp.package[client.clientInfo.platform].name, shareVariables.shareBodyNoUrl,

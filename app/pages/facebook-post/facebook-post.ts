@@ -27,14 +27,16 @@ export class FacebookPostPage {
   post() {
     this.client.logEvent('contest/facebook/post/click');
     facebookService.post(this.quizResults.data.facebookPost).then((response) => {
-      this.close();
+      this.close(true);
     }, (error) => {
       window.myLogError('FacebookPostError', 'Error posting: ' + error);
     })
   }
 
-  close() {
-    this.client.logEvent('contest/facebook/post/cancel');
+  close(posted: boolean) {
+    if (!posted) {
+      this.client.logEvent('contest/facebook/post/cancel');
+    }
     this.viewController.dismiss();
   }
 }

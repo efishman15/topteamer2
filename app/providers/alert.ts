@@ -4,72 +4,78 @@ import {Alert, ActionSheet} from 'ionic-angular';
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-export let alert = (message) => new Promise((resolve, reject) => {
+export let alert = (message) => {
 
-  var client = Client.getInstance();
+  return new Promise((resolve, reject) => {
 
-  var alert:Alert;
-  var title;
-  var messageText;
+    var client = Client.getInstance();
 
-  if (message.type) {
-    if (!message.additionalInfo) {
-      message.additionalInfo = {};
+    var alert:Alert;
+    var title;
+    var messageText;
+
+    if (message.type) {
+      if (!message.additionalInfo) {
+        message.additionalInfo = {};
+      }
+
+      title = client.translate(message.type + '_TITLE');
+      messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
+
+    }
+    else {
+      messageText = message;
     }
 
-    title = client.translate(message.type + '_TITLE');
-    messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
+    alert = Alert.create({
+      message: messageText,
+      buttons: [
+        {
+          text: client.translate('OK'),
+          role: 'cancel',
+          handler: resolve
+        }
+      ]
+    });
 
-  }
-  else {
-    messageText = message;
-  }
+    if (title) {
+      alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');
+    }
 
-  alert = Alert.create({
-    message: messageText,
-    buttons: [
-      {
-        text: client.translate('OK'),
-        role: 'cancel',
-        handler: resolve
-      }
-    ]
+    client.nav.present(alert);
+
   });
-
-  if (title) {
-    alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');
-  }
-
-  client.nav.present(alert);
-
-});
+}
 
 //------------------------------------------------------
 //-- confirm
 //------------------------------------------------------
-export let confirm = (title, message, params?) => new Promise((resolve, reject) => {
+export let confirm = (title, message, params?) => {
 
-  var client = Client.getInstance();
-  var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
+  return new Promise((resolve, reject) => {
 
-  var alert = Alert.create({
-    title: alignedTitle,
-    message: client.translate(message, params),
-    buttons: [
-      {
-        text: client.translate('OK'),
-        handler: resolve
-      },
-      {
-        text: client.translate('CANCEL'),
-        handler: reject
-      }
-    ]
+    var client = Client.getInstance();
+    var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
+
+    var alert = Alert.create({
+      title: alignedTitle,
+      message: client.translate(message, params),
+      buttons: [
+        {
+          text: client.translate('OK'),
+          handler: resolve
+        },
+        {
+          text: client.translate('CANCEL'),
+          handler: reject
+        }
+      ]
+    });
+
+    client.nav.present(alert);
+
   });
-
-  client.nav.present(alert);
-
-});
+}
 
 
 //------------------------------------------------------

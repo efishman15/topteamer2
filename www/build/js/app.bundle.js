@@ -1991,13 +1991,15 @@ var FacebookPostPage = (function () {
         var _this = this;
         this.client.logEvent('contest/facebook/post/click');
         facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
-            _this.close();
+            _this.close(true);
         }, function (error) {
             window.myLogError('FacebookPostError', 'Error posting: ' + error);
         });
     };
-    FacebookPostPage.prototype.close = function () {
-        this.client.logEvent('contest/facebook/post/cancel');
+    FacebookPostPage.prototype.close = function (posted) {
+        if (!posted) {
+            this.client.logEvent('contest/facebook/post/cancel');
+        }
         this.viewController.dismiss();
     };
     FacebookPostPage = __decorate([
@@ -2850,6 +2852,10 @@ var QuizPage = (function () {
                     break;
                 case 'SERVER_ERROR_GENERAL':
                     _this.client.nav.pop();
+                    break;
+                default:
+                    //Allow the user to answer again - probably timeout error
+                    _this.quizData.currentQuestion.answered = false;
                     break;
             }
         });
@@ -4193,58 +4199,62 @@ var ionic_angular_1 = require('ionic-angular');
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-exports.alert = function (message) { return new Promise(function (resolve, reject) {
-    var client = client_1.Client.getInstance();
-    var alert;
-    var title;
-    var messageText;
-    if (message.type) {
-        if (!message.additionalInfo) {
-            message.additionalInfo = {};
-        }
-        title = client.translate(message.type + '_TITLE');
-        messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
-    }
-    else {
-        messageText = message;
-    }
-    alert = ionic_angular_1.Alert.create({
-        message: messageText,
-        buttons: [
-            {
-                text: client.translate('OK'),
-                role: 'cancel',
-                handler: resolve
+exports.alert = function (message) {
+    return new Promise(function (resolve, reject) {
+        var client = client_1.Client.getInstance();
+        var alert;
+        var title;
+        var messageText;
+        if (message.type) {
+            if (!message.additionalInfo) {
+                message.additionalInfo = {};
             }
-        ]
+            title = client.translate(message.type + '_TITLE');
+            messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
+        }
+        else {
+            messageText = message;
+        }
+        alert = ionic_angular_1.Alert.create({
+            message: messageText,
+            buttons: [
+                {
+                    text: client.translate('OK'),
+                    role: 'cancel',
+                    handler: resolve
+                }
+            ]
+        });
+        if (title) {
+            alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');
+        }
+        client.nav.present(alert);
     });
-    if (title) {
-        alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');
-    }
-    client.nav.present(alert);
-}); };
+};
 //------------------------------------------------------
 //-- confirm
 //------------------------------------------------------
-exports.confirm = function (title, message, params) { return new Promise(function (resolve, reject) {
-    var client = client_1.Client.getInstance();
-    var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
-    var alert = ionic_angular_1.Alert.create({
-        title: alignedTitle,
-        message: client.translate(message, params),
-        buttons: [
-            {
-                text: client.translate('OK'),
-                handler: resolve
-            },
-            {
-                text: client.translate('CANCEL'),
-                handler: reject
-            }
-        ]
+exports.confirm = function (title, message, params) {
+    return new Promise(function (resolve, reject) {
+        var client = client_1.Client.getInstance();
+        var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
+        var alert = ionic_angular_1.Alert.create({
+            title: alignedTitle,
+            message: client.translate(message, params),
+            buttons: [
+                {
+                    text: client.translate('OK'),
+                    handler: resolve
+                },
+                {
+                    text: client.translate('CANCEL'),
+                    handler: reject
+                }
+            ]
+        });
+        client.nav.present(alert);
     });
-    client.nav.present(alert);
-}); };
+};
 //------------------------------------------------------
 //-- confirmExitApp
 //------------------------------------------------------
@@ -4640,11 +4650,14 @@ var Client = (function () {
                         }
                     });
                 }
-                else {
+                else if (err.httpStatus) {
+                    //An error coming from our server
                     //Display an alert or confirm message and continue the reject so further 'catch' blocks
                     //will be invoked if any
                     if (!err.additionalInfo || !err.additionalInfo.confirm) {
                         alertService.alert(err).then(function () {
+                            reject(err);
+                        }, function (alertError) {
                             reject(err);
                         });
                     }
@@ -4658,6 +4671,13 @@ var Client = (function () {
                             reject(err);
                         });
                     }
+                }
+                else {
+                    alertService.alert({ 'type': 'SERVER_ERROR_GENERAL' }).then(function () {
+                        reject(err);
+                    }, function (alertError) {
+                        reject(err);
+                    });
                 }
             });
         });
@@ -5032,8 +5052,14 @@ var ServerGateway = (function () {
                 }
                 resolve(res);
             }, function (err) {
-                if (err['_body']) {
-                    reject(JSON.parse(err['_body']));
+                if (err['_body'] && typeof err['_body'] === 'string') {
+                    try {
+                        var parsedError = JSON.parse(err['_body']);
+                        reject(parsedError);
+                    }
+                    catch (e) {
+                        reject(err);
+                    }
                 }
                 else {
                     reject(err);
@@ -5437,136 +5463,146 @@ var client_1 = require('./client');
 //------------------------------------------------------
 //-- getLoginStatus
 //------------------------------------------------------
-exports.getLoginStatus = function () { return new Promise(function (resolve, reject) {
-    if (!window.cordova) {
-        window.FB.getLoginStatus(function (response) {
-            if (response.status === 'connected') {
-                resolve({ 'connected': true, 'response': response });
-            }
-            else {
-                resolve({ 'connected': false, 'response': response });
-            }
-        });
-    }
-    else {
-        window.facebookConnectPlugin.getLoginStatus(function (response) {
-            if (response && response.status === 'unknown') {
-                //Give it another try as facebook native is not yet initiated
-                setTimeout(function () {
-                    window.facebookConnectPlugin.getLoginStatus(function (response) {
-                        if (response && response.status === 'connected') {
-                            resolve({ 'connected': true, 'response': response });
-                        }
-                        else {
-                            resolve({ 'connected': false, 'response': response });
-                        }
-                    }, function (error) {
-                        resolve({ 'connected': false, 'error': error });
-                    });
-                }, 500);
-            }
-            else if (response && response.status === 'connected') {
-                resolve({ 'connected': true, 'response': response });
-            }
-            else {
-                resolve({ 'connected': false, 'response': response });
-            }
-        }, function (error) {
-            resolve({ 'connected': false, 'error': error });
-        });
-    }
-}); };
+exports.getLoginStatus = function () {
+    return new Promise(function (resolve, reject) {
+        if (!window.cordova) {
+            window.FB.getLoginStatus(function (response) {
+                if (response.status === 'connected') {
+                    resolve({ 'connected': true, 'response': response });
+                }
+                else {
+                    resolve({ 'connected': false, 'response': response });
+                }
+            });
+        }
+        else {
+            window.facebookConnectPlugin.getLoginStatus(function (response) {
+                if (response && response.status === 'unknown') {
+                    //Give it another try as facebook native is not yet initiated
+                    setTimeout(function () {
+                        window.facebookConnectPlugin.getLoginStatus(function (response) {
+                            if (response && response.status === 'connected') {
+                                resolve({ 'connected': true, 'response': response });
+                            }
+                            else {
+                                resolve({ 'connected': false, 'response': response });
+                            }
+                        }, function (error) {
+                            resolve({ 'connected': false, 'error': error });
+                        });
+                    }, 500);
+                }
+                else if (response && response.status === 'connected') {
+                    resolve({ 'connected': true, 'response': response });
+                }
+                else {
+                    resolve({ 'connected': false, 'response': response });
+                }
+            }, function (error) {
+                resolve({ 'connected': false, 'error': error });
+            });
+        }
+    });
+};
 //------------------------------------------------------
 //-- login
 //------------------------------------------------------
-exports.login = function (permissions, rerequestDeclinedPermissions) { return new Promise(function (resolve, reject) {
-    var client = client_1.Client.getInstance();
-    if (!permissions) {
-        permissions = client.settings.facebook.readPermissions;
-    }
-    if (!window.cordova) {
-        var permissionObject = {};
-        permissionObject['scope'] = permissions.toString();
-        if (rerequestDeclinedPermissions) {
-            permissionObject['auth_type'] = 'rerequest';
+exports.login = function (permissions, rerequestDeclinedPermissions) {
+    return new Promise(function (resolve, reject) {
+        var client = client_1.Client.getInstance();
+        if (!permissions) {
+            permissions = client.settings.facebook.readPermissions;
         }
-        window.FB.login(function (response) {
-            if (response.authResponse) {
+        if (!window.cordova) {
+            var permissionObject = {};
+            permissionObject['scope'] = permissions.toString();
+            if (rerequestDeclinedPermissions) {
+                permissionObject['auth_type'] = 'rerequest';
+            }
+            window.FB.login(function (response) {
+                if (response.authResponse) {
+                    resolve(response);
+                }
+                else {
+                    reject(response.status);
+                }
+            }, permissionObject);
+        }
+        else {
+            window.facebookConnectPlugin.login(client.settings.facebook.readPermissions, function (response) {
                 resolve(response);
-            }
-            else {
-                reject(response.status);
-            }
-        }, permissionObject);
-    }
-    else {
-        window.facebookConnectPlugin.login(client.settings.facebook.readPermissions, function (response) {
-            resolve(response);
-        }, function (err) {
-            reject(err);
-        });
-    }
-}); };
+            }, function (err) {
+                reject(err);
+            });
+        }
+    });
+};
 //------------------------------------------------------
 //-- logout
 //------------------------------------------------------
-exports.logout = function () { return new Promise(function (resolve, reject) {
-    if (!window.cordova) {
-        window.FB.logout(function (response) {
-            resolve(response);
-        });
-    }
-    else {
-        window.facebookConnectPlugin.logout(function (response) {
-            resolve(response);
-        });
-    }
-}); };
+exports.logout = function () {
+    return new Promise(function (resolve, reject) {
+        if (!window.cordova) {
+            window.FB.logout(function (response) {
+                resolve(response);
+            });
+        }
+        else {
+            window.facebookConnectPlugin.logout(function (response) {
+                resolve(response);
+            });
+        }
+    });
+};
 //------------------------------------------------------
 //-- post
 //------------------------------------------------------
-exports.post = function (story) { return new Promise(function (resolve, reject) {
-    if (window.cordova) {
-        var mobilePostObject = {
-            'method': 'share_open_graph',
-            'action': story.action,
-            'object': JSON.stringify(story.object)
-        };
-        window.facebookConnectPlugin.showDialog(mobilePostObject, function (response) {
-            resolve(response);
-        }, function (error) {
-            reject(error);
-        });
-    }
-    else {
-        var webPostObject = {
-            'method': 'share_open_graph',
-            'action_type': story.action,
-            'action_properties': story.object
-        };
+exports.post = function (story) {
+    return new Promise(function (resolve, reject) {
+        if (window.cordova) {
+            var mobilePostObject = {
+                'method': 'share_open_graph',
+                'action': story.action,
+                'object': JSON.stringify(story.object)
+            };
+            window.facebookConnectPlugin.showDialog(mobilePostObject, function (response) {
+                resolve(response);
+            }, function (error) {
+                reject(error);
+            });
+        }
+        else {
+            var webPostObject = {
+                'method': 'share_open_graph',
+                'action_type': story.action,
+                'action_properties': story.object
+            };
+            try {
+                window.FB.ui(webPostObject, function (response) {
+                    resolve(response);
+                });
+            }
+            catch (error) {
+                reject(error);
+            }
+        }
+    });
+};
+//------------------------------------------------------
+//-- buy
+//------------------------------------------------------
+exports.buy = function (purchaseDialogData) {
+    return new Promise(function (resolve, reject) {
         try {
-            window.FB.ui(webPostObject, function (response) {
+            window.FB.ui(purchaseDialogData, function (response) {
                 resolve(response);
             });
         }
         catch (error) {
             reject(error);
         }
-    }
-}); };
-//------------------------------------------------------
-//-- buy
-//------------------------------------------------------
-exports.buy = function (purchaseDialogData) { return new Promise(function (resolve, reject) {
-    try {
-        window.FB.ui(purchaseDialogData, function (response) {
-            resolve(response);
-        });
-    }
-    catch (error) {
-        reject(error);
-    }
-}); };
+    });
+};
 },{"./client":36}],40:[function(require,module,exports){
 "use strict";
 var client_1 = require('./client');
@@ -5677,22 +5713,24 @@ exports.showPurchaseSuccess = function (serverPurchaseData) {
 //------------------------------------------------------
 //-- processPayment
 //------------------------------------------------------
-exports.processPayment = function (method, purchaseData, extraPurchaseData) { return new Promise(function (resolve, reject) {
-    var client = client_1.Client.getInstance();
-    var postData = { 'method': method, 'purchaseData': purchaseData };
-    if (extraPurchaseData) {
-        postData['extraPurchaseData'] = extraPurchaseData;
-    }
-    client.serverPost('payments/process', postData).then(function (serverPuchaseData) {
-        if (resolve) {
-            resolve(serverPuchaseData);
+exports.processPayment = function (method, purchaseData, extraPurchaseData) {
+    return new Promise(function (resolve, reject) {
+        var client = client_1.Client.getInstance();
+        var postData = { 'method': method, 'purchaseData': purchaseData };
+        if (extraPurchaseData) {
+            postData['extraPurchaseData'] = extraPurchaseData;
         }
-    }, function (error) {
-        if (reject) {
-            reject(error);
-        }
+        client.serverPost('payments/process', postData).then(function (serverPuchaseData) {
+            if (resolve) {
+                resolve(serverPuchaseData);
+            }
+        }, function (error) {
+            if (reject) {
+                reject(error);
+            }
+        });
     });
-}); };
+};
 },{"../objects/objects":12,"./client":36,"./facebook":39}],42:[function(require,module,exports){
 "use strict";
 var client_1 = require('./client');

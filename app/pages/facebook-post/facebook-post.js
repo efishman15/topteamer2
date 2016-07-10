@@ -25,13 +25,15 @@ var FacebookPostPage = (function () {
         var _this = this;
         this.client.logEvent('contest/facebook/post/click');
         facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
-            _this.close();
+            _this.close(true);
         }, function (error) {
             window.myLogError('FacebookPostError', 'Error posting: ' + error);
         });
     };
-    FacebookPostPage.prototype.close = function () {
-        this.client.logEvent('contest/facebook/post/cancel');
+    FacebookPostPage.prototype.close = function (posted) {
+        if (!posted) {
+            this.client.logEvent('contest/facebook/post/cancel');
+        }
         this.viewController.dismiss();
     };
     FacebookPostPage = __decorate([

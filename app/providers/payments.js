@@ -74,20 +74,22 @@ exports.showPurchaseSuccess = function (serverPurchaseData) {
 //------------------------------------------------------
 //-- processPayment
 //------------------------------------------------------
-exports.processPayment = function (method, purchaseData, extraPurchaseData) { return new Promise(function (resolve, reject) {
-    var client = client_1.Client.getInstance();
-    var postData = { 'method': method, 'purchaseData': purchaseData };
-    if (extraPurchaseData) {
-        postData['extraPurchaseData'] = extraPurchaseData;
-    }
-    client.serverPost('payments/process', postData).then(function (serverPuchaseData) {
-        if (resolve) {
-            resolve(serverPuchaseData);
+exports.processPayment = function (method, purchaseData, extraPurchaseData) {
+    return new Promise(function (resolve, reject) {
+        var client = client_1.Client.getInstance();
+        var postData = { 'method': method, 'purchaseData': purchaseData };
+        if (extraPurchaseData) {
+            postData['extraPurchaseData'] = extraPurchaseData;
         }
-    }, function (error) {
-        if (reject) {
-            reject(error);
-        }
+        client.serverPost('payments/process', postData).then(function (serverPuchaseData) {
+            if (resolve) {
+                resolve(serverPuchaseData);
+            }
+        }, function (error) {
+            if (reject) {
+                reject(error);
+            }
+        });
     });
-}); };
+};
 //# sourceMappingURL=payments.js.map

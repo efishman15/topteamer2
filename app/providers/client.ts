@@ -408,11 +408,14 @@ export class Client {
             }
           });
         }
-        else {
+        else if (err.httpStatus) {
+          //An error coming from our server
           //Display an alert or confirm message and continue the reject so further 'catch' blocks
           //will be invoked if any
           if (!err.additionalInfo || !err.additionalInfo.confirm) {
             alertService.alert(err).then(() => {
+              reject(err);
+            }, () => {
               reject(err);
             });
           }
@@ -426,6 +429,13 @@ export class Client {
               reject(err);
             });
           }
+        }
+        else {
+          alertService.alert({'type': 'SERVER_ERROR_GENERAL'}).then(() => {
+            reject(err);
+          }, () => {
+            reject(err);
+          });
         }
       });
     });
@@ -786,8 +796,14 @@ export class ServerGateway {
             resolve(res);
           },
           (err:Object) => {
-            if (err['_body']) {
-              reject(JSON.parse(err['_body']));
+            if (err['_body'] && typeof err['_body'] === 'string') {
+              try {
+                var parsedError = JSON.parse(err['_body']);
+                reject(parsedError);
+              }
+              catch(e) {
+                reject(err);
+              }
             }
             else {
               reject(err);

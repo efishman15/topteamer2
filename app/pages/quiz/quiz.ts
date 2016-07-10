@@ -31,8 +31,8 @@ export class QuizPage {
   pageInitiated:Boolean = false;
   quizStarted:Boolean = false;
   title:string;
-  circleOuterRadius: number;
-  circleInnerRadius: number;
+  circleOuterRadius:number;
+  circleInnerRadius:number;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
@@ -88,7 +88,7 @@ export class QuizPage {
       this.quizData = data.quiz;
       this.quizData.currentQuestion.answered = false;
 
-      var radius = this.quizCanvas.clientWidth / (2 * data.quiz.totalQuestions + (data.quiz.totalQuestions-1) * this.client.settings.quiz.canvas.circle.radius.spaceRatio);
+      var radius = this.quizCanvas.clientWidth / (2 * data.quiz.totalQuestions + (data.quiz.totalQuestions - 1) * this.client.settings.quiz.canvas.circle.radius.spaceRatio);
       if (radius > this.client.settings.quiz.canvas.circle.radius.max) {
         radius = this.client.settings.quiz.canvas.circle.radius.max;
       }
@@ -184,6 +184,10 @@ export class QuizPage {
         case 'SERVER_ERROR_GENERAL':
           this.client.nav.pop();
           break;
+        default:
+          //Allow the user to answer again - probably timeout error
+          this.quizData.currentQuestion.answered = false;
+          break;
       }
     });
   }
@@ -199,7 +203,7 @@ export class QuizPage {
       this.drawQuizProgress();
 
       this.client.logEvent('quiz/gotQuestion' + (this.quizData.currentQuestionIndex + 1));
-    },() => {
+    }, () => {
 
     });
   }
@@ -488,7 +492,7 @@ export class QuizPage {
     if (state.text) {
       this.quizContext.beginPath();
       this.quizContext.fillStyle = state.textFillStyle;
-      this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.signs.bold,this.circleOuterRadius + 'px', this.client.settings.quiz.canvas.font.signs.name);
+      this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.signs.bold, this.circleOuterRadius + 'px', this.client.settings.quiz.canvas.font.signs.name);
       var textWidth = this.quizContext.measureText(state.text).width;
       var directionMultiplier = 1;
       if (this.client.currentLanguage.direction === 'ltr') {
@@ -519,7 +523,7 @@ export class QuizPage {
 
     this.clearQuizScores();
 
-    this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.scores.bold,this.client.settings.quiz.canvas.font.scores.size, this.client.settings.quiz.canvas.font.scores.name);
+    this.quizContext.font = this.getCanvasFont(this.client.settings.quiz.canvas.font.scores.bold, this.client.settings.quiz.canvas.font.scores.size, this.client.settings.quiz.canvas.font.scores.name);
 
     var currentX;
     var directionMultiplier = 1;
@@ -616,7 +620,7 @@ export class QuizPage {
     this.drawQuizProgress();
   }
 
-  getCanvasFont(bold: boolean, size: string, name: string) {
+  getCanvasFont(bold:boolean, size:string, name:string) {
     var font = '';
     if (bold) {
       font += 'bold ';
