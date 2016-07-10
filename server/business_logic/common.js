@@ -55,7 +55,7 @@ function getTeamDescription(contest, myTeam) {
   }
 
   var propertyName;
-  if (abs(team1Percentage-team0Percentage) <= generalUtils.settings.server.facebook.openGraphStories.params.closeMatchTreshold) {
+  if (mathjs.abs(team1Percentage-team0Percentage) <= generalUtils.settings.server.facebook.openGraphStories.params.closeMatchTreshold) {
     propertyName = 'teamDescriptionCloseMatch'
   }
   else if (contest.teams[myTeam].score > contest.teams[1 - myTeam].score) {
