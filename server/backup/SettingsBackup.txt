@@ -106,7 +106,7 @@
           },
           "teamLeader" : {
             "og:type" : "topteamer:teamleader",
-            "og:url" : "http://www.topteamer.com/facebook/team/{{contestId}}/{{teamId}}",
+            "og:url" : "http://www.topteamer.com/facebook/teamLeader/{{contestId}}/{{teamId}}",
             "og:image" : "http://www.topteamer.com/images/winner2.jpg",
             "og:image:width" : 1200,
             "og:image:height" : 630
@@ -132,31 +132,37 @@
             "gameTitle" : "מי יותר שווה: הצטרפו לתחרויות ועזרו לקבוצתכם לנצח",
             "contestTitle" : "{{team0}} או {{team1}}??? בתחרות {{subject}}",
             "teamTitle" : "אני בקבוצת {{name}}. איפה אתם?",
-            "teamDescriptionWinning" : "קבוצת {{name}} קורעת לנו את הצורה ב{{subject}}. בואו לשחק במשחק החדש: \"מי יותר שווה\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
-            "teamDescriptionLosing" : "קבוצת {{name}} מפסידה לנו בגדול ב{{subject}}. בואו לשחק במשחק החדש: \"מי יותר שווה\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח"
+            "teamDescriptionCloseMatch" : "התחרות עם קבוצת {{name}} ב{{subject}} צמודה מאוד. בואו לעזור ולשחק במשחק החדש: \"מי יותר שווה\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
+            "teamDescriptionLosing" : "קבוצת {{name}} קורעת לנו את הצורה ב{{subject}}. בואו לשחק במשחק החדש: \"מי יותר שווה\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
+            "teamDescriptionWinning" : "קבוצת {{name}} מפסידה לנו בגדול ב{{subject}}. בואו לשחק במשחק החדש: \"מי יותר שווה\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח"
           },
           "es" : {
             "gameDescription" : "Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
             "gameTitle" : "Quien es mejor: unirse a uno o más concursos y averiguar quién es el mejor equipo",
             "contestTitle" : "{{team0}} or {{team1}}??? Compitiendo en {{subject}}}",
             "teamTitle" : "Estoy a favor de {{name}}. ¿Dónde estás?",
-            "teamDescriptionWinning" : "{{name}} nos están matando en {{subject}}. Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
-            "teamDescriptionLosing" : "{{name}} están perdiendo a lo grande en {{subject}}. Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión"
+            "teamDescriptionCloseMatch" : "La lucha con {{name}} en {{subject}} y respuestas es muy estrecha . Venir a ayudar. Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
+            "teamDescriptionWinning" : "{{name}} están perdiendo a lo grande en {{subject}}. Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
+            "teamDescriptionLosing" : "{{name}} nos están matando en {{subject}}. Comienza nuestro nuevo y emocionante juego : \" ¿Quién es mejor \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión"
           },
           "en" : {
             "gameDescription" : "Play our new and exciting game: \"Who's better\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
             "gameTitle" : "Who's better: join one or more contests and find out who's the best team",
             "contestTitle" : "{{team0}} or {{team1}}??? Competing in {{subject}}",
             "teamTitle" : "I'm for {{name}}. Where are you?",
-            "teamDescriptionWinning" : "{{name}} are killing us in {{subject}}",
-            "teamDescriptionLosing" : "{{name}} are losing big time in {{subject}}. Play our new and exciting game: \"Who's better\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions"
+            "teamDescriptionCloseMatch" : "The fight with{{name}} in {{subject}} is very close. Come and help your team and play this new and exciting game: \"Who's better\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
+            "teamDescriptionWinning" : "{{name}} are losing big time in {{subject}}. Play our new and exciting game: \"Who's better\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
+            "teamDescriptionLosing" : "{{name}} are killing us. Come and help. Play this new and exciting game: \"Who's better\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions"
           }
+        },
+        "params" : {
+          "closeMatchTreshold" : 0.1
         }
       }
     },
     "versions" : {
       "mustUpdate" : {
-        "minVersion" : "0.0.31",
+        "minVersion" : "1.0.1",
         "popup" : {
           "en" : {
             "title" : "New version",
@@ -168,7 +174,7 @@
                 "text" : "OK"
               }],
             "image" : {
-              "url" : "images/info.png",
+              "url" : "images/stop.png",
               "size" : {
                 "width" : 100,
                 "height" : 100
@@ -180,7 +186,7 @@
             "message" : "<h3>אנא עדכנו לגירסה החדשה - חשבונכם ורמתכם במשחק יישמרו</h3>",
             "preventBack" : true,
             "image" : {
-              "url" : "images/info.png",
+              "url" : "images/stop.png",
               "size" : {
                 "width" : 100,
                 "height" : 100
@@ -202,7 +208,7 @@
                 "text" : "OK"
               }],
             "image" : {
-              "url" : "images/info.png",
+              "url" : "images/stop.png",
               "size" : {
                 "width" : 100,
                 "height" : 100
@@ -1211,7 +1217,9 @@
         "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "Join the contest: {{name}} and help your team win: {{url}}",
         "SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM" : "Join the contest: {{name}} and help your team win",
         "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team. Please help: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team in the contest '{{name}}' - please help"
+        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team in the contest '{{name}}' - please help",
+        "PLAY" : "Play",
+        "VIEW" : "View"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1418,7 +1426,9 @@
         "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "הצטרפו לתחרות: {{name}} ועזרו לקבוצתכם לנצח: {{url}}",
         "SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM" : "הצטרפו לתחרות: {{name}} ועזרו לקבוצתכם לנצח",
         "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}}. בואו לעזור: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות '{{name}}' - בואו לעזור"
+        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות '{{name}}' - בואו לעזור",
+        "PLAY" : "שחקו",
+        "VIEW" : "צפו"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1629,7 +1639,9 @@
         "SHARE_OTHER_OPTIONS" : "Más...",
         "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "Participar en el concurso : {{name}} y ayudar a su equipo a ganar : {{url}}",
         "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}}. Por favor ayuda: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}} en el concurso de '{{name}}' - por favor ayuda"
+        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}} en el concurso de '{{name}}' - por favor ayuda",
+        "PLAY" : "Jugar",
+        "VIEW" : "Ver"
       }
     },
     "platforms" : {

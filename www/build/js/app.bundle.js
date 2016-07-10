@@ -59,6 +59,9 @@ var TopTeamerApp = (function () {
                 var portalNav = activeNav.getPortal();
                 if (portalNav.hasOverlay()) {
                     var activeView = portalNav.getActive();
+                    if (activeView && activeView.instance && activeView.instance['preventBack'] && activeView.instance['preventBack']()) {
+                        return; //prevent back
+                    }
                     return activeView.dismiss();
                 }
                 //Root screen - confirm exit app
@@ -441,9 +444,6 @@ var ContestDetailsComponent = (function () {
     }
     ContestDetailsComponent.prototype.onContestSelected = function () {
         this.contestSelected.emit({ 'contest': this.contest, 'source': 'contest-details' });
-    };
-    ContestDetailsComponent.prototype.share = function () {
-        this.client.share(this.contest, 'contest-details');
     };
     ContestDetailsComponent.prototype.refresh = function (contest) {
         this.contest = contest;
@@ -3401,18 +3401,21 @@ var contestsService = require('../../providers/contests');
 var ServerPopupPage = (function () {
     function ServerPopupPage(params, viewController) {
         this.client = client_1.Client.getInstance();
-        this.serverPopup = params.data.serverPopup;
+        this.params = params;
         //Look for special variables such as #storeLink (based on client's platform
-        for (var i = 0; i < this.serverPopup.buttons.length; i++) {
-            if (this.serverPopup.buttons[i].link && this.serverPopup.buttons[i].link.indexOf('#storeLink') >= 0) {
-                this.serverPopup.buttons[i].link = this.serverPopup.buttons[i].link.replaceAll('#storeLink', this.client.settings.platforms[this.client.clientInfo.platform].storeLink);
+        for (var i = 0; i < this.params.data.serverPopup.buttons.length; i++) {
+            if (this.params.data.serverPopup.buttons[i].link && this.params.data.serverPopup.buttons[i].link.indexOf('#storeLink') >= 0) {
+                this.params.data.serverPopup.buttons[i].link = this.params.data.serverPopup.buttons[i].link.replaceAll('#storeLink', this.client.settings.platforms[this.client.clientInfo.platform].storeLink);
             }
         }
         this.viewController = viewController;
     }
     //The only life cycle eve currently called in modals
     ServerPopupPage.prototype.ngAfterViewInit = function () {
-        this.client.logEvent('page/serverPopup', { 'title': this.serverPopup.title, 'message': this.serverPopup.message });
+        this.client.logEvent('page/serverPopup', { 'title': this.params.data.serverPopup.title, 'message': this.params.data.serverPopup.message });
+    };
+    ServerPopupPage.prototype.preventBack = function () {
+        return this.params.data.serverPopup.preventBack;
     };
     ServerPopupPage.prototype.buttonAction = function (button) {
         var _this = this;

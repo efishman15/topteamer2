@@ -3,16 +3,18 @@
                  [(contest)]="contests[i]"
                  (contestSelected)="onContestSelected($event)">
   </contest-chart>
-  <div class="center-image-container">
-    <img class="contests-play-image pointer"
-         [ngStyle]="{'margin-left': -(client.settings.lists.contests.playButtonSize.width/2) + 'px', 'margin-top': -(client.chartHeight+client.settings.lists.contests.playButtonSize.height+client.settings.lists.contests.playButtonSize.height/2)/2 + 'px'}"
-         src="images/go.png"
-         width="{{client.settings.lists.contests.playButtonSize.width}}"
-         title="{{contest.name.long}}"
-         (click)="onContestSelected({'contest': contests[i], 'source': 'go'})">
+
+  <div text-center class="contest-list-play-button-container">
+    <button class="button-play-contest"
+            (click)="onContestSelected({'contest': contests[i], 'source' : 'contest-list-play'})"
+            [ngStyle]="{'top': ((-(client.chartHeight - 40)/2) - 48) + 'px'}">
+      {{contests[i].status === 'running' ? client.translate('PLAY') : client.translate('VIEW')}}
+    </button>
   </div>
+
   <contest-details id="{{tab}}-{{contest._id}}-details"
                    [(contest)]="contests[i]"
                    (contestSelected)="onContestSelected({'contest': contests[i], 'source': 'list-details'})">
   </contest-details>
+
 </div>

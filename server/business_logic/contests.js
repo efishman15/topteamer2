@@ -3,7 +3,6 @@ var async = require('async');
 var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
 var dalBranchIo = require(path.resolve(__dirname, '../dal/dalBranchIo'));
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
-var mathjs = require('mathjs');
 var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var jsonTransformer = require('jsonpath-object-transform');

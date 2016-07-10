@@ -57,6 +57,9 @@ var TopTeamerApp = (function () {
                 var portalNav = activeNav.getPortal();
                 if (portalNav.hasOverlay()) {
                     var activeView = portalNav.getActive();
+                    if (activeView && activeView.instance && activeView.instance['preventBack'] && activeView.instance['preventBack']()) {
+                        return; //prevent back
+                    }
                     return activeView.dismiss();
                 }
                 //Root screen - confirm exit app

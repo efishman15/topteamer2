@@ -1,5 +1,6 @@
 var path = require('path');
 var util = require('util');
+var mathjs = require('mathjs');
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 
 //----------------------------------------------------
@@ -38,8 +39,26 @@ function getTeamTitle(contest, team) {
 //----------------------------------------------------
 function getTeamDescription(contest, myTeam) {
 
+  var team0Percentage;
+  var team1Percentage;
+
+  //Chart values
+  if (contest.teams[0].score === 0 && contest.teams[1].score === 0) {
+    team0Percentage = 0.5;
+    team1Percentage = 0.5;
+  }
+  else {
+    //Do relational compute
+    var sum = contest.teams[0].score + contest.teams[1].score;
+    team0Percentage = mathjs.round(contest.teams[0].score / sum, 2);
+    team1Percentage = mathjs.round(contest.teams[1].score / sum, 2);
+  }
+
   var propertyName;
-  if (contest.teams[myTeam].score <= contest.teams[1 - myTeam].score) {
+  if (abs(team1Percentage-team0Percentage) <= generalUtils.settings.server.facebook.openGraphStories.params.closeMatchTreshold) {
+    propertyName = 'teamDescriptionCloseMatch'
+  }
+  else if (contest.teams[myTeam].score > contest.teams[1 - myTeam].score) {
     propertyName = 'teamDescriptionWinning';
   }
   else {

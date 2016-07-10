@@ -10,18 +10,18 @@ import {ServerPopup} from '../../objects/objects';
 export class ServerPopupPage {
 
   client:Client;
-  serverPopup:ServerPopup;
+  params:NavParams;
   viewController:ViewController;
 
   constructor(params:NavParams, viewController: ViewController) {
 
     this.client = Client.getInstance();
-    this.serverPopup = params.data.serverPopup;
+    this.params = params;
 
     //Look for special variables such as #storeLink (based on client's platform
-    for (var i=0; i<this.serverPopup.buttons.length; i++) {
-      if (this.serverPopup.buttons[i].link && this.serverPopup.buttons[i].link.indexOf('#storeLink') >= 0) {
-        this.serverPopup.buttons[i].link = this.serverPopup.buttons[i].link.replaceAll('#storeLink',this.client.settings.platforms[this.client.clientInfo.platform].storeLink);
+    for (var i=0; i<this.params.data.serverPopup.buttons.length; i++) {
+      if (this.params.data.serverPopup.buttons[i].link && this.params.data.serverPopup.buttons[i].link.indexOf('#storeLink') >= 0) {
+        this.params.data.serverPopup.buttons[i].link = this.params.data.serverPopup.buttons[i].link.replaceAll('#storeLink',this.client.settings.platforms[this.client.clientInfo.platform].storeLink);
       }
     }
 
@@ -30,7 +30,11 @@ export class ServerPopupPage {
 
   //The only life cycle eve currently called in modals
   ngAfterViewInit() {
-    this.client.logEvent('page/serverPopup', {'title' : this.serverPopup.title, 'message' : this.serverPopup.message});
+    this.client.logEvent('page/serverPopup', {'title' : this.params.data.serverPopup.title, 'message' : this.params.data.serverPopup.message});
+  }
+
+  preventBack() {
+    return this.params.data.serverPopup.preventBack;
   }
 
   buttonAction(button) {

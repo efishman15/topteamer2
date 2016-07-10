@@ -75,6 +75,9 @@ export class TopTeamerApp {
         let portalNav : NavController = activeNav.getPortal();
         if (portalNav.hasOverlay()) {
           let activeView : ViewController = portalNav.getActive();
+          if (activeView && activeView.instance && activeView.instance['preventBack'] && activeView.instance['preventBack']()) {
+            return; //prevent back
+          }
           return activeView.dismiss();
         }
 
