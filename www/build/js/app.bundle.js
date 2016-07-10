@@ -1992,8 +1992,9 @@ var FacebookPostPage = (function () {
         this.client.logEvent('contest/facebook/post/click');
         facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
             _this.close(true);
-        }, function (error) {
-            window.myLogError('FacebookPostError', 'Error posting: ' + error);
+        }, function () {
+            //Do nothing - user probably canceled or any other error presented by facebook
+            //Stay on screen
         });
     };
     FacebookPostPage.prototype.close = function (posted) {
