@@ -345,7 +345,6 @@ export class SetContestPage {
     }
 
     let isDirty:boolean = false;
-    let contestNameChanged:boolean = false;
     if (this.params.data.mode === 'add') {
       isDirty = true;
     }
@@ -355,7 +354,6 @@ export class SetContestPage {
         this.contestLocalCopy.teams[1].name !== this.params.data.contest.teams[1].name ||
         this.contestLocalCopy.subject !== this.params.data.contest.subject) {
         isDirty = true;
-        contestNameChanged = true;
       }
       if (!isDirty &&
         (this.contestLocalCopy.startDate !== this.params.data.contest.startDate ||
@@ -395,7 +393,7 @@ export class SetContestPage {
         }
       }
 
-      contestsService.setContest(this.contestLocalCopy, this.params.data.mode, contestNameChanged).then((contest) => {
+      contestsService.setContest(this.contestLocalCopy, this.params.data.mode).then((contest) => {
 
         //Report to Analytics
         var contestParams = {

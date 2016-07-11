@@ -13,11 +13,21 @@ export class SharePage {
   client:Client;
   params: NavParams;
   shareVariables:ShareVariables;
+  title: string;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
     this.params = params;
-    this.shareVariables = shareService.getVariables(this.params.data.contest);
+
+    var isNewContest = (params.data.source === 'newContest');
+    if (params.data.contestJustCreated) {
+      this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_TITLE');
+    }
+    else {
+      this.title = this.client.translate('SHARE_WITH_FRIENDS_TITLE');
+    }
+
+    this.shareVariables = shareService.getVariables(this.params.data.contest, isNewContest);
   }
 
   ionViewWillEnter() {

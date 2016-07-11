@@ -51,6 +51,9 @@ var MyContestsPage = (function () {
             refresher.complete();
         });
     };
+    MyContestsPage.prototype.showLeadingContests = function () {
+        this.client.events.publish('topTeamer:showLeadingContests');
+    };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 
         __metadata('design:type', contest_list_1.ContestListComponent)

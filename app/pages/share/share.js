@@ -15,7 +15,14 @@ var SharePage = (function () {
     function SharePage(params) {
         this.client = client_1.Client.getInstance();
         this.params = params;
-        this.shareVariables = shareService.getVariables(this.params.data.contest);
+        var isNewContest = (params.data.source === 'newContest');
+        if (params.data.contestJustCreated) {
+            this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_TITLE');
+        }
+        else {
+            this.title = this.client.translate('SHARE_WITH_FRIENDS_TITLE');
+        }
+        this.shareVariables = shareService.getVariables(this.params.data.contest, isNewContest);
     }
     SharePage.prototype.ionViewWillEnter = function () {
         if (this.params.data.contest) {

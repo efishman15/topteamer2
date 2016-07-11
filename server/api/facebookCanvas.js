@@ -182,11 +182,11 @@ module.exports.getProfileDetails = function (req, res, next) {
     }
 
     var openGraphObject = commonBusinessLogic.getOpenGraphObject('profile',{'facebookUserId': req.params.id, 'language' : req.params.language}, true, false);
-    openGraphObject.facebookObject['og:title'] = facebookData.name;
+    openGraphObject.facebookObject['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[req.params.language].profileTitle.format({'name': facebookData.name});
     openGraphObject.facebookObject['og:first_name'] = facebookData.first_name;
     openGraphObject.facebookObject['og:last_name'] = facebookData.last_name;
 
-    res.render('fbprofile', data);
+    res.render('fbprofile', openGraphObject);
 
   });
 

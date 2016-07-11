@@ -659,7 +659,7 @@ module.exports.answer = function (req, res, next) {
               return;
             }
 
-            data.session.quiz.serverData.share.story.facebookPost.object['og:title'] = facebookData.name;
+            data.session.quiz.serverData.share.story.facebookPost.object['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[data.contest.language].profileTitle.format({'name': facebookData.name});
             data.session.quiz.serverData.share.story.facebookPost.object['og:first_name'] = facebookData.first_name;
             data.session.quiz.serverData.share.story.facebookPost.object['og:last_name'] = facebookData.last_name;
 

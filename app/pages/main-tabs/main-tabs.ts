@@ -53,6 +53,10 @@ export class MainTabsPage {
       this.mainTabs.select(1); //Switch to "Running contests"
     });
 
+    this.client.events.subscribe('topTeamer:showLeadingContests', () => {
+      this.mainTabs.select(1); //Switch to "Running contests"
+    });
+
   }
 
   ionViewDidEnter() {

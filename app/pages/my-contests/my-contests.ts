@@ -61,4 +61,8 @@ export class MyContestsPage {
       refresher.complete();
     })
   }
+
+  showLeadingContests() {
+    this.client.events.publish('topTeamer:showLeadingContests');
+  }
 }

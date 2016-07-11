@@ -64,9 +64,6 @@ exports.removeContest = function (contestId) {
 //------------------------------------------------------
 exports.setContest = function (contest, mode, nameChanged) {
     var postData = { 'contest': contest, 'mode': mode };
-    if (nameChanged) {
-        postData['nameChanged'] = nameChanged;
-    }
     var client = client_1.Client.getInstance();
     return new Promise(function (resolve, reject) {
         client.serverPost('contests/set', postData).then(function (contest) {

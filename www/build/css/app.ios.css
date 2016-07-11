@@ -9468,6 +9468,11 @@ body {
 .refresher-pulling-text {
   color: #ffffff; }
 
+.app-link {
+  color: #00ffff;
+  cursor: pointer;
+  text-decoration: underline; }
+
 .chart {
   margin: 0px auto;
   background-color: #ffffff;
@@ -9733,9 +9738,8 @@ loading-modal .container {
     height: 60px; }
 
 .simple-tabs-wrapper {
-  width: 90%;
-  border-bottom: 5px solid #0288d8;
-  margin: 0px auto; }
+  margin: 0px auto;
+  background-color: #2c2c52; }
 
 .active-tab {
   background-color: #0288d8;
@@ -9744,6 +9748,9 @@ loading-modal .container {
 .passive-tab {
   background-color: #d9edf9;
   color: #4d89af; }
+
+.simple-tab-border {
+  border-bottom: 5px solid #0288d8; }
 
 .simple-tab-common {
   border-top-left-radius: 10px;
@@ -9915,6 +9922,9 @@ loading-modal .container {
 
 .tab-background {
   backgroud-color: #ffffff; }
+
+.has-refresher > scroll-content {
+  border-top: none; }
 
 .game-header {
   color: #ffffff;

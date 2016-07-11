@@ -520,7 +520,7 @@ function joinToContestObject(contest, teamId, session) {
 // setContest
 //
 // data:
-// input: contest, mode (add, edit), nameChanged (optional)
+// input: contest, mode (add, edit)
 // output: contest (extended)
 //-----------------------------------------------------------------
 module.exports.setContest = function (req, res, next) {

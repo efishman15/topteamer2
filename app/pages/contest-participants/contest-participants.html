@@ -5,6 +5,13 @@
   <ion-title>{{client.translate('CONTEST_LEADERS')}}</ion-title>
 </ion-navbar>
 
+<simple-tabs>
+  <simple-tab simpleTabTitle="{{client.translate('CONTEST_LEADERS_GENERAL_SCORING')}}"
+              (selected)="tabGeneralParticipants()"></simple-tab>
+  <simple-tab simpleTabTitle="{{params.data.contest.teams[0].name}}" (selected)="tabTeamParticipants(0)"></simple-tab>
+  <simple-tab simpleTabTitle="{{params.data.contest.teams[1].name}}" (selected)="tabTeamParticipants(1)"></simple-tab>
+</simple-tabs>
+
 <ion-content class="app-bg">
 
   <ion-refresher (ionRefresh)="doRefresh($event)">
@@ -12,13 +19,6 @@
       pullingText="{{client.translate('PULL_TO_REFRESH')}}">
     </ion-refresher-content>
   </ion-refresher>
-
-  <simple-tabs>
-    <simple-tab simpleTabTitle="{{client.translate('CONTEST_LEADERS_GENERAL_SCORING')}}"
-                (selected)="tabGeneralParticipants()"></simple-tab>
-    <simple-tab simpleTabTitle="{{params.data.contest.teams[0].name}}" (selected)="tabTeamParticipants(0)"></simple-tab>
-    <simple-tab simpleTabTitle="{{params.data.contest.teams[1].name}}" (selected)="tabTeamParticipants(1)"></simple-tab>
-  </simple-tabs>
 
   <leaders>
 

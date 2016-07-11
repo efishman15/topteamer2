@@ -1,7 +1,6 @@
 .simple-tabs-wrapper {
-  width: 90%;
-  border-bottom: 5px solid #0288d8;
   margin: 0px auto;
+  background-color: #2c2c52;
 }
 
 .active-tab {
@@ -12,6 +11,10 @@
 .passive-tab {
   background-color: #d9edf9;
   color: #4d89af;
+}
+
+.simple-tab-border {
+  border-bottom: 5px solid #0288d8;
 }
 
 .simple-tab-common {

@@ -3,7 +3,7 @@ import {ShareVariables,ClientShareApp,ClientShareDiscoverApp,Contest} from '../o
 
 let emailRef:string = '?ref=shareEmail';
 
-export let getVariables = (contest?:Contest) => {
+export let getVariables = (contest?:Contest, isNewContest? : boolean) => {
 
   var client = Client.getInstance();
   var shareVariables = new ShareVariables();

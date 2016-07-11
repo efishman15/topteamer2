@@ -2238,6 +2238,9 @@ var MainTabsPage = (function () {
         this.client.events.subscribe('topTeamer:noPersonalContests', function () {
             _this.mainTabs.select(1); //Switch to "Running contests"
         });
+        this.client.events.subscribe('topTeamer:showLeadingContests', function () {
+            _this.mainTabs.select(1); //Switch to "Running contests"
+        });
     }
     MainTabsPage.prototype.ionViewDidEnter = function () {
         //Should occur only once - and AFTER top toolbar received it's height
@@ -2434,6 +2437,9 @@ var MyContestsPage = (function () {
         }, function () {
             refresher.complete();
         });
+    };
+    MyContestsPage.prototype.showLeadingContests = function () {
+        this.client.events.publish('topTeamer:showLeadingContests');
     };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 
@@ -3906,7 +3912,7 @@ var SetContestPage = (function () {
                     _this.client.events.publish('topTeamer:contestCreated', contest);
                     _this.client.nav.pop({ animate: false }).then(function () {
                         _this.client.openPage('ContestPage', { 'contest': contest }).then(function () {
-                            _this.client.openPage('SharePage', { 'contest': contest, 'source': 'newContest' });
+                            _this.client.openPage('SharePage', { 'contest': contest, 'contestJustCreated': true, 'source': 'newContest' });
                         });
                     });
                 }
@@ -4112,7 +4118,14 @@ var SharePage = (function () {
     function SharePage(params) {
         this.client = client_1.Client.getInstance();
         this.params = params;
-        this.shareVariables = shareService.getVariables(this.params.data.contest);
+        var isNewContest = (params.data.source === 'newContest');
+        if (params.data.contestJustCreated) {
+            this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_TITLE');
+        }
+        else {
+            this.title = this.client.translate('SHARE_WITH_FRIENDS_TITLE');
+        }
+        this.shareVariables = shareService.getVariables(this.params.data.contest, isNewContest);
     }
     SharePage.prototype.ionViewWillEnter = function () {
         if (this.params.data.contest) {
@@ -5778,7 +5791,7 @@ var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
 var emailRef = '?ref=shareEmail';
-exports.getVariables = function (contest) {
+exports.getVariables = function (contest, isNewContest) {
     var client = client_1.Client.getInstance();
     var shareVariables = new objects_1.ShareVariables();
     shareVariables.shareImage = client.settings.general.baseUrl + client.settings.general.logoUrl;

@@ -39,6 +39,9 @@ var MainTabsPage = (function () {
         this.client.events.subscribe('topTeamer:noPersonalContests', function () {
             _this.mainTabs.select(1); //Switch to "Running contests"
         });
+        this.client.events.subscribe('topTeamer:showLeadingContests', function () {
+            _this.mainTabs.select(1); //Switch to "Running contests"
+        });
     }
     MainTabsPage.prototype.ionViewDidEnter = function () {
         //Should occur only once - and AFTER top toolbar received it's height

@@ -273,7 +273,6 @@ var SetContestPage = (function () {
             }
         }
         var isDirty = false;
-        var contestNameChanged = false;
         if (this.params.data.mode === 'add') {
             isDirty = true;
         }
@@ -283,7 +282,6 @@ var SetContestPage = (function () {
                 this.contestLocalCopy.teams[1].name !== this.params.data.contest.teams[1].name ||
                 this.contestLocalCopy.subject !== this.params.data.contest.subject) {
                 isDirty = true;
-                contestNameChanged = true;
             }
             if (!isDirty &&
                 (this.contestLocalCopy.startDate !== this.params.data.contest.startDate ||
@@ -320,7 +318,7 @@ var SetContestPage = (function () {
                     delete this.contestLocalCopy.teams[1].score;
                 }
             }
-            contestsService.setContest(this.contestLocalCopy, this.params.data.mode, contestNameChanged).then(function (contest) {
+            contestsService.setContest(this.contestLocalCopy, this.params.data.mode).then(function (contest) {
                 //Report to Analytics
                 var contestParams = {
                     'team0': _this.contestLocalCopy.teams[0].name,

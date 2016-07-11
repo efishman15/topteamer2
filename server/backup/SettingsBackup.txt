@@ -1123,7 +1123,6 @@
         "SHARE_SUBJECT_WITH_CONTEST" : "Come play with me - '{{name}}'",
         "SHARE_BODY" : "I want you to see this cool game: {{url}}",
         "SHARE_BODY_NO_URL" : "I want you to see this cool game",
-        "JOIN_A_CONTEST_MESSAGE" : "Please join one of the leading contests so it will appear in my contests list",
         "LEADERBOARDS" : "Leaderboards",
         "FRIENDS" : "Friends",
         "WEEKLY" : "This week",
@@ -1219,7 +1218,10 @@
         "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team. Please help: {{url}}",
         "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team in the contest '{{name}}' - please help",
         "PLAY" : "Play",
-        "VIEW" : "View"
+        "VIEW" : "View",
+        "JOIN_A_CONTEST_MESSAGE_PART_1" : "Please join one the ",
+        "JOIN_A_CONTEST_MESSAGE_PART_2" : " so it will appear in my contests list",
+        "LEADING_CONTESTS" : "Leading Contests"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1333,7 +1335,6 @@
         "SHARE_SUBJECT_WITH_CONTEST" : "בואו לשחק איתי - '{{name}}'",
         "SHARE_BODY" : "אתם חייבים להסתכל על המשחק המגניב הזה: {{url}}",
         "SHARE_BODY_NO_URL" : "אתם חייבים להסתכל על המשחק המגניב הזה",
-        "JOIN_A_CONTEST_MESSAGE" : "אנא הצטרפו לאחת התחרויות המובילות על מנת שתופיע בתחרויות שלי",
         "LEADERBOARDS" : "היכל התהילה",
         "FRIENDS" : "חברים",
         "WEEKLY" : "השבוע",
@@ -1428,7 +1429,10 @@
         "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}}. בואו לעזור: {{url}}",
         "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות '{{name}}' - בואו לעזור",
         "PLAY" : "שחקו",
-        "VIEW" : "צפו"
+        "VIEW" : "צפו",
+        "JOIN_A_CONTEST_MESSAGE_PART_1" : "אנא הצטרפו לאחת ",
+        "JOIN_A_CONTEST_MESSAGE_PART_2" : " על מנת שתופיע בתחרויות שלי",
+        "LEADING_CONTESTS" : "התחרויות המובילות"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1544,7 +1548,6 @@
         "SHARE_SUBJECT_WITH_CONTEST" : "Ven a jugar conmigo - '{{name}}'",
         "SHARE_BODY" : "Yo quiero que veas a este divertido juego : {{url}}",
         "SHARE_BODY_NO_URL" : "Quiero que vea este juego fresco",
-        "JOIN_A_CONTEST_MESSAGE" : "Por favor unirse a uno de los principales concursos por lo que aparecerá en mi lista de los concursos",
         "LEADERBOARDS" : "tablas de clasificación",
         "FRIENDS" : "Amigos",
         "WEEKLY" : "Esta semana",
@@ -1641,7 +1644,10 @@
         "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}}. Por favor ayuda: {{url}}",
         "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}} en el concurso de '{{name}}' - por favor ayuda",
         "PLAY" : "Jugar",
-        "VIEW" : "Ver"
+        "VIEW" : "Ver",
+        "JOIN_A_CONTEST_MESSAGE_PART_1" : "Por favor, unirse a una de las ",
+        "LEADING_CONTESTS" : "Concursos principales",
+        "JOIN_A_CONTEST_MESSAGE_PART_2" : " por lo que aparecerá en mis concursos"
       }
     },
     "platforms" : {

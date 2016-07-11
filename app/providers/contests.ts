@@ -71,9 +71,6 @@ export let removeContest = (contestId:string) => {
 //------------------------------------------------------
 export let setContest = (contest:Object, mode:string, nameChanged:Boolean) => {
   var postData = {'contest': contest, 'mode': mode};
-  if (nameChanged) {
-    postData['nameChanged'] = nameChanged;
-  }
 
   var client = Client.getInstance();
   return new Promise((resolve, reject) => {

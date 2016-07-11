@@ -2,7 +2,7 @@ var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
 var emailRef = '?ref=shareEmail';
-exports.getVariables = function (contest) {
+exports.getVariables = function (contest, isNewContest) {
     var client = client_1.Client.getInstance();
     var shareVariables = new objects_1.ShareVariables();
     shareVariables.shareImage = client.settings.general.baseUrl + client.settings.general.logoUrl;
