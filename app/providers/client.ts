@@ -476,13 +476,13 @@ export class Client {
     });
   }
 
-  runContest(contest: Contest) {
+  showContest(contest: Contest, tryRun? : boolean) {
 
     return new Promise( (resolve: any, reject: any) => {
 
       let now : number = (new Date()).getTime();
 
-      if (contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
+      if (tryRun && contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
 
         //Joined to a contest - run it immediately (go to the quiz)
         let appPages : Array<AppPage> = new Array<AppPage>();

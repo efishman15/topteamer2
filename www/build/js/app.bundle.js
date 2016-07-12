@@ -381,8 +381,8 @@ var ContestChartComponent = (function () {
         this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
     };
     ContestChartComponent.prototype.adjustResolution = function () {
-        this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[0].fontSize);
-        this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[1].fontSize);
+        this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[0].fontSize);
+        this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[1].fontSize);
         var topMarginPercent = this.client.adjustPixelRatio(this.client.settings.charts.contest.size.topMarginPercent, true);
         var netChartHeight = 1 - (topMarginPercent / 100);
         var teamsOrder;
@@ -510,7 +510,18 @@ var ContestListComponent = (function () {
     ContestListComponent.prototype.onContestSelected = function (data) {
         var _this = this;
         this.client.logEvent('tryRunContest', { 'contestId': data.contest._id, 'source': data.source });
-        this.client.runContest(data.contest).then(function (contest) {
+        this.client.showContest(data.contest, false).then(function (contest) {
+            if (contest) {
+                //A new copy from the server
+                _this.updateContest(contest);
+            }
+        }, function () {
+        });
+    };
+    ContestListComponent.prototype.playContest = function (data) {
+        var _this = this;
+        this.client.logEvent('tryRunContest', { 'contestId': data.contest._id, 'source': data.source });
+        this.client.showContest(data.contest, true).then(function (contest) {
             if (contest) {
                 //A new copy from the server
                 _this.updateContest(contest);
@@ -2282,7 +2293,9 @@ var MainTabsPage = (function () {
         if (this.client.deepLinkContestId) {
             var contestId = this.client.deepLinkContestId;
             this.client.deepLinkContestId = null;
-            this.client.displayContestById(contestId);
+            this.client.displayContestById(contestId).then(function () {
+            }, function () {
+            });
         }
     };
     MainTabsPage.prototype.onResize = function () {
@@ -4757,11 +4770,11 @@ var Client = (function () {
             });
         });
     };
-    Client.prototype.runContest = function (contest) {
+    Client.prototype.showContest = function (contest, tryRun) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var now = (new Date()).getTime();
-            if (contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
+            if (tryRun && contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
                 //Joined to a contest - run it immediately (go to the quiz)
                 var appPages_1 = new Array();
                 if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
@@ -5887,16 +5900,16 @@ exports.getVariables = function (contest, isNewContest) {
     var params = {};
     shareVariables.shareImage = client.settings.general.baseUrl + client.settings.general.logoUrl;
     if (contest) {
-        params['team0'] = contest.teams[0].name;
-        params['team1'] = contest.teams[1].name;
+        params['team0'] = contest.teams[0].name.toLowerCase();
+        params['team1'] = contest.teams[1].name.toLowerCase();
         shareVariables.shareUrl = contest.link;
         if (isNewContest) {
             subjectField = 'SHARE_SUBJECT_NEW_CONTEST';
             bodyField = 'SHARE_BODY_NEW_CONTEST';
         }
         else if (contest.myTeam === 0 || contest.myTeam === 1) {
-            params['myTeam'] = contest.teams[contest.myTeam].name;
-            params['otherTeam'] = contest.teams[1 - contest.myTeam].name;
+            params['myTeam'] = contest.teams[contest.myTeam].name.toLowerCase();
+            params['otherTeam'] = contest.teams[1 - contest.myTeam].name.toLowerCase();
             subjectField = 'SHARE_SUBJECT_CONTEST_JOINED';
             bodyField = 'SHARE_BODY_CONTEST_JOINED';
         }

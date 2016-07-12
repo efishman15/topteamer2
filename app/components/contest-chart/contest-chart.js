@@ -86,8 +86,8 @@ var ContestChartComponent = (function () {
         this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
     };
     ContestChartComponent.prototype.adjustResolution = function () {
-        this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[0].fontSize);
-        this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[1].fontSize);
+        this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[0].fontSize);
+        this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[1].fontSize);
         var topMarginPercent = this.client.adjustPixelRatio(this.client.settings.charts.contest.size.topMarginPercent, true);
         var netChartHeight = 1 - (topMarginPercent / 100);
         var teamsOrder;

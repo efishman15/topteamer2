@@ -47,7 +47,18 @@ export class ContestListComponent {
 
   onContestSelected(data: any) {
     this.client.logEvent('tryRunContest',{'contestId' : data.contest._id, 'source': data.source});
-    this.client.runContest(data.contest).then ((contest: Contest) => {
+    this.client.showContest(data.contest, false).then ((contest: Contest) => {
+      if (contest) {
+        //A new copy from the server
+        this.updateContest(contest);
+      }
+    }, () => {
+    });
+  }
+
+  playContest(data: any) {
+    this.client.logEvent('tryRunContest',{'contestId' : data.contest._id, 'source': data.source});
+    this.client.showContest(data.contest, true).then ((contest: Contest) => {
       if (contest) {
         //A new copy from the server
         this.updateContest(contest);

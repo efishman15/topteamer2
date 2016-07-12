@@ -28,7 +28,7 @@ module.exports.injectSettings = function (dbSettings) {
       var currentVariable = evalSettings[evalSettings.length - 1].vars[0];
       var evalExpression = 'settings.' + currentVariable.substring(10,currentVariable.length - 1);
       var currentValue = eval(evalExpression);
-      if (!regularExpression.exec(currentValue)) {
+      if (typeof currentValue !== 'string' || !regularExpression.exec(currentValue)) {
         //final replace
         evalSettings[evalSettings.length - 1].object[evalSettings[evalSettings.length - 1].property] = evalSettings[evalSettings.length - 1].object[evalSettings[evalSettings.length - 1].property].replace(regularExpression, currentValue);
         evalSettings[evalSettings.length - 1].vars.shift(); //Removes the first item

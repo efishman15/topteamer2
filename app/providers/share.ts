@@ -16,8 +16,8 @@ export let getVariables = (contest?:Contest, isNewContest? : boolean) => {
 
   if (contest) {
 
-    params['team0'] = contest.teams[0].name;
-    params['team1'] = contest.teams[1].name;
+    params['team0'] = contest.teams[0].name.toLowerCase();
+    params['team1'] = contest.teams[1].name.toLowerCase();
 
     shareVariables.shareUrl = contest.link;
 
@@ -26,8 +26,8 @@ export let getVariables = (contest?:Contest, isNewContest? : boolean) => {
       bodyField = 'SHARE_BODY_NEW_CONTEST';
     }
     else if (contest.myTeam === 0 || contest.myTeam === 1) {
-      params['myTeam'] = contest.teams[contest.myTeam].name;
-      params['otherTeam'] = contest.teams[1-contest.myTeam].name;
+      params['myTeam'] = contest.teams[contest.myTeam].name.toLowerCase();
+      params['otherTeam'] = contest.teams[1-contest.myTeam].name.toLowerCase();
       subjectField = 'SHARE_SUBJECT_CONTEST_JOINED';
       bodyField = 'SHARE_BODY_CONTEST_JOINED';
     }

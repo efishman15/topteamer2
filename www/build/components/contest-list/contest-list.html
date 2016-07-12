@@ -6,7 +6,7 @@
 
   <div text-center class="contest-list-play-button-container">
     <button class="button-play-contest"
-            (click)="onContestSelected({'contest': contests[i], 'source' : 'contest-list-play'})"
+            (click)="playContest({'contest': contests[i], 'source' : 'contest-list-play'})"
             [ngStyle]="{'top': ((-(client.chartHeight - 40)/2) - 48) + 'px'}">
       {{contests[i].status === 'running' ? client.translate('PLAY') : client.translate('VIEW')}}
     </button>

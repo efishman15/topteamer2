@@ -102,8 +102,8 @@ export class ContestChartComponent {
   }
 
   adjustResolution() {
-    this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[0].fontSize);
-    this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.contest.dataSource.annotations.groups[0].items[1].fontSize);
+    this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[0].fontSize);
+    this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[1].fontSize);
     var topMarginPercent = this.client.adjustPixelRatio(this.client.settings.charts.contest.size.topMarginPercent, true);
 
     var netChartHeight = 1 - (topMarginPercent / 100);
@@ -123,6 +123,5 @@ export class ContestChartComponent {
     //Others (in grey)
     this.contest.dataSource.dataset[1].data[0].value = netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
     this.contest.dataSource.dataset[1].data[1].value = netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
-
   }
 }

@@ -38,7 +38,18 @@ var ContestListComponent = (function () {
     ContestListComponent.prototype.onContestSelected = function (data) {
         var _this = this;
         this.client.logEvent('tryRunContest', { 'contestId': data.contest._id, 'source': data.source });
-        this.client.runContest(data.contest).then(function (contest) {
+        this.client.showContest(data.contest, false).then(function (contest) {
+            if (contest) {
+                //A new copy from the server
+                _this.updateContest(contest);
+            }
+        }, function () {
+        });
+    };
+    ContestListComponent.prototype.playContest = function (data) {
+        var _this = this;
+        this.client.logEvent('tryRunContest', { 'contestId': data.contest._id, 'source': data.source });
+        this.client.showContest(data.contest, true).then(function (contest) {
             if (contest) {
                 //A new copy from the server
                 _this.updateContest(contest);

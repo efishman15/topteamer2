@@ -1435,8 +1435,8 @@
         "SHARE_BODY_NEW_CONTEST" : "הורדתי את המשחק \"$settings{client.ui.he.GAME_NAME}?\" ויצרתי תחרות: \"{{team0}} נגד {{team1}}\". בואו לשחק איתי",
         "SHARE_SUBJECT_CONTEST_NOT_JOINED" : "הורדתי את המשחק: \"$settings{client.ui.he.GAME_NAME}?\" והצטרפתי לתחרות \"{{team0}} נגד {{team1}}\"",
         "SHARE_BODY_CONTEST_NOT_JOINED" : "הורדתי את המשחק: \"$settings{client.ui.he.GAME_NAME}?\" והצטרפתי לתחרות \"{{team0}} נגד {{team1}}\". בואו לשחק איתי",
-        "SHARE_SUBJECT_CONTEST_JOINED" :"הורדתי משחק חדש: \" $settings{client.ui.he.GAME_NAME}?\" והצטרפתי לקבוצת {{myTeam}}. בואו לעזור לי לנצח את קבוצת {{OtherTeam}}",
-        "SHARE_BODY_CONTEST_JOINED" : "הורדתי משחק חדש: \" $settings{client.ui.he.GAME_NAME}?\" והצטרפתי לקבוצת {{myTeam}}. בואו לעזור לי לנצח את קבוצת {{OtherTeam}}",
+        "SHARE_SUBJECT_CONTEST_JOINED" : "הורדתי משחק חדש: \"$settings{client.ui.he.GAME_NAME}?\" והצטרפתי לקבוצת {{myTeam}}. בואו לעזור לי לנצח את קבוצת {{OtherTeam}}",
+        "SHARE_BODY_CONTEST_JOINED" : "הורדתי משחק חדש: \"$settings{client.ui.he.GAME_NAME}?\" והצטרפתי לקבוצת {{myTeam}}. בואו לעזור לי לנצח את קבוצת {{OtherTeam}}",
         "SHARE_SUBJECT_GENERAL" : "אתם חייבים להסתכל על המשחק החדש הזה: \"$settings{client.ui.he.GAME_NAME}?\"",
         "SHARE_BODY_GENERAL" : "אתם חייבים להסתכל על המשחק החדש הזה: \"$settings{client.ui.he.GAME_NAME}?\". בואו לשחק איתי"
       },
@@ -1649,14 +1649,14 @@
         "LEADING_CONTESTS" : "Concursos principales",
         "JOIN_A_CONTEST_MESSAGE_PART_2" : " por lo que aparecerá en mis concursos",
         "INVITE_FRIENDS_FOR_NEW_CONTEST_MESSAGE" : "Invitar a amigos a la nueva competencia",
-        "SHARE_SUBJECT_NEW_CONTEST" : "He descargado el juego \" $settings{client.ui.es.GAME_NAME} \" y ha creado un concurso: \" {{team0}} vs. {{team1}} \"",
-        "SHARE_BODY_NEW_CONTEST" : "He descargado el juego \" $settings{client.ui.es.GAME_NAME} \" y ha creado un concurso: \" {{team0}} vs. {{team1}} \". Ven y juega conmigo",
-        "SHARE_SUBJECT_CONTEST_NOT_JOINED" : "He descargado el juego: \" $settings{client.ui.es.GAME_NAME} ? \" y yo estoy jugando \" {{team0}} vs. {{team1}} \" del concurso",
-        "SHARE_BODY_CONTEST_NOT_JOINED" : "He descargado el juego: \" $settings{client.ui.es.GAME_NAME} ? \" y yo estoy jugando \" {{team0}} vs. {{team1}} \" del concurso. Ven y juega conmigo",
-        "SHARE_SUBJECT_CONTEST_JOINED" : "He descargado el juego: \" $settings{client.ui.es.GAME_NAME} ? \" y yo estoy jugando \" {{team0}} vs. {{team1}} \" del concurso. Ven y juega conmigo",
-        "SHARE_BODY_CONTEST_JOINED" : "He descargado un juego nuevo: \" $settings{client.ui.es.GAME_NAME} ? \" y se unió al equipo de {{myTeam}}. Ven y ayúdame a vencer al equipo {{otherTeam}}",
-        "SHARE_SUBJECT_GENERAL" : "Echa un vistazo a este nuevo juego: \" $settings{client.ui.es.GAME_NAME} ? \"",
-        "SHARE_BODY_GENERAL" : "Echa un vistazo a este nuevo juego: \" $settings{client.ui.es.GAME_NAME} ? \". Ven y juega conmigo"
+        "SHARE_SUBJECT_NEW_CONTEST" : "He descargado el juego \" ¿$settings{client.ui.es.GAME_NAME} \" y ha creado un concurso: \" {{team0}} vs. {{team1}} \"",
+        "SHARE_BODY_NEW_CONTEST" : "He descargado el juego \" ¿$settings{client.ui.es.GAME_NAME} \" y ha creado un concurso: \" {{team0}} vs. {{team1}} \". Ven y juega conmigo",
+        "SHARE_SUBJECT_CONTEST_NOT_JOINED" : "He descargado el juego: \" ¿$settings{client.ui.es.GAME_NAME} ? \" y yo estoy jugando \" {{team0}} vs. {{team1}} \" del concurso",
+        "SHARE_BODY_CONTEST_NOT_JOINED" : "He descargado el juego: \" ¿$settings{client.ui.es.GAME_NAME} ? \" y yo estoy jugando \" {{team0}} vs. {{team1}} \" del concurso. Ven y juega conmigo",
+        "SHARE_SUBJECT_CONTEST_JOINED" : "He descargado el juego: \" ¿$settings{client.ui.es.GAME_NAME} ? \" y yo estoy jugando \" {{team0}} vs. {{team1}} \" del concurso. Ven y juega conmigo",
+        "SHARE_BODY_CONTEST_JOINED" : "He descargado un juego nuevo: \" ¿$settings{client.ui.es.GAME_NAME} ? \" y se unió al equipo de {{myTeam}}. Ven y ayúdame a vencer al equipo {{otherTeam}}",
+        "SHARE_SUBJECT_GENERAL" : "Echa un vistazo a este nuevo juego: \" ¿$settings{client.ui.es.GAME_NAME} ? \"",
+        "SHARE_BODY_GENERAL" : "Echa un vistazo a este nuevo juego: \" ¿$settings{client.ui.es.GAME_NAME} ? \". Ven y juega conmigo"
       }
     },
     "platforms" : {

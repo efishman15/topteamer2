@@ -374,11 +374,11 @@ var Client = (function () {
             });
         });
     };
-    Client.prototype.runContest = function (contest) {
+    Client.prototype.showContest = function (contest, tryRun) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var now = (new Date()).getTime();
-            if (contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
+            if (tryRun && contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
                 //Joined to a contest - run it immediately (go to the quiz)
                 var appPages = new Array();
                 if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {

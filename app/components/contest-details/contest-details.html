@@ -1,10 +1,10 @@
-<div [ngStyle]="{'width': client.chartWidth + 'px'}" class="contest-details-container">
+<div [ngStyle]="{'width': client.chartWidth + 'px'}" class="contest-details-container pointer" (click)="onContestSelected({'contest': contest, 'source': 'details'})">
   <div text-center class="chart-bottom-line-separator">
   </div>
   <div class="contest-chart-bottom-container">
     <ion-row class="no-padding">
       <ion-col class="no-padding">
-        <ion-item no-lines class="no-padding pointer" (click)="onContestSelected({'contest': contest, 'source': 'details'})">
+        <ion-item no-lines class="no-padding pointer">
           <ion-avatar item-left class="no-padding no-margin">
             <img src="{{contest.creator.avatar}}">
           </ion-avatar>
@@ -20,7 +20,7 @@
       <ion-col width-5>
       </ion-col>
       <ion-col class="no-padding">
-        <div class="contest-participants-area pointer" [ngStyle]="{'float': client.currentLanguage.oppositeAlign}" (click)="onContestSelected({'contest': contest, 'source': 'details'})">
+        <div class="contest-participants-area pointer" [ngStyle]="{'float': client.currentLanguage.oppositeAlign}">
               <span [ngStyle]="{'float': client.currentLanguage.align}"
                     class="contest-chart-bottom-ribbon-participants-text">
               <span [ngStyle]="{'float': client.currentLanguage.align}"
