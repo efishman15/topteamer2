@@ -16,21 +16,12 @@ function getContestTitle(contest) {
 
   var contestTitle = generalUtils.settings.server.facebook.openGraphStories.text[contest.language].contestTitle.format(
     {
-      'team0': contest.teams[0].name,
-      'team1': contest.teams[1].name,
-      'subject': contest.subject
+      'team0': contest.teams[0].name.toLowerCase(),
+      'team1': contest.teams[1].name.toLowerCase(),
+      'subject': contest.subject.toLowerCase()
     });
 
   return contestTitle;
-}
-
-//----------------------------------------------------
-// getTeamTitle
-//
-//----------------------------------------------------
-function getTeamTitle(contest, team) {
-
-
 }
 
 //----------------------------------------------------
@@ -67,8 +58,8 @@ function getTeamDescription(contest, myTeam) {
 
   var description = generalUtils.settings.server.facebook.openGraphStories.text[contest.language][propertyName];
   description = description.format({
-    'name': contest.teams[1 - myTeam].name,
-    'subject': contest.subject
+    'name': contest.teams[1 - myTeam].name.toLowerCase(),
+    'subject': contest.subject.toLowerCase()
   });
 
   return description;
@@ -117,7 +108,7 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
       break;
     case 'team':
     case 'teamLeader':
-      facebookObject['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[objectData.contest.language].teamTitle.format({'name': objectData.contest.teams[objectData.team].name});
+      facebookObject['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[objectData.contest.language].teamTitle.format({'name': objectData.contest.teams[objectData.team].name.toLowerCase()});
       facebookObject['og:description'] = getTeamDescription(objectData.contest, objectData.team);
       facebookObject['og:url'] = facebookObject['og:url'].format({
         'contestId': objectData.contest._id.toString(),
