@@ -6,7 +6,7 @@ import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
-import {Contest,ContestName, Questions, Team, PaymentData} from '../../objects/objects';
+import {Contest,ContestName, Questions, Team, PaymentData, AppPage} from '../../objects/objects';
 
 @Component({
   templateUrl: 'build/pages/set-contest/set-contest.html',
@@ -407,9 +407,11 @@ export class SetContestPage {
           this.client.logEvent('contest/created', contestParams);
           this.client.events.publish('topTeamer:contestCreated', contest);
           this.client.nav.pop({animate: false}).then(() => {
-            this.client.openPage('ContestPage', {'contest': contest}).then(() => {
-              this.client.openPage('SharePage', {'contest': contest, 'source': 'newContest'});
-            });
+            let appPages : Array<AppPage> = new Array<AppPage>();
+            appPages.push(new AppPage('ContestPage', {'contest': contest}));
+            appPages.push(new AppPage('SharePage', {'contest': contest, 'source': 'newContest'}));
+            this.client.insertPages(appPages);
+          }, () => {
           });
         }
         else {

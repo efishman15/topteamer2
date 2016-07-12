@@ -2,14 +2,14 @@
   <button menuToggle>
     <ion-icon name="menu"></ion-icon>
   </button>
-  <ion-title>{{title}}</ion-title>
+  <ion-title>{{client.translate('SHARE_WITH_FRIENDS_TITLE')}}</ion-title>
 
 </ion-navbar>
 
 <ion-content class="app-bg">
 
   <div class="base-font" padding text-center>
-    <h3 padding-top padding-bottom>{{client.translate('SHARE_WITH_FRIENDS_MESSAGE')}}</h3>
+    <h3 padding-top padding-bottom>{{title}}</h3>
     <h5 padding *ngIf="params.data.contest">{{params.data.contest.name.long}}</h5>
     <h5 padding *ngIf="!params.data.contest">{{client.translate('GAME_NAME')}}</h5>
 

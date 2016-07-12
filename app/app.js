@@ -152,7 +152,9 @@ var TopTeamerApp = (function () {
                 if (data.data_parsed && data.data_parsed.contestId) {
                     //Will go to this contest
                     if (_this.client.session) {
-                        _this.client.displayContest(data.data_parsed.contestId);
+                        _this.client.displayContestById(data.data_parsed.contestId).then(function () {
+                        }, function () {
+                        });
                     }
                     else {
                         _this.client.deepLinkContestId = data.data_parsed.contestId;

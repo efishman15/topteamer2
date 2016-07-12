@@ -36,12 +36,15 @@ var ContestListComponent = (function () {
         });
     };
     ContestListComponent.prototype.onContestSelected = function (data) {
-        this.client.logEvent('displayContest', { 'contestId': data.contest._id, 'source': data.source });
-        this.client.displayContest(data.contest._id);
-    };
-    ContestListComponent.prototype.onContestShare = function (data) {
-        this.client.logEvent('contestShare', { 'contestId': data.contest._id, 'source': data.source });
-        this.client.displayContest(data.contest._id);
+        var _this = this;
+        this.client.logEvent('tryRunContest', { 'contestId': data.contest._id, 'source': data.source });
+        this.client.runContest(data.contest).then(function (contest) {
+            if (contest) {
+                //A new copy from the server
+                _this.updateContest(contest);
+            }
+        }, function () {
+        });
     };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {

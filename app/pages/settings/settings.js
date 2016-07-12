@@ -20,7 +20,11 @@ var SettingsPage = (function () {
     };
     SettingsPage.prototype.ionViewDidLeave = function () {
         if (this.client.session.settings.language != this.originalLanguage) {
-            this.client.events.publish('topTeamer:languageChanged');
+            var directionChanged = false;
+            if (this.client.settings.languages[this.client.session.settings.language].direction !== this.client.settings.languages[this.originalLanguage].direction) {
+                directionChanged = true;
+            }
+            this.client.events.publish('topTeamer:languageChanged', directionChanged);
         }
     };
     SettingsPage.prototype.toggleSound = function () {

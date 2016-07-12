@@ -4,7 +4,7 @@
     {{client.translate('SEARCH_MY_QUESTIONS')}}
   </ion-title>
 
-  <ion-buttons left>
+  <ion-buttons right>
     <button (click)="dismiss(false)">
       <ion-icon name="close-circle"></ion-icon>
     </button>
@@ -15,7 +15,7 @@
 <ion-content class="app-bg">
   <div padding>
     <ion-searchbar placeholder="{{client.translate('SEARCH')}}" [(ngModel)]="searchText" (ionInput)="search($event)"
-                   cancelButtonText="{{client.translate('CANCEL')}}">
+                   cancelButtonText="{{client.translate('CANCEL')}}" autofocus>
     </ion-searchbar>
   </div>
 

@@ -23,26 +23,23 @@ var QuizPage = (function () {
         this.quizStarted = false;
         this.client = client_1.Client.getInstance();
         this.params = params;
-    }
-    QuizPage.prototype.ngOnInit = function () {
-        this.init();
-    };
-    QuizPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
-    };
-    QuizPage.prototype.ionViewDidEnter = function () {
-        //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
-        if (this.quizStarted) {
-            return;
-        }
-        this.init();
-        this.contestId = this.params.data.contest._id;
         if (this.params.data.contest.leadingTeam === -1) {
             this.title = this.client.translate('TIE');
         }
         else {
             this.title = this.client.translate('QUIZ_VIEW_TITLE', { 'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name });
         }
+    }
+    QuizPage.prototype.ngOnInit = function () {
+        this.init();
+    };
+    QuizPage.prototype.ionViewWillEnter = function () {
+        this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
+        //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
+        if (this.quizStarted) {
+            return;
+        }
+        this.init();
         this.startQuiz();
     };
     QuizPage.prototype.init = function () {
@@ -59,7 +56,7 @@ var QuizPage = (function () {
             'source': this.params.data.source,
             'typeId': this.params.data.contest.type.id
         });
-        quizService.start(this.contestId).then(function (data) {
+        quizService.start(this.params.data.contest._id).then(function (data) {
             _this.quizStarted = true;
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;

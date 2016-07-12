@@ -22,7 +22,11 @@ export class SettingsPage {
 
   ionViewDidLeave() {
     if (this.client.session.settings.language != this.originalLanguage) {
-      this.client.events.publish('topTeamer:languageChanged');
+      let directionChanged : boolean = false;
+      if (this.client.settings.languages[this.client.session.settings.language].direction !== this.client.settings.languages[this.originalLanguage].direction) {
+        directionChanged = true;
+      }
+      this.client.events.publish('topTeamer:languageChanged', directionChanged);
     }
   }
 

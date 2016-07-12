@@ -35,6 +35,12 @@ var Settings = (function () {
     return Settings;
 })();
 exports.Settings = Settings;
+var ContestSettings = (function () {
+    function ContestSettings() {
+    }
+    return ContestSettings;
+})();
+exports.ContestSettings = ContestSettings;
 var ShareSettings = (function () {
     function ShareSettings() {
     }
@@ -543,4 +549,12 @@ var ShareVariables = (function () {
     return ShareVariables;
 })();
 exports.ShareVariables = ShareVariables;
+var AppPage = (function () {
+    function AppPage(page, params) {
+        this.page = page;
+        this.params = params;
+    }
+    return AppPage;
+})();
+exports.AppPage = AppPage;
 //# sourceMappingURL=objects.js.map

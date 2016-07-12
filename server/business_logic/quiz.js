@@ -234,12 +234,17 @@ module.exports.start = function (req, res, next) {
 
     dalDb.getContest,
 
-    //Check contest join and possible team switch
+    //Check contest join and possible team switch, contest ended
     function (data, callback) {
 
       if (!data.contest.users || !data.contest.users[data.session.userId]) {
-        data.DbHelper.close();
+        dalDb.closeDb(data);
         callback(new exceptions.ServerMessageException('SERVER_ERROR_NOT_JOINED_TO_CONTEST'));
+      }
+      else if (data.contest.endDate < (new Date()).getTime()) {
+        dalDb.closeDb(data);
+        callback(new exceptions.ServerException('Cannot start a quiz on a ended contest', {'contestId': data.contestId}));
+        return;
       }
       else {
         callback(null, data);
@@ -411,7 +416,9 @@ module.exports.answer = function (req, res, next) {
 
       var answers = data.session.quiz.serverData.currentQuestion.answers;
       if (data.id < 0 || data.id > answers.length - 1) {
+        dalDb.closeDb(data);
         callback(new exceptions.ServerException('Invalid answer id', {'answerId': data.id}));
+        return;
       }
 
       data.clientResponse.question.answerId = data.id;

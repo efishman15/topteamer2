@@ -17,7 +17,6 @@ export class QuizPage {
 
   client:Client;
   params:NavParams;
-  contestId:string;
   source:string;
   quizData:QuizData;
   questionHistory:Array<QuizQuestion> = [];
@@ -37,6 +36,13 @@ export class QuizPage {
   constructor(params:NavParams) {
     this.client = Client.getInstance();
     this.params = params;
+
+    if (this.params.data.contest.leadingTeam === -1) {
+      this.title = this.client.translate('TIE');
+    }
+    else {
+      this.title = this.client.translate('QUIZ_VIEW_TITLE', {'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name});
+    }
   }
 
   ngOnInit() {
@@ -45,9 +51,6 @@ export class QuizPage {
 
   ionViewWillEnter() {
     this.client.logEvent('page/quiz', {'contestId': this.params.data.contest._id});
-  }
-
-  ionViewDidEnter() {
 
     //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
     if (this.quizStarted) {
@@ -55,14 +58,6 @@ export class QuizPage {
     }
 
     this.init();
-    this.contestId = this.params.data.contest._id;
-
-    if (this.params.data.contest.leadingTeam === -1) {
-      this.title = this.client.translate('TIE');
-    }
-    else {
-      this.title = this.client.translate('QUIZ_VIEW_TITLE', {'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name});
-    }
 
     this.startQuiz();
   }
@@ -83,7 +78,7 @@ export class QuizPage {
       'source': this.params.data.source,
       'typeId': this.params.data.contest.type.id
     });
-    quizService.start(this.contestId).then((data) => {
+    quizService.start(this.params.data.contest._id).then((data) => {
       this.quizStarted = true;
       this.quizData = data.quiz;
       this.quizData.currentQuestion.answered = false;

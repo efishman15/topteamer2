@@ -1,51 +1,42 @@
 var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
-var emailRef = '?ref=shareEmail';
+var EMAIL_REF = '?ref=shareEmail';
 exports.getVariables = function (contest, isNewContest) {
     var client = client_1.Client.getInstance();
     var shareVariables = new objects_1.ShareVariables();
+    var subjectField;
+    var bodyField;
+    var params = {};
     shareVariables.shareImage = client.settings.general.baseUrl + client.settings.general.logoUrl;
     if (contest) {
+        params['team0'] = contest.teams[0].name;
+        params['team1'] = contest.teams[1].name;
         shareVariables.shareUrl = contest.link;
-        shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', { name: contest.name.long });
-        if (contest.myTeam === 0 || contest.myTeam === 1) {
-            //I am playing for one of the teams
-            shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
-                team: contest.teams[contest.myTeam].name,
-                url: shareVariables.shareUrl
-            });
-            shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
-                team: contest.teams[contest.myTeam].name,
-                url: shareVariables.shareUrl + emailRef
-            });
-            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM', {
-                team: contest.teams[contest.myTeam].name,
-                name: contest.name.long
-            });
+        if (isNewContest) {
+            subjectField = 'SHARE_SUBJECT_NEW_CONTEST';
+            bodyField = 'SHARE_BODY_NEW_CONTEST';
+        }
+        else if (contest.myTeam === 0 || contest.myTeam === 1) {
+            params['myTeam'] = contest.teams[contest.myTeam].name;
+            params['otherTeam'] = contest.teams[1 - contest.myTeam].name;
+            subjectField = 'SHARE_SUBJECT_CONTEST_JOINED';
+            bodyField = 'SHARE_BODY_CONTEST_JOINED';
         }
         else {
-            //I did not join this contest yet
-            shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
-                name: contest.name.long,
-                url: shareVariables.shareUrl
-            });
-            shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
-                name: contest.name.long,
-                url: shareVariables.shareUrl + emailRef
-            });
-            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM', {
-                name: contest.name.long
-            });
+            subjectField = 'SHARE_SUBJECT_CONTEST_NOT_JOINED';
+            bodyField = 'SHARE_BODY_CONTEST_NOT_JOINED';
         }
     }
     else {
-        shareVariables.shareUrl = client.settings.general.downloadUrl[client.user.settings.language];
-        shareVariables.shareSubject = client.translate('SHARE_SUBJECT');
-        shareVariables.shareBody = client.translate('SHARE_BODY', { url: shareVariables.shareUrl });
-        shareVariables.shareBodyEmail = client.translate('SHARE_BODY', { url: shareVariables.shareUrl + emailRef });
-        shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' ' + client.translate('GAME_NAME');
+        shareVariables.shareUrl = client.settings.general.downloadUrl[client.currentLanguage.value];
+        subjectField = 'SHARE_SUBJECT_GENERAL';
+        bodyField = 'SHARE_BODY_GENERAL';
     }
+    shareVariables.shareSubject = client.translate(subjectField, params);
+    shareVariables.shareBodyNoUrl = client.translate(bodyField, params);
+    shareVariables.shareBody = shareVariables.shareBodyNoUrl + ' ' + shareVariables.shareUrl;
+    shareVariables.shareBodyEmail = shareVariables.shareBody + EMAIL_REF;
     return shareVariables;
 };
 exports.mobileDiscoverSharingApps = function () {
@@ -90,8 +81,8 @@ exports.mobileDiscoverApp = function (client, shareApp, shareVariables) {
         });
     });
 };
-exports.mobileShare = function (appName, contest) {
-    var shareVariables = _this.getVariables(contest);
+exports.mobileShare = function (appName, contest, isNewContest) {
+    var shareVariables = _this.getVariables(contest, isNewContest);
     switch (appName) {
         case 'whatsapp':
             window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {

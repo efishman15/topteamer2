@@ -69,7 +69,7 @@ export let removeContest = (contestId:string) => {
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
-export let setContest = (contest:Object, mode:string, nameChanged:Boolean) => {
+export let setContest = (contest:Object, mode:string) => {
   var postData = {'contest': contest, 'mode': mode};
 
   var client = Client.getInstance();
@@ -109,6 +109,14 @@ export let setContestClientData = (contest:Contest) => {
 
   var client = Client.getInstance();
   var now = (new Date()).getTime();
+
+  //-----------------------------------------------------------------------------------------------
+  // lastUpdated - a mechanism to avoid retrieving the contest object again
+  // in the client based on its id - to force refresh from the server
+  // There will be a client settings threshold that will control if refreshing from the
+  // server is neccessary (e.g. - X milliseconds from last refresh)
+  //-----------------------------------------------------------------------------------------------
+  contest.lastUpdated = now;
 
   //-------------------
   // status, state

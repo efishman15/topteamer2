@@ -14,20 +14,21 @@ export class SharePage {
   params: NavParams;
   shareVariables:ShareVariables;
   title: string;
+  isNewContest: boolean;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
     this.params = params;
 
-    var isNewContest = (params.data.source === 'newContest');
-    if (params.data.contestJustCreated) {
-      this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_TITLE');
+    this.isNewContest = (params.data.source === 'newContest');
+    if (this.isNewContest) {
+      this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_MESSAGE');
     }
     else {
-      this.title = this.client.translate('SHARE_WITH_FRIENDS_TITLE');
+      this.title = this.client.translate('SHARE_WITH_FRIENDS_MESSAGE');
     }
 
-    this.shareVariables = shareService.getVariables(this.params.data.contest, isNewContest);
+    this.shareVariables = shareService.getVariables(this.params.data.contest, this.isNewContest);
   }
 
   ionViewWillEnter() {
@@ -46,6 +47,6 @@ export class SharePage {
 
   mobileShare(appName?: string) {
     this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
-    shareService.mobileShare(appName, this.params.data.contest);
+    shareService.mobileShare(appName, this.params.data.contest, this.isNewContest);
   }
 }

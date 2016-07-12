@@ -1,59 +1,53 @@
 import {Client} from './client';
 import {ShareVariables,ClientShareApp,ClientShareDiscoverApp,Contest} from '../objects/objects';
 
-let emailRef:string = '?ref=shareEmail';
+const EMAIL_REF:string = '?ref=shareEmail';
 
 export let getVariables = (contest?:Contest, isNewContest? : boolean) => {
 
   var client = Client.getInstance();
-  var shareVariables = new ShareVariables();
+  let shareVariables : ShareVariables = new ShareVariables();
+  let subjectField : string;
+  let bodyField : string;
+
+  var params = {};
 
   shareVariables.shareImage = client.settings.general.baseUrl + client.settings.general.logoUrl;
 
   if (contest) {
-    shareVariables.shareUrl = contest.link;
-    shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', {name: contest.name.long});
 
-    if (contest.myTeam === 0 || contest.myTeam === 1) {
-      //I am playing for one of the teams
-      shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
-        team: contest.teams[contest.myTeam].name,
-        url: shareVariables.shareUrl
-      });
-      shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
-        team: contest.teams[contest.myTeam].name,
-        url: shareVariables.shareUrl + emailRef
-      });
-      shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM', {
-        team: contest.teams[contest.myTeam].name,
-        name: contest.name.long
-      });
+    params['team0'] = contest.teams[0].name;
+    params['team1'] = contest.teams[1].name;
+
+    shareVariables.shareUrl = contest.link;
+
+    if (isNewContest) {
+      subjectField = 'SHARE_SUBJECT_NEW_CONTEST';
+      bodyField = 'SHARE_BODY_NEW_CONTEST';
+    }
+    else if (contest.myTeam === 0 || contest.myTeam === 1) {
+      params['myTeam'] = contest.teams[contest.myTeam].name;
+      params['otherTeam'] = contest.teams[1-contest.myTeam].name;
+      subjectField = 'SHARE_SUBJECT_CONTEST_JOINED';
+      bodyField = 'SHARE_BODY_CONTEST_JOINED';
     }
     else {
-      //I did not join this contest yet
-      shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
-        name: contest.name.long,
-        url: shareVariables.shareUrl
-      });
-      shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
-        name: contest.name.long,
-        url: shareVariables.shareUrl + emailRef
-      });
-      shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM', {
-        name: contest.name.long
-      });
+      subjectField = 'SHARE_SUBJECT_CONTEST_NOT_JOINED';
+      bodyField = 'SHARE_BODY_CONTEST_NOT_JOINED';
     }
   }
   else {
-    shareVariables.shareUrl = client.settings.general.downloadUrl[client.user.settings.language];
-    shareVariables.shareSubject = client.translate('SHARE_SUBJECT');
-    shareVariables.shareBody = client.translate('SHARE_BODY', {url: shareVariables.shareUrl});
-    shareVariables.shareBodyEmail = client.translate('SHARE_BODY', {url: shareVariables.shareUrl + emailRef});
-    shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' ' + client.translate('GAME_NAME');
+    shareVariables.shareUrl = client.settings.general.downloadUrl[client.currentLanguage.value];
+    subjectField = 'SHARE_SUBJECT_GENERAL';
+    bodyField = 'SHARE_BODY_GENERAL';
   }
 
-  return shareVariables;
+  shareVariables.shareSubject = client.translate(subjectField, params);
+  shareVariables.shareBodyNoUrl = client.translate(bodyField, params);
+  shareVariables.shareBody = shareVariables.shareBodyNoUrl + ' ' + shareVariables.shareUrl;
+  shareVariables.shareBodyEmail = shareVariables.shareBody + EMAIL_REF;
 
+  return shareVariables;
 }
 
 export let mobileDiscoverSharingApps = () => {
@@ -113,9 +107,9 @@ export let mobileDiscoverApp = (client: any, shareApp:ClientShareDiscoverApp, sh
   });
 }
 
-export let mobileShare = (appName?:string, contest?:Contest) => {
+export let mobileShare = (appName?:string, contest?:Contest, isNewContest?: boolean) => {
 
-  let shareVariables:ShareVariables = this.getVariables(contest);
+  let shareVariables:ShareVariables = this.getVariables(contest, isNewContest);
   switch (appName) {
     case 'whatsapp':
       window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl,

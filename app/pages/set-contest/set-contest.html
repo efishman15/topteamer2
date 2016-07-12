@@ -36,7 +36,7 @@
                        placeholder="{{client.translate('TEAM0')}}"
                        maxlength="15"
                        [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-10px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
-                       [disabled]="client.session.features.newContest.locked">
+                       [disabled]="client.session.features.newContest.locked" autofocus>
             </ion-input>
           </ion-item>
         </ion-col>

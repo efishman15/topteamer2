@@ -46,13 +46,14 @@ export class ContestListComponent {
   }
 
   onContestSelected(data: any) {
-    this.client.logEvent('displayContest',{'contestId' : data.contest._id, 'source': data.source});
-    this.client.displayContest(data.contest._id);
-  }
-
-  onContestShare(data: any) {
-    this.client.logEvent('contestShare',{'contestId' : data.contest._id, 'source': data.source});
-    this.client.displayContest(data.contest._id);
+    this.client.logEvent('tryRunContest',{'contestId' : data.contest._id, 'source': data.source});
+    this.client.runContest(data.contest).then ((contest: Contest) => {
+      if (contest) {
+        //A new copy from the server
+        this.updateContest(contest);
+      }
+    }, () => {
+    });
   }
 
   onResize() {

@@ -62,7 +62,7 @@ exports.removeContest = function (contestId) {
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
-exports.setContest = function (contest, mode, nameChanged) {
+exports.setContest = function (contest, mode) {
     var postData = { 'contest': contest, 'mode': mode };
     var client = client_1.Client.getInstance();
     return new Promise(function (resolve, reject) {
@@ -97,6 +97,13 @@ exports.getQuestions = function (userQuestions) {
 exports.setContestClientData = function (contest) {
     var client = client_1.Client.getInstance();
     var now = (new Date()).getTime();
+    //-----------------------------------------------------------------------------------------------
+    // lastUpdated - a mechanism to avoid retrieving the contest object again
+    // in the client based on its id - to force refresh from the server
+    // There will be a client settings threshold that will control if refreshing from the
+    // server is neccessary (e.g. - X milliseconds from last refresh)
+    //-----------------------------------------------------------------------------------------------
+    contest.lastUpdated = now;
     //-------------------
     // status, state
     //-------------------

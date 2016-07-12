@@ -15,14 +15,14 @@ var SharePage = (function () {
     function SharePage(params) {
         this.client = client_1.Client.getInstance();
         this.params = params;
-        var isNewContest = (params.data.source === 'newContest');
-        if (params.data.contestJustCreated) {
-            this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_TITLE');
+        this.isNewContest = (params.data.source === 'newContest');
+        if (this.isNewContest) {
+            this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_MESSAGE');
         }
         else {
-            this.title = this.client.translate('SHARE_WITH_FRIENDS_TITLE');
+            this.title = this.client.translate('SHARE_WITH_FRIENDS_MESSAGE');
         }
-        this.shareVariables = shareService.getVariables(this.params.data.contest, isNewContest);
+        this.shareVariables = shareService.getVariables(this.params.data.contest, this.isNewContest);
     }
     SharePage.prototype.ionViewWillEnter = function () {
         if (this.params.data.contest) {
@@ -38,7 +38,7 @@ var SharePage = (function () {
     };
     SharePage.prototype.mobileShare = function (appName) {
         this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
-        shareService.mobileShare(appName, this.params.data.contest);
+        shareService.mobileShare(appName, this.params.data.contest, this.isNewContest);
     };
     SharePage = __decorate([
         core_1.Component({

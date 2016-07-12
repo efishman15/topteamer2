@@ -249,7 +249,9 @@ var Client = (function () {
                     });
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-                            _this.displayContest(notificationData.additionalData['contestId']);
+                            _this.displayContestById(notificationData.additionalData['contestId']).then(function () {
+                            }, function () {
+                            });
                         }
                     });
                     push.on('error', function (error) {
@@ -361,11 +363,54 @@ var Client = (function () {
         });
         return this.nav.present(modal);
     };
-    Client.prototype.displayContest = function (contestId) {
+    Client.prototype.displayContestById = function (contestId) {
         var _this = this;
-        contestsService.getContest(contestId).then(function (contest) {
-            _this.openPage('ContestPage', { 'contest': contest });
-        }, function () {
+        return new Promise(function (resolve, reject) {
+            contestsService.getContest(contestId).then(function (contest) {
+                resolve(contest);
+                _this.openPage('ContestPage', { 'contest': contest });
+            }, function (err) {
+                reject(err);
+            });
+        });
+    };
+    Client.prototype.runContest = function (contest) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var now = (new Date()).getTime();
+            if (contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
+                //Joined to a contest - run it immediately (go to the quiz)
+                var appPages = new Array();
+                if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
+                    appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest }));
+                    appPages.push(new objects_1.AppPage('QuizPage', { 'contest': contest, 'source': 'list' }));
+                    _this.insertPages(appPages);
+                    resolve();
+                }
+                else {
+                    contestsService.getContest(contest._id).then(function (serverContest) {
+                        resolve(serverContest);
+                        appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest }));
+                        appPages.push(new objects_1.AppPage('QuizPage', { 'contest': contest, 'source': 'list' }));
+                        _this.insertPages(appPages);
+                    }, function (err) {
+                        reject(err);
+                    });
+                }
+            }
+            else if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
+                //Not joined and no refresh required - enter the contest with the object we have
+                resolve();
+                _this.openPage('ContestPage', { 'contest': contest });
+            }
+            else {
+                //Will enter the contest after retrieving it from the server
+                _this.displayContestById(contest._id).then(function (serverContest) {
+                    resolve(serverContest);
+                }, function (err) {
+                    reject(err);
+                });
+            }
         });
     };
     Client.prototype.share = function (contest, source) {
@@ -387,6 +432,17 @@ var Client = (function () {
     };
     Client.prototype.setRootPage = function (name, params) {
         return this.nav.setRoot(classesService.get(name), params);
+    };
+    Client.prototype.insertPages = function (pages, index) {
+        var _this = this;
+        if (index === undefined) {
+            index = -1; //Will insert at the end of the stack
+        }
+        var navPages = new Array();
+        pages.forEach(function (appPage) {
+            navPages.push({ page: _this.getPage(appPage.page), params: appPage.params });
+        });
+        this.nav.insertPages(index, navPages);
     };
     Client.prototype.resizeWeb = function () {
         //Resize app for web

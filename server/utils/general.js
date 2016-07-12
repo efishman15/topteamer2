@@ -12,11 +12,24 @@ var get_ip = require('ipware')().get_ip;
 module.exports.okResponse = {'status': 0};
 
 var settings;
+var evalSettings = [];
+
 module.exports.injectSettings = function (dbSettings) {
 
   settings = dbSettings;
 
   checkForEvalSettings(settings);
+
+  while (evalSettings.length > 0) {
+    try {
+      evalSettings[evalSettings.length-1].object[evalSettings[evalSettings.length-1].property] = eval(evalSettings[evalSettings.length-1].object[evalSettings[evalSettings.length-1].property].replaceAll('eval:', ''));
+      evalSettings.pop();
+    }
+    catch(e) {
+      //move this item to the first item in the array - probably has depending evals...
+      evalSettings.unshift(evalSettings.pop());
+    }
+  }
 
   module.exports.settings = settings;
 
@@ -39,7 +52,7 @@ function checkForEvalSettings(currentObject) {
         checkForEvalSettings(currentObject[property]);
       }
       else if (typeof currentObject[property] === 'string' && currentObject[property].indexOf('eval:') >= 0) {
-        currentObject[property] = eval(currentObject[property].replaceAll('eval:', ''));
+        evalSettings.push({object: currentObject, property: property});
       }
     }
   }

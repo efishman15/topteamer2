@@ -330,9 +330,11 @@ var SetContestPage = (function () {
                     _this.client.logEvent('contest/created', contestParams);
                     _this.client.events.publish('topTeamer:contestCreated', contest);
                     _this.client.nav.pop({ animate: false }).then(function () {
-                        _this.client.openPage('ContestPage', { 'contest': contest }).then(function () {
-                            _this.client.openPage('SharePage', { 'contest': contest, 'source': 'newContest' });
-                        });
+                        var appPages = new Array();
+                        appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest }));
+                        appPages.push(new objects_1.AppPage('SharePage', { 'contest': contest, 'source': 'newContest' }));
+                        _this.client.insertPages(appPages);
+                    }, function () {
                     });
                 }
                 else {

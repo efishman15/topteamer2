@@ -196,7 +196,9 @@ export class TopTeamerApp {
         if (data.data_parsed && data.data_parsed.contestId) {
           //Will go to this contest
           if (this.client.session) {
-            this.client.displayContest(data.data_parsed.contestId);
+            this.client.displayContestById(data.data_parsed.contestId).then(() => {
+            }, () => {
+            });
           }
           else {
             this.client.deepLinkContestId = data.data_parsed.contestId;

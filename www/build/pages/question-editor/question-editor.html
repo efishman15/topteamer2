@@ -4,7 +4,7 @@
     {{title}}
   </ion-title>
 
-  <ion-buttons left>
+  <ion-buttons right>
     <button (click)="dismiss(false)">
       <ion-icon name="close-circle"></ion-icon>
     </button>
@@ -27,7 +27,8 @@
           ngMaxlength="client.settings.quiz.question.maxLength"
           [attr.maxlength]="client.settings.quiz.question.maxLength"
           (focus)="inputFocus($event)"
-          required>
+          required
+          autofocus>
         </ion-textarea>
         <div [ngStyle]="{'float': client.currentLanguage.oppositeAlign}"
              class="question-editor-question-characters-length">

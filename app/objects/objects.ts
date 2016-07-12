@@ -30,6 +30,11 @@ export class Settings {
   newContest:NewContestSettings;
   lists:ListSettings;
   share:ShareSettings;
+  contest: ContestSettings;
+}
+
+export class ContestSettings {
+  refreshTresholdInMilliseconds: number;
 }
 
 export class ShareSettings {
@@ -436,6 +441,7 @@ export class Contest {
   state:string;
   leadingTeam:number;
   time:ContestTime;
+  lastUpdated: number;
 
   constructor(typeId:string, startDate:number, endDate?:number, endOption?:string) {
     this.startDate = startDate;
@@ -602,4 +608,13 @@ export class ShareVariables {
   shareBodyEmail:string;
   shareBodyNoUrl:string;
   shareImage:string;
+}
+
+export class AppPage {
+  page: string;
+  params: any;
+  constructor(page: string, params: any) {
+    this.page = page;
+    this.params = params;
+  }
 }

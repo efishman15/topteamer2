@@ -41,8 +41,16 @@ export class MainTabsPage {
       this.handleContestRemoved(eventData[0], eventData[1])
     });
 
-    this.client.events.subscribe('topTeamer:languageChanged', () => {
-      window.location.reload();
+    this.client.events.subscribe('topTeamer:languageChanged', (eventData) => {
+      if (eventData[0]) {
+        window.location.reload();
+      }
+      else {
+        //Just refresh the contests to reflect the new language
+        this.publishActionToTab(0,ACTION_FORCE_REFRESH);
+        this.publishActionToTab(1,ACTION_FORCE_REFRESH);
+        this.publishActionToTab(2,ACTION_FORCE_REFRESH);
+      }
     });
 
     this.client.events.subscribe('topTeamer:serverPopup', (eventData) => {
@@ -74,7 +82,9 @@ export class MainTabsPage {
     if (this.client.deepLinkContestId) {
       var contestId = this.client.deepLinkContestId;
       this.client.deepLinkContestId = null;
-      this.client.displayContest(contestId);
+      this.client.displayContestById(contestId).then(() => {
+      }, () => {
+      });
     }
   }
 

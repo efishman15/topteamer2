@@ -121,38 +121,41 @@
           "profile" : {
             "og:type" : "profile",
             "og:url" : "http://www.topteamer.com/facebook/profile/{{facebookUserId}}/{{language}}",
-            "og:image" : "https://graph.facebook.com/{{facebookUserId}/picture?width=400&height=210",
+            "og:image" : "https://graph.facebook.com/{{facebookUserId}}/picture?width=400&height=210",
             "og:image:width" : 400,
             "og:image:height" : 210
           }
         },
         "text" : {
           "he" : {
-            "gameDescription" : "בואו לשחק במשחק החדש: \"מי שולט?\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
-            "gameTitle" : "מי שולט? הצטרפו לתחרויות ועזרו לקבוצתכם לנצח",
-            "contestTitle" : "{{team0}} או {{team1}}??? בתחרות {{subject}}",
+            "gameDescription" : "'בואו לשחק במשחק החדש: \"' + eval:settings.client.ui.he.GAME_NAME + '\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: \"הבנים נגד הבנות\",  \"אוהדי כדורגל נגד אוהדי כדורסל\", לענות על שאלות ולעזור לקבוצתכם לנצח'",
+            "gameTitle" : "eval:settings.client.ui.he.GAME_NAME + '? הצטרפו לתחרויות ועזרו לקבוצתכם לנצח'",
+            "contestTitle" : "eval:settings.client.ui.he.GAME_NAME + ': {{team0}} או {{team1}}?'",
             "teamTitle" : "אני בקבוצת {{name}}. איפה אתם?",
-            "teamDescriptionCloseMatch" : "התחרות עם קבוצת {{name}} ב{{subject}} צמודה מאוד. בואו לעזור ולשחק במשחק החדש: \"מי שולט?\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
-            "teamDescriptionLosing" : "קבוצת {{name}} קורעת לנו את הצורה ב{{subject}}. בואו לשחק במשחק החדש: \"מי שולט?\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח",
-            "teamDescriptionWinning" : "קבוצת {{name}} מפסידה לנו בגדול ב{{subject}}. בואו לשחק במשחק החדש: \"מי שולט?\". המשחק מאפשר לכם להצטרף לתחרויות בין קבוצות או ליצור תחרות משלכם. לדוגמא: 'הבנים נגד הבנות',  'אוהדי כדורגל נגד אוהדי כדורסל'), לענות על שאלות ולעזור לקבוצתכם לנצח"
+            "teamDescriptionCloseMatch" : "'התחרות עם קבוצת {{name}} צמודה מאוד . עזרו לקבוצתכם. ' + eval:settings.server.facebook.openGraphStories.text.he.gameDescription",
+            "teamDescriptionLosing" : "'קבוצת {{name}} קורעת לנו את הצורה . עזרו לי להציל את כבודנו. ' + eval:settings.server.facebook.openGraphStories.text.he.gameDescription",
+            "teamDescriptionWinning" : "'קבוצת {{name}} מפסידה לנו בגדול . עזרו לי לשמור על התוצאה. ' + eval:settings.server.facebook.openGraphStories.text.he.gameDescription",
+            "profileTitle" : "'{{name}} משחק איתי במשחק \"' + eval:settings.client.ui.he.GAME_NAME + '\"'"
           },
           "es" : {
-            "gameDescription" : "Comienza nuestro nuevo y emocionante juego : \" ¿Quién manda ? \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
-            "gameTitle" : "¿Quién manda ? : unirse a uno o más concursos y averiguar quién es el mejor equipo",
-            "contestTitle" : "{{team0}} or {{team1}}??? Compitiendo en {{subject}}}",
-            "teamTitle" : "Estoy a favor de {{name}}. ¿Dónde estás?",
-            "teamDescriptionCloseMatch" : "La lucha con {{name}} en {{subject}} y respuestas es muy estrecha . Venir a ayudar. Comienza nuestro nuevo y emocionante juego : \" ¿Quién manda ? \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
-            "teamDescriptionWinning" : "{{name}} están perdiendo a lo grande en {{subject}}. Comienza nuestro nuevo y emocionante juego : \" ¿Quién manda ? \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión",
-            "teamDescriptionLosing" : "{{name}} nos están matando en {{subject}}. Comienza nuestro nuevo y emocionante juego : \" ¿Quién manda ? \" . Unirse o crear un concurso ( por ejemplo Chicos vs Chicas o aficionados al fútbol vs Los aficionados al baloncesto ) , invita a tus amigos y descubrir quién es el mejor equipo respondiendo preguntas de diversión"
+            "gameDescription" : "'Comienza nuestro nuevo y emocionante juego : \"¿' + eval:settings.client.ui.es.GAME_NAME + ' ? \" . Unirse o crear un concurso. Por ejemplo: \" Chicos vs Chicas \" o \" aficionados al fútbol vs Los aficionados al baloncesto \" , invita a tus amigos y descubrir \"¿' + eval:settings.client.ui.es.GAME_NAME_LOWERCASE + ' ? \" respondiendo preguntas de diversión'",
+            "gameTitle" : "'¿' + eval:settings.client.ui.es.GAME_NAME + ' ? : unirse a uno o más concursos y averiguar quién es el mejor equipo'",
+            "contestTitle" : "'¿' + eval:settings.client.ui.es.GAME_NAME + '  : {{team0}} o {{team1}} ? '",
+            "teamTitle" : "Estoy en el equipo de {{name}}. ¿Dónde estás?",
+            "teamDescriptionCloseMatch" : "'La lucha con {{name}} y respuestas es muy estrecha . Ayudar a su equipo. ' + eval:settings.server.facebook.openGraphStories.text.en.gameDescription",
+            "teamDescriptionLosing" : "'{{name}} nos están. Ayúdanos a salvar nuestra dignidad. ' + eval:settings.server.facebook.openGraphStories.text.en.gameDescription",
+            "teamDescriptionWinning" : "'{{name}} están perdiendo a lo grande. Ayúdenos a preservar la puntuación.' + eval:settings.server.facebook.openGraphStories.text.en.gameDescription",
+            "profileTitle" : "'{{name}} está jugando conmigo \"¿' + eval:settings.client.ui.en.GAME_NAME + ' ? \"'"
           },
           "en" : {
-            "gameDescription" : "Play our new and exciting game: \"Who rules?\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
-            "gameTitle" : "Who rules? Join one or more contests and find out who's the best team",
-            "contestTitle" : "{{team0}} or {{team1}}??? Competing in {{subject}}",
-            "teamTitle" : "I'm for {{name}}. Where are you?",
-            "teamDescriptionCloseMatch" : "The fight with{{name}} in {{subject}} is very close. Come and help your team and play this new and exciting game: \"Who rules?\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
-            "teamDescriptionWinning" : "{{name}} are losing big time in {{subject}}. Play our new and exciting game: \"Who rules?\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions",
-            "teamDescriptionLosing" : "{{name}} are killing us. Come and help. Play this new and exciting game: \"Who rules?\". Join or create a contest (e.g. Boys vs Girls or Football fans vs Basketball fans), invite your friends and find out who is the best team by answering fun questions"
+            "gameDescription" : "'Play our new and exciting game: \"' + eval:settings.client.ui.en.GAME_NAME + '?\". Join or create a contest such as: Boys vs Girls or Football fans vs Basketball fans, invite your friends and find out ' + eval:settings.client.ui.en.GAME_NAME_LOWERCASE + ' by answering fun questions'",
+            "gameTitle" : "'\"' + eval:settings.client.ui.en.GAME_NAME + '?\". Join one or more contests and find out \"' + eval:settings.client.ui.en.GAME_NAME_LOWERCASE + '\"'",
+            "contestTitle" : "eval:settings.client.ui.en.GAME_NAME + ': {{team0}} or {{team1}}?'",
+            "teamTitle" : "I'm in {{name}} team. Where are you?",
+            "teamDescriptionCloseMatch" : "'The fight with {{name}} is very close. Help your team. ' + eval:settings.server.facebook.openGraphStories.text.en.gameDescription",
+            "teamDescriptionLosing" : "'{{name}} are killing us. Help us save our dignity. ' + eval:settings.server.facebook.openGraphStories.text.en.gameDescription",
+            "teamDescriptionWinning" : "'{{name}} are losing big time. Help us preserve the score. ' + eval:settings.server.facebook.openGraphStories.text.en.gameDescription",
+            "profileTitle" : "'{{name}} is playing \"' + eval:settings.client.ui.en.GAME_NAME + '?\" with me'"
           }
         },
         "params" : {
@@ -464,7 +467,7 @@
       "list" : {
         "recentlyFinishedDays" : 180,
         "pageSize" : 10,
-        "clientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.avatar"]
+        "clientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.avatar", "leader.name", "leader.avatar", "link"]
       },
       "details" : {
         "clientTemplate" : {
@@ -1119,10 +1122,6 @@
         "CLICK_LIKE_WITH_CONTEST" : "Click LIKE to our facebook game page to get the results of:",
         "FACEBOOK_GAME_PAGE" : "Facebook game page",
         "SHARE_WITH_FRIENDS_MESSAGE" : "Invite friends to assist",
-        "SHARE_SUBJECT" : "'Come play with me ' + eval:settings.client.ui.en.GAME_NAME",
-        "SHARE_SUBJECT_WITH_CONTEST" : "Come play with me - '{{name}}'",
-        "SHARE_BODY" : "I want you to see this cool game: {{url}}",
-        "SHARE_BODY_NO_URL" : "I want you to see this cool game",
         "LEADERBOARDS" : "Leaderboards",
         "FRIENDS" : "Friends",
         "WEEKLY" : "This week",
@@ -1191,7 +1190,8 @@
         "CONTEST_CREATED_ON" : "On {{month}} {{day}}, {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["S", "M", "T", "W", "T", "F", "S"],
         "DATE_PICKER_MONTH_NAMES" : ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        "GAME_NAME" : "Who rules?",
+        "GAME_NAME" : "Who rules",
+        "GAME_NAME_LOWERCASE" : "eval:settings.client.ui.en.GAME_NAME.toLowerCase()",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} won",
         "AGAINST" : "vs.",
         "TIE" : "Draw contest",
@@ -1200,7 +1200,7 @@
         "CONTEST_NAME_SHORT" : "{{team0}} vs. {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivia questions",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "{{name}}'s questions",
-        "CONTEST_VIEW_TITLE" : "Who rules?",
+        "CONTEST_VIEW_TITLE" : "eval:settings.client.ui.en.GAME_NAME + '?'",
         "QUIZ_VIEW_TITLE" : "Leaders: {{Team}}",
         "SHOW_IN_RANDOM_ORDER" : "Display questions in random order",
         "RUNNING_CONTESTS_TAB_TEXT" : "Leading",
@@ -1213,15 +1213,20 @@
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "The points you gained will not credit your team. Are you sure you would like to exit?",
         "SYSTEM_PARTICIPANTS" : "System participants",
         "SHARE_OTHER_OPTIONS" : "More...",
-        "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "Join the contest: {{name}} and help your team win: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM" : "Join the contest: {{name}} and help your team win",
-        "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team. Please help: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "I am playing for {{team}} team in the contest '{{name}}' - please help",
         "PLAY" : "Play",
         "VIEW" : "View",
         "JOIN_A_CONTEST_MESSAGE_PART_1" : "Please join one the ",
         "JOIN_A_CONTEST_MESSAGE_PART_2" : " so it will appear in my contests list",
-        "LEADING_CONTESTS" : "Leading Contests"
+        "LEADING_CONTESTS" : "Leading Contests",
+        "INVITE_FRIENDS_FOR_NEW_CONTEST_MESSAGE" : "Invite friends to the new contest",
+        "SHARE_SUBJECT_NEW_CONTEST" : "'I downloaded the game \"' + eval:settings.client.ui.en.GAME_NAME + '\" and created a contest: \"{{team0}} vs. {{team1}}\"'",
+        "SHARE_BODY_NEW_CONTEST" : "'I downloaded the game \"' + eval:settings.client.ui.en.GAME_NAME + '\" and created a contest: \"{{team0}} vs. {{team1}}\". Come and play with me'",
+        "SHARE_SUBJECT_CONTEST_NOT_JOINED" : "'I downloaded the game: \"' + eval:settings.client.ui.en.GAME_NAME + '?\" and I am playing \"{{team0}} vs. {{team1}}\" contest'",
+        "SHARE_BODY_CONTEST_NOT_JOINED" : "'I downloaded the game: \"' + eval:settings.client.ui.en.GAME_NAME + '?\" and I am playing \"{{team0}} vs. {{team1}}\" contest. Come and play with me'",
+        "SHARE_SUBJECT_CONTEST_JOINED" : "'I downloaded a new game: \"' + eval:settings.client.ui.en.GAME_NAME + '?\" and joined {{myTeam}} team. Come and help me beat {{OtherTeam}} team'",
+        "SHARE_BODY_CONTEST_JOINED" : "'I downloaded a new game: \"' + eval:settings.client.ui.en.GAME_NAME + '?\" and joined {{myTeam}} team. Come and help me beat {{OtherTeam}} team'",
+        "SHARE_SUBJECT_GENERAL" : "'Check out this new game: \"' + eval:settings.client.ui.en.GAME_NAME + '?\"'",
+        "SHARE_BODY_GENERAL" : "'Check out this new game: \"' + eval:settings.client.ui.en.GAME_NAME + '?\". Come and play with me'"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1331,10 +1336,6 @@
         "CLICK_LIKE_WITH_CONTEST" : "לחצו לייק לדף המשחק בפייסבוק לקבלת תוצאות התחרות:",
         "FACEBOOK_GAME_PAGE" : "דף המשחק בפייסבוק",
         "SHARE_WITH_FRIENDS_MESSAGE" : "הזמינו חברים לסייע",
-        "SHARE_SUBJECT" : "'בואו לשחק איתי: ' + eval:settings.client.ui.he.GAME_NAME",
-        "SHARE_SUBJECT_WITH_CONTEST" : "בואו לשחק איתי - '{{name}}'",
-        "SHARE_BODY" : "אתם חייבים להסתכל על המשחק המגניב הזה: {{url}}",
-        "SHARE_BODY_NO_URL" : "אתם חייבים להסתכל על המשחק המגניב הזה",
         "LEADERBOARDS" : "היכל התהילה",
         "FRIENDS" : "חברים",
         "WEEKLY" : "השבוע",
@@ -1402,7 +1403,7 @@
         "CONTEST_CREATED_ON" : "ב {{day}} ל {{month}}, {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["א", "ב", "ג", "ד", "ה", "ו", "ש"],
         "DATE_PICKER_MONTH_NAMES" : ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"],
-        "GAME_NAME" : "מי שולט?",
+        "GAME_NAME" : "מי שולט",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ניצחו",
         "AGAINST" : "נגד",
         "TIE" : "תיקו בתחרות",
@@ -1411,7 +1412,7 @@
         "PLAY_FOR_TEAM" : "שחקו עבור {{team}}",
         "CONTEST_NAME_LONG" : "{{team0}} נגד {{team1}} בתחרות {{subject}}",
         "CONTEST_NAME_SHORT" : "{{team0}} נגד {{team1}}",
-        "CONTEST_VIEW_TITLE" : "מי שולט?",
+        "CONTEST_VIEW_TITLE" : "eval:settings.client.ui.he.GAME_NAME + '?'",
         "QUIZ_VIEW_TITLE" : "מובילים: {{Team}}",
         "SHOW_IN_RANDOM_ORDER" : "הצגת השאלות בסדר אקראי",
         "RUNNING_CONTESTS_TAB_TEXT" : "המובילות",
@@ -1424,15 +1425,20 @@
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "הניקוד שצברתם לא ייזכה את קבוצתכם. האם אתם בטוחים שברצונכם לצאת?",
         "SYSTEM_PARTICIPANTS" : "משתתפי מערכת",
         "SHARE_OTHER_OPTIONS" : "עוד...",
-        "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "הצטרפו לתחרות: {{name}} ועזרו לקבוצתכם לנצח: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM" : "הצטרפו לתחרות: {{name}} ועזרו לקבוצתכם לנצח",
-        "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}}. בואו לעזור: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "הצטרפתי לשחק עבור קבוצת {{team}} בתחרות '{{name}}' - בואו לעזור",
         "PLAY" : "שחקו",
         "VIEW" : "צפו",
         "JOIN_A_CONTEST_MESSAGE_PART_1" : "אנא הצטרפו לאחת ",
         "JOIN_A_CONTEST_MESSAGE_PART_2" : " על מנת שתופיע בתחרויות שלי",
-        "LEADING_CONTESTS" : "התחרויות המובילות"
+        "LEADING_CONTESTS" : "התחרויות המובילות",
+        "INVITE_FRIENDS_FOR_NEW_CONTEST_MESSAGE" : "הזמינו חברים לתחרות החדשה",
+        "SHARE_SUBJECT_NEW_CONTEST" : "'הורדתי את המשחק \"' + eval:settings.client.ui.he.GAME_NAME + '\" ויצרתי תחרות: \"{{team0}} נגד {{team1}}\"'",
+        "SHARE_BODY_NEW_CONTEST" : "'הורדתי את המשחק \"' + eval:settings.client.ui.he.GAME_NAME + '\" ויצרתי תחרות: \"{{team0}} נגד {{team1}}\". בואו לשחק איתי'",
+        "SHARE_SUBJECT_CONTEST_NOT_JOINED" : "'הורדתי את המשחק: \"' + eval:settings.client.ui.he.GAME_NAME + '?\" והצטרפתי לתחרות \"{{team0}} נגד {{team1}}\"'",
+        "SHARE_BODY_CONTEST_NOT_JOINED" : "'הורדתי את המשחק: \"' + eval:settings.client.ui.he.GAME_NAME + '?\" והצטרפתי לתחרות \"{{team0}} נגד {{team1}}\". בואו לשחק איתי'",
+        "SHARE_SUBJECT_CONTEST_JOINED" : "'הורדתי משחק חדש: \"' + eval:settings.client.ui.he.GAME_NAME + '?\" והצטרפתי לקבוצת {{myTeam}}. בואו לעזור לי לנצח את קבוצת {{OtherTeam}}'",
+        "SHARE_BODY_CONTEST_JOINED" : "'הורדתי משחק חדש: \"' + eval:settings.client.ui.he.GAME_NAME + '?\" והצטרפתי לקבוצת {{myTeam}}. בואו לעזור לי לנצח את קבוצת {{OtherTeam}}'",
+        "SHARE_SUBJECT_GENERAL" : "'אתם חייבים להסתכל על המשחק החדש הזה: \"' + eval:settings.client.ui.he.GAME_NAME + '?\"'",
+        "SHARE_BODY_GENERAL" : "'אתם חייבים להסתכל על המשחק החדש הזה: \"' + eval:settings.client.ui.he.GAME_NAME + '?\". בואו לשחק איתי'"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1544,10 +1550,6 @@
         "CLICK_LIKE_WITH_CONTEST" : "Haga clic LIKE para nuestra página de facebook juego para obtener los resultados de:",
         "FACEBOOK_GAME_PAGE" : "Facebook la página de juegos",
         "SHARE_WITH_FRIENDS_MESSAGE" : "Invita a tus amigos para ayudar",
-        "SHARE_SUBJECT" : "'Ven a jugar conmigo: ' + eval:settings.client.ui.es.GAME_NAME",
-        "SHARE_SUBJECT_WITH_CONTEST" : "Ven a jugar conmigo - '{{name}}'",
-        "SHARE_BODY" : "Yo quiero que veas a este divertido juego : {{url}}",
-        "SHARE_BODY_NO_URL" : "Quiero que vea este juego fresco",
         "LEADERBOARDS" : "tablas de clasificación",
         "FRIENDS" : "Amigos",
         "WEEKLY" : "Esta semana",
@@ -1618,7 +1620,8 @@
         "CONTEST_CREATED_ON" : "El {{day}} de {{month}} {{year}}",
         "DATE_PICKER_WEEK_DAYS" : ["D", "L", "M", "M", "J", "V", "S"],
         "DATE_PICKER_MONTH_NAMES" : ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-        "GAME_NAME" : "¿Quién manda ?",
+        "GAME_NAME" : "Quién manda",
+        "GAME_NAME_LOWERCASE" : "eval:settings.client.ui.es.GAME_NAME.toLowerCase()",
         "CONTEST_FINISHED_TEAM_WON_CAPTION" : "{{team}} ganadas",
         "AGAINST" : "frente a",
         "TIE" : "Dibuje la competencia",
@@ -1627,7 +1630,7 @@
         "CONTEST_NAME_SHORT" : "{{team0}} frente a {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivialidades",
         "CONTEST_TYPE_TRIVIA_USER_NAME" : "Concurso de conocimiento",
-        "CONTEST_VIEW_TITLE" : "¿Quién manda ?",
+        "CONTEST_VIEW_TITLE" : "'¿' + eval:settings.client.ui.es.GAME_NAME + ' ? '",
         "QUIZ_VIEW_TITLE" : "Líderes: {{Team}} equipo",
         "SHOW_IN_RANDOM_ORDER" : "Mostrar preguntas en orden aleatorio",
         "RUNNING_CONTESTS_TAB_TEXT" : "Líder",
@@ -1640,14 +1643,20 @@
         "CONFIRM_EXIT_QUIZ_TEMPLATE" : "Los puntos que adquirió no acreditar su equipo . ¿Está seguro de que desea salir?",
         "SYSTEM_PARTICIPANTS" : "los participantes del sistema",
         "SHARE_OTHER_OPTIONS" : "Más...",
-        "SHARE_BODY_WITH_CONTEST_NO_TEAM" : "Participar en el concurso : {{name}} y ayudar a su equipo a ganar : {{url}}",
-        "SHARE_BODY_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}}. Por favor ayuda: {{url}}",
-        "SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM" : "Estoy jugando para el equipo {{team}} en el concurso de '{{name}}' - por favor ayuda",
         "PLAY" : "Jugar",
         "VIEW" : "Ver",
         "JOIN_A_CONTEST_MESSAGE_PART_1" : "Por favor, unirse a una de las ",
         "LEADING_CONTESTS" : "Concursos principales",
-        "JOIN_A_CONTEST_MESSAGE_PART_2" : " por lo que aparecerá en mis concursos"
+        "JOIN_A_CONTEST_MESSAGE_PART_2" : " por lo que aparecerá en mis concursos",
+        "INVITE_FRIENDS_FOR_NEW_CONTEST_MESSAGE" : "Invitar a amigos a la nueva competencia",
+        "SHARE_SUBJECT_NEW_CONTEST" : "'He descargado el juego \"' + eval:settings.client.ui.es.GAME_NAME + '\" y ha creado un concurso: \"{{team0}} vs. {{team1}}\"'",
+        "SHARE_BODY_NEW_CONTEST" : "'He descargado el juego \"' + eval:settings.client.ui.es.GAME_NAME + '\" y ha creado un concurso: \"{{team0}} vs. {{team1}}\". Ven y juega conmigo'",
+        "SHARE_SUBJECT_CONTEST_NOT_JOINED" : "'He descargado el juego: \"' + eval:settings.client.ui.es.GAME_NAME + '?\" y yo estoy jugando \"{{team0}} vs. {{team1}}\" del concurso'",
+        "SHARE_BODY_CONTEST_NOT_JOINED" : "'He descargado el juego: \"' + eval:settings.client.ui.es.GAME_NAME + '?\" y yo estoy jugando \"{{team0}} vs. {{team1}}\" del concurso. Ven y juega conmigo'",
+        "SHARE_SUBJECT_CONTEST_JOINED" : "'He descargado un juego nuevo: \"' + eval:settings.client.ui.es.GAME_NAME + '?\" y se unió al equipo de {{myTeam}}. Ven y ayúdame a vencer al equipo {{otherTeam}}'",
+        "SHARE_BODY_CONTEST_JOINED" : "'He descargado un juego nuevo: \"' + eval:settings.client.ui.es.GAME_NAME + '?\" y se unió al equipo de {{myTeam}}. Ven y ayúdame a vencer al equipo {{otherTeam}}'",
+        "SHARE_SUBJECT_GENERAL" : "'Echa un vistazo a este nuevo juego: \"' + eval:settings.client.ui.es.GAME_NAME + '?\"'",
+        "SHARE_BODY_GENERAL" : "'Echa un vistazo a este nuevo juego: \"' + eval:settings.client.ui.es.GAME_NAME + '?\". Ven y juega conmigo'"
       }
     },
     "platforms" : {
@@ -1659,8 +1668,7 @@
       },
       "web" : {
         "storeLink" : "https://play.google.com/store/apps/details?id=com.fplabs.topteamer"
-      },
-      "SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM" : "Participar en el concurso : {{name}} y ayudar a su equipo a ganar"
+      }
     },
     "lists" : {
       "contests" : {
@@ -1681,6 +1689,9 @@
           "refreshFrequencyInMilliseconds" : 60000
         }
       }
+    },
+    "contest" : {
+      "refreshTresholdInMilliseconds" : 60000
     }
   }
 }

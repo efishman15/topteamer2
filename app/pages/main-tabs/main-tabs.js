@@ -30,8 +30,16 @@ var MainTabsPage = (function () {
         this.client.events.subscribe('topTeamer:contestRemoved', function (eventData) {
             _this.handleContestRemoved(eventData[0], eventData[1]);
         });
-        this.client.events.subscribe('topTeamer:languageChanged', function () {
-            window.location.reload();
+        this.client.events.subscribe('topTeamer:languageChanged', function (eventData) {
+            if (eventData[0]) {
+                window.location.reload();
+            }
+            else {
+                //Just refresh the contests to reflect the new language
+                _this.publishActionToTab(0, ACTION_FORCE_REFRESH);
+                _this.publishActionToTab(1, ACTION_FORCE_REFRESH);
+                _this.publishActionToTab(2, ACTION_FORCE_REFRESH);
+            }
         });
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
             _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
@@ -56,7 +64,9 @@ var MainTabsPage = (function () {
         if (this.client.deepLinkContestId) {
             var contestId = this.client.deepLinkContestId;
             this.client.deepLinkContestId = null;
-            this.client.displayContest(contestId);
+            this.client.displayContestById(contestId).then(function () {
+            }, function () {
+            });
         }
     };
     MainTabsPage.prototype.onResize = function () {

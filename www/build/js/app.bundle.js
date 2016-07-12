@@ -154,7 +154,9 @@ var TopTeamerApp = (function () {
                 if (data.data_parsed && data.data_parsed.contestId) {
                     //Will go to this contest
                     if (_this.client.session) {
-                        _this.client.displayContest(data.data_parsed.contestId);
+                        _this.client.displayContestById(data.data_parsed.contestId).then(function () {
+                        }, function () {
+                        });
                     }
                     else {
                         _this.client.deepLinkContestId = data.data_parsed.contestId;
@@ -506,12 +508,15 @@ var ContestListComponent = (function () {
         });
     };
     ContestListComponent.prototype.onContestSelected = function (data) {
-        this.client.logEvent('displayContest', { 'contestId': data.contest._id, 'source': data.source });
-        this.client.displayContest(data.contest._id);
-    };
-    ContestListComponent.prototype.onContestShare = function (data) {
-        this.client.logEvent('contestShare', { 'contestId': data.contest._id, 'source': data.source });
-        this.client.displayContest(data.contest._id);
+        var _this = this;
+        this.client.logEvent('tryRunContest', { 'contestId': data.contest._id, 'source': data.source });
+        this.client.runContest(data.contest).then(function (contest) {
+            if (contest) {
+                //A new copy from the server
+                _this.updateContest(contest);
+            }
+        }, function () {
+        });
     };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {
@@ -1157,6 +1162,12 @@ var Settings = (function () {
     return Settings;
 }());
 exports.Settings = Settings;
+var ContestSettings = (function () {
+    function ContestSettings() {
+    }
+    return ContestSettings;
+}());
+exports.ContestSettings = ContestSettings;
 var ShareSettings = (function () {
     function ShareSettings() {
     }
@@ -1665,6 +1676,14 @@ var ShareVariables = (function () {
     return ShareVariables;
 }());
 exports.ShareVariables = ShareVariables;
+var AppPage = (function () {
+    function AppPage(page, params) {
+        this.page = page;
+        this.params = params;
+    }
+    return AppPage;
+}());
+exports.AppPage = AppPage;
 },{}],13:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -2229,8 +2248,16 @@ var MainTabsPage = (function () {
         this.client.events.subscribe('topTeamer:contestRemoved', function (eventData) {
             _this.handleContestRemoved(eventData[0], eventData[1]);
         });
-        this.client.events.subscribe('topTeamer:languageChanged', function () {
-            window.location.reload();
+        this.client.events.subscribe('topTeamer:languageChanged', function (eventData) {
+            if (eventData[0]) {
+                window.location.reload();
+            }
+            else {
+                //Just refresh the contests to reflect the new language
+                _this.publishActionToTab(0, ACTION_FORCE_REFRESH);
+                _this.publishActionToTab(1, ACTION_FORCE_REFRESH);
+                _this.publishActionToTab(2, ACTION_FORCE_REFRESH);
+            }
         });
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
             _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
@@ -2255,7 +2282,7 @@ var MainTabsPage = (function () {
         if (this.client.deepLinkContestId) {
             var contestId = this.client.deepLinkContestId;
             this.client.deepLinkContestId = null;
-            this.client.displayContest(contestId);
+            this.client.displayContestById(contestId);
         }
     };
     MainTabsPage.prototype.onResize = function () {
@@ -2741,26 +2768,23 @@ var QuizPage = (function () {
         this.quizStarted = false;
         this.client = client_1.Client.getInstance();
         this.params = params;
-    }
-    QuizPage.prototype.ngOnInit = function () {
-        this.init();
-    };
-    QuizPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
-    };
-    QuizPage.prototype.ionViewDidEnter = function () {
-        //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
-        if (this.quizStarted) {
-            return;
-        }
-        this.init();
-        this.contestId = this.params.data.contest._id;
         if (this.params.data.contest.leadingTeam === -1) {
             this.title = this.client.translate('TIE');
         }
         else {
             this.title = this.client.translate('QUIZ_VIEW_TITLE', { 'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name });
         }
+    }
+    QuizPage.prototype.ngOnInit = function () {
+        this.init();
+    };
+    QuizPage.prototype.ionViewWillEnter = function () {
+        this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
+        //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
+        if (this.quizStarted) {
+            return;
+        }
+        this.init();
         this.startQuiz();
     };
     QuizPage.prototype.init = function () {
@@ -2777,7 +2801,7 @@ var QuizPage = (function () {
             'source': this.params.data.source,
             'typeId': this.params.data.contest.type.id
         });
-        quizService.start(this.contestId).then(function (data) {
+        quizService.start(this.params.data.contest._id).then(function (data) {
             _this.quizStarted = true;
             _this.quizData = data.quiz;
             _this.quizData.currentQuestion.answered = false;
@@ -3852,7 +3876,6 @@ var SetContestPage = (function () {
             }
         }
         var isDirty = false;
-        var contestNameChanged = false;
         if (this.params.data.mode === 'add') {
             isDirty = true;
         }
@@ -3862,7 +3885,6 @@ var SetContestPage = (function () {
                 this.contestLocalCopy.teams[1].name !== this.params.data.contest.teams[1].name ||
                 this.contestLocalCopy.subject !== this.params.data.contest.subject) {
                 isDirty = true;
-                contestNameChanged = true;
             }
             if (!isDirty &&
                 (this.contestLocalCopy.startDate !== this.params.data.contest.startDate ||
@@ -3899,7 +3921,7 @@ var SetContestPage = (function () {
                     delete this.contestLocalCopy.teams[1].score;
                 }
             }
-            contestsService.setContest(this.contestLocalCopy, this.params.data.mode, contestNameChanged).then(function (contest) {
+            contestsService.setContest(this.contestLocalCopy, this.params.data.mode).then(function (contest) {
                 //Report to Analytics
                 var contestParams = {
                     'team0': _this.contestLocalCopy.teams[0].name,
@@ -3911,9 +3933,11 @@ var SetContestPage = (function () {
                     _this.client.logEvent('contest/created', contestParams);
                     _this.client.events.publish('topTeamer:contestCreated', contest);
                     _this.client.nav.pop({ animate: false }).then(function () {
-                        _this.client.openPage('ContestPage', { 'contest': contest }).then(function () {
-                            _this.client.openPage('SharePage', { 'contest': contest, 'contestJustCreated': true, 'source': 'newContest' });
-                        });
+                        var appPages = new Array();
+                        appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest }));
+                        appPages.push(new objects_1.AppPage('SharePage', { 'contest': contest, 'source': 'newContest' }));
+                        _this.client.insertPages(appPages);
+                    }, function () {
                     });
                 }
                 else {
@@ -4063,7 +4087,11 @@ var SettingsPage = (function () {
     };
     SettingsPage.prototype.ionViewDidLeave = function () {
         if (this.client.session.settings.language != this.originalLanguage) {
-            this.client.events.publish('topTeamer:languageChanged');
+            var directionChanged = false;
+            if (this.client.settings.languages[this.client.session.settings.language].direction !== this.client.settings.languages[this.originalLanguage].direction) {
+                directionChanged = true;
+            }
+            this.client.events.publish('topTeamer:languageChanged', directionChanged);
         }
     };
     SettingsPage.prototype.toggleSound = function () {
@@ -4118,14 +4146,14 @@ var SharePage = (function () {
     function SharePage(params) {
         this.client = client_1.Client.getInstance();
         this.params = params;
-        var isNewContest = (params.data.source === 'newContest');
-        if (params.data.contestJustCreated) {
-            this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_TITLE');
+        this.isNewContest = (params.data.source === 'newContest');
+        if (this.isNewContest) {
+            this.title = this.client.translate('INVITE_FRIENDS_FOR_NEW_CONTEST_MESSAGE');
         }
         else {
-            this.title = this.client.translate('SHARE_WITH_FRIENDS_TITLE');
+            this.title = this.client.translate('SHARE_WITH_FRIENDS_MESSAGE');
         }
-        this.shareVariables = shareService.getVariables(this.params.data.contest, isNewContest);
+        this.shareVariables = shareService.getVariables(this.params.data.contest, this.isNewContest);
     }
     SharePage.prototype.ionViewWillEnter = function () {
         if (this.params.data.contest) {
@@ -4141,7 +4169,7 @@ var SharePage = (function () {
     };
     SharePage.prototype.mobileShare = function (appName) {
         this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
-        shareService.mobileShare(appName, this.params.data.contest);
+        shareService.mobileShare(appName, this.params.data.contest, this.isNewContest);
     };
     SharePage = __decorate([
         core_1.Component({
@@ -4604,7 +4632,9 @@ var Client = (function () {
                     });
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-                            _this.displayContest(notificationData.additionalData['contestId']);
+                            _this.displayContestById(notificationData.additionalData['contestId']).then(function () {
+                            }, function () {
+                            });
                         }
                     });
                     push.on('error', function (error) {
@@ -4716,11 +4746,54 @@ var Client = (function () {
         });
         return this.nav.present(modal);
     };
-    Client.prototype.displayContest = function (contestId) {
+    Client.prototype.displayContestById = function (contestId) {
         var _this = this;
-        contestsService.getContest(contestId).then(function (contest) {
-            _this.openPage('ContestPage', { 'contest': contest });
-        }, function () {
+        return new Promise(function (resolve, reject) {
+            contestsService.getContest(contestId).then(function (contest) {
+                resolve(contest);
+                _this.openPage('ContestPage', { 'contest': contest });
+            }, function (err) {
+                reject(err);
+            });
+        });
+    };
+    Client.prototype.runContest = function (contest) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var now = (new Date()).getTime();
+            if (contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
+                //Joined to a contest - run it immediately (go to the quiz)
+                var appPages_1 = new Array();
+                if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
+                    appPages_1.push(new objects_1.AppPage('ContestPage', { 'contest': contest }));
+                    appPages_1.push(new objects_1.AppPage('QuizPage', { 'contest': contest, 'source': 'list' }));
+                    _this.insertPages(appPages_1);
+                    resolve();
+                }
+                else {
+                    contestsService.getContest(contest._id).then(function (serverContest) {
+                        resolve(serverContest);
+                        appPages_1.push(new objects_1.AppPage('ContestPage', { 'contest': contest }));
+                        appPages_1.push(new objects_1.AppPage('QuizPage', { 'contest': contest, 'source': 'list' }));
+                        _this.insertPages(appPages_1);
+                    }, function (err) {
+                        reject(err);
+                    });
+                }
+            }
+            else if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
+                //Not joined and no refresh required - enter the contest with the object we have
+                resolve();
+                _this.openPage('ContestPage', { 'contest': contest });
+            }
+            else {
+                //Will enter the contest after retrieving it from the server
+                _this.displayContestById(contest._id).then(function (serverContest) {
+                    resolve(serverContest);
+                }, function (err) {
+                    reject(err);
+                });
+            }
         });
     };
     Client.prototype.share = function (contest, source) {
@@ -4742,6 +4815,17 @@ var Client = (function () {
     };
     Client.prototype.setRootPage = function (name, params) {
         return this.nav.setRoot(classesService.get(name), params);
+    };
+    Client.prototype.insertPages = function (pages, index) {
+        var _this = this;
+        if (index === undefined) {
+            index = -1; //Will insert at the end of the stack
+        }
+        var navPages = new Array();
+        pages.forEach(function (appPage) {
+            navPages.push({ page: _this.getPage(appPage.page), params: appPage.params });
+        });
+        this.nav.insertPages(index, navPages);
     };
     Client.prototype.resizeWeb = function () {
         //Resize app for web
@@ -5194,11 +5278,8 @@ exports.removeContest = function (contestId) {
 //------------------------------------------------------
 //-- openContest
 //------------------------------------------------------
-exports.setContest = function (contest, mode, nameChanged) {
+exports.setContest = function (contest, mode) {
     var postData = { 'contest': contest, 'mode': mode };
-    if (nameChanged) {
-        postData['nameChanged'] = nameChanged;
-    }
     var client = client_1.Client.getInstance();
     return new Promise(function (resolve, reject) {
         client.serverPost('contests/set', postData).then(function (contest) {
@@ -5232,6 +5313,13 @@ exports.getQuestions = function (userQuestions) {
 exports.setContestClientData = function (contest) {
     var client = client_1.Client.getInstance();
     var now = (new Date()).getTime();
+    //-----------------------------------------------------------------------------------------------
+    // lastUpdated - a mechanism to avoid retrieving the contest object again
+    // in the client based on its id - to force refresh from the server
+    // There will be a client settings threshold that will control if refreshing from the
+    // server is neccessary (e.g. - X milliseconds from last refresh)
+    //-----------------------------------------------------------------------------------------------
+    contest.lastUpdated = now;
     //-------------------
     // status, state
     //-------------------
@@ -5790,51 +5878,42 @@ exports.setQuestionByAdmin = function (question) {
 var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
-var emailRef = '?ref=shareEmail';
+var EMAIL_REF = '?ref=shareEmail';
 exports.getVariables = function (contest, isNewContest) {
     var client = client_1.Client.getInstance();
     var shareVariables = new objects_1.ShareVariables();
+    var subjectField;
+    var bodyField;
+    var params = {};
     shareVariables.shareImage = client.settings.general.baseUrl + client.settings.general.logoUrl;
     if (contest) {
+        params['team0'] = contest.teams[0].name;
+        params['team1'] = contest.teams[1].name;
         shareVariables.shareUrl = contest.link;
-        shareVariables.shareSubject = client.translate('SHARE_SUBJECT_WITH_CONTEST', { name: contest.name.long });
-        if (contest.myTeam === 0 || contest.myTeam === 1) {
-            //I am playing for one of the teams
-            shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
-                team: contest.teams[contest.myTeam].name,
-                url: shareVariables.shareUrl
-            });
-            shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST_AND_TEAM', {
-                team: contest.teams[contest.myTeam].name,
-                url: shareVariables.shareUrl + emailRef
-            });
-            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_AND_TEAM', {
-                team: contest.teams[contest.myTeam].name,
-                name: contest.name.long
-            });
+        if (isNewContest) {
+            subjectField = 'SHARE_SUBJECT_NEW_CONTEST';
+            bodyField = 'SHARE_BODY_NEW_CONTEST';
+        }
+        else if (contest.myTeam === 0 || contest.myTeam === 1) {
+            params['myTeam'] = contest.teams[contest.myTeam].name;
+            params['otherTeam'] = contest.teams[1 - contest.myTeam].name;
+            subjectField = 'SHARE_SUBJECT_CONTEST_JOINED';
+            bodyField = 'SHARE_BODY_CONTEST_JOINED';
         }
         else {
-            //I did not join this contest yet
-            shareVariables.shareBody = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
-                name: contest.name.long,
-                url: shareVariables.shareUrl
-            });
-            shareVariables.shareBodyEmail = client.translate('SHARE_BODY_WITH_CONTEST_NO_TEAM', {
-                name: contest.name.long,
-                url: shareVariables.shareUrl + emailRef
-            });
-            shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL_WITH_CONTEST_NO_TEAM', {
-                name: contest.name.long
-            });
+            subjectField = 'SHARE_SUBJECT_CONTEST_NOT_JOINED';
+            bodyField = 'SHARE_BODY_CONTEST_NOT_JOINED';
         }
     }
     else {
-        shareVariables.shareUrl = client.settings.general.downloadUrl[client.user.settings.language];
-        shareVariables.shareSubject = client.translate('SHARE_SUBJECT');
-        shareVariables.shareBody = client.translate('SHARE_BODY', { url: shareVariables.shareUrl });
-        shareVariables.shareBodyEmail = client.translate('SHARE_BODY', { url: shareVariables.shareUrl + emailRef });
-        shareVariables.shareBodyNoUrl = client.translate('SHARE_BODY_NO_URL') + ' ' + client.translate('GAME_NAME');
+        shareVariables.shareUrl = client.settings.general.downloadUrl[client.currentLanguage.value];
+        subjectField = 'SHARE_SUBJECT_GENERAL';
+        bodyField = 'SHARE_BODY_GENERAL';
     }
+    shareVariables.shareSubject = client.translate(subjectField, params);
+    shareVariables.shareBodyNoUrl = client.translate(bodyField, params);
+    shareVariables.shareBody = shareVariables.shareBodyNoUrl + ' ' + shareVariables.shareUrl;
+    shareVariables.shareBodyEmail = shareVariables.shareBody + EMAIL_REF;
     return shareVariables;
 };
 exports.mobileDiscoverSharingApps = function () {
@@ -5879,8 +5958,8 @@ exports.mobileDiscoverApp = function (client, shareApp, shareVariables) {
         });
     });
 };
-exports.mobileShare = function (appName, contest) {
-    var shareVariables = _this.getVariables(contest);
+exports.mobileShare = function (appName, contest, isNewContest) {
+    var shareVariables = _this.getVariables(contest, isNewContest);
     switch (appName) {
         case 'whatsapp':
             window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {

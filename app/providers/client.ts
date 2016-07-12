@@ -7,7 +7,7 @@ import {App,Platform,Config, Nav, Alert, Modal, Events} from 'ionic-angular';
 import * as contestsService from './contests';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
-import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo,Contest,ClientShareApp} from '../objects/objects';
+import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo,Contest,ClientShareApp,AppPage} from '../objects/objects';
 import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
 import * as classesService from './classes';
 
@@ -343,7 +343,9 @@ export class Client {
 
           push.on('notification', (notificationData) => {
             if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-              this.displayContest(notificationData.additionalData['contestId']);
+              this.displayContestById(notificationData.additionalData['contestId']).then(()=> {
+              },() =>{
+              });
             }
           });
 
@@ -463,10 +465,57 @@ export class Client {
     return this.nav.present(modal);
   }
 
-  displayContest(contestId:string) {
-    contestsService.getContest(contestId).then((contest:Contest) => {
-      this.openPage('ContestPage', {'contest': contest});
-    }, () => {
+  displayContestById(contestId:string) {
+    return new Promise((resolve: any, reject: any) => {
+      contestsService.getContest(contestId).then((contest:Contest) => {
+        resolve(contest);
+        this.openPage('ContestPage', {'contest': contest});
+      }, (err) => {
+        reject(err)
+      });
+    });
+  }
+
+  runContest(contest: Contest) {
+
+    return new Promise( (resolve: any, reject: any) => {
+
+      let now : number = (new Date()).getTime();
+
+      if (contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
+
+        //Joined to a contest - run it immediately (go to the quiz)
+        let appPages : Array<AppPage> = new Array<AppPage>();
+        if (now - contest.lastUpdated < this.settings.contest.refreshTresholdInMilliseconds) {
+          appPages.push(new AppPage('ContestPage', {'contest': contest}));
+          appPages.push(new AppPage('QuizPage', {'contest': contest, 'source' : 'list'}));
+          this.insertPages(appPages);
+          resolve();
+        }
+        else {
+          contestsService.getContest(contest._id).then((serverContest:Contest) => {
+            resolve(serverContest);
+            appPages.push(new AppPage('ContestPage', {'contest': contest}));
+            appPages.push(new AppPage('QuizPage', {'contest': contest, 'source' : 'list'}));
+            this.insertPages(appPages);
+          }, (err) => {
+            reject(err);
+          });
+        }
+      }
+      else if (now - contest.lastUpdated < this.settings.contest.refreshTresholdInMilliseconds) {
+        //Not joined and no refresh required - enter the contest with the object we have
+        resolve();
+        this.openPage('ContestPage', {'contest': contest});
+      }
+      else {
+        //Will enter the contest after retrieving it from the server
+        this.displayContestById(contest._id).then( (serverContest: Contest) => {
+          resolve(serverContest);
+        },(err) => {
+          reject(err);
+        });
+      }
     });
   }
 
@@ -494,6 +543,18 @@ export class Client {
 
   setRootPage(name:string, params?:any) {
     return this.nav.setRoot(classesService.get(name), params);
+  }
+
+  insertPages(pages: Array<AppPage>, index?: number) {
+    if (index === undefined) {
+      index = -1; //Will insert at the end of the stack
+    }
+    let navPages : Array<any> = new Array<any>();
+    pages.forEach((appPage: AppPage) => {
+      navPages.push({page: this.getPage(appPage.page), params: appPage.params});
+    });
+
+    this.nav.insertPages(index, navPages);
   }
 
   resizeWeb() {
