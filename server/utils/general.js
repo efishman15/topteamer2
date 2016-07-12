@@ -18,15 +18,32 @@ module.exports.injectSettings = function (dbSettings) {
 
   settings = dbSettings;
 
-  checkForEvalSettings(settings);
+  var regularExpression = new RegExp(/\$settings\{(.*?)\}/);
+  var regularExpressionGlobal = new RegExp(/\$settings\{(.*?)\}/g);
+  identifySettingsVariables(settings, regularExpressionGlobal);
 
   while (evalSettings.length > 0) {
-    try {
-      evalSettings[evalSettings.length-1].object[evalSettings[evalSettings.length-1].property] = eval(evalSettings[evalSettings.length-1].object[evalSettings[evalSettings.length-1].property].replaceAll('eval:', ''));
+
+    while (evalSettings[evalSettings.length - 1].vars.length > 0) {
+      var currentVariable = evalSettings[evalSettings.length - 1].vars[0];
+      var evalExpression = 'settings.' + currentVariable.substring(10,currentVariable.length - 1);
+      var currentValue = eval(evalExpression);
+      if (!regularExpression.exec(currentValue)) {
+        //final replace
+        evalSettings[evalSettings.length - 1].object[evalSettings[evalSettings.length - 1].property] = evalSettings[evalSettings.length - 1].object[evalSettings[evalSettings.length - 1].property].replace(regularExpression, currentValue);
+        evalSettings[evalSettings.length - 1].vars.shift(); //Removes the first item
+      }
+      else {
+        break;
+      }
+    }
+
+    if (evalSettings[evalSettings.length - 1].vars.length === 0) {
+      //All variables replaced
       evalSettings.pop();
     }
-    catch(e) {
-      //move this item to the first item in the array - probably has depending evals...
+    else {
+      //Still variables left - move this last item to the "end of the queue" (first)
       evalSettings.unshift(evalSettings.pop());
     }
   }
@@ -40,19 +57,22 @@ module.exports.injectSettings = function (dbSettings) {
 //-------------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
-// checkForEvalSettings
+// identifySettingsVariables
 //
-// Iterates recursively through all the currentObject (root=settings) and replaces items containing eval to their respective setting
+// Iterates recursively through all the currentObject (root=settings) and prepares an array to replace them
 // data: geoLocator (0,1,...), ip
 //-----------------------------------------------------------------------------------------------------------------------------------------
-function checkForEvalSettings(currentObject) {
+function identifySettingsVariables(currentObject, regularExpression) {
   for (var property in currentObject) {
     if (currentObject.hasOwnProperty(property)) {
       if (typeof currentObject[property] === 'object') {
-        checkForEvalSettings(currentObject[property]);
+        identifySettingsVariables(currentObject[property], regularExpression);
       }
-      else if (typeof currentObject[property] === 'string' && currentObject[property].indexOf('eval:') >= 0) {
-        evalSettings.push({object: currentObject, property: property});
+      else if (typeof currentObject[property] === 'string') {
+        var vars = currentObject[property].match(regularExpression);
+        if (vars) {
+          evalSettings.push({object: currentObject, property: property, vars: vars});
+        }
       }
     }
   }

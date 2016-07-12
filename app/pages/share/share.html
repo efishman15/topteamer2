@@ -11,7 +11,7 @@
   <div class="base-font" padding text-center>
     <h3 padding-top padding-bottom>{{title}}</h3>
     <h5 padding *ngIf="params.data.contest">{{params.data.contest.name.long}}</h5>
-    <h5 padding *ngIf="!params.data.contest">{{client.translate('GAME_NAME')}}</h5>
+    <h5 padding *ngIf="!params.data.contest">{{client.translate('CONTEST_VIEW_TITLE')}}</h5>
 
     <ion-list *ngIf="!client.user.clientInfo.mobile">
       <div padding *ngFor="let row of client.settings.share.web.networks, let i=index">
