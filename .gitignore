@@ -12,6 +12,7 @@ log.txt
 .idea/
 .sass-cache/
 .versions/
+build/android/apks/debug/
 coverage/
 node_modules/
 tmp/

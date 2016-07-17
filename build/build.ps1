@@ -20,7 +20,7 @@ $androidPlatform = $root + "\platforms\android"
 $androidPlatformResources = $root + "\platforms\android\res"
 $androidPlatformBuild = $androidPlatform + "\build\outputs\apk"
 $appBuildAndroidResources = $root + "\build\android\resources"
-$appBuildAndroidApks = $root + "\build\android\apks"
+$appBuildAndroidApks = $root + "\build\android\apks\" + $target
 $plugins = $root + "\plugins"
 
 LogMessage "Deleting previous build files..."
