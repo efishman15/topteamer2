@@ -374,11 +374,17 @@ var Client = (function () {
             });
         });
     };
-    Client.prototype.showContest = function (contest, tryRun) {
+    Client.prototype.showContest = function (contest, source, tryRun) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var now = (new Date()).getTime();
-            if (tryRun && contest.status === 'running' && (contest.myTeam === 0 || contest.myTeam === 1)) {
+            var eventData = {
+                'contestId': contest._id,
+                'team': '' + contest.myTeam,
+                'sourceClick': source
+            };
+            if (contest.state === 'play' && tryRun) {
+                _this.logEvent('contest/play', eventData);
                 //Joined to a contest - run it immediately (go to the quiz)
                 var appPages = new Array();
                 if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
@@ -401,10 +407,12 @@ var Client = (function () {
             else if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
                 //Not joined and no refresh required - enter the contest with the object we have
                 resolve();
+                _this.logEvent('contest/show', eventData);
                 _this.openPage('ContestPage', { 'contest': contest });
             }
             else {
                 //Will enter the contest after retrieving it from the server
+                _this.logEvent('contest/show', eventData);
                 _this.displayContestById(contest._id).then(function (serverContest) {
                     resolve(serverContest);
                 }, function (err) {
@@ -505,16 +513,7 @@ var Client = (function () {
         configurable: true
     });
     Client.prototype.adjustPixelRatio = function (size, up) {
-        var multiplier = -1;
-        if (up) {
-            multiplier = 1;
-        }
-        if (window.devicePixelRatio > 1) {
-            return size * (1 + multiplier / window.devicePixelRatio);
-        }
-        else {
-            return size;
-        }
+        return size;
     };
     Client.prototype.showLoader = function () {
         var _this = this;

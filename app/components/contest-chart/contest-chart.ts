@@ -1,5 +1,7 @@
 import {Component, Input, EventEmitter, Output} from '@angular/core';
 import {Client} from '../../providers/client';
+import * as alertService from '../../providers/alert';
+import * as contestsService from '../../providers/contests';
 import {Contest} from '../../objects/objects';
 
 const WIDTH_MARGIN:number = 2;
@@ -13,13 +15,16 @@ export class ContestChartComponent {
 
   @Input() id:Number;
   @Input() contest:Contest;
+  @Input() finishedStateButtonText:string;
 
   chartTeamEventHandled:boolean;
   client:Client;
   chart:any;
+  buttonText:string;
 
   @Output() contestSelected = new EventEmitter();
-  @Output() teamSelected = new EventEmitter();
+  @Output() myTeamSelected = new EventEmitter();
+  @Output() contestButtonClick = new EventEmitter();
 
   events:Object = {
     'dataplotClick': (eventObj, dataObj) => {
@@ -27,7 +32,7 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.onTeamSelected(teamId, 'bar');
+      this.teamSelected(teamId, 'bar');
       this.chartTeamEventHandled = true;
     },
     'dataLabelClick': (eventObj, dataObj) => {
@@ -35,7 +40,7 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.onTeamSelected(teamId, 'label');
+      this.teamSelected(teamId, 'label');
       this.chartTeamEventHandled = true;
     },
     'chartClick': (eventObj, dataObj) => {
@@ -51,14 +56,37 @@ export class ContestChartComponent {
   }
 
   onContestSelected(source:string) {
-    this.contestSelected.emit({'contest': this.contest, 'source': source});
+    if (this.contest.state === 'join') {
+      alertService.alert({'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST'});
+    }
+    else {
+      this.contestSelected.emit({'contest': this.contest, 'source': source});
+    }
   }
 
-  onTeamSelected(teamId:number, source:string) {
-    this.teamSelected.emit({'teamId': teamId, 'contest': this.contest, 'source': source})
+  teamSelected(teamId:number, source:string) {
+    if (this.contest.state === 'play') {
+      if (teamId !== this.contest.myTeam) {
+        this.switchTeams(source);
+      }
+      else {
+        //My team - start the game
+        this.client.logEvent('contest/myTeam', {
+          'contestId': this.contest._id,
+          'team': '' + this.contest.myTeam,
+          'sourceClick': source
+        });
+        this.myTeamSelected.emit({'contest': this.contest, 'source': source});
+      }
+    }
+    else if (this.contest.state !== 'finished') {
+      this.joinContest(teamId, source);
+    }
+
   }
 
   ngOnInit() {
+    this.setButtonText();
     this.initChart();
   }
 
@@ -86,15 +114,11 @@ export class ContestChartComponent {
     if (contest) {
       //new contest object arrived
       this.contest = contest;
+      this.setButtonText();
       this.adjustResolution();
     }
 
-    if (this.chart) {
-      this.chart.setJSONData(this.contest.dataSource);
-    }
-    else {
-      this.initChart();
-    }
+    this.chart.setJSONData(this.contest.dataSource);
   }
 
   onResize() {
@@ -123,5 +147,68 @@ export class ContestChartComponent {
     //Others (in grey)
     this.contest.dataSource.dataset[1].data[0].value = netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
     this.contest.dataSource.dataset[1].data[1].value = netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
+  }
+
+  setButtonText() {
+    switch (this.contest.state) {
+      case 'play':
+        this.buttonText = this.client.translate('PLAY_FOR_TEAM', {'team': this.contest.teams[this.contest.myTeam].name});
+        break;
+      case 'join':
+        this.buttonText = this.client.translate('PLAY_CONTEST');
+        break;
+      case 'finished':
+        this.buttonText = this.finishedStateButtonText;
+        break;
+    }
+  }
+
+  joinContest(team, source, action:string = 'join') {
+
+    contestsService.join(this.contest._id, team).then((data:any) => {
+
+      this.refresh(data.contest);
+
+      this.client.logEvent('contest/' + action, {
+        'contestId': this.contest._id,
+        'team': '' + this.contest.myTeam,
+        'sourceClick': source
+      });
+
+      //Should get xp if fresh join
+      var rankModal;
+      if (data.xpProgress && data.xpProgress.addition > 0) {
+        this.client.addXp(data.xpProgress).then(() => {
+          if (data.xpProgress.rankChanged) {
+            rankModal = this.client.createModalPage('NewRankPage', {
+              'xpProgress': data.xpProgress
+            });
+          }
+        })
+      }
+
+      alertService.alert({
+        'type': 'SELECT_TEAM_ALERT',
+        'additionalInfo': {'team': this.contest.teams[this.contest.myTeam].name}
+      }).then(() => {
+        if (rankModal) {
+          this.client.nav.present(rankModal);
+        }
+      });
+    }, () => {
+    });
+  }
+
+  switchTeams(source:string) {
+    this.joinContest(1 - this.contest.myTeam, source, 'switchTeams');
+  }
+
+  onContestButtonClick() {
+    if (this.contest.state === 'join') {
+      alertService.alert({'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST'});
+    }
+    else {
+      this.contestButtonClick.emit({'contest': this.contest});
+    }
   }
 }

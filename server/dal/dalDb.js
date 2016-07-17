@@ -196,7 +196,6 @@ function loadSettings(data, callback) {
       closeDb(data);
 
       callback(new exceptions.ServerException('Error finding contest', {
-        'data': data,
         'dbError': err
       }, 'error'));
 
@@ -582,7 +581,7 @@ module.exports.createOrUpdateSession = function (data, callback) {
         closeDb(data);
 
         callback(new exceptions.ServerException('Error finding/creating session', {
-          'userId': user._id,
+          'userId': data.user._id,
           'dbError': err
         }, 'error'));
         return;
@@ -849,7 +848,7 @@ function addContest(data, callback) {
         closeDb(data);
 
         callback(new exceptions.ServerException('Error adding contest', {
-          'data': data,
+          'contest': data.contest,
           'dbError': err
         }, 'error'));
         return;
@@ -934,7 +933,7 @@ function removeContest(data, callback) {
         closeDb(data);
 
         callback(new exceptions.ServerException('Error removing contest', {
-          'data': data,
+          'contestId': data.contestId,
           'dbError': err
         }, 'error'));
         return;
@@ -968,7 +967,7 @@ function getContest(data, callback) {
       closeDb(data);
 
       callback(new exceptions.ServerException('Error finding contest', {
-        'data': data,
+        'contestId': data.contestId,
         'dbError': err
       }, 'error'));
 
@@ -1039,7 +1038,7 @@ function prepareContestsQuery(data, callback) {
     default:
       closeDb(data);
       callback(new exceptions.ServerException('Error getting contests - tab invalid or not supplied', {
-        'data': data
+        'tab': data.tab
       }, 'error'));
       return;
   }
@@ -1107,7 +1106,8 @@ function updateQuestionStatistics(data, callback) {
       closeDb(data);
 
       callback(new exceptions.ServerException('Error finding question to update statistics', {
-        'data': data,
+        'questionId': data.session.quiz.serverData.currentQuestion._id,
+        'id': data.id,
         'dbError': err
       }, 'error'));
       return;

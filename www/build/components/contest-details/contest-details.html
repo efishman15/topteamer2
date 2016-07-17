@@ -1,36 +1,3 @@
 <div [ngStyle]="{'width': client.chartWidth + 'px'}" class="contest-details-container pointer" (click)="onContestSelected({'contest': contest, 'source': 'details'})">
-  <div text-center class="chart-bottom-line-separator">
-  </div>
-  <div class="contest-chart-bottom-container">
-    <ion-row class="no-padding">
-      <ion-col class="no-padding">
-        <ion-item no-lines class="no-padding pointer">
-          <ion-avatar item-left class="no-padding no-margin">
-            <img src="{{contest.creator.avatar}}">
-          </ion-avatar>
-          <div class="contest-creator-wrapper" [ngStyle]="{'text-align': client.currentLanguage.align}">
-            <span class="no-wrap-text contest-users">
-                {{client.translate('CREATED_BY')}}
-                <span class="contest-creator">{{contest.creator.name}}</span>
-              </span>
-            <p class="contest-started">{{contest.time.start.text}}</p>
-          </div>
-        </ion-item>
-      </ion-col>
-      <ion-col width-5>
-      </ion-col>
-      <ion-col class="no-padding">
-        <div class="contest-participants-area pointer" [ngStyle]="{'float': client.currentLanguage.oppositeAlign}">
-              <span [ngStyle]="{'float': client.currentLanguage.align}"
-                    class="contest-chart-bottom-ribbon-participants-text">
-              <span [ngStyle]="{'float': client.currentLanguage.align}"
-                    class="contest-chart-bottom-ribbon-participants-number">{{contest.participants}}
-              </span>
-              <br/>{{client.translate('PARTICIPANTS')}}
-              </span>
-        </div>
-      </ion-col>
-    </ion-row>
-  </div>
 </div>
 

@@ -1,20 +1,10 @@
 <div *ngFor="let contest of contests, let i=index">
   <contest-chart id="{{tab}}-{{contest._id}}"
                  [(contest)]="contests[i]"
-                 (contestSelected)="onContestSelected($event)">
+                 allowContestSelect="true"
+                 finishedStateButtonText="{{client.translate('VIEW')}}"
+                 (contestSelected)="onContestSelected($event)"
+                 (myTeamSelected)="onMyTeamSelected($event)"
+                 (contestButtonClick)="onContestButtonClick($event)">
   </contest-chart>
-
-  <div text-center class="contest-list-play-button-container">
-    <button class="button-play-contest"
-            (click)="playContest({'contest': contests[i], 'source' : 'contest-list-play'})"
-            [ngStyle]="{'top': ((-(client.chartHeight - 40)/2) - 48) + 'px'}">
-      {{contests[i].status === 'running' ? client.translate('PLAY') : client.translate('VIEW')}}
-    </button>
-  </div>
-
-  <contest-details id="{{tab}}-{{contest._id}}-details"
-                   [(contest)]="contests[i]"
-                   (contestSelected)="onContestSelected({'contest': contests[i], 'source': 'list-details'})">
-  </contest-details>
-
 </div>

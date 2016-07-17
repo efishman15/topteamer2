@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var contest_chart_1 = require('../contest-chart/contest-chart');
-var contest_details_1 = require('../contest-details/contest-details');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var ContestListComponent = (function () {
@@ -36,9 +35,15 @@ var ContestListComponent = (function () {
         });
     };
     ContestListComponent.prototype.onContestSelected = function (data) {
+        this.showContest(data, false);
+    };
+    ContestListComponent.prototype.onMyTeamSelected = function (data) {
+        this.showContest(data, true);
+    };
+    ContestListComponent.prototype.showContest = function (data, tryRun) {
         var _this = this;
-        this.client.logEvent('tryRunContest', { 'contestId': data.contest._id, 'source': data.source });
-        this.client.showContest(data.contest, false).then(function (contest) {
+        data.source = data.tab + '/' + data.source;
+        this.client.showContest(data.contest, data.source, tryRun).then(function (contest) {
             if (contest) {
                 //A new copy from the server
                 _this.updateContest(contest);
@@ -46,16 +51,16 @@ var ContestListComponent = (function () {
         }, function () {
         });
     };
-    ContestListComponent.prototype.playContest = function (data) {
-        var _this = this;
-        this.client.logEvent('tryRunContest', { 'contestId': data.contest._id, 'source': data.source });
-        this.client.showContest(data.contest, true).then(function (contest) {
-            if (contest) {
-                //A new copy from the server
-                _this.updateContest(contest);
-            }
-        }, function () {
-        });
+    ContestListComponent.prototype.onContestButtonClick = function (data) {
+        switch (data.contest.status) {
+            case 'finished':
+            case 'starting':
+                this.showContest(data, false);
+                break;
+            default:
+                this.showContest(data, true);
+                break;
+        }
     };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {
@@ -98,7 +103,7 @@ var ContestListComponent = (function () {
         core_1.Component({
             selector: 'contest-list',
             templateUrl: 'build/components/contest-list/contest-list.html',
-            directives: [contest_chart_1.ContestChartComponent, contest_details_1.ContestDetailsComponent],
+            directives: [contest_chart_1.ContestChartComponent],
         }), 
         __metadata('design:paramtypes', [])
     ], ContestListComponent);

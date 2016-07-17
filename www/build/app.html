@@ -33,7 +33,6 @@
 </ion-nav>
 
 <loading-modal id="loading"></loading-modal>
-
 <div id="playerInfo" [hidden]="isMenuOpen">
   <img id="playerInfoImage" *ngIf="client.session" src="{{client.session.avatar}}"
        class="player-info-avatar pointer" (click)="client.popToRoot()">

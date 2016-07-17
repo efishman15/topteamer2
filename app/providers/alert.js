@@ -14,7 +14,7 @@ exports.alert = function (message) {
             if (!message.additionalInfo) {
                 message.additionalInfo = {};
             }
-            title = client.translate(message.type + '_TITLE');
+            title = client.translate(message.type + '_TITLE', message.additionalInfo);
             messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
         }
         else {

@@ -1,6 +1,5 @@
 import {Component, Input, ViewChildren, QueryList} from '@angular/core';
 import {ContestChartComponent} from '../contest-chart/contest-chart';
-import {ContestDetailsComponent} from '../contest-details/contest-details';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import {Contest} from "../../objects/objects";
@@ -8,7 +7,7 @@ import {Contest} from "../../objects/objects";
 @Component({
   selector: 'contest-list',
   templateUrl: 'build/components/contest-list/contest-list.html',
-  directives: [ContestChartComponent, ContestDetailsComponent],
+  directives: [ContestChartComponent],
 })
 
 export class ContestListComponent {
@@ -45,9 +44,17 @@ export class ContestListComponent {
     });
   }
 
-  onContestSelected(data: any) {
-    this.client.logEvent('tryRunContest',{'contestId' : data.contest._id, 'source': data.source});
-    this.client.showContest(data.contest, false).then ((contest: Contest) => {
+  onContestSelected(data:any) {
+    this.showContest(data, false);
+  }
+
+  onMyTeamSelected(data:any) {
+    this.showContest(data, true);
+  }
+
+  showContest(data:any, tryRun:boolean) {
+    data.source = data.tab + '/' + data.source;
+    this.client.showContest(data.contest, data.source, tryRun).then((contest:Contest) => {
       if (contest) {
         //A new copy from the server
         this.updateContest(contest);
@@ -56,15 +63,16 @@ export class ContestListComponent {
     });
   }
 
-  playContest(data: any) {
-    this.client.logEvent('tryRunContest',{'contestId' : data.contest._id, 'source': data.source});
-    this.client.showContest(data.contest, true).then ((contest: Contest) => {
-      if (contest) {
-        //A new copy from the server
-        this.updateContest(contest);
-      }
-    }, () => {
-    });
+  onContestButtonClick(data:any) {
+    switch (data.contest.status) {
+      case 'finished':
+      case 'starting':
+        this.showContest(data, false);
+        break;
+      default:
+        this.showContest(data, true);
+        break;
+    }
   }
 
   onResize() {
