@@ -129,6 +129,8 @@ dalDb.loadSettings(null, function (err, data) {
   app.get('/facebook/ipn', facebookCanvas.getChallenge);
   app.post('/facebook/ipn', facebookCanvas.ipn);
   app.post('/paypal/ipn', paypalIPN.ipn);
+  app.get('/download', downloadUtils.download);
+  app.get('/download/:platform', downloadUtils.download);
   app.get('/download/:platform/:version', downloadUtils.download);
 
   //----------------------------------------------------

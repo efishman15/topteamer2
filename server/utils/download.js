@@ -8,13 +8,12 @@ var exceptions = require(path.resolve(__dirname,'./exceptions'));
 //--------------------------------------------------------------------------
 module.exports.download = function (req, res, next) {
 
-  console.log('start download');
   var platform = req.params.platform;
   if (!platform || platform === undefined) {
     platform = 'android';
   }
   else if (platform !== 'android') {
-    new exceptions.ServerResponseException(res, 'supported platforms are: android', {}, 'warn', 403);
+    res.send(403,'supported platforms are: android');
     return;
   }
 
@@ -23,18 +22,18 @@ module.exports.download = function (req, res, next) {
     version = '';
   }
   else if (version !== 'armv7' && version !== 'x86') {
-    new exceptions.ServerResponseException(res, 'supported versions are: armv7, x86 or do not specify version for the standard version', {}, 'warn', 403);
+    res.send(403,'supported versions are: armv7, x86 or do not specify version for the standard version');
     return;
   }
 
-  var downloadDir = '../build' + platform + '/apks/release/';
+  var downloadDir = '../../build/' + platform + '/apks/release/';
   var fileNameFriendlyName = 'topteamer';
-  var fileName = downloadDir + 'topteamer-release';
+  var fileName = downloadDir + 'topteamer';
   if (version) {
     fileNameFriendlyName += '-' + version;
     fileName += '-' + version;
   }
-  fileName += '.apk';
+  fileName += '-release.apk';
   fileNameFriendlyName += '.apk';
 
   var downloadFile = path.resolve(__dirname,fileName);
