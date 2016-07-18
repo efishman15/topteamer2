@@ -2,7 +2,6 @@
   <contest-chart id="{{tab}}-{{contest._id}}"
                  [(contest)]="contests[i]"
                  allowContestSelect="true"
-                 finishedStateButtonText="{{client.translate('VIEW')}}"
                  (contestSelected)="onContestSelected($event)"
                  (myTeamSelected)="onMyTeamSelected($event)"
                  (contestButtonClick)="onContestButtonClick($event)">

@@ -3,12 +3,12 @@ import {ShareVariables,ClientShareApp,ClientShareDiscoverApp,Contest} from '../o
 
 const EMAIL_REF:string = '?ref=shareEmail';
 
-export let getVariables = (contest?:Contest, isNewContest? : boolean) => {
+export let getVariables = (contest?:Contest, isNewContest?:boolean) => {
 
   var client = Client.getInstance();
-  let shareVariables : ShareVariables = new ShareVariables();
-  let subjectField : string;
-  let bodyField : string;
+  let shareVariables:ShareVariables = new ShareVariables();
+  let subjectField:string;
+  let bodyField:string;
 
   var params = {};
 
@@ -27,7 +27,7 @@ export let getVariables = (contest?:Contest, isNewContest? : boolean) => {
     }
     else if (contest.myTeam === 0 || contest.myTeam === 1) {
       params['myTeam'] = contest.teams[contest.myTeam].name.toLowerCase();
-      params['otherTeam'] = contest.teams[1-contest.myTeam].name.toLowerCase();
+      params['otherTeam'] = contest.teams[1 - contest.myTeam].name.toLowerCase();
       subjectField = 'SHARE_SUBJECT_CONTEST_JOINED';
       bodyField = 'SHARE_BODY_CONTEST_JOINED';
     }
@@ -84,7 +84,7 @@ export let mobileDiscoverSharingApps = () => {
   });
 }
 
-export let mobileDiscoverApp = (client: any, shareApp:ClientShareDiscoverApp, shareVariables:ShareVariables) => {
+export let mobileDiscoverApp = (client:any, shareApp:ClientShareDiscoverApp, shareVariables:ShareVariables) => {
 
   return new Promise((resolve:any, reject:any) => {
 
@@ -107,93 +107,109 @@ export let mobileDiscoverApp = (client: any, shareApp:ClientShareDiscoverApp, sh
   });
 }
 
-export let mobileShare = (appName?:string, contest?:Contest, isNewContest?: boolean) => {
+export let mobileShare = (appName?:string, contest?:Contest, isNewContest?:boolean) => {
 
-  let shareVariables:ShareVariables = this.getVariables(contest, isNewContest);
-  switch (appName) {
-    case 'whatsapp':
-      window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl,
-        shareVariables.shareImage,
-        shareVariables.shareUrl,
-        () => {
-        },
-        (err) => {
-          window.myLogError('WhatsApp Share', err);
-        }
-      )
-      break;
-    case 'facebook':
-      window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl,
-        shareVariables.shareImage,
-        shareVariables.shareUrl,
-        () => {
-        },
-        (err) => {
-          window.myLogError('Facebook Share', err);
-        }
-      )
-      break;
-    case 'instagram':
-      window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody,
-        shareVariables.shareImage,
-        () => {
-        },
-        (err) => {
-          window.myLogError('Instagram Share', err);
-        }
-      )
-      break;
-    case 'twitter':
-      window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl,
-        shareVariables.shareImage,
-        shareVariables.shareUrl,
-        () => {
-        },
-        (err) => {
-          window.myLogError('Twitter Share', err);
-        }
-      )
-      break;
-    case 'sms':
-      window.plugins.socialsharing.shareViaSMS({'message': shareVariables.shareBody},
-        null, //Phone numbers - user will type
-        () => {
-        },
-        (err) => {
-          window.myLogError('SMS Share', err);
-        }
-      )
-      break;
-    case 'email':
-      window.plugins.socialsharing.shareViaEmail(shareVariables.shareBodyEmail,
-        shareVariables.shareSubject,
-        null, //To
-        null, //Cc
-        null, //Bcc
-        shareVariables.shareImage,
-        () => {
-        },
-        (err) => {
-          window.myLogError('Email Share', err);
-        }
-      )
-      break;
+  return new Promise((resolve:any, reject:any) => {
 
-    default:
-      let options:any = {};
-      options.message = shareVariables.shareBodyNoUrl;
-      options.subject = shareVariables.shareSubject;
-      options.files = [shareVariables.shareImage];
-      options.url = shareVariables.shareUrl;
+    let shareVariables:ShareVariables = this.getVariables(contest, isNewContest);
+    switch (appName) {
+      case 'whatsapp':
+        window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl,
+          shareVariables.shareImage,
+          shareVariables.shareUrl,
+          () => {
+            resolve();
+          },
+          (err) => {
+            window.myLogError('WhatsApp Share', err);
+            reject();
+          }
+        )
+        break;
+      case 'facebook':
+        window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl,
+          shareVariables.shareImage,
+          shareVariables.shareUrl,
+          () => {
+            resolve();
+          },
+          (err) => {
+            window.myLogError('Facebook Share', err);
+            reject();
+          }
+        )
+        break;
+      case 'instagram':
+        window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody,
+          shareVariables.shareImage,
+          () => {
+            resolve();
+          },
+          (err) => {
+            window.myLogError('Instagram Share', err);
+            reject();
+          }
+        )
+        break;
+      case 'twitter':
+        window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl,
+          shareVariables.shareImage,
+          shareVariables.shareUrl,
+          () => {
+            resolve();
+          },
+          (err) => {
+            window.myLogError('Twitter Share', err);
+            reject();
+          }
+        )
+        break;
+      case 'sms':
+        window.plugins.socialsharing.shareViaSMS({'message': shareVariables.shareBody},
+          null, //Phone numbers - user will type
+          () => {
+            resolve();
+          },
+          (err) => {
+            window.myLogError('SMS Share', err);
+            reject();
+          }
+        )
+        break;
+      case 'email':
+        window.plugins.socialsharing.shareViaEmail(shareVariables.shareBodyEmail,
+          shareVariables.shareSubject,
+          null, //To
+          null, //Cc
+          null, //Bcc
+          shareVariables.shareImage,
+          () => {
+            resolve();
+          },
+          (err) => {
+            window.myLogError('Email Share', err);
+            reject();
+          }
+        )
+        break;
 
-      window.plugins.socialsharing.shareWithOptions(options,
-        () => {
-        },
-        (err) => {
-          window.myLogError('General Mobile Share', err);
-        }
-      )
-      break;
+      default:
+        let options:any = {};
+        options.message = shareVariables.shareBodyNoUrl;
+        options.subject = shareVariables.shareSubject;
+        options.files = [shareVariables.shareImage];
+        options.url = shareVariables.shareUrl;
 
-  }
+        window.plugins.socialsharing.shareWithOptions(options,
+          () => {
+            resolve();
+          },
+          (err) => {
+            window.myLogError('General Mobile Share', err);
+            reject();
+          }
+        )
+        break;
+    }
+  });
 }

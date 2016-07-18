@@ -11,10 +11,10 @@ import {Contest,ShareVariables,ShareWebNetwork} from '../../objects/objects';
 export class SharePage {
 
   client:Client;
-  params: NavParams;
+  params:NavParams;
   shareVariables:ShareVariables;
-  title: string;
-  isNewContest: boolean;
+  title:string;
+  isNewContest:boolean;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
@@ -33,20 +33,31 @@ export class SharePage {
 
   ionViewWillEnter() {
     if (this.params.data.contest) {
-      this.client.logEvent('page/share', {'contestId': this.params.data.contest._id, 'source': this.params.data.source});
+      this.client.logEvent('page/share', {
+        'contestId': this.params.data.contest._id,
+        'source': this.params.data.source
+      });
     }
     else {
       this.client.logEvent('page/share', {'source': this.params.data.source});
     }
   }
 
-  webShare(network: any) {
+  webShare(network:any) {
     this.client.logEvent('share/web/' + network.name);
-    window.open(network.url.format({url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail}),'_blank');
+    window.open(network.url.format({
+      url: this.shareVariables.shareUrl,
+      subject: this.shareVariables.shareSubject,
+      emailBody: this.shareVariables.shareBodyEmail
+    }), '_blank');
+    this.client.nav.pop();
   }
 
-  mobileShare(appName?: string) {
+  mobileShare(appName?:string) {
     this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
-    shareService.mobileShare(appName, this.params.data.contest, this.isNewContest);
+    shareService.mobileShare(appName, this.params.data.contest, this.isNewContest).then(() => {
+      this.client.nav.pop();
+    }, () => {
+    });
   }
 }

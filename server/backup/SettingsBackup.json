@@ -1252,7 +1252,7 @@
         "SHARE_SUBJECT_GENERAL" : "Check out this new game: \"$settings{client.ui.en.GAME_NAME} ?\"",
         "SHARE_BODY_GENERAL" : "Check out this new game: \"$settings{client.ui.en.GAME_NAME} ?\". Come and play with me",
         "SELECT_TEAM_ALERT_TITLE" : "{{team}} team",
-        "SELECT_TEAM_ALERT_MESSAGE" : "You started playing for {{team}} team"
+        "SELECT_TEAM_ALERT_MESSAGE" : "You chose to play for {{team}} team"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1464,7 +1464,7 @@
         "SHARE_SUBJECT_GENERAL" : "אתם חייבים להסתכל על המשחק החדש הזה: \"$settings{client.ui.he.GAME_NAME}?\"",
         "SHARE_BODY_GENERAL" : "אתם חייבים להסתכל על המשחק החדש הזה: \"$settings{client.ui.he.GAME_NAME}?\". בואו לשחק איתי",
         "SELECT_TEAM_ALERT_TITLE" : "קבוצת {{team}}",
-        "SELECT_TEAM_ALERT_MESSAGE" : "עברתם לשחק עבור קבוצת {{team}}"
+        "SELECT_TEAM_ALERT_MESSAGE" : "בחרתם לשחק עבור קבוצת {{team}}"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1682,7 +1682,7 @@
         "SHARE_SUBJECT_GENERAL" : "Echa un vistazo a este nuevo juego: \" ¿$settings{client.ui.es.GAME_NAME} ? \"",
         "SHARE_BODY_GENERAL" : "Echa un vistazo a este nuevo juego: \" ¿$settings{client.ui.es.GAME_NAME} ? \". Ven y juega conmigo",
         "SELECT_TEAM_ALERT_TITLE" : "Equipo de {{team}}",
-        "SELECT_TEAM_ALERT_MESSAGE" : "Empezó a jugar para el equipo de {{team}}"
+        "SELECT_TEAM_ALERT_MESSAGE" : "Que elgió para jugar para el equipo de {{team}}"
       }
     },
     "platforms" : {

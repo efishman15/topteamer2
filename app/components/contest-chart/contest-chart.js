@@ -25,7 +25,7 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected(teamId, 'bar');
+                _this.teamSelected(teamId, 'teamBar');
                 _this.chartTeamEventHandled = true;
             },
             'dataLabelClick': function (eventObj, dataObj) {
@@ -33,7 +33,18 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected(teamId, 'label');
+                _this.teamSelected(teamId, 'teamPercent');
+                _this.chartTeamEventHandled = true;
+            },
+            'annotationClick': function (eventObj, dataObj) {
+                var teamId;
+                if (dataObj.annotationOptions.text === _this.contest.teams[0].name) {
+                    teamId = 0;
+                }
+                else {
+                    teamId = 1;
+                }
+                _this.teamSelected(teamId, 'teamName');
                 _this.chartTeamEventHandled = true;
             },
             'chartClick': function (eventObj, dataObj) {
@@ -73,14 +84,11 @@ var ContestChartComponent = (function () {
         }
     };
     ContestChartComponent.prototype.ngOnInit = function () {
-        this.setButtonText();
         this.initChart();
     };
     ContestChartComponent.prototype.initChart = function () {
         var _this = this;
         if (!this.chart) {
-            this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
-            this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
             this.netChartHeight = 1 - (this.client.settings.charts.contest.size.topMarginPercent / 100);
             if (this.client.currentLanguage.direction === 'ltr') {
                 this.teamsOrder = [0, 1];
@@ -107,7 +115,6 @@ var ContestChartComponent = (function () {
         if (contest) {
             //new contest object arrived
             this.contest = contest;
-            this.setButtonText();
             this.adjustScores();
         }
         this.chart.setJSONData(this.contest.dataSource);
@@ -122,19 +129,6 @@ var ContestChartComponent = (function () {
         //Others (in grey)
         this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
         this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
-    };
-    ContestChartComponent.prototype.setButtonText = function () {
-        switch (this.contest.state) {
-            case 'play':
-                this.buttonText = this.client.translate('PLAY_FOR_TEAM', { 'team': this.contest.teams[this.contest.myTeam].name });
-                break;
-            case 'join':
-                this.buttonText = this.client.translate('PLAY_CONTEST');
-                break;
-            case 'finished':
-                this.buttonText = this.finishedStateButtonText;
-                break;
-        }
     };
     ContestChartComponent.prototype.joinContest = function (team, source, action) {
         var _this = this;
@@ -190,7 +184,7 @@ var ContestChartComponent = (function () {
     __decorate([
         core_1.Input(), 
         __metadata('design:type', String)
-    ], ContestChartComponent.prototype, "finishedStateButtonText", void 0);
+    ], ContestChartComponent.prototype, "alternateButtonText", void 0);
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)

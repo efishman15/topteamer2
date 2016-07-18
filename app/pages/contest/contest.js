@@ -42,6 +42,9 @@ var ContestPage = (function () {
                 soundService.play(soundFile);
             }, 500);
         });
+        this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
+            _this.refreshContestChart(eventData[0]);
+        });
     }
     ContestPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/contest', { 'contestId': this.contest._id });

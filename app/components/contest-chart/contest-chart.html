@@ -14,7 +14,7 @@
     </div>
     <div padding-bottom>
       <button *ngIf="contest.status !== 'starting'" class="button-play-contest no-wrap-text"
-              (click)="onContestButtonClick($event)">{{buttonText}}
+              (click)="onContestButtonClick($event)">{{alternateButtonText ? alternateButtonText : contest.buttonText}}
       </button>
     </div>
     <div text-center class="chart-bottom-line-separator">

@@ -321,7 +321,7 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected(teamId, 'bar');
+                _this.teamSelected(teamId, 'teamBar');
                 _this.chartTeamEventHandled = true;
             },
             'dataLabelClick': function (eventObj, dataObj) {
@@ -329,7 +329,18 @@ var ContestChartComponent = (function () {
                 if (_this.client.currentLanguage.direction === 'rtl') {
                     teamId = 1 - teamId;
                 }
-                _this.teamSelected(teamId, 'label');
+                _this.teamSelected(teamId, 'teamPercent');
+                _this.chartTeamEventHandled = true;
+            },
+            'annotationClick': function (eventObj, dataObj) {
+                var teamId;
+                if (dataObj.annotationOptions.text === _this.contest.teams[0].name) {
+                    teamId = 0;
+                }
+                else {
+                    teamId = 1;
+                }
+                _this.teamSelected(teamId, 'teamName');
                 _this.chartTeamEventHandled = true;
             },
             'chartClick': function (eventObj, dataObj) {
@@ -369,14 +380,11 @@ var ContestChartComponent = (function () {
         }
     };
     ContestChartComponent.prototype.ngOnInit = function () {
-        this.setButtonText();
         this.initChart();
     };
     ContestChartComponent.prototype.initChart = function () {
         var _this = this;
         if (!this.chart) {
-            this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
-            this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
             this.netChartHeight = 1 - (this.client.settings.charts.contest.size.topMarginPercent / 100);
             if (this.client.currentLanguage.direction === 'ltr') {
                 this.teamsOrder = [0, 1];
@@ -403,7 +411,6 @@ var ContestChartComponent = (function () {
         if (contest) {
             //new contest object arrived
             this.contest = contest;
-            this.setButtonText();
             this.adjustScores();
         }
         this.chart.setJSONData(this.contest.dataSource);
@@ -418,19 +425,6 @@ var ContestChartComponent = (function () {
         //Others (in grey)
         this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
         this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
-    };
-    ContestChartComponent.prototype.setButtonText = function () {
-        switch (this.contest.state) {
-            case 'play':
-                this.buttonText = this.client.translate('PLAY_FOR_TEAM', { 'team': this.contest.teams[this.contest.myTeam].name });
-                break;
-            case 'join':
-                this.buttonText = this.client.translate('PLAY_CONTEST');
-                break;
-            case 'finished':
-                this.buttonText = this.finishedStateButtonText;
-                break;
-        }
     };
     ContestChartComponent.prototype.joinContest = function (team, source, action) {
         var _this = this;
@@ -486,7 +480,7 @@ var ContestChartComponent = (function () {
     __decorate([
         core_1.Input(), 
         __metadata('design:type', String)
-    ], ContestChartComponent.prototype, "finishedStateButtonText", void 0);
+    ], ContestChartComponent.prototype, "alternateButtonText", void 0);
     __decorate([
         core_1.Output(), 
         __metadata('design:type', Object)
@@ -1956,6 +1950,9 @@ var ContestPage = (function () {
             setTimeout(function () {
                 soundService.play(soundFile);
             }, 500);
+        });
+        this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
+            _this.refreshContestChart(eventData[0]);
         });
     }
     ContestPage.prototype.ionViewWillEnter = function () {
@@ -4206,7 +4203,10 @@ var SharePage = (function () {
     }
     SharePage.prototype.ionViewWillEnter = function () {
         if (this.params.data.contest) {
-            this.client.logEvent('page/share', { 'contestId': this.params.data.contest._id, 'source': this.params.data.source });
+            this.client.logEvent('page/share', {
+                'contestId': this.params.data.contest._id,
+                'source': this.params.data.source
+            });
         }
         else {
             this.client.logEvent('page/share', { 'source': this.params.data.source });
@@ -4214,11 +4214,20 @@ var SharePage = (function () {
     };
     SharePage.prototype.webShare = function (network) {
         this.client.logEvent('share/web/' + network.name);
-        window.open(network.url.format({ url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail }), '_blank');
+        window.open(network.url.format({
+            url: this.shareVariables.shareUrl,
+            subject: this.shareVariables.shareSubject,
+            emailBody: this.shareVariables.shareBodyEmail
+        }), '_blank');
+        this.client.nav.pop();
     };
     SharePage.prototype.mobileShare = function (appName) {
+        var _this = this;
         this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
-        shareService.mobileShare(appName, this.params.data.contest, this.isNewContest);
+        shareService.mobileShare(appName, this.params.data.contest, this.isNewContest).then(function () {
+            _this.client.nav.pop();
+        }, function () {
+        });
     };
     SharePage = __decorate([
         core_1.Component({
@@ -5394,13 +5403,16 @@ exports.setContestClientData = function (contest) {
     contest.status = exports.getContestStatus(contest, now);
     if (contest.status === 'finished') {
         contest.state = 'finished';
+        contest.buttonText = client.translate('VIEW');
     }
     else {
         if (contest.myTeam === 0 || contest.myTeam === 1) {
             contest.state = 'play';
+            contest.buttonText = client.translate('PLAY_FOR_TEAM', { 'team': contest.teams[contest.myTeam].name });
         }
         else {
             contest.state = 'join';
+            contest.buttonText = client.translate('PLAY_CONTEST');
         }
     }
     var term;
@@ -5510,6 +5522,8 @@ exports.setContestClientData = function (contest) {
     contest.dataSource.annotations.groups[0].items[0].x = '$dataset.0.set.0.centerX';
     contest.dataSource.annotations.groups[0].items[teamsOrder[1]].text = contest.teams[1].name;
     contest.dataSource.annotations.groups[0].items[1].x = '$dataset.0.set.1.centerX';
+    contest.dataSource.annotations.groups[0].items[0].fontSize = client.settings.charts.contest.size.teamNameFontSize;
+    contest.dataSource.annotations.groups[0].items[1].fontSize = client.settings.charts.contest.size.teamNameFontSize;
     if (contest.myTeam === 0 || contest.myTeam === 1) {
         var myTeamProperties = Object.keys(client.settings.charts.contest.myTeam[teamsOrder[contest.myTeam]]);
         for (var i = 0; i < myTeamProperties.length; i++) {
@@ -6027,60 +6041,76 @@ exports.mobileDiscoverApp = function (client, shareApp, shareVariables) {
     });
 };
 exports.mobileShare = function (appName, contest, isNewContest) {
-    var shareVariables = _this.getVariables(contest, isNewContest);
-    switch (appName) {
-        case 'whatsapp':
-            window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
-            }, function (err) {
-                window.myLogError('WhatsApp Share', err);
-            });
-            break;
-        case 'facebook':
-            window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
-            }, function (err) {
-                window.myLogError('Facebook Share', err);
-            });
-            break;
-        case 'instagram':
-            window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody, shareVariables.shareImage, function () {
-            }, function (err) {
-                window.myLogError('Instagram Share', err);
-            });
-            break;
-        case 'twitter':
-            window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
-            }, function (err) {
-                window.myLogError('Twitter Share', err);
-            });
-            break;
-        case 'sms':
-            window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBody }, null, //Phone numbers - user will type
-            function () {
-            }, function (err) {
-                window.myLogError('SMS Share', err);
-            });
-            break;
-        case 'email':
-            window.plugins.socialsharing.shareViaEmail(shareVariables.shareBodyEmail, shareVariables.shareSubject, null, //To
-            null, //Cc
-            null, //Bcc
-            shareVariables.shareImage, function () {
-            }, function (err) {
-                window.myLogError('Email Share', err);
-            });
-            break;
-        default:
-            var options = {};
-            options.message = shareVariables.shareBodyNoUrl;
-            options.subject = shareVariables.shareSubject;
-            options.files = [shareVariables.shareImage];
-            options.url = shareVariables.shareUrl;
-            window.plugins.socialsharing.shareWithOptions(options, function () {
-            }, function (err) {
-                window.myLogError('General Mobile Share', err);
-            });
-            break;
-    }
+    return new Promise(function (resolve, reject) {
+        var shareVariables = _this.getVariables(contest, isNewContest);
+        switch (appName) {
+            case 'whatsapp':
+                window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('WhatsApp Share', err);
+                    reject();
+                });
+                break;
+            case 'facebook':
+                window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('Facebook Share', err);
+                    reject();
+                });
+                break;
+            case 'instagram':
+                window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody, shareVariables.shareImage, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('Instagram Share', err);
+                    reject();
+                });
+                break;
+            case 'twitter':
+                window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('Twitter Share', err);
+                    reject();
+                });
+                break;
+            case 'sms':
+                window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBody }, null, //Phone numbers - user will type
+                function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('SMS Share', err);
+                    reject();
+                });
+                break;
+            case 'email':
+                window.plugins.socialsharing.shareViaEmail(shareVariables.shareBodyEmail, shareVariables.shareSubject, null, //To
+                null, //Cc
+                null, //Bcc
+                shareVariables.shareImage, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('Email Share', err);
+                    reject();
+                });
+                break;
+            default:
+                var options = {};
+                options.message = shareVariables.shareBodyNoUrl;
+                options.subject = shareVariables.shareSubject;
+                options.files = [shareVariables.shareImage];
+                options.url = shareVariables.shareUrl;
+                window.plugins.socialsharing.shareWithOptions(options, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('General Mobile Share', err);
+                    reject();
+                });
+                break;
+        }
+    });
 };
 },{"../objects/objects":11,"./client":35}],43:[function(require,module,exports){
 "use strict";

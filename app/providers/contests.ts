@@ -124,13 +124,16 @@ export let setContestClientData = (contest:Contest) => {
   contest.status = getContestStatus(contest, now);
   if (contest.status === 'finished') {
     contest.state = 'finished';
+    contest.buttonText = client.translate('VIEW');
   }
   else {
     if (contest.myTeam === 0 || contest.myTeam === 1) {
       contest.state = 'play';
+      contest.buttonText = client.translate('PLAY_FOR_TEAM', {'team': contest.teams[contest.myTeam].name});
     }
     else {
       contest.state = 'join';
+      contest.buttonText = client.translate('PLAY_CONTEST');
     }
   }
 
@@ -250,6 +253,9 @@ export let setContestClientData = (contest:Contest) => {
 
   contest.dataSource.annotations.groups[0].items[teamsOrder[1]].text = contest.teams[1].name;
   contest.dataSource.annotations.groups[0].items[1].x = '$dataset.0.set.1.centerX';
+
+  contest.dataSource.annotations.groups[0].items[0].fontSize = client.settings.charts.contest.size.teamNameFontSize;
+  contest.dataSource.annotations.groups[0].items[1].fontSize = client.settings.charts.contest.size.teamNameFontSize;
 
   if (contest.myTeam === 0 || contest.myTeam === 1) {
     var myTeamProperties = Object.keys(client.settings.charts.contest.myTeam[teamsOrder[contest.myTeam]]);

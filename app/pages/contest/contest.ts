@@ -55,6 +55,10 @@ export class ContestPage {
 
     });
 
+    this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
+      this.refreshContestChart(eventData[0]);
+    });
+
   }
 
   ionViewWillEnter() {
@@ -104,7 +108,6 @@ export class ContestPage {
   onContestButtonClick() {
     this.playOrLeaderboard('contest/button');
   }
-
 
   playOrLeaderboard(source: string) {
     if (this.contest.state === 'play') {

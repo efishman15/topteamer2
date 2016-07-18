@@ -26,7 +26,10 @@ var SharePage = (function () {
     }
     SharePage.prototype.ionViewWillEnter = function () {
         if (this.params.data.contest) {
-            this.client.logEvent('page/share', { 'contestId': this.params.data.contest._id, 'source': this.params.data.source });
+            this.client.logEvent('page/share', {
+                'contestId': this.params.data.contest._id,
+                'source': this.params.data.source
+            });
         }
         else {
             this.client.logEvent('page/share', { 'source': this.params.data.source });
@@ -34,11 +37,20 @@ var SharePage = (function () {
     };
     SharePage.prototype.webShare = function (network) {
         this.client.logEvent('share/web/' + network.name);
-        window.open(network.url.format({ url: this.shareVariables.shareUrl, subject: this.shareVariables.shareSubject, emailBody: this.shareVariables.shareBodyEmail }), '_blank');
+        window.open(network.url.format({
+            url: this.shareVariables.shareUrl,
+            subject: this.shareVariables.shareSubject,
+            emailBody: this.shareVariables.shareBodyEmail
+        }), '_blank');
+        this.client.nav.pop();
     };
     SharePage.prototype.mobileShare = function (appName) {
+        var _this = this;
         this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
-        shareService.mobileShare(appName, this.params.data.contest, this.isNewContest);
+        shareService.mobileShare(appName, this.params.data.contest, this.isNewContest).then(function () {
+            _this.client.nav.pop();
+        }, function () {
+        });
     };
     SharePage = __decorate([
         core_1.Component({

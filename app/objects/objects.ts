@@ -486,6 +486,7 @@ export class Contest {
   leadingTeam:number;
   time:ContestTime;
   lastUpdated:number;
+  buttonText:string;
 
   constructor(typeId:string, startDate:number, endDate?:number, endOption?:string) {
     this.startDate = startDate;

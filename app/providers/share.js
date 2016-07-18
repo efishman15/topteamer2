@@ -82,59 +82,75 @@ exports.mobileDiscoverApp = function (client, shareApp, shareVariables) {
     });
 };
 exports.mobileShare = function (appName, contest, isNewContest) {
-    var shareVariables = _this.getVariables(contest, isNewContest);
-    switch (appName) {
-        case 'whatsapp':
-            window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
-            }, function (err) {
-                window.myLogError('WhatsApp Share', err);
-            });
-            break;
-        case 'facebook':
-            window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
-            }, function (err) {
-                window.myLogError('Facebook Share', err);
-            });
-            break;
-        case 'instagram':
-            window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody, shareVariables.shareImage, function () {
-            }, function (err) {
-                window.myLogError('Instagram Share', err);
-            });
-            break;
-        case 'twitter':
-            window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
-            }, function (err) {
-                window.myLogError('Twitter Share', err);
-            });
-            break;
-        case 'sms':
-            window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBody }, null, //Phone numbers - user will type
-            function () {
-            }, function (err) {
-                window.myLogError('SMS Share', err);
-            });
-            break;
-        case 'email':
-            window.plugins.socialsharing.shareViaEmail(shareVariables.shareBodyEmail, shareVariables.shareSubject, null, //To
-            null, //Cc
-            null, //Bcc
-            shareVariables.shareImage, function () {
-            }, function (err) {
-                window.myLogError('Email Share', err);
-            });
-            break;
-        default:
-            var options = {};
-            options.message = shareVariables.shareBodyNoUrl;
-            options.subject = shareVariables.shareSubject;
-            options.files = [shareVariables.shareImage];
-            options.url = shareVariables.shareUrl;
-            window.plugins.socialsharing.shareWithOptions(options, function () {
-            }, function (err) {
-                window.myLogError('General Mobile Share', err);
-            });
-            break;
-    }
+    return new Promise(function (resolve, reject) {
+        var shareVariables = _this.getVariables(contest, isNewContest);
+        switch (appName) {
+            case 'whatsapp':
+                window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('WhatsApp Share', err);
+                    reject();
+                });
+                break;
+            case 'facebook':
+                window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('Facebook Share', err);
+                    reject();
+                });
+                break;
+            case 'instagram':
+                window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody, shareVariables.shareImage, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('Instagram Share', err);
+                    reject();
+                });
+                break;
+            case 'twitter':
+                window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('Twitter Share', err);
+                    reject();
+                });
+                break;
+            case 'sms':
+                window.plugins.socialsharing.shareViaSMS({ 'message': shareVariables.shareBody }, null, //Phone numbers - user will type
+                function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('SMS Share', err);
+                    reject();
+                });
+                break;
+            case 'email':
+                window.plugins.socialsharing.shareViaEmail(shareVariables.shareBodyEmail, shareVariables.shareSubject, null, //To
+                null, //Cc
+                null, //Bcc
+                shareVariables.shareImage, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('Email Share', err);
+                    reject();
+                });
+                break;
+            default:
+                var options = {};
+                options.message = shareVariables.shareBodyNoUrl;
+                options.subject = shareVariables.shareSubject;
+                options.files = [shareVariables.shareImage];
+                options.url = shareVariables.shareUrl;
+                window.plugins.socialsharing.shareWithOptions(options, function () {
+                    resolve();
+                }, function (err) {
+                    window.myLogError('General Mobile Share', err);
+                    reject();
+                });
+                break;
+        }
+    });
 };
 //# sourceMappingURL=share.js.map

@@ -15,12 +15,11 @@ export class ContestChartComponent {
 
   @Input() id:Number;
   @Input() contest:Contest;
-  @Input() finishedStateButtonText:string;
+  @Input() alternateButtonText:string;
 
   chartTeamEventHandled:boolean;
   client:Client;
   chart:any;
-  buttonText:string;
   netChartHeight:number;
   teamsOrder:Array<number>;
 
@@ -34,7 +33,7 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.teamSelected(teamId, 'bar');
+      this.teamSelected(teamId, 'teamBar');
       this.chartTeamEventHandled = true;
     },
     'dataLabelClick': (eventObj, dataObj) => {
@@ -42,7 +41,18 @@ export class ContestChartComponent {
       if (this.client.currentLanguage.direction === 'rtl') {
         teamId = 1 - teamId;
       }
-      this.teamSelected(teamId, 'label');
+      this.teamSelected(teamId, 'teamPercent');
+      this.chartTeamEventHandled = true;
+    },
+    'annotationClick': (eventObj, dataObj) => {
+      var teamId;
+      if (dataObj.annotationOptions.text === this.contest.teams[0].name) {
+        teamId = 0;
+      }
+      else {
+        teamId = 1;
+      }
+      this.teamSelected(teamId, 'teamName');
       this.chartTeamEventHandled = true;
     },
     'chartClick': (eventObj, dataObj) => {
@@ -89,15 +99,12 @@ export class ContestChartComponent {
   }
 
   ngOnInit() {
-    this.setButtonText();
     this.initChart();
   }
 
   initChart() {
     if (!this.chart) {
 
-      this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
-      this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
       this.netChartHeight = 1 - (this.client.settings.charts.contest.size.topMarginPercent / 100);
 
       if (this.client.currentLanguage.direction === 'ltr') {
@@ -129,7 +136,6 @@ export class ContestChartComponent {
     if (contest) {
       //new contest object arrived
       this.contest = contest;
-      this.setButtonText();
       this.adjustScores();
     }
 
@@ -148,20 +154,6 @@ export class ContestChartComponent {
     //Others (in grey)
     this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
     this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
-  }
-
-  setButtonText() {
-    switch (this.contest.state) {
-      case 'play':
-        this.buttonText = this.client.translate('PLAY_FOR_TEAM', {'team': this.contest.teams[this.contest.myTeam].name});
-        break;
-      case 'join':
-        this.buttonText = this.client.translate('PLAY_CONTEST');
-        break;
-      case 'finished':
-        this.buttonText = this.finishedStateButtonText;
-        break;
-    }
   }
 
   joinContest(team, source, action:string = 'join') {
