@@ -99,7 +99,8 @@ function register(data, callback) {
     'xp': 0,
     'rank': 1,
     'createdAt': now,
-    'lastLogin': now
+    'lastLogin': now,
+    'lastClientInfo': data.user.clientInfo
   };
 
   usersCollection.insert(newUser
@@ -455,7 +456,6 @@ module.exports.facebookLogin = function (data, callback) {
         return;
       }
 
-      var dailyXp = 0;
       var prevLogin = new Date(user.lastLogin);
 
       var today = new Date();
@@ -478,7 +478,8 @@ module.exports.facebookLogin = function (data, callback) {
           'ageRange': data.user.ageRange, //keep sync with Facebook changes
           'xp': user.xp,
           'rank': user.rank,
-          'friends': thirdParty.friends
+          'friends': thirdParty.friends,
+          'lastClientInfo': data.user.clientInfo
         }
       };
 
@@ -501,7 +502,7 @@ module.exports.facebookLogin = function (data, callback) {
           user.name = data.user.name;
           user.email = data.user.email;
           user.ageRange = data.user.ageRange;
-
+          user.lastClientInfo = clientInfo;
           data.user = user;
 
           //restore the avatar back
@@ -509,10 +510,6 @@ module.exports.facebookLogin = function (data, callback) {
 
           if (thirdParty) {
             data.user.thirdParty = thirdParty;
-          }
-
-          if (clientInfo) {
-            data.user.clientInfo = clientInfo;
           }
 
           checkToCloseDb(data);
@@ -560,7 +557,7 @@ module.exports.createOrUpdateSession = function (data, callback) {
     'xp': data.user.xp,
     'rank': data.user.rank,
     'features': data.features,
-    'clientInfo': data.user.clientInfo,
+    'clientInfo': data.user.lastClientInfo
   };
 
   if (data.user.justRegistered) {
