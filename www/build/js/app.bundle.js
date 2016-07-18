@@ -88,21 +88,22 @@ var TopTeamerApp = (function () {
         //init facebook javascript sdk
         window.fbAsyncInit = function () {
             window.FB.init({
-                appId: '344342552056',
+                appId: _this.client.settings.facebook.appId,
                 xfbml: true,
                 cookie: true,
-                version: 'v2.6'
+                version: _this.client.settings.facebook.version
             });
             _this.initFacebook();
         };
         (function (d, s, id) {
+            var client = client_1.Client.getInstance();
             var js, fjs = d.getElementsByTagName(s)[0];
             if (d.getElementById(id)) {
                 return;
             }
             js = d.createElement(s);
             js.id = id;
-            js.src = '//connect.facebook.net/en_US/sdk.js';
+            js.src = client.settings.facebook.sdk;
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
     };
@@ -138,7 +139,7 @@ var TopTeamerApp = (function () {
     };
     TopTeamerApp.prototype.initFlurry = function () {
         //FlurryAgent.setDebugLogEnabled(true);
-        window.FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
+        window.FlurryAgent.startSession(this.client.settings.flurry.key);
         window.myLogError = function (errorType, message) {
             window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
         };
@@ -169,7 +170,7 @@ var TopTeamerApp = (function () {
         };
         window.initBranch = function () {
             if (window.branch) {
-                window.branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', function (err, data) {
+                window.branch.init(_this.client.settings.branch.key, function (err, data) {
                     if (window.myHandleBranch) {
                         window.myHandleBranch(err, data);
                     }
@@ -374,7 +375,16 @@ var ContestChartComponent = (function () {
     ContestChartComponent.prototype.initChart = function () {
         var _this = this;
         if (!this.chart) {
-            this.adjustResolution();
+            this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
+            this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
+            this.netChartHeight = 1 - (this.client.settings.charts.contest.size.topMarginPercent / 100);
+            if (this.client.currentLanguage.direction === 'ltr') {
+                this.teamsOrder = [0, 1];
+            }
+            else {
+                this.teamsOrder = [1, 0];
+            }
+            this.adjustScores();
             window.FusionCharts.ready(function () {
                 _this.chart = new window.FusionCharts({
                     type: _this.client.settings.charts.contest.type,
@@ -394,31 +404,20 @@ var ContestChartComponent = (function () {
             //new contest object arrived
             this.contest = contest;
             this.setButtonText();
-            this.adjustResolution();
+            this.adjustScores();
         }
         this.chart.setJSONData(this.contest.dataSource);
     };
     ContestChartComponent.prototype.onResize = function () {
         this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
     };
-    ContestChartComponent.prototype.adjustResolution = function () {
-        this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[0].fontSize);
-        this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[1].fontSize);
-        var topMarginPercent = this.client.adjustPixelRatio(this.client.settings.charts.contest.size.topMarginPercent, true);
-        var netChartHeight = 1 - (topMarginPercent / 100);
-        var teamsOrder;
-        if (this.client.currentLanguage.direction === 'ltr') {
-            teamsOrder = [0, 1];
-        }
-        else {
-            teamsOrder = [1, 0];
-        }
+    ContestChartComponent.prototype.adjustScores = function () {
         //Scores
-        this.contest.dataSource.dataset[0].data[0].value = this.contest.teams[teamsOrder[0]].chartValue * netChartHeight;
-        this.contest.dataSource.dataset[0].data[1].value = this.contest.teams[teamsOrder[1]].chartValue * netChartHeight;
+        this.contest.dataSource.dataset[0].data[0].value = this.contest.teams[this.teamsOrder[0]].chartValue * this.netChartHeight;
+        this.contest.dataSource.dataset[0].data[1].value = this.contest.teams[this.teamsOrder[1]].chartValue * this.netChartHeight;
         //Others (in grey)
-        this.contest.dataSource.dataset[1].data[0].value = netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
-        this.contest.dataSource.dataset[1].data[1].value = netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
+        this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
+        this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
     };
     ContestChartComponent.prototype.setButtonText = function () {
         switch (this.contest.state) {
@@ -1220,12 +1219,36 @@ var Settings = (function () {
     return Settings;
 }());
 exports.Settings = Settings;
+var FlurrySettings = (function () {
+    function FlurrySettings() {
+    }
+    return FlurrySettings;
+}());
+exports.FlurrySettings = FlurrySettings;
+var BranchSettings = (function () {
+    function BranchSettings() {
+    }
+    return BranchSettings;
+}());
+exports.BranchSettings = BranchSettings;
 var ContestSettings = (function () {
     function ContestSettings() {
     }
     return ContestSettings;
 }());
 exports.ContestSettings = ContestSettings;
+var ContestChartDeviceSettings = (function () {
+    function ContestChartDeviceSettings() {
+    }
+    return ContestChartDeviceSettings;
+}());
+exports.ContestChartDeviceSettings = ContestChartDeviceSettings;
+var ContestDeviceConfigurationSettings = (function () {
+    function ContestDeviceConfigurationSettings() {
+    }
+    return ContestDeviceConfigurationSettings;
+}());
+exports.ContestDeviceConfigurationSettings = ContestDeviceConfigurationSettings;
 var ShareSettings = (function () {
     function ShareSettings() {
     }
@@ -1424,6 +1447,36 @@ var ChartSettings = (function () {
     return ChartSettings;
 }());
 exports.ChartSettings = ChartSettings;
+var Size = (function () {
+    function Size() {
+    }
+    return Size;
+}());
+exports.Size = Size;
+var ChartSizeSettings = (function (_super) {
+    __extends(ChartSizeSettings, _super);
+    function ChartSizeSettings() {
+        _super.apply(this, arguments);
+    }
+    return ChartSizeSettings;
+}(Size));
+exports.ChartSizeSettings = ChartSizeSettings;
+var ContestChartSizeSettings = (function (_super) {
+    __extends(ContestChartSizeSettings, _super);
+    function ContestChartSizeSettings() {
+        _super.apply(this, arguments);
+    }
+    return ContestChartSizeSettings;
+}(ChartSizeSettings));
+exports.ContestChartSizeSettings = ContestChartSizeSettings;
+var QuestionStatsChartSizeSettings = (function (_super) {
+    __extends(QuestionStatsChartSizeSettings, _super);
+    function QuestionStatsChartSizeSettings() {
+        _super.apply(this, arguments);
+    }
+    return QuestionStatsChartSizeSettings;
+}(ChartSizeSettings));
+exports.QuestionStatsChartSizeSettings = QuestionStatsChartSizeSettings;
 var ContestChartSettings = (function (_super) {
     __extends(ContestChartSettings, _super);
     function ContestChartSettings() {
@@ -1440,26 +1493,24 @@ var QuestionStatsChartSettings = (function (_super) {
     return QuestionStatsChartSettings;
 }(ChartSettings));
 exports.QuestionStatsChartSettings = QuestionStatsChartSettings;
+var QuestionStatsChartDeviceSettings = (function () {
+    function QuestionStatsChartDeviceSettings() {
+    }
+    return QuestionStatsChartDeviceSettings;
+}());
+exports.QuestionStatsChartDeviceSettings = QuestionStatsChartDeviceSettings;
+var QuestionStatsChartDeviceConfigurationSettings = (function () {
+    function QuestionStatsChartDeviceConfigurationSettings() {
+    }
+    return QuestionStatsChartDeviceConfigurationSettings;
+}());
+exports.QuestionStatsChartDeviceConfigurationSettings = QuestionStatsChartDeviceConfigurationSettings;
 var QuestionStatsChartSettingsColors = (function () {
     function QuestionStatsChartSettingsColors() {
     }
     return QuestionStatsChartSettingsColors;
 }());
 exports.QuestionStatsChartSettingsColors = QuestionStatsChartSettingsColors;
-var Size = (function () {
-    function Size() {
-    }
-    return Size;
-}());
-exports.Size = Size;
-var ChartSizeSettings = (function (_super) {
-    __extends(ChartSizeSettings, _super);
-    function ChartSizeSettings() {
-        _super.apply(this, arguments);
-    }
-    return ChartSizeSettings;
-}(Size));
-exports.ChartSizeSettings = ChartSizeSettings;
 var Question = (function () {
     function Question() {
         this._id = null;
@@ -2192,7 +2243,9 @@ var LoginPage = (function () {
         facebookService.login().then(function (response) {
             _this.client.facebookServerConnect(response['authResponse']).then(function () {
                 _this.client.setRootPage('MainTabsPage');
+            }, function () {
             });
+        }, function () {
         });
     };
     ;
@@ -2701,8 +2754,8 @@ var QuestionStatsPage = (function () {
             this.width = this.client.width * this.client.settings.charts.questionStats.size.widthRatio;
             this.height = this.client.height * this.client.settings.charts.questionStats.size.heightRatio;
             //Adjust fonts to pixel ratio
-            this.chartDataSource.chart.legendItemFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.legendItemFontSize);
-            this.chartDataSource.chart.labelFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.labelFontSize);
+            this.chartDataSource.chart.legendItemFontSize = this.client.settings.charts.questionStats.size.legendItemFontSize;
+            this.chartDataSource.chart.labelFontSize = this.client.settings.charts.questionStats.size.labelFontSize;
             window.FusionCharts.ready(function () {
                 _this.chart = new window.FusionCharts({
                     type: _this.client.settings.charts.questionStats.type,
@@ -4111,9 +4164,7 @@ var SettingsPage = (function () {
         this.client.logEvent('settings/facebookSignOut');
         facebookService.logout().then(function (response) {
             _this.client.logout();
-            _this.client.nav.pop().then(function () {
-                _this.client.setRootPage('LoginPage');
-            });
+            _this.client.setRootPage('LoginPage');
         });
     };
     SettingsPage = __decorate([
@@ -4459,6 +4510,7 @@ var Client = (function () {
                 _this._canvasContext = _this.canvas.getContext('2d');
                 _this.setDirection();
                 _this._loaded = true;
+                _this.adjustChartsDeviceSettings();
                 Client.instance = _this;
                 resolve();
             }, function (err) { return reject(err); });
@@ -4493,8 +4545,11 @@ var Client = (function () {
     Client.prototype.initUser = function (language, geoInfo) {
         this._user = new objects_1.User(language, this.clientInfo, geoInfo);
     };
-    Client.prototype.initXp = function () {
+    Client.prototype.clearXp = function () {
         this._canvasContext.clearRect(0, 0, this.settings.xpControl.canvas.width, this.settings.xpControl.canvas.height);
+    };
+    Client.prototype.initXp = function () {
+        this.clearXp();
         //-------------------------------------------------------------------------------------
         // Draw the full circle representing the entire xp required for the next level
         //-------------------------------------------------------------------------------------
@@ -4764,7 +4819,7 @@ var Client = (function () {
                 'team': '' + contest.myTeam,
                 'sourceClick': source
             };
-            if (contest.status === 'running' && tryRun && (contest.myTeam === 0 || contest.myTeam === 1)) {
+            if (contest.state === 'play' && tryRun) {
                 _this.logEvent('contest/play', eventData);
                 //Joined to a contest - run it immediately (go to the quiz)
                 var appPages_1 = new Array();
@@ -4893,8 +4948,23 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
-    Client.prototype.adjustPixelRatio = function (size, up) {
-        return size;
+    Client.prototype.adjustChartsDeviceSettings = function () {
+        //Contest charts
+        for (var i = 0; i < this.settings.charts.contest.devices.length; i++) {
+            if (window.devicePixelRatio <= this.settings.charts.contest.devices[i].devicePixelRatio) {
+                this.settings.charts.contest.size.topMarginPercent = this.settings.charts.contest.devices[i].settings.topMarginPercent;
+                this.settings.charts.contest.size.teamNameFontSize = this.settings.charts.contest.devices[i].settings.teamNameFontSize;
+                break;
+            }
+        }
+        //Question Stats charts
+        for (var i = 0; i < this.settings.charts.questionStats.devices.length; i++) {
+            if (window.devicePixelRatio <= this.settings.charts.questionStats.devices[i].devicePixelRatio) {
+                this.settings.charts.questionStats.size.legendItemFontSize = this.settings.charts.questionStats.devices[i].settings.legendItemFontSize;
+                this.settings.charts.questionStats.size.labelFontSize = this.settings.charts.questionStats.devices[i].settings.labelFontSize;
+                break;
+            }
+        }
     };
     Client.prototype.showLoader = function () {
         var _this = this;
@@ -5078,6 +5148,7 @@ var Client = (function () {
     Client.prototype.logout = function () {
         this.serverGateway.token = null;
         this._session = null;
+        this.clearXp();
     };
     Client.prototype.setLoggedUserId = function (userId) {
         window.FlurryAgent.setUserId(userId);

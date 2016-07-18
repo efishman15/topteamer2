@@ -78,6 +78,7 @@ var Client = (function () {
                 _this._canvasContext = _this.canvas.getContext('2d');
                 _this.setDirection();
                 _this._loaded = true;
+                _this.adjustChartsDeviceSettings();
                 Client.instance = _this;
                 resolve();
             }, function (err) { return reject(err); });
@@ -112,8 +113,11 @@ var Client = (function () {
     Client.prototype.initUser = function (language, geoInfo) {
         this._user = new objects_1.User(language, this.clientInfo, geoInfo);
     };
-    Client.prototype.initXp = function () {
+    Client.prototype.clearXp = function () {
         this._canvasContext.clearRect(0, 0, this.settings.xpControl.canvas.width, this.settings.xpControl.canvas.height);
+    };
+    Client.prototype.initXp = function () {
+        this.clearXp();
         //-------------------------------------------------------------------------------------
         // Draw the full circle representing the entire xp required for the next level
         //-------------------------------------------------------------------------------------
@@ -512,8 +516,23 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
-    Client.prototype.adjustPixelRatio = function (size, up) {
-        return size;
+    Client.prototype.adjustChartsDeviceSettings = function () {
+        //Contest charts
+        for (var i = 0; i < this.settings.charts.contest.devices.length; i++) {
+            if (window.devicePixelRatio <= this.settings.charts.contest.devices[i].devicePixelRatio) {
+                this.settings.charts.contest.size.topMarginPercent = this.settings.charts.contest.devices[i].settings.topMarginPercent;
+                this.settings.charts.contest.size.teamNameFontSize = this.settings.charts.contest.devices[i].settings.teamNameFontSize;
+                break;
+            }
+        }
+        //Question Stats charts
+        for (var i = 0; i < this.settings.charts.questionStats.devices.length; i++) {
+            if (window.devicePixelRatio <= this.settings.charts.questionStats.devices[i].devicePixelRatio) {
+                this.settings.charts.questionStats.size.legendItemFontSize = this.settings.charts.questionStats.devices[i].settings.legendItemFontSize;
+                this.settings.charts.questionStats.size.labelFontSize = this.settings.charts.questionStats.devices[i].settings.labelFontSize;
+                break;
+            }
+        }
     };
     Client.prototype.showLoader = function () {
         var _this = this;
@@ -697,6 +716,7 @@ var Client = (function () {
     Client.prototype.logout = function () {
         this.serverGateway.token = null;
         this._session = null;
+        this.clearXp();
     };
     Client.prototype.setLoggedUserId = function (userId) {
         window.FlurryAgent.setUserId(userId);

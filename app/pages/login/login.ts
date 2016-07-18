@@ -36,7 +36,9 @@ export class LoginPage {
     facebookService.login().then((response) => {
       this.client.facebookServerConnect(response['authResponse']).then(() => {
         this.client.setRootPage('MainTabsPage');
+      }, () => {
       })
+    }, ()=> {
     });
   };
 

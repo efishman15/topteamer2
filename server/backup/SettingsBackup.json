@@ -406,8 +406,8 @@
           "facebookPost" : {
             "action" : "topteamer:beat",
             "dialogImage" : {
-              "width" : 350,
-              "height" : 350,
+              "width" : 200,
+              "height" : 200,
               "url" : "https://graph.facebook.com/%s/picture?width=%d&height=%d"
             },
             "object" : {
@@ -584,8 +584,7 @@
         "type" : "stackedcolumn2d",
         "size" : {
           "heightRatioFromWidth" : 0.5,
-          "widthRatio" : 0.9,
-          "topMarginPercent" : 15
+          "widthRatio" : 0.9
         },
         "time" : {
           "finished" : {
@@ -647,14 +646,12 @@
                     "id" : "label",
                     "type" : "text",
                     "y" : "$dataset.1.set.1.startY - 18",
-                    "fontColor" : "#2888AC",
-                    "fontSize" : 16.5
+                    "fontColor" : "#2888AC"
                   }, {
                     "id" : "label",
                     "type" : "text",
                     "y" : "$dataset.1.set.1.startY - 18",
-                    "fontColor" : "#BF0045",
-                    "fontSize" : 16.5
+                    "fontColor" : "#BF0045"
                   }]
               }]
           },
@@ -682,7 +679,20 @@
                   "color" : "#DCDCDC"
                 }]
             }]
-        }
+        },
+        "devices" : [{
+            "devicePixelRatio" : 1.5,
+            "settings" : {
+              "teamNameFontSize" : 22.0,
+              "topMarginPercent" : 10.0
+            }
+          }, {
+            "devicePixelRatio" : 4,
+            "settings" : {
+              "teamNameFontSize" : 16.5,
+              "topMarginPercent" : 15.0
+            }
+          }]
       },
       "questionStats" : {
         "type" : "doughnut2d",
@@ -714,7 +724,20 @@
         "size" : {
           "widthRatio" : 0.9,
           "heightRatio" : 0.4
-        }
+        },
+        "devices" : [{
+            "devicePixelRatio" : 1.5,
+            "settings" : {
+              "legendItemFontSize" : 22.0,
+              "labelFontSize" : 18.0
+            }
+          }, {
+            "devicePixelRatio" : 4,
+            "settings" : {
+              "legendItemFontSize" : 16.5,
+              "labelFontSize" : 13.0
+            }
+          }]
       }
     },
     "xpControl" : {
@@ -934,7 +957,10 @@
       "friendsPermissions" : ["user_friends"],
       "contest" : {
         "showLike" : true
-      }
+      },
+      "version" : "v2.7",
+      "appId" : "$settings{server.facebook.appId}",
+      "sdk" : "//connect.facebook.net/en_US/sdk.js"
     },
     "google" : {
       "gcm" : {
@@ -1691,7 +1717,26 @@
       }
     },
     "contest" : {
-      "refreshTresholdInMilliseconds" : 60000
+      "refreshTresholdInMilliseconds" : 60000,
+      "devices" : [{
+          "devicePixelRatio" : 1.5,
+          "settings" : {
+            "font" : 22.0,
+            "topMarginPercent" : 15.0
+          }
+        }, {
+          "devicePixelRatio" : 4,
+          "settings" : {
+            "font" : 16.5,
+            "topMarginPercent" : 17.0
+          }
+        }]
+    },
+    "flurry" : {
+      "key" : "NT66P8Q5BR5HHVN2C527"
+    },
+    "branch" : {
+      "key" : "$settings{server.branch.key}"
     }
   }
 }

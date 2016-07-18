@@ -112,23 +112,24 @@ export class TopTeamerApp {
     //init facebook javascript sdk
     window.fbAsyncInit = () => {
       window.FB.init({
-        appId: '344342552056',
+        appId: this.client.settings.facebook.appId,
         xfbml: true,
         cookie: true,
-        version: 'v2.6'
+        version: this.client.settings.facebook.version
       });
 
       this.initFacebook();
     };
 
     (function (d, s, id) {
+      var client = Client.getInstance();
       var js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) {
         return;
       }
       js = d.createElement(s);
       js.id = id;
-      js.src = '//connect.facebook.net/en_US/sdk.js';
+      js.src = client.settings.facebook.sdk;
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
   }
@@ -177,7 +178,7 @@ export class TopTeamerApp {
   initFlurry() {
 
     //FlurryAgent.setDebugLogEnabled(true);
-    window.FlurryAgent.startSession('NT66P8Q5BR5HHVN2C527');
+    window.FlurryAgent.startSession(this.client.settings.flurry.key);
 
     window.myLogError = (errorType: string, message: string) => {
       window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
@@ -212,7 +213,7 @@ export class TopTeamerApp {
 
     window.initBranch = () => {
       if (window.branch) {
-        window.branch.init('key_live_pocRNjTcwzk0YWxsqcRv3olivweLVuVE', (err, data) => {
+        window.branch.init(this.client.settings.branch.key, (err, data) => {
           if (window.myHandleBranch) {
             window.myHandleBranch(err, data);
           }

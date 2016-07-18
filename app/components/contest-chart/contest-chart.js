@@ -79,7 +79,16 @@ var ContestChartComponent = (function () {
     ContestChartComponent.prototype.initChart = function () {
         var _this = this;
         if (!this.chart) {
-            this.adjustResolution();
+            this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
+            this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
+            this.netChartHeight = 1 - (this.client.settings.charts.contest.size.topMarginPercent / 100);
+            if (this.client.currentLanguage.direction === 'ltr') {
+                this.teamsOrder = [0, 1];
+            }
+            else {
+                this.teamsOrder = [1, 0];
+            }
+            this.adjustScores();
             window.FusionCharts.ready(function () {
                 _this.chart = new window.FusionCharts({
                     type: _this.client.settings.charts.contest.type,
@@ -99,31 +108,20 @@ var ContestChartComponent = (function () {
             //new contest object arrived
             this.contest = contest;
             this.setButtonText();
-            this.adjustResolution();
+            this.adjustScores();
         }
         this.chart.setJSONData(this.contest.dataSource);
     };
     ContestChartComponent.prototype.onResize = function () {
         this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
     };
-    ContestChartComponent.prototype.adjustResolution = function () {
-        this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[0].fontSize);
-        this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[1].fontSize);
-        var topMarginPercent = this.client.adjustPixelRatio(this.client.settings.charts.contest.size.topMarginPercent, true);
-        var netChartHeight = 1 - (topMarginPercent / 100);
-        var teamsOrder;
-        if (this.client.currentLanguage.direction === 'ltr') {
-            teamsOrder = [0, 1];
-        }
-        else {
-            teamsOrder = [1, 0];
-        }
+    ContestChartComponent.prototype.adjustScores = function () {
         //Scores
-        this.contest.dataSource.dataset[0].data[0].value = this.contest.teams[teamsOrder[0]].chartValue * netChartHeight;
-        this.contest.dataSource.dataset[0].data[1].value = this.contest.teams[teamsOrder[1]].chartValue * netChartHeight;
+        this.contest.dataSource.dataset[0].data[0].value = this.contest.teams[this.teamsOrder[0]].chartValue * this.netChartHeight;
+        this.contest.dataSource.dataset[0].data[1].value = this.contest.teams[this.teamsOrder[1]].chartValue * this.netChartHeight;
         //Others (in grey)
-        this.contest.dataSource.dataset[1].data[0].value = netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
-        this.contest.dataSource.dataset[1].data[1].value = netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
+        this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
+        this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
     };
     ContestChartComponent.prototype.setButtonText = function () {
         switch (this.contest.state) {

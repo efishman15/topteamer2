@@ -21,6 +21,8 @@ export class ContestChartComponent {
   client:Client;
   chart:any;
   buttonText:string;
+  netChartHeight:number;
+  teamsOrder:Array<number>;
 
   @Output() contestSelected = new EventEmitter();
   @Output() myTeamSelected = new EventEmitter();
@@ -53,6 +55,7 @@ export class ContestChartComponent {
 
   constructor() {
     this.client = Client.getInstance();
+
   }
 
   onContestSelected(source:string) {
@@ -92,7 +95,19 @@ export class ContestChartComponent {
 
   initChart() {
     if (!this.chart) {
-      this.adjustResolution();
+
+      this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
+      this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.settings.charts.contest.size.teamNameFontSize;
+      this.netChartHeight = 1 - (this.client.settings.charts.contest.size.topMarginPercent / 100);
+
+      if (this.client.currentLanguage.direction === 'ltr') {
+        this.teamsOrder = [0, 1];
+      }
+      else {
+        this.teamsOrder = [1, 0];
+      }
+
+      this.adjustScores();
       window.FusionCharts.ready(() => {
         this.chart = new window.FusionCharts({
           type: this.client.settings.charts.contest.type,
@@ -115,7 +130,7 @@ export class ContestChartComponent {
       //new contest object arrived
       this.contest = contest;
       this.setButtonText();
-      this.adjustResolution();
+      this.adjustScores();
     }
 
     this.chart.setJSONData(this.contest.dataSource);
@@ -125,28 +140,14 @@ export class ContestChartComponent {
     this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
   }
 
-  adjustResolution() {
-    this.contest.dataSource.annotations.groups[0].items[0].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[0].fontSize);
-    this.contest.dataSource.annotations.groups[0].items[1].fontSize = this.client.adjustPixelRatio(this.client.settings.charts.contest.dataSource.annotations.groups[0].items[1].fontSize);
-    var topMarginPercent = this.client.adjustPixelRatio(this.client.settings.charts.contest.size.topMarginPercent, true);
-
-    var netChartHeight = 1 - (topMarginPercent / 100);
-
-    var teamsOrder;
-    if (this.client.currentLanguage.direction === 'ltr') {
-      teamsOrder = [0, 1];
-    }
-    else {
-      teamsOrder = [1, 0];
-    }
-
+  adjustScores() {
     //Scores
-    this.contest.dataSource.dataset[0].data[0].value = this.contest.teams[teamsOrder[0]].chartValue * netChartHeight;
-    this.contest.dataSource.dataset[0].data[1].value = this.contest.teams[teamsOrder[1]].chartValue * netChartHeight;
+    this.contest.dataSource.dataset[0].data[0].value = this.contest.teams[this.teamsOrder[0]].chartValue * this.netChartHeight;
+    this.contest.dataSource.dataset[0].data[1].value = this.contest.teams[this.teamsOrder[1]].chartValue * this.netChartHeight;
 
     //Others (in grey)
-    this.contest.dataSource.dataset[1].data[0].value = netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
-    this.contest.dataSource.dataset[1].data[1].value = netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
+    this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
+    this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
   }
 
   setButtonText() {

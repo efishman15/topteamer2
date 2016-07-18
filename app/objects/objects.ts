@@ -30,11 +30,31 @@ export class Settings {
   newContest:NewContestSettings;
   lists:ListSettings;
   share:ShareSettings;
-  contest: ContestSettings;
+  contest:ContestSettings;
+  flurry:FlurrySettings;
+  branch:BranchSettings;
+}
+
+export class FlurrySettings {
+  key:string;
+}
+
+export class BranchSettings {
+  key:string;
 }
 
 export class ContestSettings {
-  refreshTresholdInMilliseconds: number;
+  refreshTresholdInMilliseconds:number;
+}
+
+export class ContestChartDeviceSettings {
+  devicePixelRatio: number;
+  settings: ContestDeviceConfigurationSettings;
+}
+
+export class ContestDeviceConfigurationSettings {
+  teamNameFontSize: number;
+  topMarginPercent: number;
 }
 
 export class ShareSettings {
@@ -106,6 +126,9 @@ export class GeneralSettings {
 
 export class FacebookSettings {
   friendsPermission:Array<string>;
+  appId:string;
+  version:string;
+  sdk:string;
 }
 
 export class QuizSettings {
@@ -222,20 +245,6 @@ export class ChartSettings {
   dataSource:any;
 }
 
-export class ContestChartSettings extends ChartSettings {
-  size:ChartSizeSettings;
-}
-
-export class QuestionStatsChartSettings extends ChartSettings {
-  size:ChartSizeSettings;
-  colors:QuestionStatsChartSettingsColors;
-}
-
-export class QuestionStatsChartSettingsColors {
-  correct:string;
-  incorrect:string;
-}
-
 export class Size {
   width:number;
   height:number;
@@ -245,7 +254,42 @@ export class ChartSizeSettings extends Size {
   widthRatio:number;
   heightRatio:number;
   heightRatioFromWidth:number;
+}
+
+export class ContestChartSizeSettings extends ChartSizeSettings {
   topMarginPercent:number;
+  teamNameFontSize:number;
+}
+
+export class QuestionStatsChartSizeSettings extends ChartSizeSettings {
+  legendItemFontSize:number;
+  labelFontSize:number;
+}
+
+export class ContestChartSettings extends ChartSettings {
+  size:ContestChartSizeSettings;
+  devices:Array<ContestChartDeviceSettings>;
+}
+
+export class QuestionStatsChartSettings extends ChartSettings {
+  size:QuestionStatsChartSizeSettings;
+  colors:QuestionStatsChartSettingsColors;
+  devices:Array<QuestionStatsChartDeviceSettings>
+}
+
+export class QuestionStatsChartDeviceSettings {
+  devicePixelRatio: number;
+  settings: QuestionStatsChartDeviceConfigurationSettings;
+}
+
+export class QuestionStatsChartDeviceConfigurationSettings {
+  legendItemFontSize: number;
+  labelFontSize: number;
+}
+
+export class QuestionStatsChartSettingsColors {
+  correct:string;
+  incorrect:string;
 }
 
 export class Question {
@@ -441,7 +485,7 @@ export class Contest {
   state:string;
   leadingTeam:number;
   time:ContestTime;
-  lastUpdated: number;
+  lastUpdated:number;
 
   constructor(typeId:string, startDate:number, endDate?:number, endOption?:string) {
     this.startDate = startDate;
@@ -611,9 +655,10 @@ export class ShareVariables {
 }
 
 export class AppPage {
-  page: string;
-  params: any;
-  constructor(page: string, params: any) {
+  page:string;
+  params:any;
+
+  constructor(page:string, params:any) {
     this.page = page;
     this.params = params;
   }

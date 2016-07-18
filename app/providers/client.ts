@@ -117,6 +117,9 @@ export class Client {
           this.setDirection();
 
           this._loaded = true;
+
+          this.adjustChartsDeviceSettings();
+
           Client.instance = this;
 
           resolve();
@@ -164,8 +167,12 @@ export class Client {
     this._user = new User(language, this.clientInfo, geoInfo);
   }
 
-  initXp() {
+  clearXp() {
     this._canvasContext.clearRect(0, 0, this.settings.xpControl.canvas.width, this.settings.xpControl.canvas.height);
+  }
+
+  initXp() {
+    this.clearXp();
 
     //-------------------------------------------------------------------------------------
     // Draw the full circle representing the entire xp required for the next level
@@ -619,8 +626,26 @@ export class Client {
     return this._chartHeight;
   }
 
-  adjustPixelRatio(size:number, up?:boolean) {
-    return size;
+  adjustChartsDeviceSettings() {
+
+    //Contest charts
+    for (var i=0; i<this.settings.charts.contest.devices.length; i++) {
+      if (window.devicePixelRatio <= this.settings.charts.contest.devices[i].devicePixelRatio) {
+        this.settings.charts.contest.size.topMarginPercent = this.settings.charts.contest.devices[i].settings.topMarginPercent;
+        this.settings.charts.contest.size.teamNameFontSize = this.settings.charts.contest.devices[i].settings.teamNameFontSize;
+        break;
+      }
+    }
+
+    //Question Stats charts
+    for (var i=0; i<this.settings.charts.questionStats.devices.length; i++) {
+      if (window.devicePixelRatio <= this.settings.charts.questionStats.devices[i].devicePixelRatio) {
+        this.settings.charts.questionStats.size.legendItemFontSize = this.settings.charts.questionStats.devices[i].settings.legendItemFontSize;
+        this.settings.charts.questionStats.size.labelFontSize = this.settings.charts.questionStats.devices[i].settings.labelFontSize;
+        break;
+      }
+    }
+
   }
 
   showLoader() {
@@ -772,6 +797,7 @@ export class Client {
   logout() {
     this.serverGateway.token = null;
     this._session = null;
+    this.clearXp();
   }
 
   setLoggedUserId(userId:string) {

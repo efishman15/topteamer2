@@ -46,9 +46,7 @@ var SettingsPage = (function () {
         this.client.logEvent('settings/facebookSignOut');
         facebookService.logout().then(function (response) {
             _this.client.logout();
-            _this.client.nav.pop().then(function () {
-                _this.client.setRootPage('LoginPage');
-            });
+            _this.client.setRootPage('LoginPage');
         });
     };
     SettingsPage = __decorate([

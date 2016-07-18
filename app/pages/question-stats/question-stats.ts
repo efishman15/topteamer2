@@ -33,8 +33,8 @@ export class QuestionStatsPage {
       this.height = this.client.height * this.client.settings.charts.questionStats.size.heightRatio;
 
       //Adjust fonts to pixel ratio
-      this.chartDataSource.chart.legendItemFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.legendItemFontSize);
-      this.chartDataSource.chart.labelFontSize = this.client.adjustPixelRatio(this.chartDataSource.chart.labelFontSize);
+      this.chartDataSource.chart.legendItemFontSize = this.client.settings.charts.questionStats.size.legendItemFontSize;
+      this.chartDataSource.chart.labelFontSize = this.client.settings.charts.questionStats.size.labelFontSize;
 
       window.FusionCharts.ready(() => {
         this.chart = new window.FusionCharts({
