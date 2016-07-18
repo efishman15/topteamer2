@@ -21,6 +21,7 @@ var facebookCanvas = require(path.resolve(__dirname, './api/facebookCanvas'));
 var paypalIPN = require(path.resolve(__dirname, './api/paypalPN'));
 var leaderboards = require(path.resolve(__dirname, './business_logic/leaderboards'));
 var systemBusinessLogic = require(path.resolve(__dirname, './business_logic/system'));
+var downloadUtils = require(path.resolve(__dirname, './utils/download'));
 
 var domain = require('domain');
 
@@ -47,6 +48,7 @@ app.use(function runInsideDomain(req, res, next) {
   });
 
   reqDomain.on('error', function (err) {
+    logger.server.fatal(err, 'app unhandled server exception');
     reqDomain.dispose();
     next(err);
   });
@@ -127,6 +129,7 @@ dalDb.loadSettings(null, function (err, data) {
   app.get('/facebook/ipn', facebookCanvas.getChallenge);
   app.post('/facebook/ipn', facebookCanvas.ipn);
   app.post('/paypal/ipn', paypalIPN.ipn);
+  app.get('/download/:platform/:version', downloadUtils.download);
 
   //----------------------------------------------------
   // Start server listener

@@ -80,8 +80,4 @@
         <variable name="APP_ID" value="344342552056" />
         <variable name="APP_NAME" value="topTeamer" />
     </plugin>
-    <preference name="xwalkVersion" value="19+" />
-    <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
-    <preference name="xwalkMode" value="embedded" />
-    <preference name="xwalkMultipleApk" value="true" />
 </widget>

@@ -2,7 +2,6 @@ var path = require('path');
 var mathjs = require('mathjs');
 var httpUtils = require(path.resolve(__dirname, './http'));
 var util = require('util');
-var logger = require(path.resolve(__dirname, './logger'));
 var async = require('async');
 var get_ip = require('ipware')().get_ip;
 
