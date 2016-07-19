@@ -42,7 +42,7 @@ var ContestListComponent = (function () {
     };
     ContestListComponent.prototype.showContest = function (data, tryRun) {
         var _this = this;
-        data.source = data.tab + '/' + data.source;
+        data.source = this.tab + '/' + data.source;
         this.client.showContest(data.contest, data.source, tryRun).then(function (contest) {
             if (contest) {
                 //A new copy from the server
@@ -61,6 +61,9 @@ var ContestListComponent = (function () {
                 this.showContest(data, true);
                 break;
         }
+    };
+    ContestListComponent.prototype.onJoinedContest = function (data) {
+        this.updateContest(data.contest);
     };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {

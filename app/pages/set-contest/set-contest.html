@@ -21,7 +21,7 @@
       {{client.translate('UNLOCK_FEATURE_MOBILE', {cost : client.session.features.newContest.purchaseData.cost, currency
       : client.session.features.newContest.purchaseData.currencySymbol}) }}
     </button>
-  </div>
+  </div>cd\
 
   <form [ngFormModel]="contestForm" name="contestForm" novalidate="novalidate">
 
@@ -35,7 +35,7 @@
                        [(ngModel)]="contestLocalCopy.teams[0].name"
                        placeholder="{{client.translate('TEAM0')}}"
                        maxlength="15"
-                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-10px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
+                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-8px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
                        [disabled]="client.session.features.newContest.locked" autofocus>
             </ion-input>
           </ion-item>
@@ -51,7 +51,7 @@
                        [(ngModel)]="contestLocalCopy.teams[1].name"
                        placeholder="{{client.translate('TEAM1')}}"
                        maxlength="15"
-                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-10px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
+                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-8px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
                        [disabled]="client.session.features.newContest.locked">
             </ion-input>
           </ion-item>

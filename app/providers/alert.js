@@ -4,7 +4,7 @@ var ionic_angular_1 = require('ionic-angular');
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-exports.alert = function (message) {
+exports.alert = function (message, buttons) {
     return new Promise(function (resolve, reject) {
         var client = client_1.Client.getInstance();
         var alert;
@@ -20,15 +20,18 @@ exports.alert = function (message) {
         else {
             messageText = message;
         }
-        alert = ionic_angular_1.Alert.create({
-            message: messageText,
-            buttons: [
+        if (!buttons) {
+            buttons = [
                 {
                     text: client.translate('OK'),
                     role: 'cancel',
                     handler: resolve
                 }
-            ]
+            ];
+        }
+        alert = ionic_angular_1.Alert.create({
+            message: messageText,
+            buttons: buttons
         });
         if (title) {
             alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');

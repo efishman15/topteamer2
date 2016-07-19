@@ -19,6 +19,7 @@ var ContestChartComponent = (function () {
         this.contestSelected = new core_1.EventEmitter();
         this.myTeamSelected = new core_1.EventEmitter();
         this.contestButtonClick = new core_1.EventEmitter();
+        this.joinedContest = new core_1.EventEmitter();
         this.events = {
             'dataplotClick': function (eventObj, dataObj) {
                 var teamId = dataObj.dataIndex;
@@ -80,7 +81,9 @@ var ContestChartComponent = (function () {
             }
         }
         else if (this.contest.state !== 'finished') {
-            this.joinContest(teamId, source);
+            this.joinContest(teamId, source, false, true, false).then(function () {
+            }, function () {
+            });
         }
     };
     ContestChartComponent.prototype.ngOnInit = function () {
@@ -130,47 +133,114 @@ var ContestChartComponent = (function () {
         this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
         this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
     };
-    ContestChartComponent.prototype.joinContest = function (team, source, action) {
+    ContestChartComponent.prototype.joinContest = function (team, source, switchTeams, showAlert, delayRankModal) {
         var _this = this;
-        if (action === void 0) { action = 'join'; }
-        contestsService.join(this.contest._id, team).then(function (data) {
-            _this.refresh(data.contest);
-            _this.client.logEvent('contest/' + action, {
-                'contestId': _this.contest._id,
-                'team': '' + _this.contest.myTeam,
-                'sourceClick': source
-            });
-            //Should get xp if fresh join
-            var rankModal;
-            if (data.xpProgress && data.xpProgress.addition > 0) {
-                _this.client.addXp(data.xpProgress).then(function () {
+        return new Promise(function (resolve, reject) {
+            contestsService.join(_this.contest._id, team).then(function (data) {
+                _this.refresh(data.contest);
+                _this.joinedContest.emit({ 'contest': data.contest });
+                _this.client.logEvent('contest/' + (!switchTeams ? 'join' : 'switchTeams'), {
+                    'contestId': _this.contest._id,
+                    'team': '' + _this.contest.myTeam,
+                    'sourceClick': source
+                });
+                //Should get xp if fresh join
+                var rankModal;
+                if (data.xpProgress && data.xpProgress.addition > 0) {
+                    //Adds the xp with animation
                     if (data.xpProgress.rankChanged) {
                         rankModal = _this.client.createModalPage('NewRankPage', {
                             'xpProgress': data.xpProgress
                         });
+                        if (!delayRankModal) {
+                            rankModal.onDismiss(function () {
+                                resolve();
+                            });
+                        }
+                        else {
+                            resolve(rankModal);
+                        }
+                        _this.client.addXp(data.xpProgress).then(function () {
+                        }, function () {
+                            reject();
+                        });
                     }
-                });
-            }
-            alertService.alert({
-                'type': 'SELECT_TEAM_ALERT',
-                'additionalInfo': { 'team': _this.contest.teams[_this.contest.myTeam].name }
-            }).then(function () {
-                if (rankModal) {
-                    _this.client.nav.present(rankModal);
                 }
+                if (showAlert) {
+                    alertService.alert({
+                        'type': 'SELECT_TEAM_ALERT',
+                        'additionalInfo': { 'team': _this.contest.teams[_this.contest.myTeam].name }
+                    }).then(function () {
+                        if (rankModal && !delayRankModal) {
+                            _this.client.nav.present(rankModal);
+                        }
+                        else {
+                            resolve(rankModal);
+                        }
+                    });
+                }
+                else {
+                    if (rankModal && !delayRankModal) {
+                        //resolve will be called upon dismiss
+                        _this.client.nav.present(rankModal);
+                    }
+                    else {
+                        resolve(rankModal);
+                    }
+                }
+            }, function () {
+                reject();
             });
-        }, function () {
         });
     };
     ContestChartComponent.prototype.switchTeams = function (source) {
-        this.joinContest(1 - this.contest.myTeam, source, 'switchTeams');
+        this.joinContest(1 - this.contest.myTeam, source, true, true, false).then(function () {
+        }, function () {
+        });
     };
     ContestChartComponent.prototype.onContestButtonClick = function () {
+        var _this = this;
         if (this.contest.state === 'join') {
-            alertService.alert({ 'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST' });
+            //Will prompt an alert with 2 buttons with the team names
+            //Upon selecting a team - send the user directly to play
+            var cssClass;
+            if (this.contest.teams[0].name.length + this.contest.teams[1].name.length > this.client.settings.contest.maxTeamsLengthForLargeFonts) {
+                cssClass = 'chart-popup-button-team-small';
+            }
+            else {
+                cssClass = 'chart-popup-button-team-normal';
+            }
+            alertService.alert({ 'type': 'PLAY_CONTEST_CHOOSE_TEAM' }, [
+                {
+                    'text': this.contest.teams[0].name,
+                    'cssClass': cssClass + '-' + this.teamsOrder[0],
+                    'handler': function () {
+                        _this.joinContest(0, 'button', false, false, true).then(function (rankModal) {
+                            _this.contestButtonClick.emit({ 'contest': _this.contest, 'source': 'button' });
+                            if (rankModal) {
+                                _this.client.nav.present(rankModal);
+                            }
+                        }, function () {
+                        });
+                    }
+                },
+                {
+                    'text': this.contest.teams[1].name,
+                    'cssClass': cssClass + '-' + this.teamsOrder[1],
+                    'handler': function () {
+                        _this.joinContest(1, 'button', false, false, true).then(function (rankModal) {
+                            _this.contestButtonClick.emit({ 'contest': _this.contest, 'source': 'button' });
+                            if (rankModal) {
+                                _this.client.nav.present(rankModal);
+                            }
+                        }, function () {
+                        });
+                    }
+                },
+            ]);
         }
         else {
-            this.contestButtonClick.emit({ 'contest': this.contest });
+            this.contestButtonClick.emit({ 'contest': this.contest, 'source': 'button' });
         }
     };
     __decorate([
@@ -197,6 +267,10 @@ var ContestChartComponent = (function () {
         core_1.Output(), 
         __metadata('design:type', Object)
     ], ContestChartComponent.prototype, "contestButtonClick", void 0);
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], ContestChartComponent.prototype, "joinedContest", void 0);
     ContestChartComponent = __decorate([
         core_1.Component({
             selector: 'contest-chart',

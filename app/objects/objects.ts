@@ -45,6 +45,7 @@ export class BranchSettings {
 
 export class ContestSettings {
   refreshTresholdInMilliseconds:number;
+  maxTeamsLengthForLargeFonts:number;
 }
 
 export class ContestChartDeviceSettings {

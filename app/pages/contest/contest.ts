@@ -105,8 +105,12 @@ export class ContestPage {
     this.playContest('contest/myTeam');
   }
 
-  onContestButtonClick() {
+  onContestButtonClick(data) {
     this.playOrLeaderboard('contest/button');
+  }
+
+  onJoinedContest(data:any) {
+    this.contest = data.contest;
   }
 
   playOrLeaderboard(source: string) {

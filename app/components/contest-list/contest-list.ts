@@ -53,7 +53,7 @@ export class ContestListComponent {
   }
 
   showContest(data:any, tryRun:boolean) {
-    data.source = data.tab + '/' + data.source;
+    data.source = this.tab + '/' + data.source;
     this.client.showContest(data.contest, data.source, tryRun).then((contest:Contest) => {
       if (contest) {
         //A new copy from the server
@@ -73,6 +73,10 @@ export class ContestListComponent {
         this.showContest(data, true);
         break;
     }
+  }
+
+  onJoinedContest(data:any) {
+    this.updateContest(data.contest);
   }
 
   onResize() {

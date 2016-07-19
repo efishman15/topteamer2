@@ -4,7 +4,7 @@ import {Alert, ActionSheet} from 'ionic-angular';
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-export let alert = (message) => {
+export let alert = (message: any, buttons?: any) => {
 
   return new Promise((resolve, reject) => {
 
@@ -27,15 +27,19 @@ export let alert = (message) => {
       messageText = message;
     }
 
-    alert = Alert.create({
-      message: messageText,
-      buttons: [
+    if (!buttons) {
+      buttons = [
         {
           text: client.translate('OK'),
           role: 'cancel',
           handler: resolve
         }
-      ]
+      ];
+    }
+
+    alert = Alert.create({
+      message: messageText,
+      buttons: buttons
     });
 
     if (title) {
