@@ -2019,9 +2019,6 @@ var ContestPage = (function () {
             }
             else {
                 _this.animateLastResults = true;
-                setTimeout(function () {
-                    _this.animateLastResults = false;
-                }, _this.client.settings.quiz.finish.animateResultsTimeout);
             }
             var soundFile = _this.lastQuizResults.data.sound;
             setTimeout(function () {

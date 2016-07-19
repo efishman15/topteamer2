@@ -43,9 +43,9 @@ export class ContestPage {
       }
       else {
         this.animateLastResults = true;
-        setTimeout(() => {
-          this.animateLastResults = false;
-        }, this.client.settings.quiz.finish.animateResultsTimeout);
+        //setTimeout(() => {
+        //  this.animateLastResults = false;
+        //}, this.client.settings.quiz.finish.animateResultsTimeout);
       }
 
       var soundFile = this.lastQuizResults.data.sound;

@@ -676,6 +676,9 @@ module.exports.answer = function (req, res, next) {
               callback(null, data);
             });
           }
+          else {
+            callback(null, data);
+          }
         }
         else {
           callback(null, data);
