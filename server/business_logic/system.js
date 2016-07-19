@@ -80,3 +80,26 @@ module.exports.restart = function (req, res, next) {
         }, 3000);
     });
 };
+
+//--------------------------------------------------------------------------
+// showLog
+//
+// data: <NA>
+//--------------------------------------------------------------------------
+module.exports.showLog = function (req, res, next) {
+  var data = {token: req.params.token};
+  data.closeConnection = true;
+
+  sessionUtils.getAdminSession(data, function(err, data) {
+
+    if (err) {
+      res.send(err.httpStatus, err);
+      return;
+    }
+
+    var logFile = path.resolve(__dirname,'../logs/server.log');
+
+    res.download(logFile, 'server.log');
+
+  });
+};

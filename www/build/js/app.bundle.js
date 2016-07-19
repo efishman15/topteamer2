@@ -354,12 +354,7 @@ var ContestChartComponent = (function () {
         this.client = client_1.Client.getInstance();
     }
     ContestChartComponent.prototype.onContestSelected = function (source) {
-        if (this.contest.state === 'join') {
-            alertService.alert({ 'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST' });
-        }
-        else {
-            this.contestSelected.emit({ 'contest': this.contest, 'source': source });
-        }
+        this.contestSelected.emit({ 'contest': this.contest, 'source': source });
     };
     ContestChartComponent.prototype.teamSelected = function (teamId, source) {
         if (this.contest.state === 'play') {
@@ -2019,6 +2014,9 @@ var ContestPage = (function () {
             }
             else {
                 _this.animateLastResults = true;
+                setTimeout(function () {
+                    _this.animateLastResults = false;
+                }, _this.client.settings.quiz.finish.animateResultsTimeout);
             }
             var soundFile = _this.lastQuizResults.data.sound;
             setTimeout(function () {
@@ -4358,6 +4356,9 @@ var SystemToolsPage = (function () {
         }, function () {
             //Do nothing on cancel
         });
+    };
+    SystemToolsPage.prototype.showLog = function () {
+        window.open(this.client.endPoint + 'system/log/' + this.client.session['token']);
     };
     SystemToolsPage = __decorate([
         core_1.Component({

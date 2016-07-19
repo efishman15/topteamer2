@@ -24,7 +24,6 @@ export class SystemToolsPage {
       this.client.settings = settings;
       this.client.nav.pop();
     },() => {
-
     });
   }
 
@@ -36,10 +35,14 @@ export class SystemToolsPage {
           this.client.nav.pop();
         },500)
       },() => {
-
       });
     }, () => {
       //Do nothing on cancel
     });
   }
+
+  showLog() {
+    window.open(this.client.endPoint + 'system/log/' + this.client.session['token']);
+  }
+
 }

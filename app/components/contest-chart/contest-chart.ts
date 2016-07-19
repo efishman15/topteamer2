@@ -71,12 +71,7 @@ export class ContestChartComponent {
   }
 
   onContestSelected(source:string) {
-    if (this.contest.state === 'join') {
-      alertService.alert({'type': 'SERVER_ERROR_NOT_JOINED_TO_CONTEST'});
-    }
-    else {
-      this.contestSelected.emit({'contest': this.contest, 'source': source});
-    }
+    this.contestSelected.emit({'contest': this.contest, 'source': source});
   }
 
   teamSelected(teamId:number, source:string) {

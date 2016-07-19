@@ -40,6 +40,9 @@ var SystemToolsPage = (function () {
             //Do nothing on cancel
         });
     };
+    SystemToolsPage.prototype.showLog = function () {
+        window.open(this.client.endPoint + 'system/log/' + this.client.session['token']);
+    };
     SystemToolsPage = __decorate([
         core_1.Component({
             templateUrl: 'build/pages/system-tools/system-tools.html'

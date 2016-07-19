@@ -133,6 +133,9 @@ dalDb.loadSettings(null, function (err, data) {
   app.get('/download/:platform', downloadUtils.download);
   app.get('/download/:platform/:version', downloadUtils.download);
 
+  //Does require a token but in the get url as parameter
+  app.get('/system/log/:token', systemBusinessLogic.showLog);
+
   //----------------------------------------------------
   // Start server listener
   //----------------------------------------------------

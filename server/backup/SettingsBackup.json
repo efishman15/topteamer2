@@ -1254,7 +1254,8 @@
         "SELECT_TEAM_ALERT_TITLE" : "{{team}} team",
         "SELECT_TEAM_ALERT_MESSAGE" : "You chose to play for {{team}} team",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "Who will you play for?",
-        "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*Tip: next time you can select a team by tapping on its name or column on the chart<BR/><BR/><STRONG>Who will you play for?</STRONG>"
+        "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*Tip: next time you can select a team by tapping on its name or column on the chart<BR/><BR/><STRONG>Who will you play for?</STRONG>",
+        "SYSTEM_SHOW_LOG" : "Show server log"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1380,7 +1381,7 @@
         "STORY_BECAME_CONTEST_LEADER_TITLE" : "כל הכבוד, הגעתם למקום הראשון!",
         "STORY_BECAME_CONTEST_LEADER_MESSAGE" : "עברתם להוביל את התחרות",
         "STORY_BECAME_TEAM_LEADER_TITLE" : "מקום ראשון בקבוצתכם",
-        "STORY_BECAME_TEAM_LEADER_MESSAGE" : "כל הכבוד, תרמתם הכי הרבה נקודות לקבוצת {{team}} ועליתם למקום הראשון בקבוצה",
+        "STORY_BECAME_TEAM_LEADER_MESSAGE" : "כל הכבוד, תרמתם הכי הרבה נקודות לקבוצת {{team}} ואתם מובילים את הקבוצה",
         "STORY_PASSED_FRIENDS_IN_LEADERBOARD_TITLE" : "עברת חברים",
         "STORY_PASSED_FRIENDS_IN_LEADERBOARD_MESSAGE" : "כל הכבוד, עברת את {{friend}} בהיכל התהילה",
         "STORY_PERFECT_SCORE_TITLE" : "כל הכבוד, תוצאה מושלמת!",
@@ -1468,7 +1469,8 @@
         "SELECT_TEAM_ALERT_TITLE" : "קבוצת {{team}}",
         "SELECT_TEAM_ALERT_MESSAGE" : "בחרתם לשחק עבור קבוצת {{team}}",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "עבור מי תשחקו?",
-        "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*טיפ: בפעם הבאה תוכלו לבחור קבוצה על ידי לחיצה על שמה או על הטור שלה בגרף.<BR/><BR/><STRONG>עבור מי תרצו לשחק?</STRONG>"
+        "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*טיפ: בפעם הבאה תוכלו לבחור קבוצה על ידי לחיצה על שמה או על הטור שלה בגרף.<BR/><BR/><STRONG>עבור מי תרצו לשחק?</STRONG>",
+        "SYSTEM_SHOW_LOG" : "הצג לוג שרת"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1688,7 +1690,8 @@
         "SELECT_TEAM_ALERT_TITLE" : "Equipo de {{team}}",
         "SELECT_TEAM_ALERT_MESSAGE" : "Que elgió para jugar para el equipo de {{team}}",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "¿Quién va a jugar ?",
-        "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "* Consejo: la próxima vez que se seleccione un equipo pulsando sobre su nombre o columna en la tabla<BR/><BR/><STRONG>¿Para qué equipo juegas ?</STRONG>"
+        "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "* Consejo: la próxima vez que se seleccione un equipo pulsando sobre su nombre o columna en la tabla<BR/><BR/><STRONG>¿Para qué equipo juegas ?</STRONG>",
+        "SYSTEM_SHOW_LOG" : "Mostrar registro del servidor"
       }
     },
     "platforms" : {
