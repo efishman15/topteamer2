@@ -61,7 +61,7 @@ if (-Not (Test-Path "$plugins\cordova-plugin-crosswalk-webview")) {
 
 # build android app with crosswalk
 LogMessage "Starting ionic build for crosswalk..."
-Invoke-Command -ScriptBlock {ionic build --$target android}
+Invoke-Command -ScriptBlock {ionic build android --$target}
 
 # check if apk created
 if (-Not (Test-Path "$androidPlatformBuild\android-armv7-$target.apk")) {
@@ -79,7 +79,7 @@ cordova plugin remove cordova-plugin-crosswalk-webview
 
 # build android app without crosswalk
 LogMessage "Starting standard ionic build (without crosswalk)..."
-Invoke-Command -ScriptBlock {ionic build --$target android -- --minSdkVersion=21}
+Invoke-Command -ScriptBlock {ionic build android --$target -- --minSdkVersion=21}
 
 # check if apk created
 if (-Not (Test-Path "$androidPlatformBuild\android-$target.apk")) {

@@ -655,23 +655,27 @@ module.exports.answer = function (req, res, next) {
           }
         );
 
-        if (replaced && data.session.clientInfo.mobile) {
-          //Adding extra info for the client - for mobile post: name, first name, last name
+        if (replaced) {
+          //Friends image to be displayed on the client
           data.session.quiz.serverData.share.story.facebookPost.dialogImage.url = util.format(data.session.quiz.serverData.share.story.facebookPost.dialogImage.url, data.passedFriends[0].id, data.session.quiz.serverData.share.story.facebookPost.dialogImage.width, data.session.quiz.serverData.share.story.facebookPost.dialogImage.height);
-          //Complete facebook user details
-          dalFacebook.getGeneralProfile(data.passedFriends[0].id, function (err, facebookData) {
-            if (err) {
-              dalDb.closeDb(data);
-              callback(new exceptions.ServerMessageException('SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ', null, 403));
-              return;
-            }
 
-            data.session.quiz.serverData.share.story.facebookPost.object['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[data.contest.language].profileTitle.format({'name': facebookData.name});
-            data.session.quiz.serverData.share.story.facebookPost.object['og:first_name'] = facebookData.first_name;
-            data.session.quiz.serverData.share.story.facebookPost.object['og:last_name'] = facebookData.last_name;
+          //Adding extra info for the client - for mobile post: name, first name, last name
+          if (data.session.clientInfo.mobile) {
+            //Complete facebook user details
+            dalFacebook.getGeneralProfile(data.passedFriends[0].id, function (err, facebookData) {
+              if (err) {
+                dalDb.closeDb(data);
+                callback(new exceptions.ServerMessageException('SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ', null, 403));
+                return;
+              }
 
-            callback(null, data);
-          });
+              data.session.quiz.serverData.share.story.facebookPost.object['og:title'] = generalUtils.settings.server.facebook.openGraphStories.text[data.contest.language].profileTitle.format({'name': facebookData.name});
+              data.session.quiz.serverData.share.story.facebookPost.object['og:first_name'] = facebookData.first_name;
+              data.session.quiz.serverData.share.story.facebookPost.object['og:last_name'] = facebookData.last_name;
+
+              callback(null, data);
+            });
+          }
         }
         else {
           callback(null, data);
