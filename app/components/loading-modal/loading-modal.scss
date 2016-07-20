@@ -27,6 +27,14 @@ loading-modal .container {
   ion-spinner {
     width: 60px;
     height: 60px;
-  }
+    * {
+      stroke: #828282;
+    }
 
+    &.spinner-circles circle,
+    &.spinner-bubbles circle,
+    &.spinner-dots circle {
+      fill: #828282;
+    }
+  }
 }

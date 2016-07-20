@@ -11542,6 +11542,12 @@ loading-modal .container {
   loading-modal .container ion-spinner {
     width: 60px;
     height: 60px; }
+    loading-modal .container ion-spinner * {
+      stroke: #828282; }
+    loading-modal .container ion-spinner.spinner-circles circle,
+    loading-modal .container ion-spinner.spinner-bubbles circle,
+    loading-modal .container ion-spinner.spinner-dots circle {
+      fill: #828282; }
 
 .simple-tabs-wrapper {
   margin: 0px auto;
