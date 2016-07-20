@@ -69,8 +69,6 @@ var TopTeamerApp = (function () {
                 //Go back
                 return activeNav.pop();
             });
-            _this.client.hideLoader();
-            console.log('platform ready');
         });
     };
     ;

@@ -91,9 +91,6 @@ export class TopTeamerApp {
 
       });
 
-      this.client.hideLoader();
-      console.log('platform ready');
-
     });
   };
 

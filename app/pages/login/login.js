@@ -18,6 +18,9 @@ var LoginPage = (function () {
             _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
         });
     }
+    LoginPage.prototype.ngOnInit = function () {
+        this.client.hidePreloader();
+    };
     LoginPage.prototype.ionViewLoaded = function () {
         this.client.setPageTitle('GAME_NAME');
     };

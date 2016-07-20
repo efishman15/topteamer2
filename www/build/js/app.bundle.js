@@ -71,8 +71,6 @@ var TopTeamerApp = (function () {
                 //Go back
                 return activeNav.pop();
             });
-            _this.client.hideLoader();
-            console.log('platform ready');
         });
     };
     ;
@@ -2299,6 +2297,9 @@ var LoginPage = (function () {
             _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
         });
     }
+    LoginPage.prototype.ngOnInit = function () {
+        this.client.hidePreloader();
+    };
     LoginPage.prototype.ionViewLoaded = function () {
         this.client.setPageTitle('GAME_NAME');
     };
@@ -2396,6 +2397,7 @@ var MainTabsPage = (function () {
             this.client.initPlayerInfo();
             this.client.initXp();
             this.playerInfoInitiated = true;
+            this.client.hidePreloader();
         }
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
@@ -4545,6 +4547,7 @@ var Client = (function () {
         this.circle = Math.PI * 2;
         this.quarter = Math.PI / 2;
         this._loaded = false;
+        this.appPreloading = true;
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
         }
@@ -4978,6 +4981,10 @@ var Client = (function () {
         });
         this.nav.insertPages(index, navPages);
     };
+    Client.prototype.hidePreloader = function () {
+        this.appPreloading = false;
+        document.body.className = 'app-loaded';
+    };
     Client.prototype.resizeWeb = function () {
         //Resize app for web
         var containerWidth = window.innerWidth;
@@ -5058,7 +5065,7 @@ var Client = (function () {
     };
     Client.prototype.showLoader = function () {
         var _this = this;
-        if (this.loadingModalComponent) {
+        if (this.loadingModalComponent && !this.appPreloading) {
             setTimeout(function () {
                 _this.loadingModalComponent.show();
             }, 100);
@@ -5066,7 +5073,7 @@ var Client = (function () {
     };
     Client.prototype.hideLoader = function () {
         var _this = this;
-        if (this.loadingModalComponent) {
+        if (this.loadingModalComponent && !this.appPreloading) {
             setTimeout(function () {
                 _this.loadingModalComponent.hide();
             }, 100);

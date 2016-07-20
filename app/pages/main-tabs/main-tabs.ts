@@ -73,6 +73,7 @@ export class MainTabsPage {
       this.client.initPlayerInfo();
       this.client.initXp();
       this.playerInfoInitiated = true;
+      this.client.hidePreloader();
     }
 
     //Events here could be serverPopup just as the app loads - the page should be fully visible

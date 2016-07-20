@@ -23,6 +23,7 @@ var Client = (function () {
         this.circle = Math.PI * 2;
         this.quarter = Math.PI / 2;
         this._loaded = false;
+        this.appPreloading = true;
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
         }
@@ -456,6 +457,10 @@ var Client = (function () {
         });
         this.nav.insertPages(index, navPages);
     };
+    Client.prototype.hidePreloader = function () {
+        this.appPreloading = false;
+        document.body.className = 'app-loaded';
+    };
     Client.prototype.resizeWeb = function () {
         //Resize app for web
         var containerWidth = window.innerWidth;
@@ -536,7 +541,7 @@ var Client = (function () {
     };
     Client.prototype.showLoader = function () {
         var _this = this;
-        if (this.loadingModalComponent) {
+        if (this.loadingModalComponent && !this.appPreloading) {
             setTimeout(function () {
                 _this.loadingModalComponent.show();
             }, 100);
@@ -544,7 +549,7 @@ var Client = (function () {
     };
     Client.prototype.hideLoader = function () {
         var _this = this;
-        if (this.loadingModalComponent) {
+        if (this.loadingModalComponent && !this.appPreloading) {
             setTimeout(function () {
                 _this.loadingModalComponent.hide();
             }, 100);

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="css/app.preloader.css">
   <title>Top Teamer - Contests</title>
-  <!--<meta http-equiv="Content-Security-Policy" content="script-src 'self' https://maps.gstatic.com/ https://*.googleapis.com/ http://localhost:* 'unsafe-inline' 'unsafe-eval'">-->
+  <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="script-src * 'unsafe-inline' 'unsafe-eval'">
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
@@ -29,18 +29,24 @@
   </script>
 
 </head>
-<body>
+<body class="app-body-background">
 
- <!-- <ion-app> is where the app's HTML loads -->
-  <ion-app id="myApp"></ion-app>
+<div class="app-loader-wrapper">
+  <div class="app-loader"></div>
+  <div class="loader-section section-left"></div>
+  <div class="loader-section section-right"></div>
+</div>
 
-  <!-- cordova.js required for cordova apps -->
-  <script src="cordova.js"></script>
+<!-- <ion-app> is where the app's HTML loads -->
+<ion-app id="myApp"></ion-app>
 
-  <!-- the bundle which is built from the app's source code -->
- <script src="build/js/zone.js"></script>
- <script src="build/js/Reflect.js"></script>
- <script src="build/js/app.bundle.js"></script>
+<!-- cordova.js required for cordova apps -->
+<script src="cordova.js"></script>
+
+<!-- the bundle which is built from the app's source code -->
+<script src="build/js/zone.js"></script>
+<script src="build/js/Reflect.js"></script>
+<script src="build/js/app.bundle.js"></script>
 
 </body>
 </html>

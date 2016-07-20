@@ -41,7 +41,7 @@ export class Client {
   _chartHeight:number;
   _deepLinkContestId:string;
   _shareApps: Array<ClientShareApp>;
-
+  appPreloading:boolean = true;
   serverGateway:ServerGateway;
 
   constructor(http:Http) {
@@ -574,6 +574,11 @@ export class Client {
     this.nav.insertPages(index, navPages);
   }
 
+  hidePreloader() {
+    this.appPreloading = false;
+    document.body.className = 'app-loaded';
+  }
+
   resizeWeb() {
     //Resize app for web
     var containerWidth = window.innerWidth;
@@ -649,7 +654,7 @@ export class Client {
   }
 
   showLoader() {
-    if (this.loadingModalComponent) {
+    if (this.loadingModalComponent && !this.appPreloading) {
       setTimeout(() => {
         this.loadingModalComponent.show();
       }, 100);
@@ -657,7 +662,7 @@ export class Client {
   }
 
   hideLoader() {
-    if (this.loadingModalComponent) {
+    if (this.loadingModalComponent && !this.appPreloading) {
       setTimeout(() => {
         this.loadingModalComponent.hide();
       }, 100);

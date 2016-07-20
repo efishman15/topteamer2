@@ -18,6 +18,10 @@ export class LoginPage {
 
   }
 
+  ngOnInit() {
+    this.client.hidePreloader();
+  }
+
   ionViewLoaded() {
     this.client.setPageTitle('GAME_NAME');
   }
