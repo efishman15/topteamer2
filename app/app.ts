@@ -195,7 +195,13 @@ export class TopTeamerApp {
 
         if (data.data_parsed && data.data_parsed.contestId) {
           //Will go to this contest
-          this.client.deepLinkContestId = data.data_parsed.contestId;
+          if (this.client.session && this.client.nav && this.client.nav.length() > 0) {
+            this.client.displayContestById(data.data_parsed.contestId);
+          }
+          else {
+            //Will be displayed on the first posibility
+            this.client.deepLinkContestId = data.data_parsed.contestId;
+          }
         }
       }
       catch (e) {

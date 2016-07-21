@@ -152,7 +152,13 @@ var TopTeamerApp = (function () {
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
                     //Will go to this contest
-                    _this.client.deepLinkContestId = data.data_parsed.contestId;
+                    if (_this.client.session && _this.client.nav && _this.client.nav.length() > 0) {
+                        _this.client.displayContestById(data.data_parsed.contestId);
+                    }
+                    else {
+                        //Will be displayed on the first posibility
+                        _this.client.deepLinkContestId = data.data_parsed.contestId;
+                    }
                 }
             }
             catch (e) {
