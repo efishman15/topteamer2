@@ -62,9 +62,6 @@ var ContestListComponent = (function () {
                 break;
         }
     };
-    ContestListComponent.prototype.onJoinedContest = function (data) {
-        this.updateContest(data.contest);
-    };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {
             this.contestChartComponents.forEach(function (contestChartComponent) {

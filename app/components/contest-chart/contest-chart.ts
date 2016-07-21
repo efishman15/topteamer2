@@ -29,6 +29,7 @@ export class ContestChartComponent {
   @Output() contestButtonClick = new EventEmitter();
   @Output() joinedContest = new EventEmitter();
 
+
   events:Object = {
     'dataplotClick': (eventObj, dataObj) => {
       var teamId = dataObj.dataIndex;
@@ -170,6 +171,9 @@ export class ContestChartComponent {
           'team': '' + this.contest.myTeam,
           'sourceClick': source
         });
+
+        //Notify outside that contest changed
+        this.client.events.publish('topTeamer:contestUpdated', data.contest, data.contest.status, data.contest.status);
 
         //Should get xp if fresh join
         var rankModal;

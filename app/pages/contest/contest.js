@@ -83,9 +83,6 @@ var ContestPage = (function () {
     ContestPage.prototype.onContestButtonClick = function (data) {
         this.playOrLeaderboard('contest/button');
     };
-    ContestPage.prototype.onJoinedContest = function (data) {
-        this.contest = data.contest;
-    };
     ContestPage.prototype.playOrLeaderboard = function (source) {
         if (this.contest.state === 'play') {
             this.playContest(source);

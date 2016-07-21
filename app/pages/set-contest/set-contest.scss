@@ -30,7 +30,12 @@
 .set-contest-question-buttons {
   background-color: #61c2ec;
   color: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+.set-contest-add-question-button {
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .set-contest-question-button-add-ltr {
@@ -61,7 +66,7 @@
 }
 
 .set-contest-against {
-  font-size: 15px;
+  font-size: 12px;
   color: #ffffff;
   font-weight: bold;
 }
@@ -119,4 +124,9 @@
 
 .set-contest-other-team-item-rtl {
   margin-right: 5px;
+}
+
+.set-contest-subject-wrapper {
+  padding-left: 20px;
+  padding-right: 20px;
 }

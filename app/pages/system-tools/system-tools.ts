@@ -42,7 +42,7 @@ export class SystemToolsPage {
   }
 
   showLog() {
-    window.open(this.client.endPoint + 'system/log/' + this.client.session['token']);
+    window.open(this.client.endPoint + 'system/log/' + this.client.session['token'],'_system', 'location=yes');
   }
 
 }

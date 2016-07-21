@@ -14,10 +14,12 @@ var exceptions_1 = require('./providers/exceptions');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('./providers/client');
 var facebookService = require('./providers/facebook');
+var contestsService = require('./providers/contests');
 var shareService = require('./providers/share');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
 var alertService = require('./providers/alert');
 var ionic_native_1 = require('ionic-native');
+var objects_1 = require('./objects/objects');
 var TopTeamerApp = (function () {
     function TopTeamerApp(app, platform, config, client, events) {
         this.app = app;
@@ -152,14 +154,7 @@ var TopTeamerApp = (function () {
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
                     //Will go to this contest
-                    if (_this.client.session) {
-                        _this.client.displayContestById(data.data_parsed.contestId).then(function () {
-                        }, function () {
-                        });
-                    }
-                    else {
-                        _this.client.deepLinkContestId = data.data_parsed.contestId;
-                    }
+                    _this.client.deepLinkContestId = data.data_parsed.contestId;
                 }
             }
             catch (e) {
@@ -191,7 +186,18 @@ var TopTeamerApp = (function () {
         facebookService.getLoginStatus().then(function (result) {
             if (result['connected']) {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
-                    _this.client.setRootPage('MainTabsPage');
+                    var appPages = new Array();
+                    appPages.push(new objects_1.AppPage('MainTabsPage', {}));
+                    if (_this.client.deepLinkContestId) {
+                        contestsService.getContest(_this.client.deepLinkContestId).then(function (contest) {
+                            _this.client.deepLinkContestId = null;
+                            appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest, 'source': 'deepLink' }));
+                            _this.client.insertPages(appPages);
+                        });
+                    }
+                    else {
+                        _this.client.insertPages(appPages);
+                    }
                 }, function (err) {
                     _this.client.openPage('LoginPage');
                 });
@@ -290,7 +296,7 @@ exports.TopTeamerApp = TopTeamerApp;
 ionic_angular_1.ionicBootstrap(TopTeamerApp, [core_1.provide(core_1.ExceptionHandler, { useClass: exceptions_1.MyExceptionHandler }), client_1.Client], {
     backButtonText: '', prodMode: true, navExitApp: false
 });
-},{"./components/loading-modal/loading-modal":6,"./providers/alert":33,"./providers/client":35,"./providers/exceptions":37,"./providers/facebook":38,"./providers/share":42,"@angular/core":177,"ionic-angular":406,"ionic-native":430}],2:[function(require,module,exports){
+},{"./components/loading-modal/loading-modal":6,"./objects/objects":11,"./providers/alert":33,"./providers/client":35,"./providers/contests":36,"./providers/exceptions":37,"./providers/facebook":38,"./providers/share":42,"@angular/core":177,"ionic-angular":406,"ionic-native":430}],2:[function(require,module,exports){
 "use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -433,6 +439,8 @@ var ContestChartComponent = (function () {
                     'team': '' + _this.contest.myTeam,
                     'sourceClick': source
                 });
+                //Notify outside that contest changed
+                _this.client.events.publish('topTeamer:contestUpdated', data.contest, data.contest.status, data.contest.status);
                 //Should get xp if fresh join
                 var rankModal;
                 if (data.xpProgress && data.xpProgress.addition > 0) {
@@ -635,9 +643,6 @@ var ContestListComponent = (function () {
                 this.showContest(data, true);
                 break;
         }
-    };
-    ContestListComponent.prototype.onJoinedContest = function (data) {
-        this.updateContest(data.contest);
     };
     ContestListComponent.prototype.onResize = function () {
         if (this.contestChartComponents && this.contestChartComponents.length > 0) {
@@ -2062,9 +2067,6 @@ var ContestPage = (function () {
     ContestPage.prototype.onContestButtonClick = function (data) {
         this.playOrLeaderboard('contest/button');
     };
-    ContestPage.prototype.onJoinedContest = function (data) {
-        this.contest = data.contest;
-    };
     ContestPage.prototype.playOrLeaderboard = function (source) {
         if (this.contest.state === 'play') {
             this.playContest(source);
@@ -2401,7 +2403,7 @@ var MainTabsPage = (function () {
         }
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
-        //Came from external deep linking
+        //Came from external deep linking - only for the case the the appp is running
         if (this.client.deepLinkContestId) {
             var contestId = this.client.deepLinkContestId;
             this.client.deepLinkContestId = null;
@@ -2905,6 +2907,8 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
+    };
+    QuizPage.prototype.ionViewDidEnter = function () {
         //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
         if (this.quizStarted) {
             return;
@@ -2956,7 +2960,9 @@ var QuizPage = (function () {
             }
             _this.drawQuizProgress();
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
-                alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason));
+                alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason)).then(function () {
+                }, function () {
+                });
             }
         }, function () {
             //IonicBug - wait for the prev alert to be fully dismissed
@@ -3063,8 +3069,7 @@ var QuizPage = (function () {
             this.client.session.score += this.quizData.results.data.score;
             this.client.logEvent('quiz/finished', {
                 'score': '' + this.quizData.results.data.score,
-                'title': this.quizData.results.data.title,
-                'message': this.quizData.results.data.message
+                'message': this.quizData.results.data.clientKey
             });
             //Give enough time to draw the circle progress of the last question
             setTimeout(function () {
@@ -4360,7 +4365,7 @@ var SystemToolsPage = (function () {
         });
     };
     SystemToolsPage.prototype.showLog = function () {
-        window.open(this.client.endPoint + 'system/log/' + this.client.session['token']);
+        window.open(this.client.endPoint + 'system/log/' + this.client.session['token'], '_system', 'location=yes');
     };
     SystemToolsPage = __decorate([
         core_1.Component({
@@ -4778,9 +4783,16 @@ var Client = (function () {
                     });
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-                            _this.displayContestById(notificationData.additionalData['contestId']).then(function () {
-                            }, function () {
-                            });
+                            //Will display it in the first available possibility
+                            if (_this.session && _this.nav && _this.nav.length() > 0) {
+                                _this.displayContestById(notificationData.additionalData['contestId']).then(function () {
+                                }, function () {
+                                });
+                            }
+                            else {
+                                //App is loading - save it for later and display when possible
+                                _this.deepLinkContestId = notificationData.additionalData['contestId'];
+                            }
                         }
                     });
                     push.on('error', function (error) {

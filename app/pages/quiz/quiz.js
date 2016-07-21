@@ -35,6 +35,8 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
+    };
+    QuizPage.prototype.ionViewDidEnter = function () {
         //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
         if (this.quizStarted) {
             return;
@@ -86,7 +88,9 @@ var QuizPage = (function () {
             }
             _this.drawQuizProgress();
             if (_this.quizData.reviewMode && _this.quizData.reviewMode.reason) {
-                alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason));
+                alertService.alert(_this.client.translate(_this.quizData.reviewMode.reason)).then(function () {
+                }, function () {
+                });
             }
         }, function () {
             //IonicBug - wait for the prev alert to be fully dismissed
@@ -193,8 +197,7 @@ var QuizPage = (function () {
             this.client.session.score += this.quizData.results.data.score;
             this.client.logEvent('quiz/finished', {
                 'score': '' + this.quizData.results.data.score,
-                'title': this.quizData.results.data.title,
-                'message': this.quizData.results.data.message
+                'message': this.quizData.results.data.clientKey
             });
             //Give enough time to draw the circle progress of the last question
             setTimeout(function () {

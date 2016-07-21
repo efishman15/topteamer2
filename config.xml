@@ -1,48 +1,61 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="10003" id="com.fplabs.topteamer" version="1.0.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Who Rules?</name>
-    <description>
-        Choose your team out of many contests and play for your team to win.
-    </description>
-    <author email="eddy.fishman@gmail.com" href="http://www.topteamer.com/">
-        topTeamer Staff
-    </author>
-    <content src="index.html" />
-    <access origin="*" />
-    <allow-intent href="*" />
-    <allow-navigation href="*" />
-    <preference name="webviewbounce" value="false" />
-    <preference name="UIWebViewBounce" value="false" />
-    <preference name="DisallowOverscroll" value="true" />
-    <preference name="SplashScreen" value="screen" />
-    <preference name="SplashScreenDelay" value="3000" />
-    <preference name="loadUrlTimeoutValue" value="60000" />
-    <preference name="InAppBrowserStorageEnabled" value="true" />
-    <preference name="orientation" value="portrait" />
-    <preference name="android-permission" value="com.android.vending.BILLING" />
-    <preference name="Fullscreen" value="false" />
-    <preference name="SplashShowOnlyFirstTime" value="false" />
-    <preference name="android-minSdkVersion" value="15" />
-    <preference name="android-targetSdkVersion" value="22" />
-    <feature name="SocialSharing">
-        <param name="android-package" value="nl.xservices.plugins.SocialSharing" />
-    </feature>
-    <platform name="android">
-        <icon density="ldpi" src="resources/android/icon/drawable-ldpi-icon.png" />
-        <icon density="mdpi" src="resources/android/icon/drawable-mdpi-icon.png" />
-        <icon density="hdpi" src="resources/android/icon/drawable-hdpi-icon.png" />
-        <icon density="xhdpi" src="resources/android/icon/drawable-xhdpi-icon.png" />
-        <icon density="xxhdpi" src="resources/android/icon/drawable-xxhdpi-icon.png" />
-        <icon density="xxxhdpi" src="resources/android/icon/drawable-xxxhdpi-icon.png" />
-        <splash density="port-ldpi" src="resources/android/splash/drawable-port-ldpi-screen.9.png" />
-        <splash density="port-mdpi" src="resources/android/splash/drawable-port-mdpi-screen.9.png" />
-        <splash density="port-hdpi" src="resources/android/splash/drawable-port-hdpi-screen.9.png" />
-        <splash density="port-xhdpi" src="resources/android/splash/drawable-port-xhdpi-screen.9.png" />
-        <splash density="port-xxhdpi" src="resources/android/splash/drawable-port-xxhdpi-screen.9.png" />
-        <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.9.png" />
-    </platform>
-    <plugin name="cordova-plugin-facebook4" spec="~1.7.1">
-        <variable name="APP_ID" value="344342552056" />
-        <variable name="APP_NAME" value="topTeamer" />
-    </plugin>
+<widget android-versionCode="10004" id="com.fplabs.topteamer" version="1.0.4" xmlns="http://www.w3.org/ns/widgets"
+        xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>Who Rules?</name>
+  <description>
+    Choose your team out of many contests and play for your team to win.
+  </description>
+  <author email="eddy.fishman@gmail.com" href="http://www.topteamer.com/">
+    topTeamer Staff
+  </author>
+  <content src="index.html"/>
+  <access origin="*"/>
+  <allow-intent href="*"/>
+  <allow-navigation href="*"/>
+  <preference name="webviewbounce" value="false"/>
+  <preference name="UIWebViewBounce" value="false"/>
+  <preference name="DisallowOverscroll" value="true"/>
+  <preference name="SplashScreen" value="screen"/>
+  <preference name="SplashScreenDelay" value="3000"/>
+  <preference name="loadUrlTimeoutValue" value="60000"/>
+  <preference name="InAppBrowserStorageEnabled" value="true"/>
+  <preference name="orientation" value="portrait"/>
+  <preference name="android-permission" value="com.android.vending.BILLING"/>
+  <preference name="Fullscreen" value="false"/>
+  <preference name="SplashShowOnlyFirstTime" value="false"/>
+  <preference name="android-minSdkVersion" value="15"/>
+  <preference name="android-targetSdkVersion" value="22"/>
+  <feature name="SocialSharing">
+    <param name="android-package" value="nl.xservices.plugins.SocialSharing"/>
+  </feature>
+  <platform name="android">
+    <icon density="ldpi" src="resources/android/icon/drawable-ldpi-icon.png"/>
+    <icon density="mdpi" src="resources/android/icon/drawable-mdpi-icon.png"/>
+    <icon density="hdpi" src="resources/android/icon/drawable-hdpi-icon.png"/>
+    <icon density="xhdpi" src="resources/android/icon/drawable-xhdpi-icon.png"/>
+    <icon density="xxhdpi" src="resources/android/icon/drawable-xxhdpi-icon.png"/>
+    <icon density="xxxhdpi" src="resources/android/icon/drawable-xxxhdpi-icon.png"/>
+    <icon density="ldpi" src="resources/android/nofification/drawable-ldpi-ic_team_losing.png"/>
+    <icon density="mdpi" src="resources/android/nofification/drawable-mdpi-ic_team_losing.png"/>
+    <icon density="hdpi" src="resources/android/nofification/drawable-hdpi-ic_team_losing.png"/>
+    <icon density="xhdpi" src="resources/android/nofification/drawable-xhdpi-ic_team_losing.png"/>
+    <icon density="xxhdpi" src="resources/android/nofification/drawable-xxhdpi-ic_team_losing.png"/>
+    <icon density="xxxhdpi" src="resources/android/nofification/drawable-xxxhdpi-ic_team_losing.png"/>
+    <icon density="ldpi" src="resources/android/nofification/drawable-ldpi-ic_contest_ends.png"/>
+    <icon density="mdpi" src="resources/android/nofification/drawable-mdpi-ic_contest_ends.png"/>
+    <icon density="hdpi" src="resources/android/nofification/drawable-hdpi-ic_contest_ends.png"/>
+    <icon density="xhdpi" src="resources/android/nofification/drawable-xhdpi-ic_contest_ends.png"/>
+    <icon density="xxhdpi" src="resources/android/nofification/drawable-xxhdpi-ic_contest_ends.png"/>
+    <icon density="xxxhdpi" src="resources/android/nofification/drawable-xxxhdpi-ic_contest_ends.png"/>
+    <splash density="port-ldpi" src="resources/android/splash/drawable-port-ldpi-screen.9.png"/>
+    <splash density="port-mdpi" src="resources/android/splash/drawable-port-mdpi-screen.9.png"/>
+    <splash density="port-hdpi" src="resources/android/splash/drawable-port-hdpi-screen.9.png"/>
+    <splash density="port-xhdpi" src="resources/android/splash/drawable-port-xhdpi-screen.9.png"/>
+    <splash density="port-xxhdpi" src="resources/android/splash/drawable-port-xxhdpi-screen.9.png"/>
+    <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.9.png"/>
+  </platform>
+  <plugin name="cordova-plugin-facebook4" spec="~1.7.1">
+    <variable name="APP_ID" value="344342552056"/>
+    <variable name="APP_NAME" value="topTeamer"/>
+  </plugin>
 </widget>

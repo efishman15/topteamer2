@@ -40,7 +40,7 @@ export class Client {
   _chartWidth:number;
   _chartHeight:number;
   _deepLinkContestId:string;
-  _shareApps: Array<ClientShareApp>;
+  _shareApps:Array<ClientShareApp>;
   appPreloading:boolean = true;
   serverGateway:ServerGateway;
 
@@ -350,9 +350,16 @@ export class Client {
 
           push.on('notification', (notificationData) => {
             if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-              this.displayContestById(notificationData.additionalData['contestId']).then(()=> {
-              },() =>{
-              });
+              //Will display it in the first available possibility
+              if (this.session && this.nav && this.nav.length() > 0) {
+                this.displayContestById(notificationData.additionalData['contestId']).then(()=> {
+                },()=> {
+                });
+              }
+              else {
+                //App is loading - save it for later and display when possible
+                this.deepLinkContestId = notificationData.additionalData['contestId'];
+              }
             }
           });
 
@@ -473,7 +480,7 @@ export class Client {
   }
 
   displayContestById(contestId:string) {
-    return new Promise((resolve: any, reject: any) => {
+    return new Promise((resolve:any, reject:any) => {
       contestsService.getContest(contestId).then((contest:Contest) => {
         resolve(contest);
         this.openPage('ContestPage', {'contest': contest});
@@ -483,13 +490,13 @@ export class Client {
     });
   }
 
-  showContest(contest: Contest, source: string, tryRun? : boolean) {
+  showContest(contest:Contest, source:string, tryRun?:boolean) {
 
-    return new Promise( (resolve: any, reject: any) => {
+    return new Promise((resolve:any, reject:any) => {
 
-      let now : number = (new Date()).getTime();
+      let now:number = (new Date()).getTime();
 
-      let eventData: any = {
+      let eventData:any = {
         'contestId': contest._id,
         'team': '' + contest.myTeam,
         'sourceClick': source
@@ -500,10 +507,10 @@ export class Client {
         this.logEvent('contest/play', eventData);
 
         //Joined to a contest - run it immediately (go to the quiz)
-        let appPages : Array<AppPage> = new Array<AppPage>();
+        let appPages:Array<AppPage> = new Array<AppPage>();
         if (now - contest.lastUpdated < this.settings.contest.refreshTresholdInMilliseconds) {
           appPages.push(new AppPage('ContestPage', {'contest': contest}));
-          appPages.push(new AppPage('QuizPage', {'contest': contest, 'source' : 'list'}));
+          appPages.push(new AppPage('QuizPage', {'contest': contest, 'source': 'list'}));
           this.insertPages(appPages);
           resolve();
         }
@@ -511,7 +518,7 @@ export class Client {
           contestsService.getContest(contest._id).then((serverContest:Contest) => {
             resolve(serverContest);
             appPages.push(new AppPage('ContestPage', {'contest': contest}));
-            appPages.push(new AppPage('QuizPage', {'contest': contest, 'source' : 'list'}));
+            appPages.push(new AppPage('QuizPage', {'contest': contest, 'source': 'list'}));
             this.insertPages(appPages);
           }, (err) => {
             reject(err);
@@ -527,9 +534,9 @@ export class Client {
       else {
         //Will enter the contest after retrieving it from the server
         this.logEvent('contest/show', eventData);
-        this.displayContestById(contest._id).then( (serverContest: Contest) => {
+        this.displayContestById(contest._id).then((serverContest:Contest) => {
           resolve(serverContest);
-        },(err) => {
+        }, (err) => {
           reject(err);
         });
       }
@@ -562,12 +569,12 @@ export class Client {
     return this.nav.setRoot(classesService.get(name), params);
   }
 
-  insertPages(pages: Array<AppPage>, index?: number) {
+  insertPages(pages:Array<AppPage>, index?:number) {
     if (index === undefined) {
       index = -1; //Will insert at the end of the stack
     }
-    let navPages : Array<any> = new Array<any>();
-    pages.forEach((appPage: AppPage) => {
+    let navPages:Array<any> = new Array<any>();
+    pages.forEach((appPage:AppPage) => {
       navPages.push({page: this.getPage(appPage.page), params: appPage.params});
     });
 
@@ -634,7 +641,7 @@ export class Client {
   adjustChartsDeviceSettings() {
 
     //Contest charts
-    for (var i=0; i<this.settings.charts.contest.devices.length; i++) {
+    for (var i = 0; i < this.settings.charts.contest.devices.length; i++) {
       if (window.devicePixelRatio <= this.settings.charts.contest.devices[i].devicePixelRatio) {
         this.settings.charts.contest.size.topMarginPercent = this.settings.charts.contest.devices[i].settings.topMarginPercent;
         this.settings.charts.contest.size.teamNameFontSize = this.settings.charts.contest.devices[i].settings.teamNameFontSize;
@@ -643,7 +650,7 @@ export class Client {
     }
 
     //Question Stats charts
-    for (var i=0; i<this.settings.charts.questionStats.devices.length; i++) {
+    for (var i = 0; i < this.settings.charts.questionStats.devices.length; i++) {
       if (window.devicePixelRatio <= this.settings.charts.questionStats.devices[i].devicePixelRatio) {
         this.settings.charts.questionStats.size.legendItemFontSize = this.settings.charts.questionStats.devices[i].settings.legendItemFontSize;
         this.settings.charts.questionStats.size.labelFontSize = this.settings.charts.questionStats.devices[i].settings.labelFontSize;
@@ -673,7 +680,7 @@ export class Client {
     return this._shareApps;
   }
 
-  set shareApps(value: Array<ClientShareApp>) {
+  set shareApps(value:Array<ClientShareApp>) {
     this._shareApps = value;
   }
 
@@ -732,7 +739,7 @@ export class Client {
     return this._settings;
   }
 
-  set settings(value: Settings) {
+  set settings(value:Settings) {
     this._settings = value;
   }
 
@@ -894,7 +901,7 @@ export class ServerGateway {
                 var parsedError = JSON.parse(err['_body']);
                 reject(parsedError);
               }
-              catch(e) {
+              catch (e) {
                 reject(err);
               }
             }

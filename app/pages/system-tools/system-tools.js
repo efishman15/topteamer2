@@ -41,7 +41,7 @@ var SystemToolsPage = (function () {
         });
     };
     SystemToolsPage.prototype.showLog = function () {
-        window.open(this.client.endPoint + 'system/log/' + this.client.session['token']);
+        window.open(this.client.endPoint + 'system/log/' + this.client.session['token'], '_system', 'location=yes');
     };
     SystemToolsPage = __decorate([
         core_1.Component({

@@ -51,6 +51,9 @@ export class QuizPage {
 
   ionViewWillEnter() {
     this.client.logEvent('page/quiz', {'contestId': this.params.data.contest._id});
+  }
+
+  ionViewDidEnter() {
 
     //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
     if (this.quizStarted) {
@@ -60,6 +63,7 @@ export class QuizPage {
     this.init();
 
     this.startQuiz();
+
   }
 
   init() {
@@ -112,7 +116,9 @@ export class QuizPage {
       this.drawQuizProgress();
 
       if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
-        alertService.alert(this.client.translate(this.quizData.reviewMode.reason));
+        alertService.alert(this.client.translate(this.quizData.reviewMode.reason)).then(()=> {
+        },()=>{
+        });
       }
 
     }, () => {
@@ -246,8 +252,7 @@ export class QuizPage {
       this.client.logEvent('quiz/finished',
         {
           'score': '' + this.quizData.results.data.score,
-          'title': this.quizData.results.data.title,
-          'message': this.quizData.results.data.message
+          'message': this.quizData.results.data.clientKey
         });
 
       //Give enough time to draw the circle progress of the last question

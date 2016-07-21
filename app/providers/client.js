@@ -254,9 +254,16 @@ var Client = (function () {
                     });
                     push.on('notification', function (notificationData) {
                         if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-                            _this.displayContestById(notificationData.additionalData['contestId']).then(function () {
-                            }, function () {
-                            });
+                            //Will display it in the first available possibility
+                            if (_this.session && _this.nav && _this.nav.length() > 0) {
+                                _this.displayContestById(notificationData.additionalData['contestId']).then(function () {
+                                }, function () {
+                                });
+                            }
+                            else {
+                                //App is loading - save it for later and display when possible
+                                _this.deepLinkContestId = notificationData.additionalData['contestId'];
+                            }
                         }
                     });
                     push.on('error', function (error) {

@@ -568,8 +568,6 @@ export class QuizResultsData {
   clientValues:Object;
   animation:string;
   facebookPost:FacebookPostData;
-  title:string;
-  message:string;
 }
 
 export class FacebookPostData {

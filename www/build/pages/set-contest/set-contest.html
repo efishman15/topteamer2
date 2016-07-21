@@ -21,44 +21,40 @@
       {{client.translate('UNLOCK_FEATURE_MOBILE', {cost : client.session.features.newContest.purchaseData.cost, currency
       : client.session.features.newContest.purchaseData.currencySymbol}) }}
     </button>
-  </div>cd\
+  </div>
 
   <form [ngFormModel]="contestForm" name="contestForm" novalidate="novalidate">
 
     <div ngControlGroup="matchingTeamsControlGroup" padding-left padding-right padding-top>
+      <div class="set-contest-against" text-center>{{client.translate('AGAINST')}}</div>
       <ion-row>
-        <ion-col>
-          <ion-item [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-5px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}">
+        <ion-col width-50>
+          <ion-item>
             <ion-input type="text"
                        class="set-contest-team"
                        ngControl="team0Control"
                        [(ngModel)]="contestLocalCopy.teams[0].name"
                        placeholder="{{client.translate('TEAM0')}}"
                        maxlength="15"
-                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-8px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
                        [disabled]="client.session.features.newContest.locked" autofocus>
             </ion-input>
           </ion-item>
         </ion-col>
-        <ion-col width-10>
-          <div padding-top class="set-contest-against" text-center>{{client.translate('AGAINST')}}</div>
-        </ion-col>
-        <ion-col>
-          <ion-item [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '5px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '5px' : ''}">
+        <ion-col width-50>
+          <ion-item>
             <ion-input type="text"
                        class="set-contest-team"
                        ngControl="team1Control"
                        [(ngModel)]="contestLocalCopy.teams[1].name"
                        placeholder="{{client.translate('TEAM1')}}"
                        maxlength="15"
-                       [ngStyle]="{'margin-left': client.currentLanguage.direction==='ltr' ? '-8px' : '', 'margin-right': client.currentLanguage.direction==='rtl' ? '-5px' : ''}"
                        [disabled]="client.session.features.newContest.locked">
             </ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col width-40>
+        <ion-col>
           <div text-center *ngIf="(team0Control.dirty || submitted) && team0Control.errors && team0Control.errors.required"
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
@@ -71,7 +67,7 @@
             {{client.translate('SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES_MESSAGE')}}
           </div>
         </ion-col>
-        <ion-col width-40>
+        <ion-col>
           <div text-center *ngIf="(team1Control.dirty || submitted) && team1Control.errors && team1Control.errors.required"
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
@@ -80,13 +76,13 @@
       </ion-row>
     </div>
 
-    <div padding-left padding-right>
+    <div class="set-contest-subject-wrapper">
       <ion-item>
         <ion-label stacked>{{client.translate('SUBJECT')}}</ion-label>
         <ion-input type="text"
                    [(ngModel)]="contestLocalCopy.subject"
                    ngControl="subjectControl"
-                   maxlength="25"
+                   maxlength="15"
                    (focus)="subjectFocus()"
                    [attr.readonly]="contestLocalCopy.type.id==='systemTrivia' ? true : null">
         </ion-input>
@@ -136,11 +132,10 @@
           </div>
         </ion-col>
         <ion-col>
-          <div [ngStyle]="{'float' : client.currentLanguage.oppositeAlign}">
+          <div [ngStyle]="{'float': client.currentLanguage.direction==='ltr' ? 'right' : 'left'}">
             <button
               (click)="openQuestionEditor('add')"
-              class="set-contest-question-buttons"
-              [ngStyle]="{'padding-right': client.currentLanguage.direction==='ltr'?'10px':null, 'padding-left': client.currentLanguage.direction==='rtl'?'10px':null}">
+              class="set-contest-question-buttons set-contest-add-question-button">
               <ion-icon class="set-contest-add-icon" name="add-circle"></ion-icon>
               {{client.translate('ADD')}}
             </button>

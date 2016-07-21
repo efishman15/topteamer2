@@ -681,13 +681,19 @@
             }]
         },
         "devices" : [{
-            "devicePixelRatio" : 1.5,
+            "devicePixelRatio" : 1.499999,
             "settings" : {
               "teamNameFontSize" : 22.0,
               "topMarginPercent" : 10.0
             }
           }, {
-            "devicePixelRatio" : 4,
+            "devicePixelRatio" : 1.999999,
+            "settings" : {
+              "teamNameFontSize" : 16.5,
+              "topMarginPercent" : 18.0
+            }
+          }, {
+            "devicePixelRatio" : 6,
             "settings" : {
               "teamNameFontSize" : 16.5,
               "topMarginPercent" : 15.0
@@ -716,8 +722,8 @@
             "showPercentValues" : "1",
             "labelFontSize" : 18,
             "labelFontBold" : 1,
-            "chartTopMargin" : 0,
-            "chartBottomMargin" : 0,
+            "chartTopMargin" : 5,
+            "chartBottomMargin" : 5,
             "showTooltip" : 0
           }
         },
@@ -726,13 +732,13 @@
           "heightRatio" : 0.4
         },
         "devices" : [{
-            "devicePixelRatio" : 1.5,
+            "devicePixelRatio" : 1.499999,
             "settings" : {
               "legendItemFontSize" : 22.0,
               "labelFontSize" : 18.0
             }
           }, {
-            "devicePixelRatio" : 4,
+            "devicePixelRatio" : 6,
             "settings" : {
               "legendItemFontSize" : 16.5,
               "labelFontSize" : 13.0
@@ -1041,7 +1047,7 @@
       "en" : {
         "HOME_WELCOME" : "Play for your team",
         "FACEBOOK_CONNECT" : "Connect with Facebook",
-        "CONTEST_ENDS_IN" : "{{number}} {{units}}",
+        "CONTEST_ENDS_IN" : "{{number}} {{units}} left",
         "CONTEST_ENDED" : "{{number}} {{units}}",
         "CONTEST_STARTED" : "Started {{number}} {{units}} ago",
         "CONTEST_STARTING" : "Starting in {{number}} {{units}}",
@@ -1207,7 +1213,7 @@
         "CONTEST_TYPE_TRIVIA_USER_TITLE" : "Your questions",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "You can enter up to $settings{client.newContest.privateQuestions.max} questions of your own",
         "SEARCH" : "Search",
-        "SEARCH_MY_QUESTIONS" : "Search questions I added",
+        "SEARCH_MY_QUESTIONS" : "Search my questions",
         "RESULTS" : "Results",
         "NO_RESULTS" : "No results",
         "MAX_USER_QUESTIONS_REACHED" : "This contest allows up to $settings{client.newContest.privateQuestions.max} questions, please remove some questions from the list",
@@ -1225,7 +1231,7 @@
         "CONTEST_NAME_LONG" : "{{team0}} vs. {{team1}} competing in {{subject}}",
         "CONTEST_NAME_SHORT" : "{{team0}} vs. {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivia questions",
-        "CONTEST_TYPE_TRIVIA_USER_NAME" : "{{name}}'s questions",
+        "CONTEST_TYPE_TRIVIA_USER_NAME" : "My questions",
         "CONTEST_VIEW_TITLE" : "$settings{client.ui.en.GAME_NAME}",
         "QUIZ_VIEW_TITLE" : "Leaders: {{Team}}",
         "SHOW_IN_RANDOM_ORDER" : "Display questions in random order",
@@ -1260,7 +1266,7 @@
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
         "FACEBOOK_CONNECT" : "התחברו עם פייסבוק",
-        "CONTEST_ENDS_IN" : "{{number}} {{units}}",
+        "CONTEST_ENDS_IN" : "נותרו {{number}} {{units}}",
         "CONTEST_ENDED" : "{{number}} {{units}}",
         "CONTEST_STARTED" : "התחילה לפני {{number}} {{units}}",
         "CONTEST_STARTING" : "מתחילה בעוד {{number}} {{units}}",
@@ -1423,7 +1429,7 @@
         "CONTEST_TYPE_TRIVIA_USER_TITLE" : "שאלות שלכם",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "הזינו בעצמכם עד $settings{client.newContest.privateQuestions.max} שאלות לתחרות",
         "SEARCH" : "חיפוש",
-        "SEARCH_MY_QUESTIONS" : "חיפוש שאלות שהוספתי",
+        "SEARCH_MY_QUESTIONS" : "חיפוש בשאלות שלי",
         "RESULTS" : "תוצאות",
         "NO_RESULTS" : "אין תוצאות",
         "MAX_USER_QUESTIONS_REACHED" : "תחרות זו מאפשרת {{max}} שאלות בלבד. אנא הסירו חלק מהשאלות ברשימה",
@@ -1437,7 +1443,7 @@
         "AGAINST" : "נגד",
         "TIE" : "שוויון בתחרות",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "טריוויה",
-        "CONTEST_TYPE_TRIVIA_USER_NAME" : "השאלות של {{name}}",
+        "CONTEST_TYPE_TRIVIA_USER_NAME" : "השאלות שלי",
         "PLAY_FOR_TEAM" : "שחקו עבור {{team}}",
         "CONTEST_NAME_LONG" : "{{team0}} נגד {{team1}} בתחרות {{subject}}",
         "CONTEST_NAME_SHORT" : "{{team0}} נגד {{team1}}",
@@ -1475,7 +1481,7 @@
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
         "FACEBOOK_CONNECT" : "Conectarse con Facebook",
-        "CONTEST_ENDS_IN" : "{{number}} {{units}}",
+        "CONTEST_ENDS_IN" : "{{number}} {{units}} para el final",
         "CONTEST_ENDED" : "{{number}} {{units}}",
         "CONTEST_STARTED" : "Inició Hace {{number}} {{units}}",
         "CONTEST_STARTING" : "A partir de {{number}} {{units}}",
@@ -1643,7 +1649,7 @@
         "CONTEST_TYPE_TRIVIA_USER_TITLE" : "Tus preguntas",
         "CONTEST_TYPE_TRIVIA_USER_DESCRIPTION" : "Puede introducir un máximo de $settings{client.newContest.privateQuestions.max} preguntas de su propio",
         "SEARCH" : "Buscar",
-        "SEARCH_MY_QUESTIONS" : "Buscar preguntas que añaden",
+        "SEARCH_MY_QUESTIONS" : "Buscar en mis preguntas",
         "RESULTS" : "resultados",
         "NO_RESULTS" : "Sin resultados",
         "MAX_USER_QUESTIONS_REACHED" : "Este concurso permite hasta $settings{client.newContest.privateQuestions.max} preguntas , por favor, elimine algunas preguntas de la lista",
@@ -1661,7 +1667,7 @@
         "CONTEST_NAME_LONG" : "{{team0}} frente a {{team1}} que compiten en {{subject}}",
         "CONTEST_NAME_SHORT" : "{{team0}} frente a {{team1}}",
         "CONTEST_TYPE_TRIVIA_SYSTEM_NAME" : "Trivialidades",
-        "CONTEST_TYPE_TRIVIA_USER_NAME" : "preguntas de {{name}}",
+        "CONTEST_TYPE_TRIVIA_USER_NAME" : "Mis preguntas",
         "CONTEST_VIEW_TITLE" : "¿$settings{client.ui.es.GAME_NAME} ? ",
         "QUIZ_VIEW_TITLE" : "Líderes: {{Team}} equipo",
         "SHOW_IN_RANDOM_ORDER" : "Mostrar preguntas en orden aleatorio",

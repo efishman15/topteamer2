@@ -200,3 +200,12 @@
   text-align: center;
   text-shadow: 1px 1px 0 #d11678;
 }
+
+
+ion-col[width-5] {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 5%;
+  -ms-flex: 0 0 5%;
+  flex: 0 0 5%;
+  max-width: 5%;
+}

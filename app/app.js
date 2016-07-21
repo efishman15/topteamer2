@@ -12,10 +12,12 @@ var exceptions_1 = require('./providers/exceptions');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('./providers/client');
 var facebookService = require('./providers/facebook');
+var contestsService = require('./providers/contests');
 var shareService = require('./providers/share');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
 var alertService = require('./providers/alert');
 var ionic_native_1 = require('ionic-native');
+var objects_1 = require('./objects/objects');
 var TopTeamerApp = (function () {
     function TopTeamerApp(app, platform, config, client, events) {
         this.app = app;
@@ -150,14 +152,7 @@ var TopTeamerApp = (function () {
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
                     //Will go to this contest
-                    if (_this.client.session) {
-                        _this.client.displayContestById(data.data_parsed.contestId).then(function () {
-                        }, function () {
-                        });
-                    }
-                    else {
-                        _this.client.deepLinkContestId = data.data_parsed.contestId;
-                    }
+                    _this.client.deepLinkContestId = data.data_parsed.contestId;
                 }
             }
             catch (e) {
@@ -189,7 +184,18 @@ var TopTeamerApp = (function () {
         facebookService.getLoginStatus().then(function (result) {
             if (result['connected']) {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
-                    _this.client.setRootPage('MainTabsPage');
+                    var appPages = new Array();
+                    appPages.push(new objects_1.AppPage('MainTabsPage', {}));
+                    if (_this.client.deepLinkContestId) {
+                        contestsService.getContest(_this.client.deepLinkContestId).then(function (contest) {
+                            _this.client.deepLinkContestId = null;
+                            appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest, 'source': 'deepLink' }));
+                            _this.client.insertPages(appPages);
+                        });
+                    }
+                    else {
+                        _this.client.insertPages(appPages);
+                    }
                 }, function (err) {
                     _this.client.openPage('LoginPage');
                 });

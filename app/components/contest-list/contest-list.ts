@@ -75,10 +75,6 @@ export class ContestListComponent {
     }
   }
 
-  onJoinedContest(data:any) {
-    this.updateContest(data.contest);
-  }
-
   onResize() {
     if (this.contestChartComponents && this.contestChartComponents.length > 0) {
       this.contestChartComponents.forEach((contestChartComponent:ContestChartComponent) => {

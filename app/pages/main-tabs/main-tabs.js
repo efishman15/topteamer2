@@ -61,7 +61,7 @@ var MainTabsPage = (function () {
         }
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
-        //Came from external deep linking
+        //Came from external deep linking - only for the case the the appp is running
         if (this.client.deepLinkContestId) {
             var contestId = this.client.deepLinkContestId;
             this.client.deepLinkContestId = null;

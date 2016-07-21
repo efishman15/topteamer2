@@ -7,7 +7,7 @@
   <ion-title>{{client.translate('RUNNING_CONTESTS')}}</ion-title>
 
   <ion-buttons left>
-    <button (click)="client.openNewContest()">
+    <button class="toolbar-new-contest-{{client.currentLanguage.direction}}" (click)="client.openNewContest()">
       <ion-icon name="add-circle"></ion-icon>
     </button>
   </ion-buttons>

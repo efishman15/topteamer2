@@ -3,11 +3,13 @@ import {MyExceptionHandler} from './providers/exceptions';
 import {ionicBootstrap, App, Platform, Config, Events, Nav, ViewController, NavController} from 'ionic-angular';
 import {Client} from './providers/client';
 import * as facebookService from './providers/facebook';
+import * as contestsService from './providers/contests';
 import * as shareService from './providers/share';
 import {LoadingModalComponent} from './components/loading-modal/loading-modal';
 import * as alertService from './providers/alert';
 import {} from './interfaces/interfaces'
 import {AppVersion} from 'ionic-native';
+import {AppPage,Contest} from './objects/objects'
 
 @Component({
   templateUrl: 'build/app.html',
@@ -19,12 +21,12 @@ export class TopTeamerApp {
   @ViewChild(Nav) nav:Nav;
   @ViewChild(LoadingModalComponent) loadingModalComponent:LoadingModalComponent;
 
-  app: App;
-  platform: Platform;
-  config: Config;
-  events: Events;
+  app:App;
+  platform:Platform;
+  config:Config;
+  events:Events;
 
-  constructor(app:App, platform:Platform, config: Config, client:Client, events:Events) {
+  constructor(app:App, platform:Platform, config:Config, client:Client, events:Events) {
 
     this.app = app;
     this.platform = platform;
@@ -36,7 +38,7 @@ export class TopTeamerApp {
   ngAfterViewInit() {
     this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent).then(() => {
       this.initApp();
-    },(err) => this.ngAfterViewInit());
+    }, (err) => this.ngAfterViewInit());
   }
 
   initApp() {
@@ -66,15 +68,15 @@ export class TopTeamerApp {
       }
 
       //Handle hardware back button
-      this.client.platform.registerBackButtonAction( () => {
+      this.client.platform.registerBackButtonAction(() => {
 
         var client = Client.getInstance();
         var activeNav = client.nav;
 
         //Modal - dismiss
-        let portalNav : NavController = activeNav.getPortal();
+        let portalNav:NavController = activeNav.getPortal();
         if (portalNav.hasOverlay()) {
-          let activeView : ViewController = portalNav.getActive();
+          let activeView:ViewController = portalNav.getActive();
           if (activeView && activeView.instance && activeView.instance['preventBack'] && activeView.instance['preventBack']()) {
             return; //prevent back
           }
@@ -177,7 +179,7 @@ export class TopTeamerApp {
     //FlurryAgent.setDebugLogEnabled(true);
     window.FlurryAgent.startSession(this.client.settings.flurry.key);
 
-    window.myLogError = (errorType: string, message: string) => {
+    window.myLogError = (errorType:string, message:string) => {
       window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
     }
 
@@ -193,14 +195,7 @@ export class TopTeamerApp {
 
         if (data.data_parsed && data.data_parsed.contestId) {
           //Will go to this contest
-          if (this.client.session) {
-            this.client.displayContestById(data.data_parsed.contestId).then(() => {
-            }, () => {
-            });
-          }
-          else {
-            this.client.deepLinkContestId = data.data_parsed.contestId;
-          }
+          this.client.deepLinkContestId = data.data_parsed.contestId;
         }
       }
       catch (e) {
@@ -220,14 +215,14 @@ export class TopTeamerApp {
         console.log('branch script not loaded - retrying in 2000 ms.');
         setTimeout(() => {
           window.initBranch();
-        },2000)
+        }, 2000)
       }
     }
 
     //Give the appropriate mobile/web branch js file time to load
     setTimeout(() => {
       window.initBranch();
-    },2000)
+    }, 2000)
 
   }
 
@@ -235,8 +230,19 @@ export class TopTeamerApp {
     facebookService.getLoginStatus().then((result) => {
       if (result['connected']) {
         this.client.facebookServerConnect(result['response'].authResponse).then(() => {
-          this.client.setRootPage('MainTabsPage');
-        },(err) => {
+          let appPages:Array<AppPage> = new Array<AppPage>();
+          appPages.push(new AppPage('MainTabsPage', {}));
+          if (this.client.deepLinkContestId) {
+            contestsService.getContest(this.client.deepLinkContestId).then((contest:Contest) => {
+              this.client.deepLinkContestId = null;
+              appPages.push(new AppPage('ContestPage', {'contest': contest, 'source': 'deepLink'}));
+              this.client.insertPages(appPages);
+            })
+          }
+          else {
+            this.client.insertPages(appPages);
+          }
+        }, (err) => {
           this.client.openPage('LoginPage');
         })
       }
@@ -329,6 +335,6 @@ export class TopTeamerApp {
   }
 }
 
-ionicBootstrap(TopTeamerApp, [provide(ExceptionHandler, {useClass: MyExceptionHandler}),Client], {
-  backButtonText:'', prodMode: true, navExitApp: false
+ionicBootstrap(TopTeamerApp, [provide(ExceptionHandler, {useClass: MyExceptionHandler}), Client], {
+  backButtonText: '', prodMode: true, navExitApp: false
 });

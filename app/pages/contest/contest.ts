@@ -109,10 +109,6 @@ export class ContestPage {
     this.playOrLeaderboard('contest/button');
   }
 
-  onJoinedContest(data:any) {
-    this.contest = data.contest;
-  }
-
   playOrLeaderboard(source: string) {
     if (this.contest.state === 'play') {
       this.playContest(source);

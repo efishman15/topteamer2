@@ -16,6 +16,7 @@
     "jade": "^1.11.0",
     "method-override": "~2.0.1",
     "mongodb": "^2.1.21",
+    "node-gcm": "^0.14.3",
     "useragent": "^2.1.7"
   },
   "scripts": {
