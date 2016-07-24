@@ -998,7 +998,7 @@ function sendPush(users, contest, alertName, team) {
 
   if (users0.length > 0 && (team === undefined || team === null || team===0)) {
     messageData.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[0].name});
-    messageData.buttonCssClass = 'chart-popup-button-team-normal-0';
+    messageData.buttonCssClass = 'chart-popup-button-team-small-0';
 
     //Done async - do not wait for response
     pushUtils.send(users0, messageData);
@@ -1018,7 +1018,7 @@ function sendPush(users, contest, alertName, team) {
     messageData1.message = generalUtils.settings.server.contest.alerts.text[contest.language][messageKey].format(params);
 
     messageData1.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[1].name});
-    messageData1.buttonCssClass = 'chart-popup-button-team-normal-1';
+    messageData1.buttonCssClass = 'chart-popup-button-team-small-1';
 
     //Done async - do not wait for response
     pushUtils.send(users1, messageData1);
