@@ -4,28 +4,39 @@ import {Alert, ActionSheet} from 'ionic-angular';
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
-export let alert = (message: any, buttons?: any) => {
+export let alert = (message:any, buttons?:any) => {
+
+  var client = Client.getInstance();
+
+  var title;
+  var messageText;
+
+  if (message.type) {
+    if (!message.additionalInfo) {
+      message.additionalInfo = {};
+    }
+
+    title = client.translate(message.type + '_TITLE', message.additionalInfo);
+    messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
+
+  }
+  else {
+    messageText = message;
+  }
+
+  return alertTranslated(title, messageText, buttons);
+}
+
+//------------------------------------------------------
+//-- alert
+//------------------------------------------------------
+export let alertTranslated = (title:string, message:string, buttons?:any) => {
 
   return new Promise((resolve, reject) => {
 
     var client = Client.getInstance();
 
     var alert:Alert;
-    var title;
-    var messageText;
-
-    if (message.type) {
-      if (!message.additionalInfo) {
-        message.additionalInfo = {};
-      }
-
-      title = client.translate(message.type + '_TITLE', message.additionalInfo);
-      messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
-
-    }
-    else {
-      messageText = message;
-    }
 
     if (!buttons) {
       buttons = [
@@ -38,7 +49,7 @@ export let alert = (message: any, buttons?: any) => {
     }
 
     alert = Alert.create({
-      message: messageText,
+      message: message,
       buttons: buttons
     });
 
@@ -51,10 +62,11 @@ export let alert = (message: any, buttons?: any) => {
   });
 }
 
+
 //------------------------------------------------------
 //-- confirm
 //------------------------------------------------------
-export let confirm = (title, message, params?) => {
+export let confirm = (title:string, message:string, params?:any) => {
 
   return new Promise((resolve, reject) => {
 

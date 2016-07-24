@@ -9,12 +9,24 @@ var dalFacebook = require(path.resolve(__dirname, '../dal/dalFacebook'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var contestsBusinessLogic = require(path.resolve(__dirname, '../business_logic/contests'));
 var dalLeaderboard = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
+var ObjectId = require('mongodb').ObjectID;
 var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 
 //--------------------------------------------------------------------------
 //Private functions
 //--------------------------------------------------------------------------
 
+//--------------------------------------------------------------------------
+// prepareGcmQuery
+//--------------------------------------------------------------------------
+function prepareGcmQuery(data) {
+  data.fields = {'gcmRegistrationId': 1};
+  var userKeys = Object.keys(data.contest.users);
+  data.userIds = [];
+  for (var i = 0; i < userKeys.length; i++) {
+    data.userIds.push(ObjectId(userKeys[i]));
+  }
+}
 //--------------------------------------------------------------------------
 // getNextQuestion
 //
@@ -243,7 +255,7 @@ module.exports.start = function (req, res, next) {
       }
       else if (data.contest.endDate < (new Date()).getTime()) {
         dalDb.closeDb(data);
-        callback(new exceptions.ServerException('Cannot start a quiz on a ended contest', {'contestId': data.contestId}));
+        callback(new exceptions.ServerMessageException('SERVER_ERROR_CONTEST_ENDED',{'contest': data.contest}));
         return;
       }
       else {
@@ -278,7 +290,7 @@ module.exports.start = function (req, res, next) {
 
       //Number of questions (either entered by user or X random questions from the system
       if (data.contest.type.id !== 'userTrivia') {
-        quiz.clientData.totalQuestions = generalUtils.settings.server.quiz.questions.systemTrivia.levels.length;
+        quiz.clientData.totalQuestions = 1;//generalUtils.settings.server.quiz.questions.systemTrivia.levels.length;
         quiz.serverData.previousQuestions = [];
       }
       else {
@@ -601,6 +613,10 @@ module.exports.answer = function (req, res, next) {
               'url': data.contest.teams[myTeam].link
             }
           );
+
+          //Retrieve users to send to the push notification about the 'other team losing'
+          prepareGcmQuery(data);
+          dalDb.getUsers(data, callback);
         }
         else if (data.contest.teams[myTeam].score < data.contest.teams[1 - myTeam].score &&
           contestsBusinessLogic.getTeamDistancePercent(data.contest, 1 - myTeam) < generalUtils.settings.server.quiz.teamPercentDistanceForShare) {
@@ -611,7 +627,30 @@ module.exports.answer = function (req, res, next) {
               'url': data.contest.teams[myTeam].link
             }
           );
+          callback(null, data);
         }
+        else {
+          callback(null, data);
+        }
+      }
+      else {
+        callback(null, data);
+      }
+    },
+
+    //Check the passedFriends story and save the contest
+    function (data, callback) {
+
+      if (!data.session.quiz.clientData.finished || data.session.quiz.clientData.reviewMode) {
+        callback(null, data);
+        return;
+      }
+
+      //From previous function - the users to send to a push notification
+      if (data.users) {
+        var myTeam = data.contest.users[data.session.userId].team;
+        //Send push to the other team members that they are losing - and come back to play
+        contestsBusinessLogic.sendPush(data.users, data.contest, 'teamLosing', 1 - myTeam);
       }
 
       if (
@@ -665,7 +704,7 @@ module.exports.answer = function (req, res, next) {
             dalFacebook.getGeneralProfile(data.passedFriends[0].id, function (err, facebookData) {
               if (err) {
                 dalDb.closeDb(data);
-                callback(new exceptions.ServerMessageException('SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ', null, 403));
+                callback(new exceptions.ServerException('Error retreiving facebook profile', {'facebookUserId': data.passedFriends[0].id}));
                 return;
               }
 
@@ -689,9 +728,70 @@ module.exports.answer = function (req, res, next) {
       }
     },
 
+    //Check if contest needs to send "end alert"
     function (data, callback) {
 
       if (!data.session.quiz.clientData.finished || data.session.quiz.clientData.reviewMode) {
+        callback(null, data);
+        return;
+      }
+
+      if (!data.contest.endAlerts) {
+        callback(null, data);
+        return;
+      }
+
+      var now = (new Date()).getTime();
+      for (var i = 0; i < data.contest.endAlerts.length; i++) {
+        if (data.contest.endAlerts[i].sent) {
+          continue;
+        }
+        if (data.contest.endDate - now < data.contest.endAlerts[i].timeToEnd) {
+          data.sendAlertIndex = i;
+          break;
+        }
+      }
+      callback(null, data);
+
+    },
+
+    //Prepare users for push
+    function (data, callback) {
+
+      if (!data.session.quiz.clientData.finished || (data.session.quiz.clientData.reviewMode && !(data.sendAlertIndex >= 0))) {
+        dalDb.closeDb(data);
+        callback(null, data);
+        return;
+      }
+
+      //Need to send alert
+      if (data.sendAlertIndex >= 0) {
+        if (!data.users) {
+          prepareGcmQuery(data);
+          dalDb.getUsers(data, function (err, data) {
+            data.contest.endAlerts[data.sendAlertIndex].sent = true;
+            data.setData['endAlerts.' + data.sendAlertIndex + '.sent'] = true;
+            contestsBusinessLogic.sendPush(data.users, data.contest, 'contestEnds');
+            callback(null, data);
+          });
+        }
+        else {
+          //Users to send retrived previouselly from other alert
+          data.contest.endAlerts[data.sendAlertIndex].sent = true;
+          data.setData['endAlerts.' + data.sendAlertIndex + '.sent'] = true;
+          contestsBusinessLogic.sendPush(data.users, data.contest, 'contestEnds');
+          callback(null, data);
+        }
+      }
+      else {
+        callback(null, data);
+      }
+    },
+
+    //Save the contest to the db
+    function (data, callback) {
+
+      if (!data.session.quiz.clientData.finished || (data.session.quiz.clientData.reviewMode && !(data.sendAlertIndex >= 0))) {
         dalDb.closeDb(data);
         callback(null, data);
         return;

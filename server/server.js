@@ -88,9 +88,8 @@ dalDb.loadSettings(null, function (err, data) {
   // API's that require authentication
   //----------------------------------------------------
   app.post('/user/logout', isAuthenticated, credentials.logout);
-  app.post('/user/settings', sessionUtils.saveSettings);
   app.post('/user/setGcmRegistration', sessionUtils.setGcmRegistration);
-  app.post('/user/toggleSound', sessionUtils.toggleSound);
+  app.post('/user/toggleSettings', sessionUtils.toggleSettings);
   app.post('/user/switchLanguage', sessionUtils.switchLanguage);
   app.post('/quiz/start', isAuthenticated, quiz.start);
   app.post('/quiz/answer', isAuthenticated, quiz.answer);

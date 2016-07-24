@@ -43,6 +43,7 @@ export class Client {
   _shareApps:Array<ClientShareApp>;
   appPreloading:boolean = true;
   serverGateway:ServerGateway;
+  pushService:any;
 
   constructor(http:Http) {
 
@@ -103,6 +104,7 @@ export class Client {
         this.getSettings(language).then((data) => {
 
           this._settings = data['settings'];
+
           if (!language || language === 'undefined') {
             //Language was computed on the server using geoInfo or the fallback to the default language
             language = data['language'];
@@ -110,6 +112,78 @@ export class Client {
           }
 
           this.initUser(language, data['geoInfo']);
+
+          if (this.clientInfo.platform === 'android') {
+
+            //Push Service - init
+            this.pushService = Push.init(
+              {
+                'android': this.settings.google.gcm
+              }
+            );
+
+            this.pushService.on('error', (error) => {
+              window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+            });
+
+            //Push Service - registration
+            this.pushService.on('registration', (registrationData) => {
+
+              if (!registrationData || !registrationData.registrationId) {
+                return;
+              }
+
+              localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
+              this.user.gcmRegistrationId = registrationData.registrationId;
+
+            });
+
+            //Push Service - notification
+            this.pushService.on('notification', (notificationData) => {
+              if (this.session && notificationData.additionalData && notificationData.additionalData.foreground) {
+                //App is in the foreground - popup the alert
+                var buttons:Array<Object> = null;
+                if (notificationData.additionalData['contestId']) {
+                  buttons = new Array<Object>();
+                  buttons.push(
+                    {
+                      'text': notificationData.additionalData['buttonText'],
+                      'cssClass': notificationData.additionalData['buttonCssClass'],
+                      'handler': () => {
+                        contestsService.getContest(notificationData.additionalData['contestId']).then((contest: Contest) => {
+                          this.showContest(contest, 'push', true);
+                        },() => {
+                        })
+                      }
+                    });
+                  if (!notificationData.additionalData['hideNotNow']) {
+                    buttons.push(
+                      {
+                        'text': this.translate('NOT_NOW'),
+                        'role': 'cancel'
+                      }
+                    );
+                  }
+                }
+                alertService.alertTranslated(notificationData.title, notificationData.message, buttons).then(()=> {
+                }, ()=> {
+                  //Notify push plugin that the 'notification' event has been handled
+                  this.pushService.finish(()=> {
+                  },()=>{
+                  });
+                });
+              }
+              else if (notificationData.additionalData['contestId']) {
+                //App is not running or in the background
+                //Save deep linked contest id for later
+                this.deepLinkContestId = notificationData.additionalData['contestId'];
+                //Notify push plugin that the 'notification' event has been handled
+                this.pushService.finish(()=> {
+                },()=>{
+                });
+              }
+            });
+          }
 
           this.canvas = document.getElementById('playerInfoRankCanvas');
           this._canvasContext = this.canvas.getContext('2d');
@@ -304,6 +378,7 @@ export class Client {
       this.user.thirdParty.accessToken = facebookAuthResponse.accessToken;
 
       this.serverPost('user/facebookConnect', {'user': this.user}).then((data) => {
+
         if (this.user.settings.language !== data['session'].settings.language) {
           this.user.settings.language = data['session'].settings.language;
           this.localSwitchLanguage(this.user.settings.language);
@@ -325,51 +400,19 @@ export class Client {
 
         if (this.clientInfo.platform === 'android') {
 
-          var push = Push.init(
-            {
-              'android': this.settings.google.gcm
-            }
-          );
+          if (!this.user.gcmRegistrationId) {
+            this.user.gcmRegistrationId = localStorage.getItem('gcmRegistrationId');
+          }
 
-          push.on('registration', (registrationData) => {
+          if (this.user.gcmRegistrationId &&
+            (
+              (!data['session'].gcmRegistrationId ||
+              data['session'].gcmRegistrationId !== this.user.gcmRegistrationId)
+            )) {
 
-            if (!registrationData || !registrationData.registrationId) {
-              return;
-            }
-
-            localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
-
-            //Update the server with the registration id - if server has no registration or it has a different reg id
-            //Just submit and forget
-            if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
-              this.serverPost('user/setGcmRegistration', {'registrationId': registrationData.registrationId}).then(() => {
-              }, () => {
-              });
-            }
-          });
-
-          push.on('notification', (notificationData) => {
-            if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-              //Will display it in the first available possibility
-              if (this.session && this.nav && this.nav.length() > 0) {
-                this.displayContestById(notificationData.additionalData['contestId']).then(()=> {
-                },()=> {
-                });
-              }
-              else {
-                //App is loading - save it for later and display when possible
-                this.deepLinkContestId = notificationData.additionalData['contestId'];
-              }
-            }
-          });
-
-          push.on('error', (error) => {
-            window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
-          });
-
-          var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
-          if (storedGcmRegistration && !this.session.gcmRegistrationId) {
-            this.serverPost('user/setGcmRegistration', {'registrationId': storedGcmRegistration}).then(() => {
+            //If client has a registration Id and server has not / server has a different one
+            //Update the server
+            this.serverPost('user/setGcmRegistration', {'registrationId': this.user.gcmRegistrationId}).then(() => {
             }, () => {
             });
           }
@@ -573,12 +616,22 @@ export class Client {
     if (index === undefined) {
       index = -1; //Will insert at the end of the stack
     }
+
+    this.nav.insertPages(index, this.getNavPages(pages));
+  }
+
+  setPages(pages:Array<AppPage>) {
+    return this.nav.setPages(this.getNavPages(pages));
+  }
+
+  getNavPages(pages:Array<AppPage>) : Array<any> {
+
     let navPages:Array<any> = new Array<any>();
     pages.forEach((appPage:AppPage) => {
       navPages.push({page: this.getPage(appPage.page), params: appPage.params});
     });
 
-    this.nav.insertPages(index, navPages);
+    return navPages;
   }
 
   hidePreloader() {
@@ -782,8 +835,9 @@ export class Client {
     return translatedValue;
   }
 
-  toggleSound() {
-    return this.serverPost('user/toggleSound');
+  toggleSettings(name: string) {
+    let postData : Object = {'name': name};
+    return this.serverPost('user/toggleSettings', postData);
   }
 
   localSwitchLanguage(language:string) {

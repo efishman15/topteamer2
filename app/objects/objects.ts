@@ -322,11 +322,10 @@ export class User {
   settings:UserSettings;
   geoInfo:Object;
   thirdParty:ThirdPartyInfo;
+  gcmRegistrationId:string;
 
   constructor(language:string, clientInfo:ClientInfo, geoInfo?:Object) {
-    this.settings = new UserSettings();
-    this.settings.language = language;
-    this.settings.timezoneOffset = (new Date).getTimezoneOffset();
+    this.settings = new UserSettings(language,(new Date).getTimezoneOffset());
     this.clientInfo = clientInfo;
 
     if (geoInfo) {
@@ -344,6 +343,15 @@ export class ThirdPartyInfo {
 export class UserSettings {
   language:string;
   timezoneOffset:number;
+  sound:boolean;
+  contestNotifications:boolean;
+
+  constructor(language: string, timezoneOffset: number) {
+    this.language = language;
+    this.timezoneOffset = timezoneOffset;
+    this.sound = true;
+    this.contestNotifications = true;
+  }
 }
 
 export class ClientInfo {

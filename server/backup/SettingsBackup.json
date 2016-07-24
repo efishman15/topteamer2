@@ -511,6 +511,75 @@
           "rating" : "$.rating",
           "link" : "$.link"
         }
+      },
+      "alerts" : {
+        "teamLosing" : {
+          "notifications" : [{
+              "title" : ["contestNameTitle1", "contestNameTitle2"],
+              "message" : ["yourTeamLoses1", "yourTeamLoses2"],
+              "style" : "picture",
+              "picture" : ["http://www.topteamer.com/images/winner1.jpg", "http://www.topteamer.com/images/winner2.jpg"],
+              "icon" : "notification",
+              "image" : "icon",
+              "color" : "#4a457b"
+            }, {
+              "title" : ["contestNameTitle1", "contestNameTitle2"],
+              "message" : ["yourTeamLoses1", "yourTeamLoses2"],
+              "icon" : "notification",
+              "image" : "icon",
+              "color" : "#4a457b"
+            }]
+        },
+        "contestEnds" : {
+          "notifications" : [{
+              "title" : ["contestNameTitle1", "contestNameTitle2"],
+              "message" : ["contestEnds1", "contestEnds2"],
+              "style" : "picture",
+              "picture" : ["http://www.topteamer.com/images/winner1.jpg", "http://www.topteamer.com/images/winner2.jpg"],
+              "icon" : "notification",
+              "image" : "icon",
+              "color" : "#4a457b"
+            }, {
+              "title" : ["contestNameTitle1", "contestNameTitle2"],
+              "message" : ["contestEnds1", "contestEnds2"],
+              "icon" : "notification",
+              "image" : "icon",
+              "color" : "#4a457b"
+            }],
+          "timing" : {
+            "m30" : [300000],
+            "m60" : [900000, 300000],
+            "h4" : [1800000, 300000],
+            "h24" : [3600000, 900000, 300000],
+            "d3" : [7200000, 900000, 300000]
+          }
+        },
+        "text" : {
+          "en" : {
+            "contestNameTitle1" : "$settings{client.ui.en.GAME_NAME}: {{team0}} or {{team1}}?",
+            "contestNameTitle2" : "{{team0}} vs. {{team1}} contest",
+            "yourTeamLoses1" : "{{winningTeam}} are leading, what now?",
+            "yourTeamLoses2" : "{{winningTeam}} are killing us. What now?",
+            "contestEnds1" : "The contest ends in {{contestEndsNumber}} {{contestEndsUnits}}. Help {{yourTeam}} team win!",
+            "contestEnds2" : "{{contestEndsNumber}} more {{contestEndsUnits}} left, help {{yourTeam}} team win!"
+          },
+          "he" : {
+            "contestNameTitle1" : "$settings{client.ui.he.GAME_NAME}: {{team0}} או {{team1}}?",
+            "contestNameTitle2" : "תחרות {{team0}} נגד {{team1}}",
+            "yourTeamLoses1" : "קבוצת {{winningTeam}} מובילה. מה יהיה?",
+            "yourTeamLoses2" : "קבוצת {{winningTeam}} קורעת לנו את הצורה. מה עכשיו?",
+            "contestEnds1" : "התחרות מסתיימת בעוד {{contestEndsNumber}} {{contestEndsUnits}}. עזרו לקבוצת {{yourTeam}} לנצח!",
+            "contestEnds2" : "עוד {{contestEndsNumber}} {{contestEndsUnits}} נותרו לסיום התחרות. עזרו לקבוצת {{yourTeam}} לנצח!"
+          },
+          "es" : {
+            "contestNameTitle1" : "$settings{client.ui.es.GAME_NAME}: {{team0}} o {{team1}}?",
+            "contestNameTitle2" : "Concurso de {{team0}} frente a {{team1}}",
+            "yourTeamLoses1" : "{{winningTeam}} están conduciendo . ¿Ahora que?",
+            "yourTeamLoses2" : "{{winningTeam}} nos están matando . ¿Ahora que?",
+            "contestEnds1" : "El concurso termina en {{contestEndsNumber}} {{contestEndsUnits}} . Ayuda equipo a ganar {{yourTeam}}",
+            "contestEnds2" : "{{contestEndsNumber}} {{contestEndsUnits}} más a la izquierda. Ayuda equipo a ganar {{yourTeam}}"
+          }
+        }
       }
     }
   },
@@ -1261,7 +1330,11 @@
         "SELECT_TEAM_ALERT_MESSAGE" : "You chose to play for {{team}} team",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "Who will you play for?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*Tip: next time you can select a team by tapping on its name or column on the chart<BR/><BR/><STRONG>Who will you play for?</STRONG>",
-        "SYSTEM_SHOW_LOG" : "Show server log"
+        "SYSTEM_SHOW_LOG" : "Show server log",
+        "CONTEST_NOTIFICATIONS_ON" : "Contest notifications on",
+        "CONTEST_NOTIFICATIONS_OFF" : "Contest notifications off",
+        "SERVER_ERROR_CONTEST_ENDED_TITLE" : "Contest Ended",
+        "SERVER_ERROR_CONTEST_TITLE_MESSAGE" : "Unfortunatelly this contest has ended. You can only view its final results or play other contests"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1476,7 +1549,11 @@
         "SELECT_TEAM_ALERT_MESSAGE" : "בחרתם לשחק עבור קבוצת {{team}}",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "עבור מי תשחקו?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*טיפ: בפעם הבאה תוכלו לבחור קבוצה על ידי לחיצה על שמה או על הטור שלה בגרף.<BR/><BR/><STRONG>עבור מי תרצו לשחק?</STRONG>",
-        "SYSTEM_SHOW_LOG" : "הצג לוג שרת"
+        "SYSTEM_SHOW_LOG" : "הצג לוג שרת",
+        "CONTEST_NOTIFICATIONS_OFF" : "התראות לא פעילות לתחרויות",
+        "CONTEST_NOTIFICATIONS_ON" : "התראות פעילות לתחרויות",
+        "SERVER_ERROR_CONTEST_ENDED_TITLE" : "התחרות הסתיימה",
+        "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "לצערנו התחזרות הזו הסתיימה. תוכלו רק לצפות בתוצאות הסופיות שלה או לשחק בתחרויות אחרות"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1697,7 +1774,11 @@
         "SELECT_TEAM_ALERT_MESSAGE" : "Que elgió para jugar para el equipo de {{team}}",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "¿Quién va a jugar ?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "* Consejo: la próxima vez que se seleccione un equipo pulsando sobre su nombre o columna en la tabla<BR/><BR/><STRONG>¿Para qué equipo juegas ?</STRONG>",
-        "SYSTEM_SHOW_LOG" : "Mostrar registro del servidor"
+        "SYSTEM_SHOW_LOG" : "Mostrar registro del servidor",
+        "CONTEST_NOTIFICATIONS_OFF" : "notificaciones del concurso off",
+        "CONTEST_NOTIFICATIONS_ON" : "notificaciones concurso en",
+        "SERVER_ERROR_CONTEST_ENDED_TITLE" : "concurso Terminado",
+        "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "Desafortunadamente este concurso ha terminado . Sólo puede ver sus resultados finales o jugar otros concursos"
       }
     },
     "platforms" : {

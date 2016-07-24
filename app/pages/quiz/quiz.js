@@ -12,6 +12,7 @@ var ionic_angular_1 = require('ionic-angular');
 var animation_listener_1 = require('../../directives/animation-listener/animation-listener');
 var transition_listener_1 = require('../../directives/transition-listener/transition-listener');
 var client_1 = require('../../providers/client');
+var contestsService = require('../../providers/contests');
 var quizService = require('../../providers/quiz');
 var soundService = require('../../providers/sound');
 var alertService = require('../../providers/alert');
@@ -92,11 +93,26 @@ var QuizPage = (function () {
                 }, function () {
                 });
             }
-        }, function () {
-            //IonicBug - wait for the prev alert to be fully dismissed
-            setTimeout(function () {
-                _this.client.nav.pop();
-            }, 1000);
+        }, function (err) {
+            switch (err.type) {
+                case 'SERVER_ERROR_GENERAL':
+                    _this.client.nav.pop();
+                    break;
+                case 'SERVER_ERROR_CONTEST_ENDED':
+                    //additionalInfo contains the updated contest object from the server
+                    contestsService.setContestClientData(err.additionalInfo.contest);
+                    setTimeout(function () {
+                        _this.client.nav.pop().then(function () {
+                            _this.client.events.publish('topTeamer:contestUpdated', err.additionalInfo.contest, _this.params.data.contest.status, err.additionalInfo.contest.status);
+                        }, function () {
+                        });
+                    }, 1000);
+                    break;
+                default:
+                    //Allow the user to answer again - probably timeout error
+                    _this.quizData.currentQuestion.answered = false;
+                    break;
+            }
         });
     };
     QuizPage.prototype.submitAnswer = function (answerId) {

@@ -12,7 +12,14 @@
       <ion-icon name="{{client.session.settings.sound ? 'volume-up' : 'volume-off'}}" item-left></ion-icon>
       <ion-label>{{client.session.settings.sound ? client.translate('SOUND_ON') : client.translate('SOUND_OFF') }}
       </ion-label>
-      <ion-toggle [(ngModel)]="client.session.settings.sound" (click)="toggleSound()"></ion-toggle>
+      <ion-toggle [(ngModel)]="client.session.settings.sound" (click)="toggleSettings('sound')"></ion-toggle>
+    </ion-item>
+
+    <ion-item class="app-menu-item">
+      <ion-icon name="{{client.session.settings.contestNotifications ? 'notifications' : 'notifications-off'}}" item-left></ion-icon>
+      <ion-label>{{client.session.settings.contestNotifications ? client.translate('CONTEST_NOTIFICATIONS_ON') : client.translate('CONTEST_NOTIFICATIONS_OFF') }}
+      </ion-label>
+      <ion-toggle [(ngModel)]="client.session.settings.contestNotifications" (click)="toggleSettings('contestNotifications')"></ion-toggle>
     </ion-item>
 
     <ion-item class="app-menu-item">

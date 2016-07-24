@@ -242,18 +242,24 @@ export class TopTeamerApp {
             contestsService.getContest(this.client.deepLinkContestId).then((contest:Contest) => {
               this.client.deepLinkContestId = null;
               appPages.push(new AppPage('ContestPage', {'contest': contest, 'source': 'deepLink'}));
-              this.client.insertPages(appPages);
+              this.client.setPages(appPages).then(()=>{
+                //VERY IMPORTANT
+                //Since code in MainTabsPage is not excuted and we're jumping
+                //right to the contest view, the preloader must be hidden here
+                this.client.hidePreloader();
+              },()=>{
+              });
             })
           }
           else {
-            this.client.insertPages(appPages);
+            this.client.setPages(appPages);
           }
         }, (err) => {
-          this.client.openPage('LoginPage');
+          this.client.nav.setRoot(this.client.getPage('LoginPage'));
         })
       }
       else {
-        this.client.openPage('LoginPage');
+        this.client.nav.setRoot(this.client.getPage('LoginPage'));
       }
     });
   }

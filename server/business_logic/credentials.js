@@ -41,6 +41,7 @@ function getSessionResponse(session) {
 // data: user - should contain:
 //          thirdParty (id, type, accessToken)
 //          clientInfo (platform, appVersion (optional for apps), platformVersion (optional for apps)
+//          gcmRegistrationId (optional)
 //-----------------------------------------------------------------------------------------------------------
 module.exports.facebookConnect = function (req, res, next) {
   var data = req.body;

@@ -27,13 +27,13 @@ var SettingsPage = (function () {
             this.client.events.publish('topTeamer:languageChanged', directionChanged);
         }
     };
-    SettingsPage.prototype.toggleSound = function () {
+    SettingsPage.prototype.toggleSettings = function (name) {
         var _this = this;
-        this.client.logEvent('settings/sound/' + !this.client.session.settings.sound);
-        this.client.toggleSound().then(function () {
+        this.client.logEvent('settings/' + name + '/' + !this.client.session.settings[name]);
+        this.client.toggleSettings(name).then(function () {
         }, function (err) {
             //Revert GUI on server error
-            _this.client.session.settings.sound = !_this.client.session.settings.sound;
+            _this.client.session.settings[name] = !_this.client.session.settings[name];
         });
     };
     SettingsPage.prototype.switchLanguage = function () {

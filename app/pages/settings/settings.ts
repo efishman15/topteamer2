@@ -30,12 +30,12 @@ export class SettingsPage {
     }
   }
 
-  toggleSound() {
-    this.client.logEvent('settings/sound/' + !this.client.session.settings.sound);
-    this.client.toggleSound().then(() => {
+  toggleSettings(name: string) {
+    this.client.logEvent('settings/' + name + '/' + !this.client.session.settings[name]);
+    this.client.toggleSettings(name).then(() => {
     }, (err) => {
       //Revert GUI on server error
-      this.client.session.settings.sound = !this.client.session.settings.sound;
+      this.client.session.settings[name] = !this.client.session.settings[name];
     });
   }
 

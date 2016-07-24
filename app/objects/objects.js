@@ -346,9 +346,7 @@ var Questions = (function () {
 exports.Questions = Questions;
 var User = (function () {
     function User(language, clientInfo, geoInfo) {
-        this.settings = new UserSettings();
-        this.settings.language = language;
-        this.settings.timezoneOffset = (new Date).getTimezoneOffset();
+        this.settings = new UserSettings(language, (new Date).getTimezoneOffset());
         this.clientInfo = clientInfo;
         if (geoInfo) {
             this.geoInfo = geoInfo;
@@ -364,7 +362,11 @@ var ThirdPartyInfo = (function () {
 })();
 exports.ThirdPartyInfo = ThirdPartyInfo;
 var UserSettings = (function () {
-    function UserSettings() {
+    function UserSettings(language, timezoneOffset) {
+        this.language = language;
+        this.timezoneOffset = timezoneOffset;
+        this.sound = true;
+        this.contestNotifications = true;
     }
     return UserSettings;
 })();

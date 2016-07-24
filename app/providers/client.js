@@ -75,6 +75,65 @@ var Client = (function () {
                     localStorage.setItem('language', language);
                 }
                 _this.initUser(language, data['geoInfo']);
+                if (_this.clientInfo.platform === 'android') {
+                    //Push Service - init
+                    _this.pushService = ionic_native_1.Push.init({
+                        'android': _this.settings.google.gcm
+                    });
+                    _this.pushService.on('error', function (error) {
+                        window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+                    });
+                    //Push Service - registration
+                    _this.pushService.on('registration', function (registrationData) {
+                        if (!registrationData || !registrationData.registrationId) {
+                            return;
+                        }
+                        localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
+                        _this.user.gcmRegistrationId = registrationData.registrationId;
+                    });
+                    //Push Service - notification
+                    _this.pushService.on('notification', function (notificationData) {
+                        if (_this.session && notificationData.additionalData && notificationData.additionalData.foreground) {
+                            //App is in the foreground - popup the alert
+                            var buttons = null;
+                            if (notificationData.additionalData['contestId']) {
+                                buttons = new Array();
+                                buttons.push({
+                                    'text': notificationData.additionalData['buttonText'],
+                                    'cssClass': notificationData.additionalData['buttonCssClass'],
+                                    'handler': function () {
+                                        contestsService.getContest(notificationData.additionalData['contestId']).then(function (contest) {
+                                            _this.showContest(contest, 'push', true);
+                                        }, function () {
+                                        });
+                                    }
+                                });
+                                if (!notificationData.additionalData['hideNotNow']) {
+                                    buttons.push({
+                                        'text': _this.translate('NOT_NOW'),
+                                        'role': 'cancel'
+                                    });
+                                }
+                            }
+                            alertService.alertTranslated(notificationData.title, notificationData.message, buttons).then(function () {
+                            }, function () {
+                                //Notify push plugin that the 'notification' event has been handled
+                                _this.pushService.finish(function () {
+                                }, function () {
+                                });
+                            });
+                        }
+                        else if (notificationData.additionalData['contestId']) {
+                            //App is not running or in the background
+                            //Save deep linked contest id for later
+                            _this.deepLinkContestId = notificationData.additionalData['contestId'];
+                            //Notify push plugin that the 'notification' event has been handled
+                            _this.pushService.finish(function () {
+                            }, function () {
+                            });
+                        }
+                    });
+                }
                 _this.canvas = document.getElementById('playerInfoRankCanvas');
                 _this._canvasContext = _this.canvas.getContext('2d');
                 _this.setDirection();
@@ -236,42 +295,15 @@ var Client = (function () {
                     _this.logEvent('server/login');
                 }
                 if (_this.clientInfo.platform === 'android') {
-                    var push = ionic_native_1.Push.init({
-                        'android': _this.settings.google.gcm
-                    });
-                    push.on('registration', function (registrationData) {
-                        if (!registrationData || !registrationData.registrationId) {
-                            return;
-                        }
-                        localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
-                        //Update the server with the registration id - if server has no registration or it has a different reg id
-                        //Just submit and forget
-                        if (!data['session'].gcmRegistrationId || data['session'].gcmRegistrationId !== registrationData.registrationId) {
-                            _this.serverPost('user/setGcmRegistration', { 'registrationId': registrationData.registrationId }).then(function () {
-                            }, function () {
-                            });
-                        }
-                    });
-                    push.on('notification', function (notificationData) {
-                        if (notificationData.additionalData && notificationData.additionalData['contestId']) {
-                            //Will display it in the first available possibility
-                            if (_this.session && _this.nav && _this.nav.length() > 0) {
-                                _this.displayContestById(notificationData.additionalData['contestId']).then(function () {
-                                }, function () {
-                                });
-                            }
-                            else {
-                                //App is loading - save it for later and display when possible
-                                _this.deepLinkContestId = notificationData.additionalData['contestId'];
-                            }
-                        }
-                    });
-                    push.on('error', function (error) {
-                        window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
-                    });
-                    var storedGcmRegistration = localStorage.getItem('gcmRegistrationId');
-                    if (storedGcmRegistration && !_this.session.gcmRegistrationId) {
-                        _this.serverPost('user/setGcmRegistration', { 'registrationId': storedGcmRegistration }).then(function () {
+                    if (!_this.user.gcmRegistrationId) {
+                        _this.user.gcmRegistrationId = localStorage.getItem('gcmRegistrationId');
+                    }
+                    if (_this.user.gcmRegistrationId &&
+                        ((!data['session'].gcmRegistrationId ||
+                            data['session'].gcmRegistrationId !== _this.user.gcmRegistrationId))) {
+                        //If client has a registration Id and server has not / server has a different one
+                        //Update the server
+                        _this.serverPost('user/setGcmRegistration', { 'registrationId': _this.user.gcmRegistrationId }).then(function () {
                         }, function () {
                         });
                     }
@@ -454,15 +486,21 @@ var Client = (function () {
         return this.nav.setRoot(classesService.get(name), params);
     };
     Client.prototype.insertPages = function (pages, index) {
-        var _this = this;
         if (index === undefined) {
             index = -1; //Will insert at the end of the stack
         }
+        this.nav.insertPages(index, this.getNavPages(pages));
+    };
+    Client.prototype.setPages = function (pages) {
+        return this.nav.setPages(this.getNavPages(pages));
+    };
+    Client.prototype.getNavPages = function (pages) {
+        var _this = this;
         var navPages = new Array();
         pages.forEach(function (appPage) {
             navPages.push({ page: _this.getPage(appPage.page), params: appPage.params });
         });
-        this.nav.insertPages(index, navPages);
+        return navPages;
     };
     Client.prototype.hidePreloader = function () {
         this.appPreloading = false;
@@ -703,8 +741,9 @@ var Client = (function () {
         }
         return translatedValue;
     };
-    Client.prototype.toggleSound = function () {
-        return this.serverPost('user/toggleSound');
+    Client.prototype.toggleSettings = function (name) {
+        var postData = { 'name': name };
+        return this.serverPost('user/toggleSettings', postData);
     };
     Client.prototype.localSwitchLanguage = function (language) {
         localStorage.setItem('language', language);

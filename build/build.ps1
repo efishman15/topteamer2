@@ -52,13 +52,19 @@ LogMessage "Copying resources..."
 # copy signing properties
 Copy-Item "$appBuildAndroidResources\$target-signing.properties" "$androidPlatform\$target-signing.properties"
 
-# copy template files
+# copy resources
 Copy-Item -Force "$appBuildAndroidResources\AndroidManifest.xml" "$androidPlatform\AndroidManifest.xml"
 Copy-Item -Force "$appBuildAndroidResources\lint.xml" "$androidPlatform\lint.xml"
 Copy-Item -Recurse -Force "$appBuildAndroidResources\values\" "$androidPlatformResources\"
 Copy-Item -Recurse -Force "$appBuildAndroidResources\values-es\" "$androidPlatformResources\"
 Copy-Item -Recurse -Force "$appBuildAndroidResources\values-he\" "$androidPlatformResources\"
 Copy-Item -Recurse -Force "$appBuildAndroidResources\values-iw\" "$androidPlatformResources\"
+Copy-Item -Recurse -Force "$appBuildAndroidResources\drawable-hdpi\" "$androidPlatformResources\"
+Copy-Item -Recurse -Force "$appBuildAndroidResources\drawable-ldpi\" "$androidPlatformResources\"
+Copy-Item -Recurse -Force "$appBuildAndroidResources\drawable-mdpi\" "$androidPlatformResources\"
+Copy-Item -Recurse -Force "$appBuildAndroidResources\drawable-xhdpi\" "$androidPlatformResources\"
+Copy-Item -Recurse -Force "$appBuildAndroidResources\drawable-xxhdpi\" "$androidPlatformResources\"
+Copy-Item -Recurse -Force "$appBuildAndroidResources\drawable-xxxhdpi\" "$androidPlatformResources\"
 
 # add crosswalk if needed
 

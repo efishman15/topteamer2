@@ -38,7 +38,14 @@
     "run-sequence": "1.1.5"
   },
   "cordovaPlugins": [
-    "cordova-plugin-whitelist"
+    "cordova-plugin-whitelist",
+    {
+      "variables": {
+        "SENDER_ID": "742205400669"
+      },
+      "locator": "phonegap-plugin-push",
+      "id": "phonegap-plugin-push"
+    }
   ],
   "cordovaPlatforms": [
     "android"

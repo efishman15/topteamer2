@@ -3,6 +3,7 @@ import {NavParams} from 'ionic-angular';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener';
 import {TransitionListener} from '../../directives/transition-listener/transition-listener';
 import {Client} from '../../providers/client';
+import * as contestsService from '../../providers/contests';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
 import * as alertService from '../../providers/alert';
@@ -121,11 +122,26 @@ export class QuizPage {
         });
       }
 
-    }, () => {
-      //IonicBug - wait for the prev alert to be fully dismissed
-      setTimeout(() => {
-        this.client.nav.pop();
-      }, 1000);
+    }, (err:any) => {
+      switch (err.type) {
+        case 'SERVER_ERROR_GENERAL':
+          this.client.nav.pop();
+          break;
+        case 'SERVER_ERROR_CONTEST_ENDED':
+          //additionalInfo contains the updated contest object from the server
+          contestsService.setContestClientData(err.additionalInfo.contest);
+          setTimeout(()=> {
+            this.client.nav.pop().then(()=>{
+              this.client.events.publish('topTeamer:contestUpdated',err.additionalInfo.contest,this.params.data.contest.status,err.additionalInfo.contest.status);
+            },() => {
+            });
+          },1000);
+          break;
+        default:
+          //Allow the user to answer again - probably timeout error
+          this.quizData.currentQuestion.answered = false;
+          break;
+      }
     });
   }
 
@@ -177,7 +193,7 @@ export class QuizPage {
 
       this.correctButtonName = 'buttonAnswer' + correctAnswerId;
 
-    }, (err) => {
+    }, (err:any) => {
       switch (err.type) {
         case 'SERVER_ERROR_SESSION_EXPIRED_DURING_QUIZ':
           this.startQuiz();

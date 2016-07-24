@@ -100,20 +100,25 @@ module.exports.getAdminSession = function (data, callback) {
   });
 };
 
-
-//----------------------------------------------------
-// saveSettings
+//---------------------------------------------------------------------------------
+// Toggle Settings
 //
-// data: settings
-//----------------------------------------------------
-module.exports.saveSettings = function (req, res, next) {
+// data: name (name of the boolean settings to toggle, e.g.: sound, notifications
+//---------------------------------------------------------------------------------
+module.exports.toggleSettings = function (req, res, next) {
 
   var data = req.body;
   var token = req.headers.authorization;
 
   //Empty settings
-  if (!data.settings) {
-    callback(new exceptions.ServerException('settings not supplied'));
+  if (!data.name) {
+    exceptions.ServerResponseException(res, 'settings name not supplied, use name=<sound|contestNotifications>', null, 'error', 403);
+    return;
+  }
+
+  //Empty settings
+  if (data.name !== 'sound' && data.name !== 'contestNotifications') {
+    exceptions.ServerResponseException(res, 'invalid settings name, use name=<sound|contestNotifications>', null, 'error', 403);
     return;
   }
 
@@ -131,59 +136,14 @@ module.exports.saveSettings = function (req, res, next) {
 
     //Store the session back
     function (data, callback) {
-      data.session.settings = data.settings;
+      data.session.settings[data.name] = !data.session.settings[data.name];
       dalDb.storeSession(data, callback);
     },
 
     //Save the settings to the user object
     function (data, callback) {
-      data.setData = {'settings': data.session.settings};
-      data.closeConnection = true;
-      dalDb.setUser(data, callback);
-    }
-  ];
-
-  async.waterfall(operations, function (err) {
-    if (!err) {
-      res.json(generalUtils.okResponse);
-    }
-    else {
-      res.send(err.httpStatus, err);
-    }
-  });
-};
-
-//----------------------------------------------------
-// Toggle Sound
-//
-// data: <NA>
-//----------------------------------------------------
-module.exports.toggleSound = function (req, res, next) {
-
-  var token = req.headers.authorization;
-  var data = {};
-
-  var operations = [
-
-    //Connect to the database
-    dalDb.connect,
-
-    //Retrieve the session
-    function (connectData, callback) {
-      data.DbHelper = connectData.DbHelper;
-      data.token = token;
-      dalDb.retrieveSession(data, callback);
-    },
-
-    //Store the session back
-    function (data, callback) {
-      data.session.settings.sound = !data.session.settings.sound;
-      dalDb.storeSession(data, callback);
-    },
-
-    //Save the settings to the user object
-    function (data, callback) {
-      data.setData = {'settings.sound': data.session.settings.sound};
+      data.setData = {};
+      data.setData['settings.' + data.name] = data.session.settings[data.name];
       data.closeConnection = true;
       dalDb.setUser(data, callback);
     }
@@ -212,11 +172,11 @@ module.exports.switchLanguage = function (req, res, next) {
 
   //Empty language
   if (!data.language) {
-    callback(new exceptions.ServerException('language not supplied'));
+    exceptions.ServerResponseException(res, 'language not supplied', null, 'error', 403);
     return;
   }
   else if (!generalUtils.settings.client.languages[data.language]) {
-    callback(new exceptions.ServerException('language ' + data.language + ' is not supported'));
+    exceptions.ServerResponseException(res, 'language ' + data.language + ' is not supported', null, 'error', 403);
     return;
   }
 
@@ -265,14 +225,12 @@ module.exports.switchLanguage = function (req, res, next) {
 module.exports.setGcmRegistration = function (req, res, next) {
 
   var data = req.body;
+  var token = req.headers.authorization;
 
   if (!data.registrationId) {
     exceptions.ServerResponseException(res, 'registrationId not supplied', null, 'warn', 424);
     return;
   }
-
-  var token = req.headers.authorization;
-
 
   var operations = [
 

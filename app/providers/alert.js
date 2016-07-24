@@ -5,21 +5,28 @@ var ionic_angular_1 = require('ionic-angular');
 //-- alert
 //------------------------------------------------------
 exports.alert = function (message, buttons) {
+    var client = client_1.Client.getInstance();
+    var title;
+    var messageText;
+    if (message.type) {
+        if (!message.additionalInfo) {
+            message.additionalInfo = {};
+        }
+        title = client.translate(message.type + '_TITLE', message.additionalInfo);
+        messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
+    }
+    else {
+        messageText = message;
+    }
+    return exports.alertTranslated(title, messageText, buttons);
+};
+//------------------------------------------------------
+//-- alert
+//------------------------------------------------------
+exports.alertTranslated = function (title, message, buttons) {
     return new Promise(function (resolve, reject) {
         var client = client_1.Client.getInstance();
         var alert;
-        var title;
-        var messageText;
-        if (message.type) {
-            if (!message.additionalInfo) {
-                message.additionalInfo = {};
-            }
-            title = client.translate(message.type + '_TITLE', message.additionalInfo);
-            messageText = client.translate(message.type + '_MESSAGE', message.additionalInfo);
-        }
-        else {
-            messageText = message;
-        }
         if (!buttons) {
             buttons = [
                 {
@@ -30,7 +37,7 @@ exports.alert = function (message, buttons) {
             ];
         }
         alert = ionic_angular_1.Alert.create({
-            message: messageText,
+            message: message,
             buttons: buttons
         });
         if (title) {

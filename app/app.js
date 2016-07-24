@@ -196,18 +196,24 @@ var TopTeamerApp = (function () {
                         contestsService.getContest(_this.client.deepLinkContestId).then(function (contest) {
                             _this.client.deepLinkContestId = null;
                             appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest, 'source': 'deepLink' }));
-                            _this.client.insertPages(appPages);
+                            _this.client.setPages(appPages).then(function () {
+                                //VERY IMPORTANT
+                                //Since code in MainTabsPage is not excuted and we're jumping
+                                //right to the contest view, the preloader must be hidden here
+                                _this.client.hidePreloader();
+                            }, function () {
+                            });
                         });
                     }
                     else {
-                        _this.client.insertPages(appPages);
+                        _this.client.setPages(appPages);
                     }
                 }, function (err) {
-                    _this.client.openPage('LoginPage');
+                    _this.client.nav.setRoot(_this.client.getPage('LoginPage'));
                 });
             }
             else {
-                _this.client.openPage('LoginPage');
+                _this.client.nav.setRoot(_this.client.getPage('LoginPage'));
             }
         });
     };

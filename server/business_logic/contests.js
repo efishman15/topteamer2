@@ -1,10 +1,13 @@
 var path = require('path');
 var async = require('async');
+var mathjs = require('mathjs');
 var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
 var dalBranchIo = require(path.resolve(__dirname, '../dal/dalBranchIo'));
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var pushUtils = require(path.resolve(__dirname, '../utils/pushNotifications'));
+var randomUtils = require(path.resolve(__dirname, '../utils/random'));
 var jsonTransformer = require('jsonpath-object-transform');
 
 //---------------------------------------------------------------------
@@ -298,6 +301,18 @@ function validateContestData(data, callback) {
       cleanContest.type.randomOrder = data.contest.type.randomOrder ? true : false;
     }
 
+    //Copy endAlerts definitions
+    if (generalUtils.settings.server.contest.alerts.contestEnds.timing[cleanContest.endOption]) {
+      cleanContest.endAlerts = [];
+      for (var i = 0; i < generalUtils.settings.server.contest.alerts.contestEnds.timing[cleanContest.endOption].length; i++) {
+        cleanContest.endAlerts.push(
+          {
+            'timeToEnd': generalUtils.settings.server.contest.alerts.contestEnds.timing[cleanContest.endOption][i],
+            'sent': false
+          });
+      }
+    }
+
     //Now the data.contest object is 'clean' and contains only fields that passed validation
     data.contest = cleanContest;
   }
@@ -329,6 +344,12 @@ function updateContest(data, callback) {
   data.setData['teams.1.name'] = data.contest.teams[1].name;
   data.setData['subject'] = data.contest.subject;
   data.setData.endDate = data.contest.endDate;
+
+  if (data.contest.clearEndAlerts) {
+    //Sent in case endDate is changed
+    data.unsetData = {};
+    data.unsetData['endAlerts'] = '';
+  }
 
   if (data.contest.type.id === 'userTrivia') {
     data.setData['type.userQuestions'] = data.contest.type.userQuestions;
@@ -886,3 +907,120 @@ function prepareContestForClient(contest, session) {
 
   return contestForClient;
 };
+
+
+//---------------------------------------------------------------------
+// sendPush
+// users - list of user objects containing gcmRegistrationId each
+// contest - contest Object
+// alertName - name of alert pointing to generalUtils.settings.server.contest.alerts[xxx]
+//---------------------------------------------------------------------
+module.exports.sendPush = sendPush;
+function sendPush(users, contest, alertName, team) {
+
+  var notifications = generalUtils.settings.server.contest.alerts[alertName].notifications;
+
+  //Will pick a random notification from the array
+  var notification = randomUtils.pick(notifications);
+
+  var messageData = {};
+  var titleKey = randomUtils.pick(notification.title);
+  var messageKey = randomUtils.pick(notification.message);
+
+  //All possible params to be replaced in all the texts
+  var params = {'team0': contest.teams[0].name, 'team1': contest.teams[1].name};
+  var winningTeam;
+  if (contest.teams[0].score > contest.teams[1].score) {
+    winningTeam = 0;
+  }
+  else if (contest.teams[0].score < contest.teams[1].score) {
+    winningTeam = 1;
+  }
+  else {
+    //Picks a random team
+    winningTeam = randomUtils.pick([0,1]);
+  }
+
+  params.winningTeam = contest.teams[winningTeam].name;
+  params.losingTeam = contest.teams[1-winningTeam].name;
+
+  //-------------------
+  // time.end
+  //-------------------
+  var number;
+  var units;
+  var minutes;
+
+  var now = (new Date()).getTime();
+  minutes = mathjs.abs(contest.endDate - now) / 1000 / 60;
+  if (minutes >= 60 * 24) {
+    number = mathjs.ceil(minutes / 24 / 60);
+    units = 'DAYS';
+  }
+  else if (minutes >= 60) {
+    number = mathjs.ceil(minutes / 60);
+    units = 'HOURS';
+  }
+  else {
+    number = mathjs.ceil(minutes);
+    units = 'MINUTES';
+  }
+
+  params.contestEndsNumber = number;
+  params.contestEndsUnits = generalUtils.translate(contest.language, units);
+  params.yourTeam = contest.teams[0].name;
+
+  messageData.title = generalUtils.settings.server.contest.alerts.text[contest.language][titleKey].format(params);
+  messageData.message = generalUtils.settings.server.contest.alerts.text[contest.language][messageKey].format(params);
+
+  if (notification.style && notification.style === 'picture') {
+    messageData.style = 'picture';
+    messageData.summaryText = messageData.message;
+    messageData.picture = randomUtils.pick(notification.picture);
+  }
+
+  messageData.contestId = contest._id.toString();
+  messageData.icon = notification.icon;
+  messageData.image = notification.image;
+  messageData.color = notification.color;
+
+  //Split the push into 2 messages - one for each team
+  var users0 = [];
+  var users1 = [];
+  for (var i=0; i<users.length; i++) {
+    if (contest.users[users[i]._id.toString()].team === 0) {
+      users0.push(users[i].gcmRegistrationId)
+    }
+    if (contest.users[users[i]._id.toString()].team === 1) {
+      users1.push(users[i].gcmRegistrationId)
+    }
+  }
+
+  if (users0.length > 0 && (team === undefined || team === null || team===0)) {
+    messageData.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[0].name});
+    messageData.buttonCssClass = 'chart-popup-button-team-normal-0';
+
+    //Done async - do not wait for response
+    pushUtils.send(users0, messageData);
+  }
+
+  if (users1.length > 0 && (team === undefined || team === null || team===1)) {
+    var messageData1
+    if (users0.length > 0) {
+      //Clone the message not to change button text and style while prev message is still sending
+      messageData1 = JSON.parse(JSON.stringify(messageData));
+    }
+    else {
+      messageData1 = messageData;
+    }
+    params.yourTeam = contest.teams[1].name;
+    messageData1.title = generalUtils.settings.server.contest.alerts.text[contest.language][titleKey].format(params);
+    messageData1.message = generalUtils.settings.server.contest.alerts.text[contest.language][messageKey].format(params);
+
+    messageData1.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[1].name});
+    messageData1.buttonCssClass = 'chart-popup-button-team-normal-1';
+
+    //Done async - do not wait for response
+    pushUtils.send(users1, messageData1);
+  }
+}

@@ -103,6 +103,10 @@ function register(data, callback) {
     'lastClientInfo': data.user.clientInfo
   };
 
+  if (data.user.gcmRegistrationId) {
+    newUser.gcmRegistrationId = data.user.gcmRegistrationId;
+  }
+
   usersCollection.insert(newUser
     , {}, function (err, insertResult) {
       if (err) {
@@ -482,6 +486,9 @@ module.exports.facebookLogin = function (data, callback) {
           'lastClientInfo': data.user.clientInfo
         }
       };
+      if (data.user.gcmRegistrationId) {
+        setObject['$set'].gcmRegistrationId = data.user.gcmRegistrationId;
+      }
 
       usersCollection.updateOne({'_id': user._id}, setObject
         , function (err, results) {
@@ -880,6 +887,9 @@ function setContest(data, callback) {
   var updateFields = {$set: data.setData};
   if (data.incData) {
     updateFields['$inc'] = data.incData;
+  }
+  if (data.unsetData) {
+    updateFields['$unset'] = data.unsetData;
   }
   contestsCollection.findAndModify(whereClause, {},
     updateFields, {w: 1, new: true}, function (err, contest) {
@@ -1453,9 +1463,79 @@ function searchMyQuestions(data, callback) {
       return;
     }
 
-    questionsCursor.toArray(function (err, questions) {
+    questionsCursor.toArray(function (toArrayError, questions) {
+
+      if (toArrayError) {
+
+        closeDb(data);
+
+        callback(new exceptions.ServerException('Error converting questions cursor to array', {
+          'text': data.text,
+          'dbError': err
+        }, 'error'));
+
+        return;
+      }
 
       data.questions = buildQuestionsResult(questions);
+
+      checkToCloseDb(data);
+
+      callback(null, data);
+    });
+
+  });
+}
+
+//------------------------------------------------------------------------------------------------
+// getGcmRegistrationIds
+//
+// Get getGcmRegistrationIds of all user id's passed as parameter.
+//
+// data:
+// -----
+// input: DbHelper, session, userIds (array of ObjectId("xxx")), fields ({fieldName1: 1, fieldName2: 1}) = specific fields to retrieve
+// output: users (each user will contain _id, and list of specified fields)
+//------------------------------------------------------------------------------------------------
+module.exports.getUsers = getUsers;
+function getUsers(data, callback) {
+
+  var usersCollection = data.DbHelper.getCollection('Users');
+
+  var criteria =
+  {
+    _id: {$in: data.userIds}
+  };
+
+  usersCollection.find({_id: {$in: data.userIds}}, {'gcmRegistrationId' : 1}, function (err, usersCursor) {
+
+    if (err || !usersCursor) {
+
+      closeDb(data);
+
+      callback(new exceptions.ServerException('Error retrieving users by their ids', {
+        'userIds': data.userIds,
+        'dbError': err
+      }, 'error'));
+
+      return;
+    }
+
+    usersCursor.toArray(function (toArrayError, users) {
+
+      if (toArrayError) {
+
+        closeDb(data);
+
+        callback(new exceptions.ServerException('Error converting users cursor to array', {
+          'userIds': data.userIds,
+          'dbError': err
+        }, 'error'));
+
+        return;
+      }
+
+      data.users = users;
 
       checkToCloseDb(data);
 
