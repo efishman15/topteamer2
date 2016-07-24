@@ -759,7 +759,6 @@ module.exports.answer = function (req, res, next) {
     function (data, callback) {
 
       if (!data.session.quiz.clientData.finished || (data.session.quiz.clientData.reviewMode && !(data.sendAlertIndex >= 0))) {
-        dalDb.closeDb(data);
         callback(null, data);
         return;
       }
