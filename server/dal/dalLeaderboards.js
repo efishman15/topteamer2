@@ -191,7 +191,6 @@ function getFriends(data, callback) {
     options.withMemberData = true;
     options.sortBy = 'rank';
     options.reverse = true;
-    options.pageSize = trueLeaderboardMembers.length;
 
     generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
 
