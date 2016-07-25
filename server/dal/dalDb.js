@@ -1556,7 +1556,6 @@ function getUsers(data, callback) {
 
   var usersCollection = data.DbHelper.getCollection('Users');
 
-  console.log('whereClause=' + JSON.stringify(data.whereClause));
   usersCollection.find(data.whereClause, {'gcmRegistrationId' : 1}, function (err, usersCursor) {
 
     if (err || !usersCursor) {
@@ -1585,7 +1584,6 @@ function getUsers(data, callback) {
         return;
       }
 
-      console.log('users retrieved=' + JSON.stringify(users));
       data.users = users;
 
       checkToCloseDb(data);

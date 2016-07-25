@@ -19,14 +19,17 @@ var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 //--------------------------------------------------------------------------
 // prepareGcmQuery
 //--------------------------------------------------------------------------
-function prepareGcmQuery(data, alertName) {
+function prepareGcmQuery(data, alertName, team) {
   data.fields = {'gcmRegistrationId': 1};
   var userKeys = Object.keys(data.contest.users);
   data.userIds = [];
   for (var i = 0; i < userKeys.length; i++) {
-    data.userIds.push(ObjectId(userKeys[i]));
+    if (team === undefined || team === null || data.contest.users[userKeys[i].team === team]) {
+      //If specific team requested - retrieve only its members
+      data.userIds.push(ObjectId(userKeys[i]));
+    }
   }
-  data.whereClause = {_id: {$in: data.userIds}, 'setting.notifications.on': true};
+  data.whereClause = {_id: {$in: data.userIds}, 'settings.notifications.on': true};
   data.whereClause['settings.notifications.' + alertName] = true;
 
 }
@@ -636,7 +639,7 @@ module.exports.answer = function (req, res, next) {
             //Update the team with "last sent" for next time
             data.contest.teams[1-myTeam].losingAlertLastSent = now;
             data.setData['teams.' + (1-myTeam) + '.losingAlertLastSent'] = now;
-            prepareGcmQuery(data,'myTeamLosing');
+            prepareGcmQuery(data,'myTeamLosing',1-myTeam);
             dalDb.getUsers(data, callback);
           }
           else {
