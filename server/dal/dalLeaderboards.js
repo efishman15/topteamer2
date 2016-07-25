@@ -162,14 +162,15 @@ function getLeaders(data, callback) {
 module.exports.getFriends = getFriends;
 function getFriends(data, callback) {
 
-    var options = {
-        withMemberData: false
-        //pageSize: generalUtils.settings.server.leaderboard.pageSize + 1 //Including myself
-    };
-
     data.clientResponse = [];
 
-    var members = [];
+  var options = {
+    withMemberData: false,
+    pageSize: data.session.friends.list.length + 1 //Including myself
+  };
+
+
+  var members = [];
     for (var i = 0; i < data.session.friends.list.length; i++) {
         members.push(data.session.friends.list[i].id);
     }
@@ -190,6 +191,7 @@ function getFriends(data, callback) {
       options.withMemberData = true;
       options.sortBy = 'rank';
       options.reverse = true;
+      options.pageSize = trueLeaderboardMembers.length;
 
       generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
         for (var i = 0; i < leaders.length; i++) {
