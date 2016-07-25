@@ -166,7 +166,7 @@ function getFriends(data, callback) {
 
   var options = {
     withMemberData: false,
-    pageSize: generalUtils.settings.server.leaderboard.pageSize
+    pageSize: data.session.friends.list.length
   };
 
 
@@ -190,6 +190,7 @@ function getFriends(data, callback) {
 
     options.withMemberData = true;
     options.sortBy = 'rank';
+    options.pageSize = generalUtils.settings.server.leaderboard.pageSize;
     options.reverse = true;
 
     generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
@@ -206,6 +207,8 @@ function getFriends(data, callback) {
 
       })
 
+      console.log('sorted list: ' + JSON.stringify(leaders));
+
       var myUserInPage = false;
       for (var i = 0; i < leaders.length; i++) {
         if (leaders[i].member === data.session.facebookUserId) {
@@ -214,12 +217,16 @@ function getFriends(data, callback) {
         data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
       }
       if (!myUserInPage) {
+        console.log('my user not in page - adding...');
         myUserInLeaderboard = {
           score: data.session.score,
           rank: leaders.length,
           member_data: data.session.avatar + '|' + data.session.name
         }
         data.clientResponse.push(prepareLeaderObject(leaders.length, myUserInLeaderboard, true));
+      }
+      else {
+        console.log('my user in page - not adding...');
       }
 
       callback(null, data);
