@@ -192,7 +192,7 @@ function getFriends(data, callback) {
       options.reverse = true;
 
       generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
-
+        console.log('final list: ' + JSON.stringify(leaders));
         for (var i = 0; i < leaders.length; i++) {
           data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
         }
