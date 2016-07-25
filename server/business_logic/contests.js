@@ -542,7 +542,7 @@ function joinToContestObject(contest, teamId, session) {
   }
 
   //Join the user to the contest's leader board (with zero score addition) to this team
-  dalLeaderboard.addScore(contest._id, team, 0, session.facebookUserId, session.name, session.avatar);
+  dalLeaderboard.addScore(contest._id, teamId, 0, session.facebookUserId, session.name, session.avatar);
 
   return newJoin;
 }
