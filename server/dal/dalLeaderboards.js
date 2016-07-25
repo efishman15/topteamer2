@@ -164,7 +164,6 @@ function getFriends(data, callback) {
 
     var options = {
         withMemberData: false,
-        sortBy: 'rank',
         pageSize: generalUtils.settings.server.leaderboard.pageSize
     };
 
@@ -188,13 +187,12 @@ function getFriends(data, callback) {
         }
       }
 
-      console.log('true leaders: ' + JSON.stringify(trueLeaderboardMembers));
       options.withMemberData = true;
+      options.sortBy = 'rank';
       options.reverse = true;
-      
+
       generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
 
-        console.log('final leaders: ' + JSON.stringify(leaders));
         for (var i = 0; i < leaders.length; i++) {
           data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
         }
