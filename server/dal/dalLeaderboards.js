@@ -165,10 +165,11 @@ function getFriends(data, callback) {
   data.clientResponse = [];
 
   var options = {
-    withMemberData: false,
-    pageSize: data.session.friends.list.length
+    withMemberData: true,
+    pageSize: generalUtils.settings.server.leaderboard.pageSize,
+    sortBy: 'rank',
+    reverse: true
   };
-
 
   var members = [];
   for (var i = 0; i < data.session.friends.list.length; i++) {
@@ -177,63 +178,40 @@ function getFriends(data, callback) {
   //Push myself as well
   members.push(data.session.facebookUserId);
 
-  generalLeaderboard.rankedInList(members, options, function (leadersWithoutMemberData) {
+  generalLeaderboard.rankedInList(members, options, function (leaders) {
 
-    var trueLeaderboardMembers = [];
-    for (var i = 0; i < leadersWithoutMemberData.length; i++) {
-
-      //Check that rank exist - otherwise this friends did not play yet and he/she is not in the leaderboard
-      if (leadersWithoutMemberData[i].rank) {
-        trueLeaderboardMembers.push(leadersWithoutMemberData[i].member);
+    //Bug of AgoraGames - does NOT return the array sorted
+    leaders.sort(function compare(a, b) {
+      if (a.rank < b.rank) {
+        return -1;
       }
-    }
+      if (a.rank > b.rank) {
+        return 1;
+      }
+      return 0;
 
-    options.withMemberData = true;
-    options.sortBy = 'rank';
-    options.pageSize = generalUtils.settings.server.leaderboard.pageSize;
-    options.reverse = true;
+    })
 
-    generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
-
-      //Bug of AgoraGames - does NOT return the array sorted
-      leaders.sort(function compare(a, b) {
-        if (a.rank < b.rank) {
-          return -1;
-        }
-        if (a.rank > b.rank) {
-          return 1;
-        }
-        return 0;
-
-      })
-
-      console.log('sorted list: ' + JSON.stringify(leaders));
-
-      var myUserInPage = false;
-      for (var i = 0; i < leaders.length; i++) {
-        if (leaders[i].member === data.session.facebookUserId) {
-          myUserInPage = true;
-        }
+    var myUserInPage = false;
+    for (var i = 0; i < leaders.length; i++) {
+      if (leaders[i].member === data.session.facebookUserId) {
+        myUserInPage = true;
+      }
+      if (leaders[i].rank && data.clientResponse.length < generalUtils.settings.server.leaderboard.pageSize) {
         data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
       }
-      if (!myUserInPage) {
-        console.log('my user not in page - adding...');
-        myUserInLeaderboard = {
-          score: data.session.score,
-          rank: leaders.length,
-          member_data: data.session.avatar + '|' + data.session.name
-        }
-        data.clientResponse.push(prepareLeaderObject(leaders.length, myUserInLeaderboard, true));
+    }
+    if (!myUserInPage) {
+      myUserInLeaderboard = {
+        score: data.session.score,
+        rank: leaders.length,
+        member_data: data.session.avatar + '|' + data.session.name
       }
-      else {
-        console.log('my user in page - not adding...');
-      }
+      data.clientResponse.push(prepareLeaderObject(data.clientResponse.length, myUserInLeaderboard, true));
+    }
 
-      callback(null, data);
-    });
-
-  })
-
+    callback(null, data);
+  });
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
