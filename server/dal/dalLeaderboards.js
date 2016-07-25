@@ -164,7 +164,7 @@ function getFriends(data, callback) {
 
     var options = {
         withMemberData: false,
-        pageSize: generalUtils.settings.server.leaderboard.pageSize
+        pageSize: generalUtils.settings.server.leaderboard.pageSize + 1 //Including myself
     };
 
     data.clientResponse = [];
