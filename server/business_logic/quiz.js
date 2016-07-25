@@ -326,8 +326,9 @@ module.exports.start = function (req, res, next) {
       //-- store if myTeamStartedBehind
       if (data.contest.teams[myTeam].score < data.contest.teams[1 - myTeam].score) {
         //My team is behind
+        quiz.serverData.share.data.myTeamStartedBehind = true;
         if (contestsBusinessLogic.getTeamDistancePercent(data.contest, 1 - myTeam) > generalUtils.settings.server.quiz.teamPercentDistanceForShare) {
-          quiz.serverData.share.data.myTeamStartedBehind = true;
+          quiz.serverData.share.data.myTeamStartedBehindWithThreshold = true;
         }
       }
 
@@ -605,18 +606,39 @@ module.exports.answer = function (req, res, next) {
       // 1. My team started leading
       // 2. My team is very close to lead
       if (data.session.quiz.serverData.share.data.myTeamStartedBehind) {
-        if (data.contest.teams[myTeam].score > data.contest.teams[1 - myTeam].score) {
-          setPostStory(data, 'madeMyTeamLead',
-            {
-              'contest': data.contest,
-              'team': myTeam,
-              'url': data.contest.teams[myTeam].link
-            }
-          );
 
-          //Retrieve users to send to the push notification about the 'other team losing'
-          prepareGcmQuery(data);
-          dalDb.getUsers(data, callback);
+        if (data.contest.teams[myTeam].score > data.contest.teams[1 - myTeam].score) {
+
+          //Only if started behind with threshold worth mentioning in Facebook
+          if (data.session.quiz.serverData.share.data.myTeamStartedBehindWithThreshold) {
+            setPostStory(data, 'madeMyTeamLead',
+              {
+                'contest': data.contest,
+                'team': myTeam,
+                'url': data.contest.teams[myTeam].link
+              }
+            );
+          }
+
+          var now = (new Date()).getTime();
+          if (generalUtils.settings.server.contest.alerts.teamLosing[data.contest.endOption] &&
+            //Only if this end option time slot should receive losing alerts
+              //And minimum time has passed since last losing alert to the same team
+            (
+              !data.contest.teams[1-myTeam].losingAlertLastSent ||
+              (now - data.contest.teams[1-myTeam].losingAlertLastSent > generalUtils.settings.server.contest.alerts.teamLosing.timing[data.contest.endOption].minimumMillisecondsBetweenAlerts)
+            )
+          ) {
+            //Retrieve users to send to the push notification about the 'other team losing'
+            //Update the team with "last sent" for next time
+            data.contest.teams[1-myTeam].losingAlertLastSent = now;
+            data.setDate['teams.' + (1-myTeam) + '.losingAlertLastSent'] = now;
+            prepareGcmQuery(data);
+            dalDb.getUsers(data, callback);
+          }
+          else {
+            callback(null, data);
+          }
         }
         else if (data.contest.teams[myTeam].score < data.contest.teams[1 - myTeam].score &&
           contestsBusinessLogic.getTeamDistancePercent(data.contest, 1 - myTeam) < generalUtils.settings.server.quiz.teamPercentDistanceForShare) {

@@ -113,78 +113,6 @@ export class Client {
 
           this.initUser(language, data['geoInfo']);
 
-          if (this.clientInfo.platform === 'android') {
-
-            //Push Service - init
-            this.pushService = Push.init(
-              {
-                'android': this.settings.google.gcm
-              }
-            );
-
-            this.pushService.on('error', (error) => {
-              window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
-            });
-
-            //Push Service - registration
-            this.pushService.on('registration', (registrationData) => {
-
-              if (!registrationData || !registrationData.registrationId) {
-                return;
-              }
-
-              localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
-              this.user.gcmRegistrationId = registrationData.registrationId;
-
-            });
-
-            //Push Service - notification
-            this.pushService.on('notification', (notificationData) => {
-              if (this.session && notificationData.additionalData && notificationData.additionalData.foreground) {
-                //App is in the foreground - popup the alert
-                var buttons:Array<Object> = null;
-                if (notificationData.additionalData['contestId']) {
-                  buttons = new Array<Object>();
-                  buttons.push(
-                    {
-                      'text': notificationData.additionalData['buttonText'],
-                      'cssClass': notificationData.additionalData['buttonCssClass'],
-                      'handler': () => {
-                        contestsService.getContest(notificationData.additionalData['contestId']).then((contest: Contest) => {
-                          this.showContest(contest, 'push', true);
-                        },() => {
-                        })
-                      }
-                    });
-                  if (!notificationData.additionalData['hideNotNow']) {
-                    buttons.push(
-                      {
-                        'text': this.translate('NOT_NOW'),
-                        'role': 'cancel'
-                      }
-                    );
-                  }
-                }
-                alertService.alertTranslated(notificationData.title, notificationData.message, buttons).then(()=> {
-                }, ()=> {
-                  //Notify push plugin that the 'notification' event has been handled
-                  this.pushService.finish(()=> {
-                  },()=>{
-                  });
-                });
-              }
-              else if (notificationData.additionalData['contestId']) {
-                //App is not running or in the background
-                //Save deep linked contest id for later
-                this.deepLinkContestId = notificationData.additionalData['contestId'];
-                //Notify push plugin that the 'notification' event has been handled
-                this.pushService.finish(()=> {
-                },()=>{
-                });
-              }
-            });
-          }
-
           this.canvas = document.getElementById('playerInfoRankCanvas');
           this._canvasContext = this.canvas.getContext('2d');
 
@@ -400,6 +328,77 @@ export class Client {
 
         if (this.clientInfo.platform === 'android') {
 
+          //Push Service - init
+          //Will have sound/vibration only if sounds are on
+          this.settings.google.gcm.sound = this.session.settings.sound;
+          this.settings.google.gcm.vibrate = this.session.settings.sound;
+          this.pushService = Push.init(
+            {
+              'android': this.settings.google.gcm
+            }
+          );
+
+          this.pushService.on('error', (error) => {
+            window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+          });
+
+          //Push Service - registration
+          this.pushService.on('registration', (registrationData) => {
+
+            if (!registrationData || !registrationData.registrationId) {
+              return;
+            }
+
+            localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
+            this.user.gcmRegistrationId = registrationData.registrationId;
+
+          });
+
+          //Push Service - notification
+          this.pushService.on('notification', (notificationData) => {
+            if (this.session && notificationData.additionalData && notificationData.additionalData.foreground) {
+              //App is in the foreground - popup the alert
+              var buttons:Array<Object> = null;
+              if (notificationData.additionalData['contestId']) {
+                buttons = new Array<Object>();
+                buttons.push(
+                  {
+                    'text': notificationData.additionalData['buttonText'],
+                    'cssClass': notificationData.additionalData['buttonCssClass'],
+                    'handler': () => {
+                      contestsService.getContest(notificationData.additionalData['contestId']).then((contest: Contest) => {
+                        this.showContest(contest, 'push', true);
+                      },() => {
+                      })
+                    }
+                  });
+                if (!notificationData.additionalData['hideNotNow']) {
+                  buttons.push(
+                    {
+                      'text': this.translate('NOT_NOW'),
+                      'role': 'cancel'
+                    }
+                  );
+                }
+              }
+              alertService.alertTranslated(notificationData.title, notificationData.message, buttons).then(()=> {
+              }, ()=> {
+                //Notify push plugin that the 'notification' event has been handled
+                this.pushService.finish(()=> {
+                },()=>{
+                });
+              });
+            }
+            else if (notificationData.additionalData['contestId']) {
+              //App is not running or in the background
+              //Save deep linked contest id for later
+              this.deepLinkContestId = notificationData.additionalData['contestId'];
+              //Notify push plugin that the 'notification' event has been handled
+              this.pushService.finish(()=> {
+              },()=>{
+              });
+            }
+          });
           if (!this.user.gcmRegistrationId) {
             this.user.gcmRegistrationId = localStorage.getItem('gcmRegistrationId');
           }

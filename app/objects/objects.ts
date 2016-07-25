@@ -98,6 +98,8 @@ export class GoogleSettings {
 
 export class GoogleGcmSettings {
   senderID:string;
+  sound:boolean;
+  vibrate:boolean;
 }
 
 export class XpControl {
