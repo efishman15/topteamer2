@@ -261,7 +261,7 @@ module.exports.start = function (req, res, next) {
       }
       else if (data.contest.endDate < (new Date()).getTime()) {
         dalDb.closeDb(data);
-        callback(new exceptions.ServerMessageException('SERVER_ERROR_CONTEST_ENDED',{'contest': data.contest}));
+        callback(new exceptions.ServerMessageException('SERVER_ERROR_CONTEST_ENDED', {'contest': data.contest}));
         return;
       }
       else {
@@ -628,18 +628,15 @@ module.exports.answer = function (req, res, next) {
 
           var now = (new Date()).getTime();
           if (generalUtils.settings.server.contest.alerts.teamLosing.timing[data.contest.endOption] &&
-            //Only if this end option time slot should receive losing alerts
+              //Only if this end option time slot should receive losing alerts
               //And minimum time has passed since last losing alert to the same team
             (
-              !data.contest.teams[1-myTeam].losingAlertLastSent ||
-              (now - data.contest.teams[1-myTeam].losingAlertLastSent > generalUtils.settings.server.contest.alerts.teamLosing.timing[data.contest.endOption].minimumMillisecondsBetweenAlerts)
+              !data.contest.teams[1 - myTeam].losingAlertLastSent ||
+              (now - data.contest.teams[1 - myTeam].losingAlertLastSent > generalUtils.settings.server.contest.alerts.teamLosing.timing[data.contest.endOption].minimumMillisecondsBetweenAlerts)
             )
           ) {
+            prepareGcmQuery(data, 'myTeamLosing', 1 - myTeam);
             //Retrieve users to send to the push notification about the 'other team losing'
-            //Update the team with "last sent" for next time
-            data.contest.teams[1-myTeam].losingAlertLastSent = now;
-            data.setData['teams.' + (1-myTeam) + '.losingAlertLastSent'] = now;
-            prepareGcmQuery(data,'myTeamLosing',1-myTeam);
             dalDb.getUsers(data, callback);
           }
           else {
@@ -675,9 +672,15 @@ module.exports.answer = function (req, res, next) {
       }
 
       //From previous function - the users to send to a push notification
-      if (data.users) {
+      if (data.users && data.users.length > 0) {
         var myTeam = data.contest.users[data.session.userId].team;
+
         //Send push to the other team members that they are losing - and come back to play
+        //Update the team with "last sent" for next time
+        var now = (new Date()).getTime();
+        data.contest.teams[1 - myTeam].losingAlertLastSent = now;
+        data.setData['teams.' + (1 - myTeam) + '.losingAlertLastSent'] = now;
+
         contestsBusinessLogic.sendPush(data.users, data.contest, 'teamLosing', 1 - myTeam);
       }
 
@@ -793,7 +796,7 @@ module.exports.answer = function (req, res, next) {
 
       //Need to send alert
       if (data.sendAlertIndex >= 0) {
-        prepareGcmQuery(data,'endingContests');
+        prepareGcmQuery(data, 'endingContests');
         dalDb.getUsers(data, function (err, data) {
           data.contest.endAlerts[data.sendAlertIndex].sent = true;
           data.setData['endAlerts.' + data.sendAlertIndex + '.sent'] = true;
