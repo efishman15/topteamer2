@@ -163,9 +163,9 @@ module.exports.getFriends = getFriends;
 function getFriends(data, callback) {
 
     var options = {
-        'withMemberData': true,
-        'sortBy': 'rank',
-        'pageSize': generalUtils.settings.server.leaderboard.pageSize
+        withMemberData: false,
+        sortBy: 'rank',
+        pageSize: generalUtils.settings.server.leaderboard.pageSize
     };
 
     data.clientResponse = [];
@@ -177,18 +177,29 @@ function getFriends(data, callback) {
     //Push myself as well
     members.push(data.session.facebookUserId);
 
-    generalLeaderboard.rankedInList(members, options, function (leaders) {
+    generalLeaderboard.rankedInList(members, options, function (leadersWithoutMemberData) {
+
+      var trueLeaderboardMembers = [];
+      for (var i = 0; i < leadersWithoutMemberData.length; i++) {
+
+        //Check that rank exist - otherwise this friends did not play yet and he/she is not in the leaderboard
+        if (leadersWithoutMemberData[i].rank) {
+          trueLeaderboardMembers.push(leadersWithoutMemberData[i].member);
+        }
+      }
+
+      options.withMemberData = true;
+      generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
 
         for (var i = 0; i < leaders.length; i++) {
-
-            //Check that rank exist - otherwise this friends did not play yet and he/she is not in the leaderboard
-            if (leaders[i].rank) {
-                data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
-            }
+          data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
         }
 
         callback(null, data);
-    });
+      });
+
+    })
+
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
