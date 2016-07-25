@@ -632,7 +632,7 @@ module.exports.answer = function (req, res, next) {
             //Retrieve users to send to the push notification about the 'other team losing'
             //Update the team with "last sent" for next time
             data.contest.teams[1-myTeam].losingAlertLastSent = now;
-            data.setDate['teams.' + (1-myTeam) + '.losingAlertLastSent'] = now;
+            data.setData['teams.' + (1-myTeam) + '.losingAlertLastSent'] = now;
             prepareGcmQuery(data);
             dalDb.getUsers(data, callback);
           }

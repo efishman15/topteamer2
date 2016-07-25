@@ -165,7 +165,7 @@
     },
     "versions" : {
       "mustUpdate" : {
-        "minVersion" : "1.0.1",
+        "minVersion" : "1.0.4",
         "popup" : {
           "en" : {
             "title" : "New version",
@@ -517,20 +517,36 @@
           "notifications" : [{
               "title" : ["contestNameTitle1", "contestNameTitle2"],
               "message" : ["yourTeamLoses1", "yourTeamLoses2"],
-              "style" : "picture",
-              "picture" : ["http://www.topteamer.com/images/winner1.jpg", "http://www.topteamer.com/images/winner2.jpg"],
               "icon" : "notification",
               "image" : "icon",
               "color" : "#4a457b"
-            }, {
-              "title" : ["contestNameTitle1", "contestNameTitle2"],
-              "message" : ["yourTeamLoses1", "yourTeamLoses2"],
-              "icon" : "notification",
-              "image" : "icon",
-              "color" : "#4a457b"
-            }]
+            }],
+          "timing" : {
+            "m30" : {
+              "minimumMillisecondsBetweenAlerts" : 900000
+            },
+            "m60" : {
+              "minimumMillisecondsBetweenAlerts" : 1200000
+            },
+            "h4" : {
+              "minimumMillisecondsBetweenAlerts" : 3600000
+            },
+            "h24" : {
+              "minimumMillisecondsBetweenAlerts" : 21600000
+            },
+            "d3" : {
+              "minimumMillisecondsBetweenAlerts" : 43200000
+            }
+          }
         },
         "contestEnds" : {
+          "timing" : {
+            "m30" : [300000],
+            "m60" : [900000, 300000],
+            "h4" : [1800000, 300000],
+            "h24" : [3600000, 900000, 300000],
+            "d3" : [7200000, 900000, 300000]
+          },
           "notifications" : [{
               "title" : ["contestNameTitle1", "contestNameTitle2"],
               "message" : ["contestEnds1", "contestEnds2"],
@@ -539,20 +555,7 @@
               "icon" : "notification",
               "image" : "icon",
               "color" : "#4a457b"
-            }, {
-              "title" : ["contestNameTitle1", "contestNameTitle2"],
-              "message" : ["contestEnds1", "contestEnds2"],
-              "icon" : "notification",
-              "image" : "icon",
-              "color" : "#4a457b"
-            }],
-          "timing" : {
-            "m30" : [300000],
-            "m60" : [900000, 300000],
-            "h4" : [1800000, 300000],
-            "h24" : [3600000, 900000, 300000],
-            "d3" : [7200000, 900000, 300000]
-          }
+            }]
         },
         "text" : {
           "en" : {
@@ -1082,6 +1085,12 @@
         "m5" : {
           "value" : "m5",
           "number" : 5,
+          "units" : "ENDS_IN_MINUTES",
+          "msecMultiplier" : 60000
+        },
+        "m30" : {
+          "value" : "m30",
+          "number" : 30,
           "units" : "ENDS_IN_MINUTES",
           "msecMultiplier" : 60000
         },
