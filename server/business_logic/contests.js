@@ -526,13 +526,19 @@ function joinToContestObject(contest, teamId, session) {
   }
 
   //Actual join
-  contest.users[session.userId] = {
-    'userId': session.userId,
-    'joinDate': now,
-    'team': teamId,
-    'score': 0,
-    'teamScores': [0, 0]
-  };
+  if (newJoin) {
+    contest.users[session.userId] = {
+      'userId': session.userId,
+      'joinDate': now,
+      'team': teamId,
+      'score': 0,
+      'teamScores': [0, 0]
+    };
+  }
+  else {
+    //Switching teams
+    contest.users[session.userId].team = teamId;
+  }
 
   return newJoin;
 }
