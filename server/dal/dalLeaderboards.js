@@ -1,6 +1,6 @@
 var path = require('path');
-var exceptions = require(path.resolve(__dirname,'../utils/exceptions'));
-var generalUtils = require(path.resolve(__dirname,'../utils/general'));
+var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
+var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var Leaderboard = require('agoragames-leaderboard');
 
 //Open connection to general leaderboards (not timebased)
@@ -15,7 +15,7 @@ var generalLeaderboard = new Leaderboard('topteamer:general');
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.getContestLeaderboard = getContestLeaderboard;
 function getContestLeaderboard(contestId) {
-    return new Leaderboard('topteamer:contest_' + contestId);
+  return new Leaderboard('topteamer:contest_' + contestId);
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ function getContestLeaderboard(contestId) {
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.getTeamLeaderboard = getTeamLeaderboard;
 function getTeamLeaderboard(contestId, teamId) {
-    return new Leaderboard('topteamer:contest_' + contestId + '_team' + teamId);
+  return new Leaderboard('topteamer:contest_' + contestId + '_team' + teamId);
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -31,27 +31,27 @@ function getTeamLeaderboard(contestId, teamId) {
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.getWeeklyLeaderboard = getWeeklyLeaderboard;
 function getWeeklyLeaderboard() {
-    return new Leaderboard('topteamer:weekly_' + generalUtils.getYearWeek());
+  return new Leaderboard('topteamer:weekly_' + generalUtils.getYearWeek());
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
 // prepareLeaderObject - parse member_data
 //---------------------------------------------------------------------------------------------------------------------------
 function prepareLeaderObject(id, leader, outsideLeaderboard) {
-    var memberDataParts = leader.member_data.split('|');
-    var leaderObject = {
-        'id': id,
-        'rank': leader.rank,
-        'score': leader.score,
-        'avatar': memberDataParts[0],
-        'name': memberDataParts[1],
-    };
+  var memberDataParts = leader.member_data.split('|');
+  var leaderObject = {
+    'id': id,
+    'rank': leader.rank,
+    'score': leader.score,
+    'avatar': memberDataParts[0],
+    'name': memberDataParts[1],
+  };
 
-    if (outsideLeaderboard) {
-        leaderObject.outside = true;
-    }
+  if (outsideLeaderboard) {
+    leaderObject.outside = true;
+  }
 
-    return leaderObject;
+  return leaderObject;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -70,31 +70,31 @@ function prepareLeaderObject(id, leader, outsideLeaderboard) {
 module.exports.addScore = addScore;
 function addScore(contestId, teamId, deltaScore, facebookUserId, name, avatar) {
 
-    var contestGeneralLeaderboard = getContestLeaderboard(contestId);
-    var contestTeamLeaderboard = getTeamLeaderboard(contestId, teamId);
-    var weeklyLeaderboard = getWeeklyLeaderboard();
+  var contestGeneralLeaderboard = getContestLeaderboard(contestId);
+  var contestTeamLeaderboard = getTeamLeaderboard(contestId, teamId);
+  var weeklyLeaderboard = getWeeklyLeaderboard();
 
-    generalLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-        generalLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name);
-    });
+  generalLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
+    generalLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name);
+  });
 
-    contestGeneralLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-        contestGeneralLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
-            contestGeneralLeaderboard.disconnect();
-        });
+  contestGeneralLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
+    contestGeneralLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
+      contestGeneralLeaderboard.disconnect();
     });
+  });
 
-    contestTeamLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-        contestTeamLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
-            contestTeamLeaderboard.disconnect();
-        });
+  contestTeamLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
+    contestTeamLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
+      contestTeamLeaderboard.disconnect();
     });
+  });
 
-    weeklyLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-        weeklyLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
-            weeklyLeaderboard.disconnect();
-        });
+  weeklyLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
+    weeklyLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
+      weeklyLeaderboard.disconnect();
     });
+  });
 };
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -109,46 +109,46 @@ function addScore(contestId, teamId, deltaScore, facebookUserId, name, avatar) {
 module.exports.getLeaders = getLeaders;
 function getLeaders(data, callback) {
 
-    var options = {
-        'withMemberData': true,
-        'sortBy': 'rank',
-        'pageSize': generalUtils.settings.server.leaderboard.pageSize
-    };
+  var options = {
+    'withMemberData': true,
+    'sortBy': 'rank',
+    'pageSize': generalUtils.settings.server.leaderboard.pageSize
+  };
 
-    data.clientResponse = [];
+  data.clientResponse = [];
 
-    data.leaderboard.leaders(0, options, function (leaders) {
-        for (var i = 0; i < leaders.length; i++) {
+  data.leaderboard.leaders(0, options, function (leaders) {
+    for (var i = 0; i < leaders.length; i++) {
 
-            if (leaders[i].member === data.session.facebookUserId) {
-                data.inLeaderboard = true;
-            }
+      if (leaders[i].member === data.session.facebookUserId) {
+        data.inLeaderboard = true;
+      }
 
-            data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
+      data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
 
-        }
+    }
 
-        if (!data.inLeaderboard && data.clientResponse.length > 0) {
+    if (!data.inLeaderboard && data.clientResponse.length > 0) {
 
-            //I am not in the first page of the leaderboard
-            var options = {'withMemberData': true, 'sortBy': 'rank', 'pageSize': 1};
-            data.leaderboard.aroundMe(data.session.facebookUserId, options, function (leaders) {
-                if (leaders && leaders.length > 0) {
-                    //I am in the leaderboard (not at the first page)
-                    data.clientResponse.push(prepareLeaderObject(data.clientResponse.length, leaders[0], true));
-                    callback(null, data);
-                }
-                else {
-                    //I am not in the leaderboard at all (never played for that leaderboard)
-                    callback(null, data);
-                }
-            });
+      //I am not in the first page of the leaderboard
+      var options = {'withMemberData': true, 'sortBy': 'rank', 'pageSize': 1};
+      data.leaderboard.aroundMe(data.session.facebookUserId, options, function (leaders) {
+        if (leaders && leaders.length > 0) {
+          //I am in the leaderboard (not at the first page)
+          data.clientResponse.push(prepareLeaderObject(data.clientResponse.length, leaders[0], true));
+          callback(null, data);
         }
         else {
-            //I am in the first page of the leaderboard
-            callback(null, data);
+          //I am not in the leaderboard at all (never played for that leaderboard)
+          callback(null, data);
         }
-    });
+      });
+    }
+    else {
+      //I am in the first page of the leaderboard
+      callback(null, data);
+    }
+  });
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -162,46 +162,71 @@ function getLeaders(data, callback) {
 module.exports.getFriends = getFriends;
 function getFriends(data, callback) {
 
-    data.clientResponse = [];
+  data.clientResponse = [];
 
   var options = {
     withMemberData: false,
-    pageSize: data.session.friends.list.length + 1 //Including myself
+    pageSize: generalUtils.settings.server.leaderboard.pageSize
   };
 
 
   var members = [];
-    for (var i = 0; i < data.session.friends.list.length; i++) {
-        members.push(data.session.friends.list[i].id);
+  for (var i = 0; i < data.session.friends.list.length; i++) {
+    members.push(data.session.friends.list[i].id);
+  }
+  //Push myself as well
+  members.push(data.session.facebookUserId);
+
+  generalLeaderboard.rankedInList(members, options, function (leadersWithoutMemberData) {
+
+    var trueLeaderboardMembers = [];
+    for (var i = 0; i < leadersWithoutMemberData.length; i++) {
+
+      //Check that rank exist - otherwise this friends did not play yet and he/she is not in the leaderboard
+      if (leadersWithoutMemberData[i].rank) {
+        trueLeaderboardMembers.push(leadersWithoutMemberData[i].member);
+      }
     }
-    //Push myself as well
-    members.push(data.session.facebookUserId);
 
-    generalLeaderboard.rankedInList(members, options, function (leadersWithoutMemberData) {
+    options.withMemberData = true;
+    options.sortBy = 'rank';
+    options.reverse = true;
+    options.pageSize = trueLeaderboardMembers.length;
 
-      var trueLeaderboardMembers = [];
-      for (var i = 0; i < leadersWithoutMemberData.length; i++) {
+    generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
 
-        //Check that rank exist - otherwise this friends did not play yet and he/she is not in the leaderboard
-        if (leadersWithoutMemberData[i].rank) {
-          trueLeaderboardMembers.push(leadersWithoutMemberData[i].member);
+      //Bug of AgoraGames - does NOT return the array sorted
+      leaders.sort(function compare(a, b) {
+        if (a.rank < b.rank) {
+          return -1;
         }
+        if (a.rank > b.rank) {
+          return 1;
+        }
+        return 0;
+
+      })
+
+      var myUserInPage = false;
+      for (var i = 0; i < leaders.length; i++) {
+        if (leaders[i].member === data.session.facebookUserId) {
+          myUserInPage = true;
+        }
+        data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
+      }
+      if (!myUserInPage) {
+        myUserInLeaderboard = {
+          score: data.session.score,
+          rank: leaders.length,
+          member_data: data.session.avatar + '|' + data.session.name
+        }
+        data.clientResponse.push(prepareLeaderObject(leaders.length, myUserInLeaderboard, true));
       }
 
-      options.withMemberData = true;
-      options.sortBy = 'rank';
-      options.reverse = true;
-      options.pageSize = trueLeaderboardMembers.length;
+      callback(null, data);
+    });
 
-      generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
-        for (var i = 0; i < leaders.length; i++) {
-          data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
-        }
-
-        callback(null, data);
-      });
-
-    })
+  })
 
 }
 
@@ -216,30 +241,30 @@ function getFriends(data, callback) {
 module.exports.getFriendsAboveMe = getFriendsAboveMe;
 function getFriendsAboveMe(data, callback) {
 
-    var options = {
-        'withMemberData': true,
-        'sortBy': 'rank',
-        'pageSize': generalUtils.settings.server.leaderboard.friendsAboveMePageSize
-    };
+  var options = {
+    'withMemberData': true,
+    'sortBy': 'rank',
+    'pageSize': generalUtils.settings.server.leaderboard.friendsAboveMePageSize
+  };
 
-    data.friendsAboveMe = [];
+  data.friendsAboveMe = [];
 
-    generalLeaderboard.aroundMe(data.session.facebookUserId, options, function (leaders) {
-        if (leaders && leaders.length > 0) {
+  generalLeaderboard.aroundMe(data.session.facebookUserId, options, function (leaders) {
+    if (leaders && leaders.length > 0) {
 
-            //I will be in that list as the last one - all my friends that are above me - will be first in the array)
-            //.id property for each item in the friendsAboveMe list is the facebookUserId - for later to compute the passedFriends
-            for (var i = 0; i < leaders.length; i++) {
-                data.friendsAboveMe.push(prepareLeaderObject(leaders[i].member, leaders[i]));
-                if (leaders[i].member === data.session.facebookUserId) {
-                    break;
-                }
-            }
+      //I will be in that list as the last one - all my friends that are above me - will be first in the array)
+      //.id property for each item in the friendsAboveMe list is the facebookUserId - for later to compute the passedFriends
+      for (var i = 0; i < leaders.length; i++) {
+        data.friendsAboveMe.push(prepareLeaderObject(leaders[i].member, leaders[i]));
+        if (leaders[i].member === data.session.facebookUserId) {
+          break;
         }
+      }
+    }
 
-        callback(null, data);
+    callback(null, data);
 
-    });
+  });
 };
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -253,36 +278,36 @@ function getFriendsAboveMe(data, callback) {
 module.exports.getPassedFriends = getPassedFriends;
 function getPassedFriends(data, callback) {
 
-    var options = {
-        'withMemberData': true,
-        'sortBy': 'rank',
-        'pageSize': data.friendsAboveMe.length
-    };
+  var options = {
+    'withMemberData': true,
+    'sortBy': 'rank',
+    'pageSize': data.friendsAboveMe.length
+  };
 
-    data.passedFriends = [];
+  data.passedFriends = [];
 
-    var members = [];
-    for (var i = 0; i < data.friendsAboveMe.length; i++) {
-        members.push(data.friendsAboveMe[i].id); //Id is the facebookUserId which is the key of the member in the leaderboard
+  var members = [];
+  for (var i = 0; i < data.friendsAboveMe.length; i++) {
+    members.push(data.friendsAboveMe[i].id); //Id is the facebookUserId which is the key of the member in the leaderboard
+  }
+
+  generalLeaderboard.rankedInList(members, options, function (leaders) {
+    var reachedMyself = false;
+    var friendsAfterMe = 0;
+
+    for (var i = 0; i < leaders.length; i++) {
+
+      if (reachedMyself) {
+        data.passedFriends.push(prepareLeaderObject(leaders[i].member, leaders[i]));
+        friendsAfterMe++;
+      }
+      else if (leaders[i].member === data.session.facebookUserId) {
+        reachedMyself = true;
+      }
     }
 
-    generalLeaderboard.rankedInList(members, options, function (leaders) {
-        var reachedMyself = false;
-        var friendsAfterMe = 0;
-
-        for (var i = 0; i < leaders.length; i++) {
-
-            if (reachedMyself) {
-                data.passedFriends.push(prepareLeaderObject(leaders[i].member, leaders[i]));
-                friendsAfterMe++;
-            }
-            else if (leaders[i].member === data.session.facebookUserId) {
-                reachedMyself = true;
-            }
-        }
-
-        callback(null, data);
-    });
+    callback(null, data);
+  });
 
 };
 
