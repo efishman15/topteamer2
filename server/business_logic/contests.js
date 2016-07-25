@@ -6,6 +6,7 @@ var dalBranchIo = require(path.resolve(__dirname, '../dal/dalBranchIo'));
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
+var dalLeaderboard = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
 var pushUtils = require(path.resolve(__dirname, '../utils/pushNotifications'));
 var randomUtils = require(path.resolve(__dirname, '../utils/random'));
 var jsonTransformer = require('jsonpath-object-transform');
@@ -539,6 +540,9 @@ function joinToContestObject(contest, teamId, session) {
     //Switching teams
     contest.users[session.userId].team = teamId;
   }
+
+  //Join the user to the contest's leader board (with zero score addition) to this team
+  dalLeaderboard.addScore(contest._id, team, 0, session.facebookUserId, session.name, session.avatar);
 
   return newJoin;
 }
