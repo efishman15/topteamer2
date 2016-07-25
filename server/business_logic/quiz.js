@@ -24,7 +24,7 @@ function prepareGcmQuery(data, alertName, team) {
   var userKeys = Object.keys(data.contest.users);
   data.userIds = [];
   for (var i = 0; i < userKeys.length; i++) {
-    if (team === undefined || team === null || data.contest.users[userKeys[i].team === team]) {
+    if (team === undefined || team === null || data.contest.users[userKeys[i]].team === team) {
       //If specific team requested - retrieve only its members
       data.userIds.push(ObjectId(userKeys[i]));
     }
