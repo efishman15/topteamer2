@@ -19,13 +19,16 @@ var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 //--------------------------------------------------------------------------
 // prepareGcmQuery
 //--------------------------------------------------------------------------
-function prepareGcmQuery(data) {
+function prepareGcmQuery(data, alertName) {
   data.fields = {'gcmRegistrationId': 1};
   var userKeys = Object.keys(data.contest.users);
   data.userIds = [];
   for (var i = 0; i < userKeys.length; i++) {
     data.userIds.push(ObjectId(userKeys[i]));
   }
+  data.whereClause = {_id: {$in: data.userIds}, 'setting.notifications.on': true};
+  data.whereClause['settings.notifications.' + alertName] = true;
+
 }
 //--------------------------------------------------------------------------
 // getNextQuestion
@@ -633,7 +636,7 @@ module.exports.answer = function (req, res, next) {
             //Update the team with "last sent" for next time
             data.contest.teams[1-myTeam].losingAlertLastSent = now;
             data.setData['teams.' + (1-myTeam) + '.losingAlertLastSent'] = now;
-            prepareGcmQuery(data);
+            prepareGcmQuery(data,'myTeamLosing');
             dalDb.getUsers(data, callback);
           }
           else {
@@ -787,22 +790,13 @@ module.exports.answer = function (req, res, next) {
 
       //Need to send alert
       if (data.sendAlertIndex >= 0) {
-        if (!data.users) {
-          prepareGcmQuery(data);
-          dalDb.getUsers(data, function (err, data) {
-            data.contest.endAlerts[data.sendAlertIndex].sent = true;
-            data.setData['endAlerts.' + data.sendAlertIndex + '.sent'] = true;
-            contestsBusinessLogic.sendPush(data.users, data.contest, 'contestEnds');
-            callback(null, data);
-          });
-        }
-        else {
-          //Users to send retrived previouselly from other alert
+        prepareGcmQuery(data,'endingContests');
+        dalDb.getUsers(data, function (err, data) {
           data.contest.endAlerts[data.sendAlertIndex].sent = true;
           data.setData['endAlerts.' + data.sendAlertIndex + '.sent'] = true;
           contestsBusinessLogic.sendPush(data.users, data.contest, 'contestEnds');
           callback(null, data);
-        }
+        });
       }
       else {
         callback(null, data);

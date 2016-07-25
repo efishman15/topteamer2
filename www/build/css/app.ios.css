@@ -9448,6 +9448,10 @@ body {
 .no-margin {
   margin: 0px auto !important; }
 
+.no-horizontal-padding {
+  padding-left: 0px !important;
+  padding-right: 0px !important; }
+
 .no-wrap-text {
   overflow: visible !important; }
 
@@ -10294,6 +10298,17 @@ loading-modal .container {
   font: normal 700 20px/1 "Calibri", sans-serif;
   text-align: center;
   text-shadow: 1px 1px 0 #2c2c52; }
+
+.settings-notifications-off {
+  opacity: 0.8;
+  pointer-events: none; }
+
+.settings-notifications-properties-ltr {
+  margin-left: 70px; }
+
+.settings-notifications-properties-rtl {
+  margin-right: 55px;
+  padding-left: 25px; }
 
 .share-more-options {
   padding-top: 50px; }

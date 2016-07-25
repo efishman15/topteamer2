@@ -328,15 +328,7 @@ export class Client {
 
         if (this.clientInfo.platform === 'android') {
 
-          //Push Service - init
-          //Will have sound/vibration only if sounds are on
-          this.settings.google.gcm.sound = this.session.settings.sound;
-          this.settings.google.gcm.vibrate = this.session.settings.sound;
-          this.pushService = Push.init(
-            {
-              'android': this.settings.google.gcm
-            }
-          );
+          this.initPushService();
 
           this.pushService.on('error', (error) => {
             window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
@@ -878,6 +870,49 @@ export class Client {
     }
   }
 
+  getRecursiveProperty(object: any, property: string) : any {
+    if (object && property) {
+      let keys = property.split('.');
+      let currentObject: any = object;
+      for (var i=0; i<keys.length; i++) {
+        if (!currentObject[keys[i]]) {
+          return null;
+        }
+        currentObject = currentObject[keys[i]];
+      }
+      return currentObject;
+    }
+  }
+
+  setRecursiveProperty(object: any, property: string, value: any) : any {
+    if (object && property) {
+      let keys = property.split('.');
+      let currentObject: any = object;
+      for (var i=0; i<keys.length; i++) {
+        if (!currentObject[keys[i]]) {
+          return;
+        }
+        if (i===keys.length-1) {
+          //Last cycle - will exit loop
+          currentObject[keys[i]] = value;
+        }
+      }
+    }
+  }
+
+  initPushService() {
+    if (this.clientInfo.platform === 'android') {
+      //Push Service - init
+      //Will have sound/vibration only if sounds are on
+      this.settings.google.gcm.sound = this.session.settings.notifications.sound;
+      this.settings.google.gcm.vibrate = this.session.settings.notifications.vibrate;
+      this.pushService = Push.init(
+        {
+          'android': this.settings.google.gcm
+        }
+      );
+    }
+  }
 }
 
 export class ServerGateway {

@@ -366,11 +366,22 @@ var UserSettings = (function () {
         this.language = language;
         this.timezoneOffset = timezoneOffset;
         this.sound = true;
-        this.contestNotifications = true;
+        this.notifications = new NotificationSettings();
     }
     return UserSettings;
 })();
 exports.UserSettings = UserSettings;
+var NotificationSettings = (function () {
+    function NotificationSettings() {
+        this.on = true;
+        this.sound = true;
+        this.vibrate = true;
+        this.endingContests = true;
+        this.myTeamLosing = true;
+    }
+    return NotificationSettings;
+})();
+exports.NotificationSettings = NotificationSettings;
 var ClientInfo = (function () {
     function ClientInfo() {
     }

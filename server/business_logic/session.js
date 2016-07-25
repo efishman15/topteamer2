@@ -112,13 +112,19 @@ module.exports.toggleSettings = function (req, res, next) {
 
   //Empty settings
   if (!data.name) {
-    exceptions.ServerResponseException(res, 'settings name not supplied, use name=<sound|contestNotifications>', null, 'error', 403);
+    exceptions.ServerResponseException(res, 'settings name not supplied, use name=<sound|notifications.on|notifications.sound|notifications.vibrate|notifications.endingContests|notificaitons.myTeamLosing>', null, 'error', 403);
     return;
   }
 
   //Empty settings
-  if (data.name !== 'sound' && data.name !== 'contestNotifications') {
-    exceptions.ServerResponseException(res, 'invalid settings name, use name=<sound|contestNotifications>', null, 'error', 403);
+  if (data.name !== 'sound' &&
+      data.name !== 'notifications.on' &&
+    data.name !== 'notifications.sound' &&
+    data.name !== 'notifications.vibrate' &&
+    data.name !== 'notifications.endingContests' &&
+    data.name !== 'notifications.myTeamLosing'
+  ) {
+    exceptions.ServerResponseException(res, 'invalid settings name, use name=<sound|contestNotifications>', {'name': data.name}, 'error', 403);
     return;
   }
 
@@ -136,14 +142,21 @@ module.exports.toggleSettings = function (req, res, next) {
 
     //Store the session back
     function (data, callback) {
-      data.session.settings[data.name] = !data.session.settings[data.name];
-      dalDb.storeSession(data, callback);
+      var keys = data.name.split('.');
+      var currentObject = data.session.settings;
+      for(var i=0; i<keys.length; i++) {
+        currentObject = currentObject[keys[i]];
+      }
+      data.currentObjectValue = !currentObject;
+      data.setData = {};
+      data.setData['settings.' + data.name] = !currentObject;
+      dalDb.setSession(data, callback);
     },
 
     //Save the settings to the user object
     function (data, callback) {
       data.setData = {};
-      data.setData['settings.' + data.name] = data.session.settings[data.name];
+      data.setData['settings.' + data.name] = data.currentObjectValue;
       data.closeConnection = true;
       dalDb.setUser(data, callback);
     }

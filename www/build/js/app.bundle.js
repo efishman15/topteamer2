@@ -1631,11 +1631,22 @@ var UserSettings = (function () {
         this.language = language;
         this.timezoneOffset = timezoneOffset;
         this.sound = true;
-        this.contestNotifications = true;
+        this.notifications = new NotificationSettings();
     }
     return UserSettings;
 }());
 exports.UserSettings = UserSettings;
+var NotificationSettings = (function () {
+    function NotificationSettings() {
+        this.on = true;
+        this.sound = true;
+        this.vibrate = true;
+        this.endingContests = true;
+        this.myTeamLosing = true;
+    }
+    return NotificationSettings;
+}());
+exports.NotificationSettings = NotificationSettings;
 var ClientInfo = (function () {
     function ClientInfo() {
     }
@@ -4254,13 +4265,17 @@ var SettingsPage = (function () {
             this.client.events.publish('topTeamer:languageChanged', directionChanged);
         }
     };
-    SettingsPage.prototype.toggleSettings = function (name) {
+    SettingsPage.prototype.toggleSettings = function (name, initPushService) {
         var _this = this;
         this.client.logEvent('settings/' + name + '/' + !this.client.session.settings[name]);
         this.client.toggleSettings(name).then(function () {
-        }, function (err) {
+            if (initPushService) {
+                _this.client.initPushService();
+            }
+        }, function () {
             //Revert GUI on server error
-            _this.client.session.settings[name] = !_this.client.session.settings[name];
+            var currentValue = _this.client.getRecursiveProperty(_this.client.session.settings, name);
+            _this.client.setRecursiveProperty(_this.client.session.settings, name, !currentValue);
         });
     };
     SettingsPage.prototype.switchLanguage = function () {
@@ -4641,65 +4656,6 @@ var Client = (function () {
                     localStorage.setItem('language', language);
                 }
                 _this.initUser(language, data['geoInfo']);
-                if (_this.clientInfo.platform === 'android') {
-                    //Push Service - init
-                    _this.pushService = ionic_native_1.Push.init({
-                        'android': _this.settings.google.gcm
-                    });
-                    _this.pushService.on('error', function (error) {
-                        window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
-                    });
-                    //Push Service - registration
-                    _this.pushService.on('registration', function (registrationData) {
-                        if (!registrationData || !registrationData.registrationId) {
-                            return;
-                        }
-                        localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
-                        _this.user.gcmRegistrationId = registrationData.registrationId;
-                    });
-                    //Push Service - notification
-                    _this.pushService.on('notification', function (notificationData) {
-                        if (_this.session && notificationData.additionalData && notificationData.additionalData.foreground) {
-                            //App is in the foreground - popup the alert
-                            var buttons = null;
-                            if (notificationData.additionalData['contestId']) {
-                                buttons = new Array();
-                                buttons.push({
-                                    'text': notificationData.additionalData['buttonText'],
-                                    'cssClass': notificationData.additionalData['buttonCssClass'],
-                                    'handler': function () {
-                                        contestsService.getContest(notificationData.additionalData['contestId']).then(function (contest) {
-                                            _this.showContest(contest, 'push', true);
-                                        }, function () {
-                                        });
-                                    }
-                                });
-                                if (!notificationData.additionalData['hideNotNow']) {
-                                    buttons.push({
-                                        'text': _this.translate('NOT_NOW'),
-                                        'role': 'cancel'
-                                    });
-                                }
-                            }
-                            alertService.alertTranslated(notificationData.title, notificationData.message, buttons).then(function () {
-                            }, function () {
-                                //Notify push plugin that the 'notification' event has been handled
-                                _this.pushService.finish(function () {
-                                }, function () {
-                                });
-                            });
-                        }
-                        else if (notificationData.additionalData['contestId']) {
-                            //App is not running or in the background
-                            //Save deep linked contest id for later
-                            _this.deepLinkContestId = notificationData.additionalData['contestId'];
-                            //Notify push plugin that the 'notification' event has been handled
-                            _this.pushService.finish(function () {
-                            }, function () {
-                            });
-                        }
-                    });
-                }
                 _this.canvas = document.getElementById('playerInfoRankCanvas');
                 _this._canvasContext = _this.canvas.getContext('2d');
                 _this.setDirection();
@@ -4861,6 +4817,60 @@ var Client = (function () {
                     _this.logEvent('server/login');
                 }
                 if (_this.clientInfo.platform === 'android') {
+                    _this.initPushService();
+                    _this.pushService.on('error', function (error) {
+                        window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+                    });
+                    //Push Service - registration
+                    _this.pushService.on('registration', function (registrationData) {
+                        if (!registrationData || !registrationData.registrationId) {
+                            return;
+                        }
+                        localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
+                        _this.user.gcmRegistrationId = registrationData.registrationId;
+                    });
+                    //Push Service - notification
+                    _this.pushService.on('notification', function (notificationData) {
+                        if (_this.session && notificationData.additionalData && notificationData.additionalData.foreground) {
+                            //App is in the foreground - popup the alert
+                            var buttons = null;
+                            if (notificationData.additionalData['contestId']) {
+                                buttons = new Array();
+                                buttons.push({
+                                    'text': notificationData.additionalData['buttonText'],
+                                    'cssClass': notificationData.additionalData['buttonCssClass'],
+                                    'handler': function () {
+                                        contestsService.getContest(notificationData.additionalData['contestId']).then(function (contest) {
+                                            _this.showContest(contest, 'push', true);
+                                        }, function () {
+                                        });
+                                    }
+                                });
+                                if (!notificationData.additionalData['hideNotNow']) {
+                                    buttons.push({
+                                        'text': _this.translate('NOT_NOW'),
+                                        'role': 'cancel'
+                                    });
+                                }
+                            }
+                            alertService.alertTranslated(notificationData.title, notificationData.message, buttons).then(function () {
+                            }, function () {
+                                //Notify push plugin that the 'notification' event has been handled
+                                _this.pushService.finish(function () {
+                                }, function () {
+                                });
+                            });
+                        }
+                        else if (notificationData.additionalData['contestId']) {
+                            //App is not running or in the background
+                            //Save deep linked contest id for later
+                            _this.deepLinkContestId = notificationData.additionalData['contestId'];
+                            //Notify push plugin that the 'notification' event has been handled
+                            _this.pushService.finish(function () {
+                            }, function () {
+                            });
+                        }
+                    });
                     if (!_this.user.gcmRegistrationId) {
                         _this.user.gcmRegistrationId = localStorage.getItem('gcmRegistrationId');
                     }
@@ -5344,6 +5354,45 @@ var Client = (function () {
         }
         else {
             window.FlurryAgent.logEvent(eventName);
+        }
+    };
+    Client.prototype.getRecursiveProperty = function (object, property) {
+        if (object && property) {
+            var keys = property.split('.');
+            var currentObject = object;
+            for (var i = 0; i < keys.length; i++) {
+                if (!currentObject[keys[i]]) {
+                    return null;
+                }
+                currentObject = currentObject[keys[i]];
+            }
+            return currentObject;
+        }
+    };
+    Client.prototype.setRecursiveProperty = function (object, property, value) {
+        if (object && property) {
+            var keys = property.split('.');
+            var currentObject = object;
+            for (var i = 0; i < keys.length; i++) {
+                if (!currentObject[keys[i]]) {
+                    return;
+                }
+                if (i === keys.length - 1) {
+                    //Last cycle - will exit loop
+                    currentObject[keys[i]] = value;
+                }
+            }
+        }
+    };
+    Client.prototype.initPushService = function () {
+        if (this.clientInfo.platform === 'android') {
+            //Push Service - init
+            //Will have sound/vibration only if sounds are on
+            this.settings.google.gcm.sound = this.session.settings.notifications.sound;
+            this.settings.google.gcm.vibrate = this.session.settings.notifications.vibrate;
+            this.pushService = ionic_native_1.Push.init({
+                'android': this.settings.google.gcm
+            });
         }
     };
     Client = __decorate([

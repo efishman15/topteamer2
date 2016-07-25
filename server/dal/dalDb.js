@@ -361,7 +361,7 @@ module.exports.storeSession = function (data, callback) {
 
         closeDb(data);
 
-        callback(new exceptions.ServerException('Error storing session expired - session expired', {'sessionId': data.session._id}, 'info', 401));
+        callback(new exceptions.ServerException('Error storing session expired - session expired', {'sessionId': data.session._id, 'error' : err}, 'info', 401));
         return;
       }
 
@@ -428,6 +428,60 @@ module.exports.setUser = function (data, callback) {
       callback(null, data);
     });
 };
+
+//---------------------------------------------------------------------
+// setSession
+//
+// Saves specific data into the session's object in db
+//
+// data:
+// -----
+// input: DbHelper, session, setData (properties and their values to set)
+// output: <NA>
+//---------------------------------------------------------------------
+module.exports.setSession = function (data, callback) {
+
+  if (!data.setData && !data.unsetData) {
+    callback(new exceptions.ServerException('Cannot update session, either setData or unsetData must be supplied', {
+      'setData': data.setData,
+      'unsetData': data.unsetData,
+      'dbError': err
+    }, 'error'));
+  }
+
+  var sessionsCollection = data.DbHelper.getCollection('Sessions');
+
+  var updateClause = {};
+  if (data.setData) {
+    updateClause['$set'] = data.setData;
+  }
+  if (data.unsetData) {
+    updateClause['$unset'] = data.unsetData;
+  }
+
+  sessionsCollection.updateOne({'_id': ObjectId(data.session._id)}, updateClause,
+    function (err, results) {
+
+      if (err || results.nModified < 1) {
+
+        closeDb(data);
+
+        callback(new exceptions.ServerException('Error updating session', {
+          'id': data.session._id.toString(),
+          'setData': data.setData,
+          'unsetData': data.unsetData,
+          'dbError': err
+        }, 'error'));
+
+        return;
+      }
+
+      checkToCloseDb(data);
+
+      callback(null, data);
+    });
+};
+
 
 //---------------------------------------------------------------------
 // facebookLogin
@@ -1507,7 +1561,7 @@ function getUsers(data, callback) {
     _id: {$in: data.userIds}
   };
 
-  usersCollection.find({_id: {$in: data.userIds}}, {'gcmRegistrationId' : 1}, function (err, usersCursor) {
+  usersCollection.find(data.whereClause, {'gcmRegistrationId' : 1}, function (err, usersCursor) {
 
     if (err || !usersCursor) {
 

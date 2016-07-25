@@ -30,12 +30,16 @@ export class SettingsPage {
     }
   }
 
-  toggleSettings(name: string) {
+  toggleSettings(name: string, initPushService?:boolean) {
     this.client.logEvent('settings/' + name + '/' + !this.client.session.settings[name]);
     this.client.toggleSettings(name).then(() => {
-    }, (err) => {
+      if (initPushService) {
+        this.client.initPushService();
+      }
+    }, () => {
       //Revert GUI on server error
-      this.client.session.settings[name] = !this.client.session.settings[name];
+      let currentValue: boolean = this.client.getRecursiveProperty(this.client.session.settings, name);
+      this.client.setRecursiveProperty(this.client.session.settings, name, !currentValue);
     });
   }
 

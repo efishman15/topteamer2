@@ -236,13 +236,7 @@ var Client = (function () {
                     _this.logEvent('server/login');
                 }
                 if (_this.clientInfo.platform === 'android') {
-                    //Push Service - init
-                    //Will have sound/vibration only if sounds are on
-                    _this.settings.google.gcm.sound = _this.session.settings.sound;
-                    _this.settings.google.gcm.vibrate = _this.session.settings.sound;
-                    _this.pushService = ionic_native_1.Push.init({
-                        'android': _this.settings.google.gcm
-                    });
+                    _this.initPushService();
                     _this.pushService.on('error', function (error) {
                         window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
                     });
@@ -779,6 +773,45 @@ var Client = (function () {
         }
         else {
             window.FlurryAgent.logEvent(eventName);
+        }
+    };
+    Client.prototype.getRecursiveProperty = function (object, property) {
+        if (object && property) {
+            var keys = property.split('.');
+            var currentObject = object;
+            for (var i = 0; i < keys.length; i++) {
+                if (!currentObject[keys[i]]) {
+                    return null;
+                }
+                currentObject = currentObject[keys[i]];
+            }
+            return currentObject;
+        }
+    };
+    Client.prototype.setRecursiveProperty = function (object, property, value) {
+        if (object && property) {
+            var keys = property.split('.');
+            var currentObject = object;
+            for (var i = 0; i < keys.length; i++) {
+                if (!currentObject[keys[i]]) {
+                    return;
+                }
+                if (i === keys.length - 1) {
+                    //Last cycle - will exit loop
+                    currentObject[keys[i]] = value;
+                }
+            }
+        }
+    };
+    Client.prototype.initPushService = function () {
+        if (this.clientInfo.platform === 'android') {
+            //Push Service - init
+            //Will have sound/vibration only if sounds are on
+            this.settings.google.gcm.sound = this.session.settings.notifications.sound;
+            this.settings.google.gcm.vibrate = this.session.settings.notifications.vibrate;
+            this.pushService = ionic_native_1.Push.init({
+                'android': this.settings.google.gcm
+            });
         }
     };
     Client = __decorate([

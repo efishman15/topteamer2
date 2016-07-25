@@ -1131,8 +1131,6 @@
         "CONTEST_STARTING" : "Starting in {{number}} {{units}}",
         "CONTEST_PARTICIPANTS" : "Participants: {{participants}}",
         "SOUND" : "Sound",
-        "SOUND_ON" : "Sound On",
-        "SOUND_OFF" : "Sound Off",
         "SETTINGS" : "Settings",
         "SIGN_OUT" : "Sign out from Facebook",
         "LANGUAGE" : "Language",
@@ -1340,10 +1338,13 @@
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "Who will you play for?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*Tip: next time you can select a team by tapping on its name or column on the chart<BR/><BR/><STRONG>Who will you play for?</STRONG>",
         "SYSTEM_SHOW_LOG" : "Show server log",
-        "CONTEST_NOTIFICATIONS_ON" : "Contest notifications on",
-        "CONTEST_NOTIFICATIONS_OFF" : "Contest notifications off",
         "SERVER_ERROR_CONTEST_ENDED_TITLE" : "Contest Ended",
-        "SERVER_ERROR_CONTEST_TITLE_MESSAGE" : "Unfortunatelly this contest has ended. You can only view its final results or play other contests"
+        "SERVER_ERROR_CONTEST_TITLE_MESSAGE" : "Unfortunatelly this contest has ended. You can only view its final results or play other contests",
+        "ENDING_CONTESTS" : "Contests end",
+        "GAME_SOUND" : "Game sound",
+        "VIBRATE" : "Vibrate",
+        "WHEN_MY_TEAM_LOSING" : "My team loses",
+        "NOTIFICATIONS" : "Notifications"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1353,9 +1354,7 @@
         "CONTEST_STARTED" : "התחילה לפני {{number}} {{units}}",
         "CONTEST_STARTING" : "מתחילה בעוד {{number}} {{units}}",
         "CONTEST_PARTICIPANTS" : "משתתפים: {{participants}}",
-        "SOUND" : "צלילים",
-        "SOUND_ON" : "צלילים פעילים",
-        "SOUND_OFF" : "צלילים לא פעילים",
+        "SOUND" : "צליל",
         "SETTINGS" : "הגדרות",
         "SIGN_OUT" : "התנתקות מפייסבוק",
         "LANGUAGE" : "שפה",
@@ -1559,10 +1558,13 @@
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "עבור מי תשחקו?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*טיפ: בפעם הבאה תוכלו לבחור קבוצה על ידי לחיצה על שמה או על הטור שלה בגרף.<BR/><BR/><STRONG>עבור מי תרצו לשחק?</STRONG>",
         "SYSTEM_SHOW_LOG" : "הצג לוג שרת",
-        "CONTEST_NOTIFICATIONS_OFF" : "התראות לא פעילות לתחרויות",
-        "CONTEST_NOTIFICATIONS_ON" : "התראות פעילות לתחרויות",
         "SERVER_ERROR_CONTEST_ENDED_TITLE" : "התחרות הסתיימה",
-        "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "לצערנו התחזרות הזו הסתיימה. תוכלו רק לצפות בתוצאות הסופיות שלה או לשחק בתחרויות אחרות"
+        "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "לצערנו התחזרות הזו הסתיימה. תוכלו רק לצפות בתוצאות הסופיות שלה או לשחק בתחרויות אחרות",
+        "ENDING_CONTESTS" : "כשתחרויות מסתיימות",
+        "GAME_SOUND" : "צלילי משחק",
+        "VIBRATE" : "רטט",
+        "WHEN_MY_TEAM_LOSING" : "כשקבוצתי מפסידה",
+        "NOTIFICATIONS" : "התראות"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1573,8 +1575,6 @@
         "CONTEST_STARTING" : "A partir de {{number}} {{units}}",
         "CONTEST_PARTICIPANTS" : "Participantes: {{participants}}",
         "SOUND" : "Sonido",
-        "SOUND_ON" : "Sonido encendido",
-        "SOUND_OFF" : "Sonido apagado",
         "SETTINGS" : "Ajustes",
         "SIGN_OUT" : "Salir del Facebook",
         "LANGUAGE" : "Idioma",
@@ -1784,10 +1784,13 @@
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "¿Quién va a jugar ?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "* Consejo: la próxima vez que se seleccione un equipo pulsando sobre su nombre o columna en la tabla<BR/><BR/><STRONG>¿Para qué equipo juegas ?</STRONG>",
         "SYSTEM_SHOW_LOG" : "Mostrar registro del servidor",
-        "CONTEST_NOTIFICATIONS_OFF" : "notificaciones del concurso off",
-        "CONTEST_NOTIFICATIONS_ON" : "notificaciones concurso en",
         "SERVER_ERROR_CONTEST_ENDED_TITLE" : "concurso Terminado",
-        "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "Desafortunadamente este concurso ha terminado . Sólo puede ver sus resultados finales o jugar otros concursos"
+        "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "Desafortunadamente este concurso ha terminado . Sólo puede ver sus resultados finales o jugar otros concursos",
+        "ENDING_CONTESTS" : "final concursos",
+        "GAME_SOUND" : "Sonidos de juegos",
+        "VIBRATE" : "Vibrar",
+        "WHEN_MY_TEAM_LOSING" : "Mi equipo pierde",
+        "NOTIFICATIONS" : "Notificaciones"
       }
     },
     "platforms" : {

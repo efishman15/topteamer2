@@ -27,13 +27,17 @@ var SettingsPage = (function () {
             this.client.events.publish('topTeamer:languageChanged', directionChanged);
         }
     };
-    SettingsPage.prototype.toggleSettings = function (name) {
+    SettingsPage.prototype.toggleSettings = function (name, initPushService) {
         var _this = this;
         this.client.logEvent('settings/' + name + '/' + !this.client.session.settings[name]);
         this.client.toggleSettings(name).then(function () {
-        }, function (err) {
+            if (initPushService) {
+                _this.client.initPushService();
+            }
+        }, function () {
             //Revert GUI on server error
-            _this.client.session.settings[name] = !_this.client.session.settings[name];
+            var currentValue = _this.client.getRecursiveProperty(_this.client.session.settings, name);
+            _this.client.setRecursiveProperty(_this.client.session.settings, name, !currentValue);
         });
     };
     SettingsPage.prototype.switchLanguage = function () {

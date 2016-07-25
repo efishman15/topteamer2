@@ -346,14 +346,31 @@ export class UserSettings {
   language:string;
   timezoneOffset:number;
   sound:boolean;
-  contestNotifications:boolean;
+  notifications:NotificationSettings;
 
   constructor(language: string, timezoneOffset: number) {
     this.language = language;
     this.timezoneOffset = timezoneOffset;
     this.sound = true;
-    this.contestNotifications = true;
+    this.notifications = new NotificationSettings();
   }
+}
+
+export class NotificationSettings {
+  on: boolean;
+  sound:boolean;
+  vibrate:boolean;
+  endingContests:boolean;
+  myTeamLosing:boolean;
+
+  constructor() {
+    this.on = true;
+    this.sound = true;
+    this.vibrate = true;
+    this.endingContests = true;
+    this.myTeamLosing = true;
+  }
+
 }
 
 export class ClientInfo {
@@ -406,6 +423,7 @@ export class ClientShareAppPlatformPackage {
 export class SessionSettings {
   sound:boolean;
   language:string;
+  notifications: NotificationSettings;
 }
 
 export class Feature {
