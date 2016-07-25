@@ -621,7 +621,7 @@ module.exports.answer = function (req, res, next) {
           }
 
           var now = (new Date()).getTime();
-          if (generalUtils.settings.server.contest.alerts.teamLosing[data.contest.endOption] &&
+          if (generalUtils.settings.server.contest.alerts.teamLosing.timing[data.contest.endOption] &&
             //Only if this end option time slot should receive losing alerts
               //And minimum time has passed since last losing alert to the same team
             (
