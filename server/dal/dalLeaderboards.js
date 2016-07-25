@@ -163,8 +163,8 @@ module.exports.getFriends = getFriends;
 function getFriends(data, callback) {
 
     var options = {
-        withMemberData: false,
-        pageSize: generalUtils.settings.server.leaderboard.pageSize + 1 //Including myself
+        withMemberData: false
+        //pageSize: generalUtils.settings.server.leaderboard.pageSize + 1 //Including myself
     };
 
     data.clientResponse = [];
@@ -192,7 +192,6 @@ function getFriends(data, callback) {
       options.reverse = true;
 
       generalLeaderboard.rankedInList(trueLeaderboardMembers, options, function (leaders) {
-        console.log('final list: ' + JSON.stringify(leaders));
         for (var i = 0; i < leaders.length; i++) {
           data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
         }
