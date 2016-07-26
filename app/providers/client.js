@@ -758,7 +758,7 @@ var Client = (function () {
                 _this.user.gcmRegistrationId = registrationData.registrationId;
                 if (_this.session && _this.user.gcmRegistrationId &&
                     ((_this.session.gcmRegistrationId ||
-                        _this.['session'].gcmRegistrationId !== _this.user.gcmRegistrationId))) {
+                        _this.session.gcmRegistrationId !== _this.user.gcmRegistrationId))) {
                     //If client has a registration Id and server has not / server has a different one
                     //Update the server
                     _this.serverPost('user/setGcmRegistration', { 'registrationId': _this.user.gcmRegistrationId }).then(function () {

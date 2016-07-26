@@ -1,16 +1,18 @@
-<ion-navbar app-top-bar *navbar>
-  <button menuToggle>
-    <ion-icon name="menu"></ion-icon>
-  </button>
-  <ion-title>{{client.translate('CONTEST_LEADERS')}}</ion-title>
-</ion-navbar>
+<ion-header>
+  <ion-navbar app-top-bar>
+    <button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>{{client.translate('CONTEST_LEADERS')}}</ion-title>
+  </ion-navbar>
+  <simple-tabs>
+    <simple-tab simpleTabTitle="{{client.translate('CONTEST_LEADERS_GENERAL_SCORING')}}"
+                (selected)="tabGeneralParticipants()"></simple-tab>
+    <simple-tab simpleTabTitle="{{params.data.contest.teams[0].name}}" (selected)="tabTeamParticipants(0)"></simple-tab>
+    <simple-tab simpleTabTitle="{{params.data.contest.teams[1].name}}" (selected)="tabTeamParticipants(1)"></simple-tab>
+  </simple-tabs>
+</ion-header>
 
-<simple-tabs>
-  <simple-tab simpleTabTitle="{{client.translate('CONTEST_LEADERS_GENERAL_SCORING')}}"
-              (selected)="tabGeneralParticipants()"></simple-tab>
-  <simple-tab simpleTabTitle="{{params.data.contest.teams[0].name}}" (selected)="tabTeamParticipants(0)"></simple-tab>
-  <simple-tab simpleTabTitle="{{params.data.contest.teams[1].name}}" (selected)="tabTeamParticipants(1)"></simple-tab>
-</simple-tabs>
 
 <ion-content class="app-bg">
 

@@ -165,7 +165,7 @@
     },
     "versions" : {
       "mustUpdate" : {
-        "minVersion" : "1.0.4",
+        "minVersion" : "1.0.5",
         "popup" : {
           "en" : {
             "title" : "New version",
@@ -467,7 +467,8 @@
       "list" : {
         "recentlyFinishedDays" : 180,
         "pageSize" : 10,
-        "clientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.avatar", "leader.name", "leader.avatar", "link"]
+        "clientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.avatar", "leader.name", "leader.avatar", "link"],
+        "adminClientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.avatar", "leader.name", "leader.avatar", "link", "rating", "systemParticipants"]
       },
       "details" : {
         "clientTemplate" : {
@@ -570,7 +571,7 @@
             "contestNameTitle1" : "$settings{client.ui.he.GAME_NAME}: {{team0}} או {{team1}}?",
             "contestNameTitle2" : "תחרות {{team0}} נגד {{team1}}",
             "yourTeamLoses1" : "קבוצת {{winningTeam}} מובילה. מה יהיה?",
-            "yourTeamLoses2" : "קבוצת {{winningTeam}} קורעת לנו את הצורה. מה עכשיו?",
+            "yourTeamLoses2" : "קבוצת {{winningTeam}} מנצחת אותנו. מה עכשיו?",
             "contestEnds1" : "התחרות מסתיימת בעוד {{contestEndsNumber}} {{contestEndsUnits}}. עזרו לקבוצת {{yourTeam}} לנצח!",
             "contestEnds2" : "עוד {{contestEndsNumber}} {{contestEndsUnits}} נותרו לסיום התחרות. עזרו לקבוצת {{yourTeam}} לנצח!"
           },
@@ -1082,9 +1083,9 @@
       },
       "selectableContestTypes" : [["systemTrivia", "userTrivia"]],
       "endOptions" : {
-        "m5" : {
-          "value" : "m5",
-          "number" : 5,
+        "m10" : {
+          "value" : "m10",
+          "number" : 10,
           "units" : "ENDS_IN_MINUTES",
           "msecMultiplier" : 60000
         },
@@ -1559,7 +1560,7 @@
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*טיפ: בפעם הבאה תוכלו לבחור קבוצה על ידי לחיצה על שמה או על הטור שלה בגרף.<BR/><BR/><STRONG>עבור מי תרצו לשחק?</STRONG>",
         "SYSTEM_SHOW_LOG" : "הצג לוג שרת",
         "SERVER_ERROR_CONTEST_ENDED_TITLE" : "התחרות הסתיימה",
-        "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "לצערנו התחזרות הזו הסתיימה. תוכלו רק לצפות בתוצאות הסופיות שלה או לשחק בתחרויות אחרות",
+        "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "לצערנו התחרות הזו הסתיימה. תוכלו רק לצפות בתוצאות הסופיות שלה או לשחק בתחרויות אחרות",
         "ENDING_CONTESTS" : "כשתחרויות מסתיימות",
         "GAME_SOUND" : "צלילי משחק",
         "VIBRATE" : "רטט",

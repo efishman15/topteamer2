@@ -1,10 +1,11 @@
-<ion-navbar app-top-bar *navbar>
-  <button menuToggle>
-    <ion-icon name="menu"></ion-icon>
-  </button>
-  <ion-title>{{client.translate('SETTINGS')}}</ion-title>
-
-</ion-navbar>
+<ion-header>
+  <ion-navbar app-top-bar>
+    <button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>{{client.translate('SETTINGS')}}</ion-title>
+  </ion-navbar>
+</ion-header>
 
 <ion-content class="app-bg">
   <ion-list inset class="no-horizontal-padding">
@@ -21,30 +22,35 @@
       <ion-toggle [(ngModel)]="client.session.settings.notifications.on"
                   (click)="toggleSettings('notifications.on')"></ion-toggle>
     </ion-item>
-    <div class="settings-notifications-properties-{{client.currentLanguage.direction}}" [ngClass]="{'settings-notifications-off': !client.session.settings.notifications.on}">
+    <div class="settings-notifications-properties-{{client.currentLanguage.direction}}"
+         [ngClass]="{'settings-notifications-off': !client.session.settings.notifications.on}">
       <ion-item no-lines class="app-menu-item no-horizontal-padding">
         <ion-label>{{client.translate('SOUND')}}
         </ion-label>
-        <ion-toggle [disabled]="!client.session.settings.notifications.on" [(ngModel)]="client.session.settings.notifications.sound"
+        <ion-toggle [disabled]="!client.session.settings.notifications.on"
+                    [(ngModel)]="client.session.settings.notifications.sound"
                     (click)="toggleSettings('notifications.sound',true)"></ion-toggle>
       </ion-item>
 
       <ion-item no-lines class="app-menu-item no-horizontal-padding">
         <ion-label>{{client.translate('VIBRATE')}}
         </ion-label>
-        <ion-toggle [disabled]="!client.session.settings.notifications.on" [(ngModel)]="client.session.settings.notifications.vibrate"
+        <ion-toggle [disabled]="!client.session.settings.notifications.on"
+                    [(ngModel)]="client.session.settings.notifications.vibrate"
                     (click)="toggleSettings('notifications.vibrate', true)"></ion-toggle>
       </ion-item>
 
       <ion-item no-lines class="app-menu-item no-horizontal-padding">
         <ion-label>{{client.translate('ENDING_CONTESTS')}}</ion-label>
-        <ion-toggle [disabled]="!client.session.settings.notifications.on" [(ngModel)]="client.session.settings.notifications.endingContests"
+        <ion-toggle [disabled]="!client.session.settings.notifications.on"
+                    [(ngModel)]="client.session.settings.notifications.endingContests"
                     (click)="toggleSettings('notifications.endingContests')"></ion-toggle>
       </ion-item>
 
       <ion-item class="app-menu-item no-horizontal-padding">
         <ion-label>{{client.translate('WHEN_MY_TEAM_LOSING')}}</ion-label>
-        <ion-toggle [disabled]="!client.session.settings.notifications.on" [(ngModel)]="client.session.settings.notifications.myTeamLosing"
+        <ion-toggle [disabled]="!client.session.settings.notifications.on"
+                    [(ngModel)]="client.session.settings.notifications.myTeamLosing"
                     (click)="toggleSettings('notifications.myTeamLosing')"></ion-toggle>
       </ion-item>
     </div>

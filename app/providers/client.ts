@@ -534,7 +534,7 @@ export class Client {
     return this.nav.setPages(this.getNavPages(pages));
   }
 
-  getNavPages(pages:Array<AppPage>) : Array<any> {
+  getNavPages(pages:Array<AppPage>):Array<any> {
 
     let navPages:Array<any> = new Array<any>();
     pages.forEach((appPage:AppPage) => {
@@ -745,8 +745,8 @@ export class Client {
     return translatedValue;
   }
 
-  toggleSettings(name: string) {
-    let postData : Object = {'name': name};
+  toggleSettings(name:string) {
+    let postData:Object = {'name': name};
     return this.serverPost('user/toggleSettings', postData);
   }
 
@@ -789,11 +789,11 @@ export class Client {
     }
   }
 
-  getRecursiveProperty(object: any, property: string) : any {
+  getRecursiveProperty(object:any, property:string):any {
     if (object && property) {
       let keys = property.split('.');
-      let currentObject: any = object;
-      for (var i=0; i<keys.length; i++) {
+      let currentObject:any = object;
+      for (var i = 0; i < keys.length; i++) {
         if (!currentObject[keys[i]]) {
           return null;
         }
@@ -803,15 +803,15 @@ export class Client {
     }
   }
 
-  setRecursiveProperty(object: any, property: string, value: any) : any {
+  setRecursiveProperty(object:any, property:string, value:any):any {
     if (object && property) {
       let keys = property.split('.');
-      let currentObject: any = object;
-      for (var i=0; i<keys.length; i++) {
+      let currentObject:any = object;
+      for (var i = 0; i < keys.length; i++) {
         if (!currentObject[keys[i]]) {
           return;
         }
-        if (i===keys.length-1) {
+        if (i === keys.length - 1) {
           //Last cycle - will exit loop
           currentObject[keys[i]] = value;
         }
@@ -848,7 +848,7 @@ export class Client {
         if (this.session && this.user.gcmRegistrationId &&
           (
             (this.session.gcmRegistrationId ||
-            this.['session'].gcmRegistrationId !== this.user.gcmRegistrationId)
+            this.session.gcmRegistrationId !== this.user.gcmRegistrationId)
           )) {
 
           //If client has a registration Id and server has not / server has a different one
@@ -872,9 +872,9 @@ export class Client {
                 'text': notificationData.additionalData['buttonText'],
                 'cssClass': notificationData.additionalData['buttonCssClass'],
                 'handler': () => {
-                  contestsService.getContest(notificationData.additionalData['contestId']).then((contest: Contest) => {
+                  contestsService.getContest(notificationData.additionalData['contestId']).then((contest:Contest) => {
                     this.showContest(contest, 'push', true);
-                  },() => {
+                  }, () => {
                   })
                 }
               });
@@ -891,7 +891,7 @@ export class Client {
           }, ()=> {
             //Notify push plugin that the 'notification' event has been handled
             this.pushService.finish(()=> {
-            },()=>{
+            }, ()=> {
             });
           });
         }
@@ -901,7 +901,7 @@ export class Client {
           this.deepLinkContestId = notificationData.additionalData['contestId'];
           //Notify push plugin that the 'notification' event has been handled
           this.pushService.finish(()=> {
-          },()=>{
+          }, ()=> {
           });
         }
       });

@@ -1057,7 +1057,13 @@ function prepareContestsQuery(data, callback) {
   var limitClause;
   var sortClause = {'$sort': {}};
 
-  var clientFields = generalUtils.arrayToObject(generalUtils.settings.server.contest.list.clientFields, 1);
+  var clientFields;
+  if (data.session.isAdmin) {
+    clientFields = generalUtils.arrayToObject(generalUtils.settings.server.contest.list.adminClientFields, 1);
+  }
+  else {
+    clientFields = generalUtils.arrayToObject(generalUtils.settings.server.contest.list.clientFields, 1);
+  }
 
   //Will return the user's team if joined to a team or null if not
   clientFields['myTeam'] = {$cond: [{$eq: ['$users.' + data.session.userId + '.userId', ObjectId(data.session.userId)]}, '$users.' + data.session.userId + '.team', null]};

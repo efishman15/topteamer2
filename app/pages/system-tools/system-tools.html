@@ -1,9 +1,11 @@
-<ion-navbar app-top-bar *navbar>
-  <button menuToggle>
-    <ion-icon name="menu"></ion-icon>
-  </button>
-  <ion-title>{{client.translate('SYSTEM_TOOLS')}}</ion-title>
-</ion-navbar>
+<ion-header>
+  <ion-navbar app-top-bar>
+    <button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>{{client.translate('SYSTEM_TOOLS')}}</ion-title>
+  </ion-navbar>
+</ion-header>
 
 <ion-content class="app-bg">
 
@@ -12,7 +14,8 @@
     </button>
   </div>
   <div text-center padding>
-    <button class="button-full app-button-light-purple" (click)="restart()">{{client.translate('SYSTEM_RESTART_SERVER')}}
+    <button class="button-full app-button-light-purple" (click)="restart()">
+      {{client.translate('SYSTEM_RESTART_SERVER')}}
     </button>
   </div>
 

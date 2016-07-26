@@ -1,16 +1,16 @@
-<ion-toolbar app-top-bar>
+<ion-header>
+  <ion-toolbar app-top-bar>
+    <ion-title>
+      {{client.translate('NEW_CONTEST')}}
+    </ion-title>
 
-  <ion-title>
-    {{client.translate('NEW_CONTEST')}}
-  </ion-title>
-
-  <ion-buttons left>
-    <button (click)="selectContestContent(null)">
-      <ion-icon name="close-circle"></ion-icon>
-    </button>
-  </ion-buttons>
-
-</ion-toolbar>
+    <ion-buttons left>
+      <button (click)="selectContestContent(null)">
+        <ion-icon name="close-circle"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
 <ion-content class="app-bg" dir="{{client.currentLanguage.direction}}">
 

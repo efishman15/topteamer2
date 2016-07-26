@@ -1,10 +1,11 @@
-<ion-navbar app-top-bar *navbar>
-  <button menuToggle>
-    <ion-icon name="menu"></ion-icon>
-  </button>
-  <ion-title>{{client.translate(params.data.mode === 'add' ? 'NEW_CONTEST' : 'EDIT_CONTEST')}}</ion-title>
-
-</ion-navbar>
+<ion-header>
+  <ion-navbar app-top-bar>
+    <button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>{{client.translate(params.data.mode === 'add' ? 'NEW_CONTEST' : 'EDIT_CONTEST')}}</ion-title>
+  </ion-navbar>
+</ion-header>
 
 <ion-content class="app-bg">
 
@@ -55,7 +56,8 @@
       </ion-row>
       <ion-row>
         <ion-col>
-          <div text-center *ngIf="(team0Control.dirty || submitted) && team0Control.errors && team0Control.errors.required"
+          <div text-center
+               *ngIf="(team0Control.dirty || submitted) && team0Control.errors && team0Control.errors.required"
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
           </div>
@@ -68,7 +70,8 @@
           </div>
         </ion-col>
         <ion-col>
-          <div text-center *ngIf="(team1Control.dirty || submitted) && team1Control.errors && team1Control.errors.required"
+          <div text-center
+               *ngIf="(team1Control.dirty || submitted) && team1Control.errors && team1Control.errors.required"
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
           </div>
@@ -88,7 +91,8 @@
         </ion-input>
       </ion-item>
     </div>
-    <div text-center *ngIf="(subjectControl.dirty || submitted) && subjectControl.errors && subjectControl.errors.required"
+    <div text-center
+         *ngIf="(subjectControl.dirty || submitted) && subjectControl.errors && subjectControl.errors.required"
          class="invalid-input">
       {{client.translate('FIELD_REQUIRED')}}
     </div>
@@ -149,25 +153,28 @@
         </ion-col>
       </ion-row>
       <div *ngIf="contestLocalCopy.type.questions && contestLocalCopy.type.questions.visibleCount > 0">
-          <ion-scroll class="set-contest-questions-scroll-{{client.currentLanguage.direction}}" scrollY="true" [ngStyle]="{'height': contestLocalCopy.type.questions.visibleCount >=5 ? '230px' : (contestLocalCopy.type.questions.visibleCount * 46) + 'px'}">
-            <ion-list class="set-contet-questions-list">
-              <ion-item
-                        *ngFor="let question of contestLocalCopy.type.questions.list, let i=index"
-                        [hidden]="question.deleted">
-                <ion-icon class="pointer" title="{{client.translate('REMOVE_QUESTION')}}" (click)="removeQuestion(i)" name="close-circle"
-                          item-right></ion-icon>
+        <ion-scroll class="set-contest-questions-scroll-{{client.currentLanguage.direction}}" scrollY="true"
+                    [ngStyle]="{'height': contestLocalCopy.type.questions.visibleCount >=5 ? '230px' : (contestLocalCopy.type.questions.visibleCount * 46) + 'px'}">
+          <ion-list class="set-contet-questions-list">
+            <ion-item
+              *ngFor="let question of contestLocalCopy.type.questions.list, let i=index"
+              [hidden]="question.deleted">
+              <ion-icon class="pointer" title="{{client.translate('REMOVE_QUESTION')}}" (click)="removeQuestion(i)"
+                        name="close-circle"
+                        item-right></ion-icon>
               <span class="pointer" (click)="openQuestionEditor('edit', question)" [innerHtml]="question.text">
               </span>
-              </ion-item>
-            </ion-list>
-          </ion-scroll>
-          <ion-item no-lines class="transparent-background set-contest-questions-random-order">
-            <ion-label class="base-font">{{client.translate('SHOW_IN_RANDOM_ORDER')}}
-            </ion-label>
-            <ion-checkbox light-purple [(ngModel)]="contestLocalCopy.type.randomOrder" class="set-contest-random-order-checkbox-{{client.currentLanguage.direction}}">
-            </ion-checkbox>
-          </ion-item>
-        </div>
+            </ion-item>
+          </ion-list>
+        </ion-scroll>
+        <ion-item no-lines class="transparent-background set-contest-questions-random-order">
+          <ion-label class="base-font">{{client.translate('SHOW_IN_RANDOM_ORDER')}}
+          </ion-label>
+          <ion-checkbox light-purple [(ngModel)]="contestLocalCopy.type.randomOrder"
+                        class="set-contest-random-order-checkbox-{{client.currentLanguage.direction}}">
+          </ion-checkbox>
+        </ion-item>
+      </div>
     </div>
 
     <div padding-left padding-right class="invalid-input"

@@ -1,16 +1,15 @@
-<ion-toolbar app-top-bar>
-
-  <ion-title>
-    {{client.translate('FACEBOOK_POST_TITLE')}}
-  </ion-title>
-
-  <ion-buttons left>
-    <button (click)="close(false)">
-      <ion-icon name="close-circle"></ion-icon>
-    </button>
-  </ion-buttons>
-
-</ion-toolbar>
+<ion-header>
+  <ion-toolbar app-top-bar>
+    <ion-title>
+      {{client.translate('FACEBOOK_POST_TITLE')}}
+    </ion-title>
+    <ion-buttons left>
+      <button (click)="close(false)">
+        <ion-icon name="close-circle"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
 <ion-content class="app-bg" dir="{{client.currentLanguage.direction}}">
 
