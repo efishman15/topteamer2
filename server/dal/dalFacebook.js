@@ -61,7 +61,7 @@ module.exports.getUserInfo = function (data, callback) {
       }
       else {
         callback(new exceptions.ServerException('Error validating facebook access token, token belongs to someone else', {
-          'facebookResponse': responseData,
+          'facebookResponse': facebookData,
           'facebookAccessToken': data.user.thirdParty.accessToken,
           'actualFacebookId': facebookData.id
         }));
@@ -70,7 +70,7 @@ module.exports.getUserInfo = function (data, callback) {
     }
     else {
       callback(new exceptions.ServerMessageException('SERVER_ERROR_INVALID_FACEBOOK_ACCESS_TOKEN', {
-        'facebookResponse': responseData,
+        'facebookResponse': facebookData,
         'facebookAccessToken': data.user.thirdParty.accessToken
       }, 424));
       return;
