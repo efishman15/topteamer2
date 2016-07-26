@@ -11189,6 +11189,9 @@ body {
 .toolbar-new-contest-rtl {
   margin-right: -10px; }
 
+.action-sheet-title {
+  text-align: center !important; }
+
 .chart {
   margin: 0px auto;
   background-color: #ffffff;
