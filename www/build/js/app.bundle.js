@@ -5263,8 +5263,8 @@ var Client = (function () {
         return new Promise(function (resolve, reject) {
             var postData = { 'language': _this.user.settings.language };
             _this.serverPost('user/switchLanguage', postData).then(function () {
-                _this.localSwitchLanguage(_this.user.settings.language);
                 _this.session.settings.language = _this.user.settings.language;
+                _this.localSwitchLanguage(_this.user.settings.language);
                 _this.logEvent('settings/language/change', { language: _this.user.settings.language });
                 resolve();
             }, function (err) {

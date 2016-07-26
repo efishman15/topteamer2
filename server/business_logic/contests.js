@@ -541,8 +541,10 @@ function joinToContestObject(contest, teamId, session) {
     contest.users[session.userId].team = teamId;
   }
 
-  //Join the user to the contest's leader board (with zero score addition) to this team
-  dalLeaderboard.addScore(contest._id, teamId, 0, session.facebookUserId, session.name, session.avatar);
+  //If edit mode (has _id) - join the user to the contest's leader board (with zero score addition) to this team
+  if (contest._id) {
+    dalLeaderboard.addScore(contest._id, teamId, 0, session.facebookUserId, session.name, session.avatar);
+  }
 
   return newJoin;
 }
@@ -599,6 +601,7 @@ module.exports.setContest = function (req, res, next) {
     function (data, callback) {
       if (data.mode === 'add') {
         //In case of add - contest needed to be added in the previous operation first, to get an _id
+        dalLeaderboard.addScore(data.contest._id, 0, 0, data.session.facebookUserId, data.session.name, data.session.avatar);
         dalBranchIo.createContestLinks(data, callback);
       }
       else {

@@ -759,8 +759,8 @@ export class Client {
     return new Promise((resolve, reject) => {
       var postData = {'language': this.user.settings.language};
       this.serverPost('user/switchLanguage', postData).then(() => {
-        this.localSwitchLanguage(this.user.settings.language);
         this.session.settings.language = this.user.settings.language;
+        this.localSwitchLanguage(this.user.settings.language);
         this.logEvent('settings/language/change', {language: this.user.settings.language});
         resolve();
       }, (err) => {
