@@ -4480,6 +4480,7 @@ exports.confirm = function (title, message, params) {
         var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
         var alert = ionic_angular_1.Alert.create({
             title: alignedTitle,
+            cssClass: 'app-bg',
             message: client.translate(message, params),
             buttons: [
                 {

@@ -759,8 +759,8 @@ export class Client {
     return new Promise((resolve, reject) => {
       var postData = {'language': this.user.settings.language};
       this.serverPost('user/switchLanguage', postData).then(() => {
-        this.session.settings.language = this.user.settings.language;
         this.localSwitchLanguage(this.user.settings.language);
+        this.session.settings.language = this.user.settings.language;
         this.logEvent('settings/language/change', {language: this.user.settings.language});
         resolve();
       }, (err) => {
@@ -848,7 +848,7 @@ export class Client {
         if (this.session && this.user.gcmRegistrationId &&
           (
             (this.session.gcmRegistrationId ||
-            this.session.gcmRegistrationId !== this.user.gcmRegistrationId)
+            this.['session'].gcmRegistrationId !== this.user.gcmRegistrationId)
           )) {
 
           //If client has a registration Id and server has not / server has a different one
