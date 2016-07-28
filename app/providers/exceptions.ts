@@ -42,13 +42,40 @@ export class MyExceptionHandler extends ExceptionHandler {
 
     var client = Client.getInstance();
 
-    if (client &&
-      (
-        (client.settings.general && client.settings.general.debugMode) ||
-        (client.session && client.session.isAdmin)
-      )) {
-      //Will also log the error to the console
-      super.call(exception, stackTrace, reason);
+    if (client) {
+
+      //Post errors to server
+      if (
+        (
+          (!client.settings) ||
+          (client.settings && client.settings.general && client.settings.general.postErrors) ||
+          (client.session && client.session.isAdmin)
+        )) {
+
+        //Will also try to post errors to the server
+        let postData:any = {};
+        if (exception) {
+          postData.exception = exception;
+        }
+        if (stackTrace) {
+          postData.stack = stackTrace;
+        }
+        if (reason) {
+          postData.reason = reason;
+        }
+        if (client.clientInfo) {
+          postData.clientInfo = client.clientInfo;
+        }
+        if (client.session) {
+          postData.sessionId = client.session.token;
+        }
+
+        client.serverPost('client/error', postData).then(()=> {
+        }, ()=> {
+        });
+
+      }
+
     }
   }
 }

@@ -32,7 +32,9 @@ export class ContestPage {
       contestsService.setContestClientData(eventData[0].contest);
 
       //Refresh the contest chart and the contest details
-      this.refreshContestChart(eventData[0].contest)
+      //This is the only case where we want to animate the chart
+      //right after a quiz so the user will notice the socre changes
+      this.refreshContestChart(eventData[0].contest, true)
 
       //Event data comes as an array of data objects - we expect only one (last quiz results)
       this.lastQuizResults = eventData[0];
@@ -56,7 +58,7 @@ export class ContestPage {
     });
 
     this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
-      this.refreshContestChart(eventData[0]);
+      this.refreshContestChart(eventData[0], false);
     });
 
   }
@@ -74,9 +76,9 @@ export class ContestPage {
     this.client.openPage('ContestParticipantsPage', {'contest': this.contest, 'source': source});
   }
 
-  refreshContestChart(contest) {
+  refreshContestChart(contest: Contest, animate: boolean) {
     this.contest = contest;
-    this.contestChartComponent.refresh(contest);
+    this.contestChartComponent.refresh(contest, animate);
   }
 
   share(source) {

@@ -4,6 +4,7 @@ declare global
 {
   interface Window {
     cordova: any;
+    device: any;
     StatusBar: any;
     loadJsFile(fileName:string) : void;
     FB: IFB;

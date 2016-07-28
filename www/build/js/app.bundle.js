@@ -421,12 +421,13 @@ var ContestChartComponent = (function () {
             });
         }
     };
-    ContestChartComponent.prototype.refresh = function (contest) {
+    ContestChartComponent.prototype.refresh = function (contest, animate) {
         if (contest) {
             //new contest object arrived
             this.contest = contest;
             this.adjustScores();
         }
+        this.contest.dataSource.chart.animation = (animate ? 1 : 0);
         this.chart.setJSONData(this.contest.dataSource);
     };
     ContestChartComponent.prototype.onResize = function () {
@@ -2033,7 +2034,9 @@ var ContestPage = (function () {
             //Prepare some client calculated fields on the contest
             contestsService.setContestClientData(eventData[0].contest);
             //Refresh the contest chart and the contest details
-            _this.refreshContestChart(eventData[0].contest);
+            //This is the only case where we want to animate the chart
+            //right after a quiz so the user will notice the socre changes
+            _this.refreshContestChart(eventData[0].contest, true);
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
@@ -2052,7 +2055,7 @@ var ContestPage = (function () {
             }, 500);
         });
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
-            _this.refreshContestChart(eventData[0]);
+            _this.refreshContestChart(eventData[0], false);
         });
     }
     ContestPage.prototype.ionViewWillEnter = function () {
@@ -2065,9 +2068,9 @@ var ContestPage = (function () {
     ContestPage.prototype.showParticipants = function (source) {
         this.client.openPage('ContestParticipantsPage', { 'contest': this.contest, 'source': source });
     };
-    ContestPage.prototype.refreshContestChart = function (contest) {
+    ContestPage.prototype.refreshContestChart = function (contest, animate) {
         this.contest = contest;
-        this.contestChartComponent.refresh(contest);
+        this.contestChartComponent.refresh(contest, animate);
     };
     ContestPage.prototype.share = function (source) {
         this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
@@ -4620,6 +4623,7 @@ var Client = (function () {
         }
         else {
             this.clientInfo.mobile = true;
+            this.clientInfo.device = window.device;
         }
         this.serverGateway = new ServerGateway(http);
     }
@@ -4907,6 +4911,7 @@ var Client = (function () {
     };
     Client.prototype.openNewContest = function () {
         var _this = this;
+        var a = window.device.moshe.david;
         this.logEvent('menu/newContest');
         var modal = this.createModalPage('ContestTypePage');
         modal.onDismiss(function (contestTypeId) {
@@ -5852,11 +5857,32 @@ var MyExceptionHandler = (function (_super) {
             window.myLogError('UnhandledException', errorMessage);
         }
         var client = client_1.Client.getInstance();
-        if (client &&
-            ((client.settings.general && client.settings.general.debugMode) ||
+        if (client) {
+            //Post errors to server
+            if (((!client.settings) ||
+                (client.settings && client.settings.general && client.settings.general.postErrors) ||
                 (client.session && client.session.isAdmin))) {
-            //Will also log the error to the console
-            _super.prototype.call.call(this, exception, stackTrace, reason);
+                //Will also try to post errors to the server
+                var postData = {};
+                if (exception) {
+                    postData.exception = exception;
+                }
+                if (stackTrace) {
+                    postData.stack = stackTrace;
+                }
+                if (reason) {
+                    postData.reason = reason;
+                }
+                if (client.clientInfo) {
+                    postData.clientInfo = client.clientInfo;
+                }
+                if (client.session) {
+                    postData.sessionId = client.session.token;
+                }
+                client.serverPost('client/error', postData).then(function () {
+                }, function () {
+                });
+            }
         }
     };
     return MyExceptionHandler;

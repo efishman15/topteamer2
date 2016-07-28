@@ -42,11 +42,32 @@ var MyExceptionHandler = (function (_super) {
             window.myLogError('UnhandledException', errorMessage);
         }
         var client = client_1.Client.getInstance();
-        if (client &&
-            ((client.settings.general && client.settings.general.debugMode) ||
+        if (client) {
+            //Post errors to server
+            if (((!client.settings) ||
+                (client.settings && client.settings.general && client.settings.general.postErrors) ||
                 (client.session && client.session.isAdmin))) {
-            //Will also log the error to the console
-            _super.prototype.call.call(this, exception, stackTrace, reason);
+                //Will also try to post errors to the server
+                var postData = {};
+                if (exception) {
+                    postData.exception = exception;
+                }
+                if (stackTrace) {
+                    postData.stack = stackTrace;
+                }
+                if (reason) {
+                    postData.reason = reason;
+                }
+                if (client.clientInfo) {
+                    postData.clientInfo = client.clientInfo;
+                }
+                if (client.session) {
+                    postData.sessionId = client.session.token;
+                }
+                client.serverPost('client/error', postData).then(function () {
+                }, function () {
+                });
+            }
         }
     };
     return MyExceptionHandler;

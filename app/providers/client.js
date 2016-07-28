@@ -39,6 +39,7 @@ var Client = (function () {
         }
         else {
             this.clientInfo.mobile = true;
+            this.clientInfo.device = window.device;
         }
         this.serverGateway = new ServerGateway(http);
     }

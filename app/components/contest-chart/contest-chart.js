@@ -109,12 +109,13 @@ var ContestChartComponent = (function () {
             });
         }
     };
-    ContestChartComponent.prototype.refresh = function (contest) {
+    ContestChartComponent.prototype.refresh = function (contest, animate) {
         if (contest) {
             //new contest object arrived
             this.contest = contest;
             this.adjustScores();
         }
+        this.contest.dataSource.chart.animation = (animate ? 1 : 0);
         this.chart.setJSONData(this.contest.dataSource);
     };
     ContestChartComponent.prototype.onResize = function () {

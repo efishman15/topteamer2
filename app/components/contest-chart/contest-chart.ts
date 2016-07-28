@@ -132,12 +132,14 @@ export class ContestChartComponent {
     }
   }
 
-  refresh(contest?:Contest) {
+  refresh(contest?:Contest, animate?:boolean) {
     if (contest) {
       //new contest object arrived
       this.contest = contest;
       this.adjustScores();
     }
+
+    this.contest.dataSource.chart.animation = (animate ? 1 : 0);
 
     this.chart.setJSONData(this.contest.dataSource);
   }

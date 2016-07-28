@@ -20,6 +20,19 @@ module.exports.server = logger.createLogger({
   }
 });
 
+module.exports.client = logger.createLogger({
+  name: 'client',
+  streams: [{
+    type: 'rotating-file',
+    path: path.resolve(__dirname, '../logs/client/client.log'),
+    period: '1d',   // daily rotation
+    count: 180        // keep back copies
+  }],
+  serializers: {
+    req: reqSerializer
+  }
+});
+
 module.exports.paypalIPN = logger.createLogger({
   name: 'topTeamerPayPalIPN',
   streams: [{

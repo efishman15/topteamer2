@@ -125,6 +125,7 @@ export class GeneralSettings {
   webCanvasWidth:number;
   facebookFanPage:string;
   debugMode:boolean;
+  postErrors:boolean;
 }
 
 export class FacebookSettings {
@@ -377,10 +378,7 @@ export class ClientInfo {
   appVersion:string;
   platform:string;
   mobile:boolean;
-
-  constructor() {
-
-  }
+  device:any;
 }
 
 export class Session {

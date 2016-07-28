@@ -4,6 +4,7 @@ var httpUtils = require(path.resolve(__dirname, './http'));
 var util = require('util');
 var async = require('async');
 var get_ip = require('ipware')().get_ip;
+var logger = require(path.resolve(__dirname, './logger'));
 
 //-------------------------------------------------------------------------------------------------------
 // returns okResponse sent to the client
@@ -477,3 +478,18 @@ module.exports.arrayToObject = function (array, objectValue) {
   return newObject;
 };
 
+//-------------------------------------------------------------------------------------------------------------------------
+// logClientError
+//
+// data: clientInfo (object), error (string)
+//-------------------------------------------------------------------------------------------------------------------------
+module.exports.logClientError = function (req, res, next) {
+
+  var data = req.body;
+  data.userAgent = req.headers['user-agent'];
+
+  logger.client.fatal(data, null);
+
+  res.json(this.okResponse);
+
+}

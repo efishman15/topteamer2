@@ -24,7 +24,9 @@ var ContestPage = (function () {
             //Prepare some client calculated fields on the contest
             contestsService.setContestClientData(eventData[0].contest);
             //Refresh the contest chart and the contest details
-            _this.refreshContestChart(eventData[0].contest);
+            //This is the only case where we want to animate the chart
+            //right after a quiz so the user will notice the socre changes
+            _this.refreshContestChart(eventData[0].contest, true);
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
@@ -43,7 +45,7 @@ var ContestPage = (function () {
             }, 500);
         });
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
-            _this.refreshContestChart(eventData[0]);
+            _this.refreshContestChart(eventData[0], false);
         });
     }
     ContestPage.prototype.ionViewWillEnter = function () {
@@ -56,9 +58,9 @@ var ContestPage = (function () {
     ContestPage.prototype.showParticipants = function (source) {
         this.client.openPage('ContestParticipantsPage', { 'contest': this.contest, 'source': source });
     };
-    ContestPage.prototype.refreshContestChart = function (contest) {
+    ContestPage.prototype.refreshContestChart = function (contest, animate) {
         this.contest = contest;
-        this.contestChartComponent.refresh(contest);
+        this.contestChartComponent.refresh(contest, animate);
     };
     ContestPage.prototype.share = function (source) {
         this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
