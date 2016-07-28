@@ -134,7 +134,7 @@ dalDb.loadSettings(null, function (err, data) {
   app.post('/client/error', generalUtils.logClientError);
 
   //Does require a token but in the get url as parameter
-  app.get('/system/log/:token', systemBusinessLogic.showLog);
+  app.get('/system/log/:type/:token', systemBusinessLogic.showLog);
 
   //----------------------------------------------------
   // Start server listener

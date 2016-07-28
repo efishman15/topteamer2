@@ -33,6 +33,20 @@ export class Settings {
   contest:ContestSettings;
   flurry:FlurrySettings;
   branch:BranchSettings;
+  admin: AdminSettings;
+}
+
+export class AdminSettings {
+  commands: Array<AdminCommand>;
+}
+
+export class AdminCommand {
+  id: string;
+  text: string;
+  action:string;
+  type:string;
+  confirm:string;
+  returnValue:string;
 }
 
 export class FlurrySettings {
@@ -390,6 +404,7 @@ export class Session {
   isAdmin:boolean;
   xpProgress:XpProgress;
   gcmRegistrationId:string;
+  token:string;
 }
 
 export class ClientShareApp {

@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
 import * as alertService from '../../providers/alert';
-import * as systemService from '../../providers/system';
+import {AdminCommand} from '../../objects/objects';
 
 @Component({
   templateUrl: 'build/pages/system-tools/system-tools.html'
@@ -10,39 +10,81 @@ import * as systemService from '../../providers/system';
 export class SystemToolsPage {
 
   client:Client;
+  commandId:string;
 
   constructor() {
     this.client = Client.getInstance();
+
+    //Init with first command
+    this.commandId = this.client.settings.admin.commands[0].id;
   }
 
   ionViewWillEnter() {
     this.client.logEvent('page/systemTools');
   }
 
-  clearCache() {
-    systemService.clearCache().then((settings) => {
-      this.client.settings = settings;
-      this.client.nav.pop();
-    },() => {
-    });
-  }
+  runCommand() {
 
-  restart() {
-    alertService.confirm('SYSTEM_RESTART_CONFIRM_TITLE', 'SYSTEM_RESTART_CONFIRM_TEMPLATE').then(() => {
-      systemService.restart().then(() => {
-        //Ionic bug - let the confirm dialog properly close
+    let command:AdminCommand;
+    for(var i=0; i<this.client.settings.admin.commands.length; i++) {
+      if (this.client.settings.admin.commands[i].id === this.commandId) {
+        command = this.client.settings.admin.commands[i];
+        break;
+      }
+    }
+
+    switch (command.type) {
+      case 'system':
+        if (command.confirm) {
+          alertService.confirm(command.confirm + '_TITLE', command.confirm + '_TEMPLATE').then(() => {
+            this.runSystemCommand(command, true);
+          },()=> {
+          });
+        }
+        else {
+          this.runSystemCommand(command, false);
+        }
+        break;
+
+      case 'download':
+        var action = command.action.replace('{{token}}',this.client.session.token);
+        window.open(this.client.endPoint + action, '_system', 'location=yes');
         setTimeout(() => {
           this.client.nav.pop();
-        },500)
-      },() => {
-      });
-    }, () => {
-      //Do nothing on cancel
-    });
+        }, 500)
+        break;
+    }
   }
 
-  showLog() {
-    window.open(this.client.endPoint + 'system/log/' + this.client.session['token'],'_system', 'location=yes');
+  runSystemCommand(command:AdminCommand, confirmed: boolean) {
+    if (command.returnValue) {
+      this.client.serverPost(command.action).then((data:any) => {
+          this.client[command.returnValue] = data;
+          if (confirmed) {
+            setTimeout(() => {
+              this.client.nav.pop();
+            }, 500)
+          }
+          else {
+            this.client.nav.pop();
+          }
+        },
+        ()=> {
+        });
+    }
+    else {
+      this.client.serverPost(command.action).then(() => {
+          if (confirmed) {
+            setTimeout(() => {
+              this.client.nav.pop();
+            }, 500)
+          }
+          else {
+            this.client.nav.pop();
+          }
+        },
+        ()=> {
+        })
+    }
   }
-
 }

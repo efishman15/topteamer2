@@ -165,7 +165,7 @@
     },
     "versions" : {
       "mustUpdate" : {
-        "minVersion" : "1.0.5",
+        "minVersion" : "1.0.6",
         "popup" : {
           "en" : {
             "title" : "New version",
@@ -710,7 +710,8 @@
             "chartLeftMargin" : 0,
             "chartRightMargin" : 0,
             "showCanvasBorder" : 0,
-            "canvasBorderColor" : "#ffffff"
+            "canvasBorderColor" : "#ffffff",
+            "animation" : 0
           },
           "annotations" : {
             "groups" : [{
@@ -939,7 +940,8 @@
         "he" : "https://bnc.lt/m/MpHMrSo20n",
         "es" : "https://bnc.lt/m/Rxi4rSo20n"
       },
-      "debugMode" : false
+      "debugMode" : false,
+      "postErrors" : true
     },
     "share" : {
       "web" : {
@@ -1338,14 +1340,17 @@
         "SELECT_TEAM_ALERT_MESSAGE" : "You chose to play for {{team}} team",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "Who will you play for?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*Tip: next time you can select a team by tapping on its name or column on the chart<BR/><BR/><STRONG>Who will you play for?</STRONG>",
-        "SYSTEM_SHOW_LOG" : "Show server log",
         "SERVER_ERROR_CONTEST_ENDED_TITLE" : "Contest Ended",
         "SERVER_ERROR_CONTEST_TITLE_MESSAGE" : "Unfortunatelly this contest has ended. You can only view its final results or play other contests",
         "ENDING_CONTESTS" : "Contests end",
         "GAME_SOUND" : "Game sound",
         "VIBRATE" : "Vibrate",
         "WHEN_MY_TEAM_LOSING" : "My team loses",
-        "NOTIFICATIONS" : "Notifications"
+        "NOTIFICATIONS" : "Notifications",
+        "SYSTEM_SHOW_CLIENT_LOG" : "Show client log",
+        "SYSTEM_SHOW_SERVER_LOG" : "Show server log",
+        "RUN" : "Run",
+        "ACTION" : "Action"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1558,14 +1563,17 @@
         "SELECT_TEAM_ALERT_MESSAGE" : "בחרתם לשחק עבור קבוצת {{team}}",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "עבור מי תשחקו?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "*טיפ: בפעם הבאה תוכלו לבחור קבוצה על ידי לחיצה על שמה או על הטור שלה בגרף.<BR/><BR/><STRONG>עבור מי תרצו לשחק?</STRONG>",
-        "SYSTEM_SHOW_LOG" : "הצג לוג שרת",
         "SERVER_ERROR_CONTEST_ENDED_TITLE" : "התחרות הסתיימה",
         "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "לצערנו התחרות הזו הסתיימה. תוכלו רק לצפות בתוצאות הסופיות שלה או לשחק בתחרויות אחרות",
         "ENDING_CONTESTS" : "כשתחרויות מסתיימות",
         "GAME_SOUND" : "צלילי משחק",
         "VIBRATE" : "רטט",
         "WHEN_MY_TEAM_LOSING" : "כשקבוצתי מפסידה",
-        "NOTIFICATIONS" : "התראות"
+        "NOTIFICATIONS" : "התראות",
+        "SYSTEM_SHOW_SERVER_LOG" : "הצג לוג שרת",
+        "SYSTEM_SHOW_CLIENT_LOG" : "הצג לוג קליינט",
+        "RUN" : "הריצו",
+        "ACTION" : "פעולה"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1784,14 +1792,17 @@
         "SELECT_TEAM_ALERT_MESSAGE" : "Que elgió para jugar para el equipo de {{team}}",
         "PLAY_CONTEST_CHOOSE_TEAM_TITLE" : "¿Quién va a jugar ?",
         "PLAY_CONTEST_CHOOSE_TEAM_MESSAGE" : "* Consejo: la próxima vez que se seleccione un equipo pulsando sobre su nombre o columna en la tabla<BR/><BR/><STRONG>¿Para qué equipo juegas ?</STRONG>",
-        "SYSTEM_SHOW_LOG" : "Mostrar registro del servidor",
         "SERVER_ERROR_CONTEST_ENDED_TITLE" : "concurso Terminado",
         "SERVER_ERROR_CONTEST_ENDED_MESSAGE" : "Desafortunadamente este concurso ha terminado . Sólo puede ver sus resultados finales o jugar otros concursos",
         "ENDING_CONTESTS" : "final concursos",
         "GAME_SOUND" : "Sonidos de juegos",
         "VIBRATE" : "Vibrar",
         "WHEN_MY_TEAM_LOSING" : "Mi equipo pierde",
-        "NOTIFICATIONS" : "Notificaciones"
+        "NOTIFICATIONS" : "Notificaciones",
+        "SYSTEM_SHOW_SERVER_LOG" : "Mostrar registro del servidor",
+        "SYSTEM_SHOW_CLIENT_LOG" : "Mostrar registro de cliente",
+        "RUN" : "correr",
+        "ACTION" : "Acción"
       }
     },
     "platforms" : {
@@ -1847,6 +1858,31 @@
     },
     "branch" : {
       "key" : "$settings{server.branch.key}"
+    },
+    "admin" : {
+      "commands" : [{
+          "id" : "clearCache",
+          "text" : "SYSTEM_CLEAR_CACHE",
+          "action" : "system/clearCache",
+          "type" : "system",
+          "returnValue" : "settings"
+        }, {
+          "id" : "restart",
+          "text" : "SYSTEM_RESTART_SERVER",
+          "action" : "system/restart",
+          "type" : "system",
+          "confirm" : "SYSTEM_RESTART_CONFIRM"
+        }, {
+          "id" : "serverLog",
+          "text" : "SYSTEM_SHOW_SERVER_LOG",
+          "action" : "system/log/server/{{token}}",
+          "type" : "download"
+        }, {
+          "id" : "clientLog",
+          "text" : "SYSTEM_SHOW_CLIENT_LOG",
+          "action" : "system/log/client/{{token}}",
+          "type" : "download"
+        }]
     }
   }
 }

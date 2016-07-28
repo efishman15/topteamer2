@@ -10,38 +10,74 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
 var alertService = require('../../providers/alert');
-var systemService = require('../../providers/system');
 var SystemToolsPage = (function () {
     function SystemToolsPage() {
         this.client = client_1.Client.getInstance();
+        //Init with first command
+        this.commandId = this.client.settings.admin.commands[0].id;
     }
     SystemToolsPage.prototype.ionViewWillEnter = function () {
         this.client.logEvent('page/systemTools');
     };
-    SystemToolsPage.prototype.clearCache = function () {
+    SystemToolsPage.prototype.runCommand = function () {
         var _this = this;
-        systemService.clearCache().then(function (settings) {
-            _this.client.settings = settings;
-            _this.client.nav.pop();
-        }, function () {
-        });
-    };
-    SystemToolsPage.prototype.restart = function () {
-        var _this = this;
-        alertService.confirm('SYSTEM_RESTART_CONFIRM_TITLE', 'SYSTEM_RESTART_CONFIRM_TEMPLATE').then(function () {
-            systemService.restart().then(function () {
-                //Ionic bug - let the confirm dialog properly close
+        var command;
+        for (var i = 0; i < this.client.settings.admin.commands.length; i++) {
+            if (this.client.settings.admin.commands[i].id === this.commandId) {
+                command = this.client.settings.admin.commands[i];
+                break;
+            }
+        }
+        switch (command.type) {
+            case 'system':
+                if (command.confirm) {
+                    alertService.confirm(command.confirm + '_TITLE', command.confirm + '_TEMPLATE').then(function () {
+                        _this.runSystemCommand(command, true);
+                    }, function () {
+                    });
+                }
+                else {
+                    this.runSystemCommand(command, false);
+                }
+                break;
+            case 'download':
+                var action = command.action.replace('{{token}}', this.client.session.token);
+                window.open(this.client.endPoint + action, '_system', 'location=yes');
                 setTimeout(function () {
                     _this.client.nav.pop();
                 }, 500);
+                break;
+        }
+    };
+    SystemToolsPage.prototype.runSystemCommand = function (command, confirmed) {
+        var _this = this;
+        if (command.returnValue) {
+            this.client.serverPost(command.action).then(function (data) {
+                _this.client[command.returnValue] = data;
+                if (confirmed) {
+                    setTimeout(function () {
+                        _this.client.nav.pop();
+                    }, 500);
+                }
+                else {
+                    _this.client.nav.pop();
+                }
             }, function () {
             });
-        }, function () {
-            //Do nothing on cancel
-        });
-    };
-    SystemToolsPage.prototype.showLog = function () {
-        window.open(this.client.endPoint + 'system/log/' + this.client.session['token'], '_system', 'location=yes');
+        }
+        else {
+            this.client.serverPost(command.action).then(function () {
+                if (confirmed) {
+                    setTimeout(function () {
+                        _this.client.nav.pop();
+                    }, 500);
+                }
+                else {
+                    _this.client.nav.pop();
+                }
+            }, function () {
+            });
+        }
     };
     SystemToolsPage = __decorate([
         core_1.Component({

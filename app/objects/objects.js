@@ -35,6 +35,18 @@ var Settings = (function () {
     return Settings;
 })();
 exports.Settings = Settings;
+var AdminSettings = (function () {
+    function AdminSettings() {
+    }
+    return AdminSettings;
+})();
+exports.AdminSettings = AdminSettings;
+var AdminCommand = (function () {
+    function AdminCommand() {
+    }
+    return AdminCommand;
+})();
+exports.AdminCommand = AdminCommand;
 var FlurrySettings = (function () {
     function FlurrySettings() {
     }
