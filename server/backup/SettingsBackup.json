@@ -1883,6 +1883,7 @@
           "action" : "system/log/client/{{token}}",
           "type" : "download"
         }]
-    }
+    },
+    "version" : 1.0
   }
 }

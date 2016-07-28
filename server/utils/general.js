@@ -188,7 +188,7 @@ function getLanguageByCountryCode(countryCode) {
 //-------------------------------------------------------------------------------------------------------------------------
 // getSettings (client request)
 //
-// data: language (optional), defaultLanguage (optional) platform (optional), platformVersion (optional), appVersion (optional)
+// data: settingsVersion, language (optional), defaultLanguage (optional) platform (optional), platformVersion (optional), appVersion (optional)
 //
 // returns general server settings for each client.
 // Optionally return a serverPopup to request to upgrade
@@ -228,7 +228,10 @@ module.exports.getSettings = function (req, res, next) {
     //The setttings for the client
     function (data, callback) {
 
-      data.clientResponse.settings = settings.client;
+      //Sends the client settings only if server has a newer version
+      if (!data.settingsVersion || data.settingsVersion < settings.client.version) {
+        data.clientResponse.settings = settings.client;
+      }
       callback(null, data);
     }
   ];

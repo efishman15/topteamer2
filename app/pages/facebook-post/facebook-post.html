@@ -20,10 +20,10 @@
       <div padding-top padding-bottom class="post-story-row-2">{{client.translate(quizResults.data.clientKey + '_MESSAGE', quizResults.data.clientValues) }}</div>
     </div>
 
-    <img *ngIf="quizResults.data.facebookPost.dialogImage"
+    <ion-img *ngIf="quizResults.data.facebookPost.dialogImage"
          src="{{quizResults.data.facebookPost.dialogImage.url}}"
          width="{{quizResults.data.facebookPost.dialogImage.width}}"
-         height="{{quizResults.data.facebookPost.dialogImage.height}}">
+         height="{{quizResults.data.facebookPost.dialogImage.height}}"></ion-img>
 
     <div padding-top padding-bottom text-center>
       <button class="button-facebook" (click)="post()">{{client.translate('FACEBOOK_POST_TITLE')}}

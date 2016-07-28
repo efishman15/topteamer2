@@ -27,8 +27,8 @@
              [ngStyle]="{'color': client.settings.newContest.contestTypes[contestTypeId].text.titleColor}">
           {{client.translate(client.settings.newContest.contestTypes[contestTypeId].text.title)}}
         </div>
-        <img class="contest-type-image"
-             src="{{client.settings.newContest.contestTypes[contestTypeId].image.url}}">
+        <ion-img class="contest-type-image"
+                 src="{{client.settings.newContest.contestTypes[contestTypeId].image.url}}"></ion-img>
         <div class="contest-type-description" text-center>
           {{client.translate(client.settings.newContest.contestTypes[contestTypeId].text.description)}}
         </div>

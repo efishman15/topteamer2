@@ -68,8 +68,20 @@ var Client = (function () {
                 }
             }
             var language = localStorage.getItem('language');
-            _this.getSettings(language).then(function (data) {
-                _this._settings = data['settings'];
+            var settingsVersion = localStorage.getItem('settingsVersion');
+            if (!settingsVersion) {
+                settingsVersion = 0;
+            }
+            _this.getSettings(settingsVersion, language).then(function (data) {
+                if (data['settings']) {
+                    _this._settings = data['settings'];
+                    //Save new settings in localStorage
+                    localStorage.setItem('settings', JSON.stringify(data['settings']));
+                    localStorage.setItem('settingsVersion', data['settings']['version']);
+                }
+                else {
+                    _this._settings = JSON.parse(localStorage.getItem('settings'));
+                }
                 if (!language || language === 'undefined') {
                     //Language was computed on the server using geoInfo or the fallback to the default language
                     language = data['language'];
@@ -100,7 +112,7 @@ var Client = (function () {
         this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
         this.canvas.style.top = (navBarHeight - this.settings.xpControl.canvas.height) / 2 + 'px';
     };
-    Client.prototype.getSettings = function (localStorageLanguage) {
+    Client.prototype.getSettings = function (settingsVersion, localStorageLanguage) {
         var postData = { 'clientInfo': this.clientInfo };
         if (localStorageLanguage && localStorageLanguage !== 'undefined') {
             //This will indicate to the server NOT to retrieve geo info - since language is already determined
@@ -110,6 +122,7 @@ var Client = (function () {
             //Server will try to retrieve geo info based on client ip - if fails - will revert to this default language
             postData['defaultLanguage'] = this.getDefaultLanguage();
         }
+        postData['settingsVersion'] = settingsVersion;
         return this.serverPost('info/settings', postData);
     };
     Client.prototype.initUser = function (language, geoInfo) {
@@ -758,7 +771,7 @@ var Client = (function () {
                 localStorage.setItem('gcmRegistrationId', registrationData.registrationId);
                 _this.user.gcmRegistrationId = registrationData.registrationId;
                 if (_this.session && _this.user.gcmRegistrationId &&
-                    ((_this.session.gcmRegistrationId ||
+                    ((!_this.session.gcmRegistrationId ||
                         _this.session.gcmRegistrationId !== _this.user.gcmRegistrationId))) {
                     //If client has a registration Id and server has not / server has a different one
                     //Update the server

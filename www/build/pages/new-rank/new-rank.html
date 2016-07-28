@@ -14,7 +14,7 @@
 <ion-content class="app-bg">
 
   <div padding text-center class="base-font">
-    <img padding src="images/cup.png" width="250" height="250">
+    <ion-img padding src="images/cup.png" width="250" height="250"></ion-img>
 
     <h2 padding>{{client.translate('NEW_RANK_MESSAGE', {rank : client.session.rank}) }}</h2>
     <h4 padding [hidden]="xpProgress.unlockFeatureMessage">{{client.translate(xpProgress.unlockFeatureMessage)}}</h4>

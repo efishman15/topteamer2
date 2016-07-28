@@ -78,6 +78,7 @@ exports.confirmExitApp = function () {
     return _this.confirm('EXIT_APP_TITLE', 'EXIT_APP_MESSAGE', null).then(function () {
         window.FlurryAgent.endSession();
         window.navigator['app'].exitApp();
+    }, function () {
     });
 };
 //# sourceMappingURL=alert.js.map

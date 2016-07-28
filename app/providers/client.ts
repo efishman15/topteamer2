@@ -102,9 +102,22 @@ export class Client {
 
         var language = localStorage.getItem('language');
 
-        this.getSettings(language).then((data) => {
+        let settingsVersion = localStorage.getItem('settingsVersion');
+        if (!settingsVersion) {
+          settingsVersion = 0;
+        }
 
-          this._settings = data['settings'];
+        this.getSettings(settingsVersion,language).then((data) => {
+
+          if (data['settings']) {
+            this._settings = data['settings'];
+            //Save new settings in localStorage
+            localStorage.setItem('settings',JSON.stringify(data['settings']));
+            localStorage.setItem('settingsVersion',data['settings']['version']);
+          }
+          else {
+            this._settings = JSON.parse(localStorage.getItem('settings'));
+          }
 
           if (!language || language === 'undefined') {
             //Language was computed on the server using geoInfo or the fallback to the default language
@@ -149,7 +162,7 @@ export class Client {
 
   }
 
-  getSettings(localStorageLanguage) {
+  getSettings(settingsVersion:number, localStorageLanguage:string) {
 
     var postData = {'clientInfo': this.clientInfo};
 
@@ -162,6 +175,7 @@ export class Client {
       postData['defaultLanguage'] = this.getDefaultLanguage();
     }
 
+    postData['settingsVersion'] = settingsVersion;
     return this.serverPost('info/settings', postData);
   }
 
@@ -848,7 +862,7 @@ export class Client {
 
         if (this.session && this.user.gcmRegistrationId &&
           (
-            (this.session.gcmRegistrationId ||
+            (!this.session.gcmRegistrationId ||
             this.session.gcmRegistrationId !== this.user.gcmRegistrationId)
           )) {
 
