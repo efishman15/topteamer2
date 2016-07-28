@@ -1,9 +1,7 @@
 <ion-menu *ngIf="client.loaded" [content]="content" side="{{client.currentLanguage.align}}">
 
   <ion-toolbar light-blue>
-    <ion-title>
-      <div text-center>{{client.translate('TOOLS')}}</div>
-    </ion-title>
+    <ion-title><div text-center>{{client.translate('TOOLS')}}</div></ion-title>
   </ion-toolbar>
 
   <ion-content class="app-bg" dir="{{client.currentLanguage.direction}}">
@@ -21,8 +19,7 @@
         <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="settings"></ion-icon>
         {{client.translate('SETTINGS')}}
       </button>
-      <button ion-item class="app-menu-item app-menu-button" *ngIf="client.session && client.session.isAdmin" menuClose
-              (click)="systemTools()">
+      <button ion-item class="app-menu-item app-menu-button" *ngIf="client.session && client.session.isAdmin" menuClose (click)="systemTools()">
         <ion-icon class="app-menu-icon-{{client.currentLanguage.direction}}" name="hammer"></ion-icon>
         {{client.translate('SYSTEM_TOOLS')}}
       </button>
@@ -37,9 +34,8 @@
 
 <loading-modal id="loading"></loading-modal>
 <div id="playerInfo">
-  <ion-img id="playerInfoImage" *ngIf="client.session" src="{{client.session.avatar}}"
-           class="player-info-avatar pointer" (click)="client.popToRoot()">
-  </ion-img>
+  <img id="playerInfoImage" *ngIf="client.session" src="{{client.session.avatar}}"
+       class="player-info-avatar pointer" (click)="client.popToRoot()">
   <canvas id="playerInfoRankCanvas">
   </canvas>
 </div>

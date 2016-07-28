@@ -19,8 +19,8 @@
         <a class="share-button-padding pointer" *ngFor="let network of client.settings.share.web.networks[i]"
            (click)="webShare(network)"
            title="{{network.name}}">
-          <ion-img src="{{network.image}}" width="{{client.settings.share.iconSize.width}}"
-               height="{{client.settings.share.iconSize.height}}"></ion-img>
+          <img src="{{network.image}}" width="{{client.settings.share.iconSize.width}}"
+               height="{{client.settings.share.iconSize.height}}">
         </a>
       </div>
     </ion-list>
@@ -28,8 +28,8 @@
     <div *ngIf="client.user.clientInfo.mobile">
       <a class="share-button-padding" *ngFor="let app of client.shareApps" (click)="mobileShare(app.name)"
          title="{{app.title}}" [hidden]="app.discover && !app.installed">
-        <ion-img src="{{app.image}}" width="{{client.settings.share.iconSize.width}}"
-             height="{{client.settings.share.iconSize.height}}"></ion-img>
+        <img src="{{app.image}}" width="{{client.settings.share.iconSize.width}}"
+             height="{{client.settings.share.iconSize.height}}">
       </a>
       <div class="share-more-options">
         <button class="button-small app-button-light-blue" (click)="mobileShare()">
