@@ -129,11 +129,11 @@ module.exports.showLog = function (req, res, next) {
 }
 
 //--------------------------------------------------------------------------
-// fixAvatars
+// upgradeDb
 //
 // data: <NA>
 //--------------------------------------------------------------------------
-module.exports.fixAvatars = function (req, res, next) {
+module.exports.upgradeDb = function (req, res, next) {
 
   var token = req.headers.authorization;
   var data = req.body;

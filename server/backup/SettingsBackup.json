@@ -1215,7 +1215,8 @@
         "SYSTEM_SHOW_CLIENT_LOG" : "Show client log",
         "SYSTEM_SHOW_SERVER_LOG" : "Show server log",
         "RUN" : "Run",
-        "ACTION" : "Action"
+        "ACTION" : "Action",
+        "SYSTEM_UPGRADE_SERVER_DATABASE" : "Upgrade server database"
       },
       "he" : {
         "HOME_WELCOME" : "שחקו עבור קבוצתכם",
@@ -1438,7 +1439,8 @@
         "SYSTEM_SHOW_SERVER_LOG" : "הצג לוג שרת",
         "SYSTEM_SHOW_CLIENT_LOG" : "הצג לוג קליינט",
         "RUN" : "הריצו",
-        "ACTION" : "פעולה"
+        "ACTION" : "פעולה",
+        "SYSTEM_UPGRADE_SERVER_DATABASE" : "שדרג בסיס נתוני שרת"
       },
       "es" : {
         "HOME_WELCOME" : "Juega a su equipo",
@@ -1667,7 +1669,8 @@
         "SYSTEM_SHOW_SERVER_LOG" : "Mostrar registro del servidor",
         "SYSTEM_SHOW_CLIENT_LOG" : "Mostrar registro de cliente",
         "RUN" : "correr",
-        "ACTION" : "Acción"
+        "ACTION" : "Acción",
+        "SYSTEM_UPGRADE_SERVER_DATABASE" : "la base de datos del servidor de actualización"
       }
     },
     "platforms" : {
@@ -1731,12 +1734,12 @@
           "action" : "system/log/client/{{token}}",
           "type" : "download"
         }, {
-          "id" : "fixAvatars",
-          "text" : "SYSTEM_CLEAR_CACHE",
-          "action" : "system/fixAvatars",
+          "id" : "upgradeDb",
+          "text" : "SYSTEM_UPGRADE_SERVER_DATABASE",
+          "action" : "system/upgradeDb",
           "type" : "system"
         }]
     },
-    "version" : 3.0
+    "version" : 4.0
   }
 }
