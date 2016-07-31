@@ -11896,8 +11896,11 @@ loading-modal .container {
     loading-modal .container ion-spinner.spinner-dots circle {
       fill: #828282; }
 
-.player-info-wrapper {
+.player-info-wrapper-visible {
   height: 5.6rem; }
+
+.player-info-wrapper-hidden {
+  display: none; }
 
 .player-info-row {
   position: relative;

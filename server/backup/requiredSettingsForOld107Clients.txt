@@ -1,0 +1,11 @@
+client.settings.charts.contest:
+devices []
+dataSource
+size.teamNameFontSize
+myTeam []
+
+client.settings.charts.questionStats:
+devices []
+
+client.settings.xpControl:
+canvas {}

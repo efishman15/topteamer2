@@ -987,6 +987,7 @@ var PlayerInfoComponent = (function () {
         this.circle = Math.PI * 2;
         this.quarter = Math.PI / 2;
         this.height = 0;
+        this.hidden = true;
     }
     PlayerInfoComponent.prototype.ngAfterViewInit = function () {
         this.canvas = this.canvasElementRef.nativeElement;
@@ -998,6 +999,7 @@ var PlayerInfoComponent = (function () {
         this.client = client;
         this.myAvatar = this.client.getFacebookAvatar(this.client.session.thirdParty.id);
         this.initXp();
+        this.hidden = false;
     };
     PlayerInfoComponent.prototype.clearXp = function () {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -2347,6 +2349,7 @@ var LoginPage = (function () {
         this.client.logEvent('login/facebookLogin');
         facebookService.login().then(function (response) {
             _this.client.facebookServerConnect(response['authResponse']).then(function () {
+                _this.client.playerInfoComponent.init(_this.client);
                 _this.client.setRootPage('MainTabsPage');
             }, function () {
             });

@@ -1,4 +1,7 @@
-<div class="player-info-wrapper player-info-{{client && client.session ? client.currentLanguage.direction : null}}">
+<div [ngClass]="{'player-info-wrapper-visible': client && client.session,
+                  'player-info-ltr': client && client.session && client.currentLanguage.direction==='ltr',
+                  'player-info-rtl': client && client.session && client.currentLanguage.direction==='rtl',
+                  'player-info-wrapper-hidden': !client || !client.session}">
   <div class="player-info-row">
     <img src="{{myAvatar}}"
          class="player-info-avatar pointer"

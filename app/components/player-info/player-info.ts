@@ -19,9 +19,10 @@ export class PlayerInfoComponent {
   quarter:number = Math.PI / 2;
   height:number = 0;
   myAvatar:string;
-  controlInitiated: boolean;
+  hidden:boolean;
 
   constructor() {
+    this.hidden = true;
   }
 
   ngAfterViewInit() {
@@ -36,6 +37,7 @@ export class PlayerInfoComponent {
     this.client = client;
     this.myAvatar = this.client.getFacebookAvatar(this.client.session.thirdParty.id);
     this.initXp();
+    this.hidden = false;
   }
 
   clearXp() {

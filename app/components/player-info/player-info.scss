@@ -1,5 +1,9 @@
-.player-info-wrapper {
+.player-info-wrapper-visible {
   height: 5.6rem;
+}
+
+.player-info-wrapper-hidden {
+  display:none;
 }
 
 .player-info-row {

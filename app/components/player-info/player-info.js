@@ -13,6 +13,7 @@ var PlayerInfoComponent = (function () {
         this.circle = Math.PI * 2;
         this.quarter = Math.PI / 2;
         this.height = 0;
+        this.hidden = true;
     }
     PlayerInfoComponent.prototype.ngAfterViewInit = function () {
         this.canvas = this.canvasElementRef.nativeElement;
@@ -24,6 +25,7 @@ var PlayerInfoComponent = (function () {
         this.client = client;
         this.myAvatar = this.client.getFacebookAvatar(this.client.session.thirdParty.id);
         this.initXp();
+        this.hidden = false;
     };
     PlayerInfoComponent.prototype.clearXp = function () {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);

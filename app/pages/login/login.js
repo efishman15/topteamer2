@@ -36,6 +36,7 @@ var LoginPage = (function () {
         this.client.logEvent('login/facebookLogin');
         facebookService.login().then(function (response) {
             _this.client.facebookServerConnect(response['authResponse']).then(function () {
+                _this.client.playerInfoComponent.init(_this.client);
                 _this.client.setRootPage('MainTabsPage');
             }, function () {
             });

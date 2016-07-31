@@ -52,8 +52,9 @@ export class SettingsPage {
   logout() {
     this.client.logEvent('settings/facebookSignOut');
     facebookService.logout().then((response) => {
-      this.client.logout();
-      this.client.setRootPage('LoginPage');
+      this.client.setRootPage('LoginPage').then(()=> {
+        this.client.logout();
+      });
     });
   }
 
