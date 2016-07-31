@@ -13,8 +13,6 @@ import {Contest} from "../../objects/objects";
 export class ContestListComponent {
   @Input() tab:String;
 
-  @ViewChildren(ContestChartComponent) contestChartComponents:QueryList<ContestChartComponent>;
-
   contests:Array<Contest>;
   client:Client;
   lastRefreshTime;
@@ -72,14 +70,6 @@ export class ContestListComponent {
       default:
         this.showContest(data, true);
         break;
-    }
-  }
-
-  onResize() {
-    if (this.contestChartComponents && this.contestChartComponents.length > 0) {
-      this.contestChartComponents.forEach((contestChartComponent:ContestChartComponent) => {
-        contestChartComponent.onResize();
-      });
     }
   }
 

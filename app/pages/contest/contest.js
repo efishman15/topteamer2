@@ -26,7 +26,7 @@ var ContestPage = (function () {
             //Refresh the contest chart and the contest details
             //This is the only case where we want to animate the chart
             //right after a quiz so the user will notice the socre changes
-            _this.refreshContestChart(eventData[0].contest, true);
+            _this.refreshContestChart(eventData[0].contest, eventData[0].data.animation);
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
@@ -45,7 +45,7 @@ var ContestPage = (function () {
             }, 500);
         });
         this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
-            _this.refreshContestChart(eventData[0], false);
+            _this.refreshContestChart(eventData[0]);
         });
     }
     ContestPage.prototype.ionViewWillEnter = function () {
@@ -58,9 +58,9 @@ var ContestPage = (function () {
     ContestPage.prototype.showParticipants = function (source) {
         this.client.openPage('ContestParticipantsPage', { 'contest': this.contest, 'source': source });
     };
-    ContestPage.prototype.refreshContestChart = function (contest, animate) {
+    ContestPage.prototype.refreshContestChart = function (contest, animation) {
         this.contest = contest;
-        this.contestChartComponent.refresh(contest, animate);
+        this.contestChartComponent.refresh(contest, animation);
     };
     ContestPage.prototype.share = function (source) {
         this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
@@ -100,9 +100,6 @@ var ContestPage = (function () {
             'sourceClick': source
         });
         this.client.openPage('QuizPage', { 'contest': this.contest, 'source': source });
-    };
-    ContestPage.prototype.onResize = function () {
-        this.contestChartComponent.onResize();
     };
     __decorate([
         core_1.ViewChild(contest_chart_1.ContestChartComponent), 

@@ -68,11 +68,6 @@ var LeaderboardsPage = (function () {
         this.mode = 'weekly';
         return this.leadersComponent.showWeekly(forceRefresh);
     };
-    LeaderboardsPage.prototype.onResize = function () {
-        if (this.mode === 'contests') {
-            this.contestList.onResize();
-        }
-    };
     LeaderboardsPage.prototype.refreshList = function (forceRefresh) {
         return this.contestList.refresh(forceRefresh);
     };

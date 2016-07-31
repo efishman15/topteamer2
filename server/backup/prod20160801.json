@@ -165,7 +165,7 @@
     },
     "versions" : {
       "mustUpdate" : {
-        "minVersion" : "1.0.8",
+        "minVersion" : "1.0.6",
         "popup" : {
           "en" : {
             "title" : "New version",
@@ -467,8 +467,8 @@
       "list" : {
         "recentlyFinishedDays" : 180,
         "pageSize" : 10,
-        "clientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.facebookUserId", "leader.name", "leader.id", "link"],
-        "adminClientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.facebookUserId", "leader.name", "leader.facebookUserId", "link", "rating", "systemParticipants"]
+        "clientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.avatar", "leader.name", "leader.avatar", "link"],
+        "adminClientFields" : ["_id", "subject", "type", "startDate", "endDate", "teams.name", "teams.score", "creator.name", "creator.avatar", "leader.name", "leader.avatar", "link", "rating", "systemParticipants"]
       },
       "details" : {
         "clientTemplate" : {
@@ -483,11 +483,11 @@
             }],
           "creator" : {
             "name" : "$.creator.name",
-            "facebookUserId" : "$.creator.facebookUserId"
+            "avatar" : "$.creator.avatar"
           },
           "leader" : {
             "name" : "$.leader.name",
-            "facebookUserId" : "$.leader.facebookUserId"
+            "avatar" : "$.leader.avatar"
           },
           "link" : "$.link"
         },
@@ -503,11 +503,11 @@
             }],
           "creator" : {
             "name" : "$.creator.name",
-            "facebookUserId" : "$.creator.facebookUserId"
+            "avatar" : "$.creator.avatar"
           },
           "leader" : {
             "name" : "$.leader.name",
-            "facebookUserId" : "$.leader.facebookUserId"
+            "avatar" : "$.leader.avatar"
           },
           "rating" : "$.rating",
           "link" : "$.link"
@@ -654,6 +654,7 @@
     },
     "charts" : {
       "contest" : {
+        "type" : "stackedcolumn2d",
         "size" : {
           "heightRatioFromWidth" : 0.5,
           "widthRatio" : 0.9
@@ -671,23 +672,159 @@
         },
         "timer" : {
           "width" : 30
-        }
+        },
+        "bottomRibbon" : {
+          "list" : 30,
+          "detailed" : 140
+        },
+        "myTeam" : [{
+            "bold" : 1,
+            "y" : "$dataset.1.set.1.startY - 18",
+            "underline" : 1,
+            "italic" : 1
+          }, {
+            "bold" : 1,
+            "y" : "$dataset.1.set.1.startY - 18",
+            "underline" : 1,
+            "italic" : 1
+          }],
+        "dataSource" : {
+          "chart" : {
+            "bgColor" : "#ffffff",
+            "baseFont" : "Arial",
+            "showBorder" : 0,
+            "yAxisMinValue" : 0.0,
+            "yAxisMaxValue" : 1.0,
+            "numDivLines" : 0,
+            "numberScaleValue" : ".01",
+            "showYAxisValues" : 0,
+            "chartBottomMargin" : 0,
+            "usePlotGradientColor" : 0,
+            "showValues" : 0,
+            "showLegend" : 0,
+            "showPlotBorder" : 1,
+            "plotBorderThickness" : "1",
+            "plotBorderAlpha" : 10,
+            "showTooltip" : 0,
+            "chartTopMargin" : 0,
+            "chartLeftMargin" : 0,
+            "chartRightMargin" : 0,
+            "showCanvasBorder" : 0,
+            "canvasBorderColor" : "#ffffff",
+            "animation" : 0
+          },
+          "annotations" : {
+            "groups" : [{
+                "id" : "infobar",
+                "items" : [{
+                    "id" : "label",
+                    "type" : "text",
+                    "y" : "$dataset.1.set.1.startY - 18",
+                    "fontColor" : "#2888AC"
+                  }, {
+                    "id" : "label",
+                    "type" : "text",
+                    "y" : "$dataset.1.set.1.startY - 18",
+                    "fontColor" : "#BF0045"
+                  }]
+              }]
+          },
+          "categories" : [{
+              "category" : [{
+                  "fontColor" : "#2888AC",
+                  "fontSize" : 24
+                }, {
+                  "fontColor" : "#BF0045",
+                  "fontSize" : 24
+                }]
+            }],
+          "dataset" : [{
+              "seriesname" : "Scores",
+              "data" : [{
+                  "color" : "#0BC2F8"
+                }, {
+                  "color" : "#D13F78"
+                }]
+            }, {
+              "seriesname" : "Others",
+              "data" : [{
+                  "color" : "#DCDCDC"
+                }, {
+                  "color" : "#DCDCDC"
+                }]
+            }]
+        },
+        "devices" : [{
+            "devicePixelRatio" : 1.499999,
+            "settings" : {
+              "teamNameFontSize" : 22.0,
+              "topMarginPercent" : 10.0
+            }
+          }, {
+            "devicePixelRatio" : 1.999999,
+            "settings" : {
+              "teamNameFontSize" : 16.5,
+              "topMarginPercent" : 18.0
+            }
+          }, {
+            "devicePixelRatio" : 6,
+            "settings" : {
+              "teamNameFontSize" : 16.5,
+              "topMarginPercent" : 15.0
+            }
+          }]
       },
       "questionStats" : {
+        "type" : "doughnut2d",
         "colors" : {
           "correct" : "#37b37d",
-          "incorrect" : "#f35e4a",
-          "innerDoughnut" : "#ffffff"
+          "incorrect" : "#f35e4a"
+        },
+        "dataSource" : {
+          "chart" : {
+            "baseFont" : "Arial",
+            "paletteColors" : "#f35e4a,#37b37d",
+            "startingAngle" : 90,
+            "bgColor" : "#ffffff",
+            "showBorder" : "0",
+            "use3DLighting" : "0",
+            "showLabels" : "0",
+            "showLegend" : "1",
+            "legendItemFontSize" : 22,
+            "legendShadow" : "0",
+            "legendBorderAlpha" : "0",
+            "showPercentValues" : "1",
+            "labelFontSize" : 18,
+            "labelFontBold" : 1,
+            "chartTopMargin" : 5,
+            "chartBottomMargin" : 5,
+            "showTooltip" : 0
+          }
         },
         "size" : {
           "widthRatio" : 0.9,
-          "heightRatio" : 0.4,
-          "innerDoughnutRadiusRatio" : 0.7,
-          "radiusRatio" : 0.9
-        }
+          "heightRatio" : 0.4
+        },
+        "devices" : [{
+            "devicePixelRatio" : 1.499999,
+            "settings" : {
+              "legendItemFontSize" : 22.0,
+              "labelFontSize" : 18.0
+            }
+          }, {
+            "devicePixelRatio" : 6,
+            "settings" : {
+              "legendItemFontSize" : 16.5,
+              "labelFontSize" : 13.0
+            }
+          }]
       }
     },
     "xpControl" : {
+      "canvas" : {
+        "width" : 40,
+        "height" : 44
+      },
       "radius" : 15,
       "fillColor" : "#54b0d2",
       "lineWidth" : 4,
@@ -754,8 +891,7 @@
         },
         "size" : {
           "height" : 52,
-          "topOffset" : 12,
-          "widthRatio" : 0.9
+          "topOffset" : 12
         },
         "line" : {
           "color" : "#4c59a2",
@@ -905,8 +1041,7 @@
       },
       "version" : "v2.7",
       "appId" : "$settings{server.facebook.appId}",
-      "sdk" : "//connect.facebook.net/en_US/sdk.js",
-      "avatarTemplate" : "https://graph.facebook.com/{{id}}/picture?type=square"
+      "sdk" : "//connect.facebook.net/en_US/sdk.js"
     },
     "google" : {
       "gcm" : {
@@ -1683,6 +1818,10 @@
     },
     "lists" : {
       "contests" : {
+        "playButtonSize" : {
+          "width" : 60,
+          "height" : 60
+        },
         "refreshFrequencyInMilliseconds" : 60000
       },
       "leaderboards" : {
@@ -1699,6 +1838,19 @@
     },
     "contest" : {
       "refreshTresholdInMilliseconds" : 60000,
+      "devices" : [{
+          "devicePixelRatio" : 1.5,
+          "settings" : {
+            "font" : 22.0,
+            "topMarginPercent" : 15.0
+          }
+        }, {
+          "devicePixelRatio" : 4,
+          "settings" : {
+            "font" : 16.5,
+            "topMarginPercent" : 17.0
+          }
+        }],
       "maxTeamsLengthForLargeFonts" : 25
     },
     "flurry" : {
@@ -1730,13 +1882,8 @@
           "text" : "SYSTEM_SHOW_CLIENT_LOG",
           "action" : "system/log/client/{{token}}",
           "type" : "download"
-        }, {
-          "id" : "fixAvatars",
-          "text" : "SYSTEM_CLEAR_CACHE",
-          "action" : "system/fixAvatars",
-          "type" : "system"
         }]
     },
-    "version" : 3.0
+    "version" : 1.0
   }
 }

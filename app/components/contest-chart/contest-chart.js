@@ -12,55 +12,28 @@ var client_1 = require('../../providers/client');
 var alertService = require('../../providers/alert');
 var contestsService = require('../../providers/contests');
 var objects_1 = require('../../objects/objects');
-var WIDTH_MARGIN = 2;
 var ContestChartComponent = (function () {
     function ContestChartComponent() {
-        var _this = this;
         this.contestSelected = new core_1.EventEmitter();
         this.myTeamSelected = new core_1.EventEmitter();
         this.contestButtonClick = new core_1.EventEmitter();
         this.joinedContest = new core_1.EventEmitter();
-        this.events = {
-            'dataplotClick': function (eventObj, dataObj) {
-                var teamId = dataObj.dataIndex;
-                if (_this.client.currentLanguage.direction === 'rtl') {
-                    teamId = 1 - teamId;
-                }
-                _this.teamSelected(teamId, 'teamBar');
-                _this.chartTeamEventHandled = true;
-            },
-            'dataLabelClick': function (eventObj, dataObj) {
-                var teamId = dataObj.dataIndex;
-                if (_this.client.currentLanguage.direction === 'rtl') {
-                    teamId = 1 - teamId;
-                }
-                _this.teamSelected(teamId, 'teamPercent');
-                _this.chartTeamEventHandled = true;
-            },
-            'annotationClick': function (eventObj, dataObj) {
-                var teamId;
-                if (dataObj.annotationOptions.text === _this.contest.teams[0].name) {
-                    teamId = 0;
-                }
-                else {
-                    teamId = 1;
-                }
-                _this.teamSelected(teamId, 'teamName');
-                _this.chartTeamEventHandled = true;
-            },
-            'chartClick': function (eventObj, dataObj) {
-                if (!_this.chartTeamEventHandled) {
-                    _this.onContestSelected('chart');
-                }
-                _this.chartTeamEventHandled = false;
-            }
-        };
         this.client = client_1.Client.getInstance();
+        this.animation = null;
+        this.eventJustHandled = false;
     }
-    ContestChartComponent.prototype.onContestSelected = function (source) {
+    ContestChartComponent.prototype.onContestSelected = function (event, source) {
+        if (this.eventJustHandled) {
+            this.eventJustHandled = false;
+            return;
+        }
+        if (source !== 'chart') {
+            this.eventJustHandled = true;
+        }
         this.contestSelected.emit({ 'contest': this.contest, 'source': source });
     };
-    ContestChartComponent.prototype.teamSelected = function (teamId, source) {
+    ContestChartComponent.prototype.teamSelected = function (event, teamId, source) {
+        this.eventJustHandled = true;
         if (this.contest.state === 'play') {
             if (teamId !== this.contest.myTeam) {
                 this.switchTeams(source);
@@ -81,53 +54,9 @@ var ContestChartComponent = (function () {
             });
         }
     };
-    ContestChartComponent.prototype.ngOnInit = function () {
-        this.initChart();
-    };
-    ContestChartComponent.prototype.initChart = function () {
-        var _this = this;
-        if (!this.chart) {
-            this.netChartHeight = 1 - (this.client.settings.charts.contest.size.topMarginPercent / 100);
-            if (this.client.currentLanguage.direction === 'ltr') {
-                this.teamsOrder = [0, 1];
-            }
-            else {
-                this.teamsOrder = [1, 0];
-            }
-            this.adjustScores();
-            window.FusionCharts.ready(function () {
-                _this.chart = new window.FusionCharts({
-                    type: _this.client.settings.charts.contest.type,
-                    renderAt: _this.id + '-container',
-                    width: _this.client.chartWidth - WIDTH_MARGIN,
-                    height: _this.client.chartHeight,
-                    dataFormat: 'json',
-                    dataSource: _this.contest.dataSource,
-                    events: _this.events
-                });
-                _this.chart.render();
-            });
-        }
-    };
-    ContestChartComponent.prototype.refresh = function (contest, animate) {
-        if (contest) {
-            //new contest object arrived
-            this.contest = contest;
-            this.adjustScores();
-        }
-        this.contest.dataSource.chart.animation = (animate ? 1 : 0);
-        this.chart.setJSONData(this.contest.dataSource);
-    };
-    ContestChartComponent.prototype.onResize = function () {
-        this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
-    };
-    ContestChartComponent.prototype.adjustScores = function () {
-        //Scores
-        this.contest.dataSource.dataset[0].data[0].value = this.contest.teams[this.teamsOrder[0]].chartValue * this.netChartHeight;
-        this.contest.dataSource.dataset[0].data[1].value = this.contest.teams[this.teamsOrder[1]].chartValue * this.netChartHeight;
-        //Others (in grey)
-        this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
-        this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
+    ContestChartComponent.prototype.refresh = function (contest, animation) {
+        this.contest = contest;
+        this.animation = animation;
     };
     ContestChartComponent.prototype.joinContest = function (team, source, switchTeams, showAlert, delayRankModal) {
         var _this = this;
@@ -158,7 +87,7 @@ var ContestChartComponent = (function () {
                         else {
                             resolve(rankModal);
                         }
-                        _this.client.addXp(data.xpProgress).then(function () {
+                        _this.client.playerInfoComponent.addXp(data.xpProgress).then(function () {
                         }, function () {
                             reject();
                         });
@@ -196,8 +125,9 @@ var ContestChartComponent = (function () {
         }, function () {
         });
     };
-    ContestChartComponent.prototype.onContestButtonClick = function () {
+    ContestChartComponent.prototype.onContestButtonClick = function (event) {
         var _this = this;
+        this.eventJustHandled = true;
         if (this.contest.state === 'join') {
             //Will prompt an alert with 2 buttons with the team names
             //Upon selecting a team - send the user directly to play
@@ -211,7 +141,7 @@ var ContestChartComponent = (function () {
             alertService.alert({ 'type': 'PLAY_CONTEST_CHOOSE_TEAM' }, [
                 {
                     'text': this.contest.teams[0].name,
-                    'cssClass': cssClass + '-' + this.teamsOrder[0],
+                    'cssClass': cssClass + '-0',
                     'handler': function () {
                         _this.joinContest(0, 'button', false, false, true).then(function (rankModal) {
                             _this.contestButtonClick.emit({ 'contest': _this.contest, 'source': 'button' });
@@ -224,7 +154,7 @@ var ContestChartComponent = (function () {
                 },
                 {
                     'text': this.contest.teams[1].name,
-                    'cssClass': cssClass + '-' + this.teamsOrder[1],
+                    'cssClass': cssClass + '-1',
                     'handler': function () {
                         _this.joinContest(1, 'button', false, false, true).then(function (rankModal) {
                             _this.contestButtonClick.emit({ 'contest': _this.contest, 'source': 'button' });
@@ -241,10 +171,6 @@ var ContestChartComponent = (function () {
             this.contestButtonClick.emit({ 'contest': this.contest, 'source': 'button' });
         }
     };
-    __decorate([
-        core_1.Input(), 
-        __metadata('design:type', Number)
-    ], ContestChartComponent.prototype, "id", void 0);
     __decorate([
         core_1.Input(), 
         __metadata('design:type', objects_1.Contest)

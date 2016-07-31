@@ -15,6 +15,7 @@ var facebookService = require('./providers/facebook');
 var contestsService = require('./providers/contests');
 var shareService = require('./providers/share');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
+var player_info_1 = require('./components/player-info/player-info');
 var alertService = require('./providers/alert');
 var ionic_native_1 = require('ionic-native');
 var objects_1 = require('./objects/objects');
@@ -28,7 +29,7 @@ var TopTeamerApp = (function () {
     }
     TopTeamerApp.prototype.ngAfterViewInit = function () {
         var _this = this;
-        this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent).then(function () {
+        this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent, this.playerInfoComponent).then(function () {
             _this.initApp();
         }, function (err) { return _this.ngAfterViewInit(); });
     };
@@ -190,6 +191,7 @@ var TopTeamerApp = (function () {
         facebookService.getLoginStatus().then(function (result) {
             if (result['connected']) {
                 _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
+                    _this.playerInfoComponent.init(_this.client);
                     var appPages = new Array();
                     appPages.push(new objects_1.AppPage('MainTabsPage', {}));
                     if (_this.client.deepLinkContestId) {
@@ -197,16 +199,16 @@ var TopTeamerApp = (function () {
                             _this.client.deepLinkContestId = null;
                             appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest, 'source': 'deepLink' }));
                             _this.client.setPages(appPages).then(function () {
-                                //VERY IMPORTANT
-                                //Since code in MainTabsPage is not excuted and we're jumping
-                                //right to the contest view, the preloader must be hidden here
                                 _this.client.hidePreloader();
                             }, function () {
                             });
                         });
                     }
                     else {
-                        _this.client.setPages(appPages);
+                        _this.client.setPages(appPages).then(function () {
+                            _this.client.hidePreloader();
+                        }, function () {
+                        });
                     }
                 }, function (err) {
                     _this.client.nav.setRoot(_this.client.getPage('LoginPage'));
@@ -293,10 +295,14 @@ var TopTeamerApp = (function () {
         core_1.ViewChild(loading_modal_1.LoadingModalComponent), 
         __metadata('design:type', loading_modal_1.LoadingModalComponent)
     ], TopTeamerApp.prototype, "loadingModalComponent", void 0);
+    __decorate([
+        core_1.ViewChild(player_info_1.PlayerInfoComponent), 
+        __metadata('design:type', player_info_1.PlayerInfoComponent)
+    ], TopTeamerApp.prototype, "playerInfoComponent", void 0);
     TopTeamerApp = __decorate([
         core_1.Component({
             templateUrl: 'build/app.html',
-            directives: [loading_modal_1.LoadingModalComponent]
+            directives: [loading_modal_1.LoadingModalComponent, player_info_1.PlayerInfoComponent]
         }), 
         __metadata('design:paramtypes', [ionic_angular_1.App, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events])
     ], TopTeamerApp);

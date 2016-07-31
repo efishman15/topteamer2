@@ -9,14 +9,6 @@ var BasicListSettings = (function () {
     return BasicListSettings;
 })();
 exports.BasicListSettings = BasicListSettings;
-var ContestsListSettings = (function (_super) {
-    __extends(ContestsListSettings, _super);
-    function ContestsListSettings() {
-        _super.apply(this, arguments);
-    }
-    return ContestsListSettings;
-})(BasicListSettings);
-exports.ContestsListSettings = ContestsListSettings;
 var LeaderboardListSettings = (function () {
     function LeaderboardListSettings() {
     }
@@ -65,18 +57,6 @@ var ContestSettings = (function () {
     return ContestSettings;
 })();
 exports.ContestSettings = ContestSettings;
-var ContestChartDeviceSettings = (function () {
-    function ContestChartDeviceSettings() {
-    }
-    return ContestChartDeviceSettings;
-})();
-exports.ContestChartDeviceSettings = ContestChartDeviceSettings;
-var ContestDeviceConfigurationSettings = (function () {
-    function ContestDeviceConfigurationSettings() {
-    }
-    return ContestDeviceConfigurationSettings;
-})();
-exports.ContestDeviceConfigurationSettings = ContestDeviceConfigurationSettings;
 var ShareSettings = (function () {
     function ShareSettings() {
     }
@@ -269,12 +249,6 @@ var ChartsSettings = (function () {
     return ChartsSettings;
 })();
 exports.ChartsSettings = ChartsSettings;
-var ChartSettings = (function () {
-    function ChartSettings() {
-    }
-    return ChartSettings;
-})();
-exports.ChartSettings = ChartSettings;
 var Size = (function () {
     function Size() {
     }
@@ -289,14 +263,18 @@ var ChartSizeSettings = (function (_super) {
     return ChartSizeSettings;
 })(Size);
 exports.ChartSizeSettings = ChartSizeSettings;
-var ContestChartSizeSettings = (function (_super) {
-    __extends(ContestChartSizeSettings, _super);
-    function ContestChartSizeSettings() {
-        _super.apply(this, arguments);
+var ContestChartSettings = (function () {
+    function ContestChartSettings() {
     }
-    return ContestChartSizeSettings;
-})(ChartSizeSettings);
-exports.ContestChartSizeSettings = ContestChartSizeSettings;
+    return ContestChartSettings;
+})();
+exports.ContestChartSettings = ContestChartSettings;
+var QuestionStatsChartSettings = (function () {
+    function QuestionStatsChartSettings() {
+    }
+    return QuestionStatsChartSettings;
+})();
+exports.QuestionStatsChartSettings = QuestionStatsChartSettings;
 var QuestionStatsChartSizeSettings = (function (_super) {
     __extends(QuestionStatsChartSizeSettings, _super);
     function QuestionStatsChartSizeSettings() {
@@ -305,34 +283,6 @@ var QuestionStatsChartSizeSettings = (function (_super) {
     return QuestionStatsChartSizeSettings;
 })(ChartSizeSettings);
 exports.QuestionStatsChartSizeSettings = QuestionStatsChartSizeSettings;
-var ContestChartSettings = (function (_super) {
-    __extends(ContestChartSettings, _super);
-    function ContestChartSettings() {
-        _super.apply(this, arguments);
-    }
-    return ContestChartSettings;
-})(ChartSettings);
-exports.ContestChartSettings = ContestChartSettings;
-var QuestionStatsChartSettings = (function (_super) {
-    __extends(QuestionStatsChartSettings, _super);
-    function QuestionStatsChartSettings() {
-        _super.apply(this, arguments);
-    }
-    return QuestionStatsChartSettings;
-})(ChartSettings);
-exports.QuestionStatsChartSettings = QuestionStatsChartSettings;
-var QuestionStatsChartDeviceSettings = (function () {
-    function QuestionStatsChartDeviceSettings() {
-    }
-    return QuestionStatsChartDeviceSettings;
-})();
-exports.QuestionStatsChartDeviceSettings = QuestionStatsChartDeviceSettings;
-var QuestionStatsChartDeviceConfigurationSettings = (function () {
-    function QuestionStatsChartDeviceConfigurationSettings() {
-    }
-    return QuestionStatsChartDeviceConfigurationSettings;
-})();
-exports.QuestionStatsChartDeviceConfigurationSettings = QuestionStatsChartDeviceConfigurationSettings;
 var QuestionStatsChartSettingsColors = (function () {
     function QuestionStatsChartSettingsColors() {
     }

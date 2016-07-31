@@ -15,7 +15,6 @@ function getSessionResponse(session) {
     'userId': session.userId,
     'thirdParty': {'id': session.facebookUserId, 'accessToken': session.facebookAccessToken, 'type': 'facebook'},
     'isAdmin': session.isAdmin,
-    'avatar': session.avatar,
     'name': session.name,
     'score': session.score,
     'rank': session.rank,

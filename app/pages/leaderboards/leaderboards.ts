@@ -83,12 +83,6 @@ export class LeaderboardsPage {
     return this.leadersComponent.showWeekly(forceRefresh);
   }
 
-  onResize() {
-    if (this.mode === 'contests') {
-      this.contestList.onResize();
-    }
-  }
-
   refreshList(forceRefresh?:boolean) {
     return this.contestList.refresh(forceRefresh);
   }

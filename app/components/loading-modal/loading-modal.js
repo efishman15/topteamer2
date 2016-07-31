@@ -8,7 +8,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var ionic_angular_1 = require('ionic-angular');
 var LoadingModalComponent = (function () {
     function LoadingModalComponent() {
         this.isBusy = false;
@@ -22,8 +21,7 @@ var LoadingModalComponent = (function () {
     LoadingModalComponent = __decorate([
         core_1.Component({
             selector: 'loading-modal',
-            templateUrl: 'build/components/loading-modal/loading-modal.html',
-            directives: [ionic_angular_1.IONIC_DIRECTIVES] // makes all Ionic directives available to your component
+            templateUrl: 'build/components/loading-modal/loading-modal.html'
         }), 
         __metadata('design:paramtypes', [])
     ], LoadingModalComponent);

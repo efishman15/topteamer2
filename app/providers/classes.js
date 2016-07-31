@@ -19,53 +19,33 @@ var set_contest_admin_1 = require('../pages/set-contest-admin/set-contest-admin'
 var settings_1 = require('../pages/settings/settings');
 var share_1 = require('../pages/share/share');
 var system_tools_1 = require('../pages/system-tools/system-tools');
+var appClasses = {
+    'ContestPage': contest_1.ContestPage,
+    'ContestParticipantsPage': contest_participants_1.ContestParticipantsPage,
+    'ContestTypePage': contest_type_1.ContestTypePage,
+    'FacebookPostPage': facebook_post_1.FacebookPostPage,
+    'LeaderboardsPage': leaderboards_1.LeaderboardsPage,
+    'LoginPage': login_1.LoginPage,
+    'MainTabsPage': main_tabs_1.MainTabsPage,
+    'MyContestsPage': my_contests_1.MyContestsPage,
+    'NewRankPage': new_rank_1.NewRankPage,
+    'PurchaseSuccessPage': purchase_success_1.PurchaseSuccessPage,
+    'QuestionEditorPage': question_editor_1.QuestionEditorPage,
+    'QuestionStatsPage': question_stats_1.QuestionStatsPage,
+    'QuizPage': quiz_1.QuizPage,
+    'RunningContestsPage': running_contests_1.RunningContestsPage,
+    'SearchQuestionsPage': search_questions_1.SearchQuestionsPage,
+    'ServerPopupPage': server_popup_1.ServerPopupPage,
+    'SetContestPage': set_contest_1.SetContestPage,
+    'SetContestAdminPage': set_contest_admin_1.SetContestAdminPage,
+    'SettingsPage': settings_1.SettingsPage,
+    'SharePage': share_1.SharePage,
+    'SystemToolsPage': system_tools_1.SystemToolsPage
+};
 //------------------------------------------------------
 //-- get
 //------------------------------------------------------
 exports.get = function (className) {
-    switch (className) {
-        case 'ContestPage':
-            return contest_1.ContestPage;
-        case 'ContestParticipantsPage':
-            return contest_participants_1.ContestParticipantsPage;
-        case 'ContestTypePage':
-            return contest_type_1.ContestTypePage;
-        case 'FacebookPostPage':
-            return facebook_post_1.FacebookPostPage;
-        case 'LeaderboardsPage':
-            return leaderboards_1.LeaderboardsPage;
-        case 'LoginPage':
-            return login_1.LoginPage;
-        case 'MainTabsPage':
-            return main_tabs_1.MainTabsPage;
-        case 'MyContestsPage':
-            return my_contests_1.MyContestsPage;
-        case 'NewRankPage':
-            return new_rank_1.NewRankPage;
-        case 'PurchaseSuccessPage':
-            return purchase_success_1.PurchaseSuccessPage;
-        case 'QuestionEditorPage':
-            return question_editor_1.QuestionEditorPage;
-        case 'QuestionStatsPage':
-            return question_stats_1.QuestionStatsPage;
-        case 'QuizPage':
-            return quiz_1.QuizPage;
-        case 'RunningContestsPage':
-            return running_contests_1.RunningContestsPage;
-        case 'SearchQuestionsPage':
-            return search_questions_1.SearchQuestionsPage;
-        case 'ServerPopupPage':
-            return server_popup_1.ServerPopupPage;
-        case 'SetContestPage':
-            return set_contest_1.SetContestPage;
-        case 'SetContestAdminPage':
-            return set_contest_admin_1.SetContestAdminPage;
-        case 'SettingsPage':
-            return settings_1.SettingsPage;
-        case 'SharePage':
-            return share_1.SharePage;
-        case 'SystemToolsPage':
-            return system_tools_1.SystemToolsPage;
-    }
+    return appClasses[className];
 };
 //# sourceMappingURL=classes.js.map

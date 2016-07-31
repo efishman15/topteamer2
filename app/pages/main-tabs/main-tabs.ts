@@ -14,7 +14,6 @@ export class MainTabsPage {
 
   client:Client;
   @ViewChild(Tabs) mainTabs:Tabs;
-  playerInfoInitiated:boolean;
 
   private rootMyContestsPage;
   private rootRunningContestsPage;
@@ -68,14 +67,6 @@ export class MainTabsPage {
   }
 
   ionViewDidEnter() {
-    //Should occur only once - and AFTER top toolbar received it's height
-    if (!this.playerInfoInitiated) {
-      this.client.initPlayerInfo();
-      this.client.initXp();
-      this.playerInfoInitiated = true;
-      this.client.hidePreloader();
-    }
-
     //Events here could be serverPopup just as the app loads - the page should be fully visible
     this.client.processInternalEvents();
 
@@ -86,13 +77,6 @@ export class MainTabsPage {
       this.client.displayContestById(contestId).then(() => {
       }, () => {
       });
-    }
-  }
-
-  onResize() {
-    var selectedPage = this.mainTabs.getSelected().first();
-    if (selectedPage.instance && selectedPage.instance.onResize) {
-      selectedPage.instance.onResize();
     }
   }
 

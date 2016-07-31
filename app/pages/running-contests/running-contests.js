@@ -35,9 +35,6 @@ var RunningContestsPage = (function () {
     RunningContestsPage.prototype.refreshList = function (forceRefresh) {
         return this.contestList.refresh(forceRefresh);
     };
-    RunningContestsPage.prototype.onResize = function () {
-        this.contestList.onResize();
-    };
     RunningContestsPage.prototype.doRefresh = function (refresher) {
         this.refreshList(true).then(function () {
             refresher.complete();

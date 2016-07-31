@@ -52,13 +52,6 @@ var MainTabsPage = (function () {
         });
     }
     MainTabsPage.prototype.ionViewDidEnter = function () {
-        //Should occur only once - and AFTER top toolbar received it's height
-        if (!this.playerInfoInitiated) {
-            this.client.initPlayerInfo();
-            this.client.initXp();
-            this.playerInfoInitiated = true;
-            this.client.hidePreloader();
-        }
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
         //Came from external deep linking - only for the case the the appp is running
@@ -68,12 +61,6 @@ var MainTabsPage = (function () {
             this.client.displayContestById(contestId).then(function () {
             }, function () {
             });
-        }
-    };
-    MainTabsPage.prototype.onResize = function () {
-        var selectedPage = this.mainTabs.getSelected().first();
-        if (selectedPage.instance && selectedPage.instance.onResize) {
-            selectedPage.instance.onResize();
         }
     };
     MainTabsPage.prototype.publishActionToTab = function (index, action, param) {

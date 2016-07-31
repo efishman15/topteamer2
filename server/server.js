@@ -110,6 +110,7 @@ dalDb.loadSettings(null, function (err, data) {
   app.post('/leaderboard/weekly', isAuthenticated, leaderboards.getWeeklyLeaders);
   app.post('/system/clearCache', isAuthenticated, systemBusinessLogic.clearCache);
   app.post('/system/restart', isAuthenticated, systemBusinessLogic.restart);
+  app.post('/system/fixAvatars', isAuthenticated, systemBusinessLogic.fixAvatars);
 
   //----------------------------------------------------
   // API's that do NOT require authentication

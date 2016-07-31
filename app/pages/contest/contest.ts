@@ -34,7 +34,7 @@ export class ContestPage {
       //Refresh the contest chart and the contest details
       //This is the only case where we want to animate the chart
       //right after a quiz so the user will notice the socre changes
-      this.refreshContestChart(eventData[0].contest, true)
+      this.refreshContestChart(eventData[0].contest, eventData[0].data.animation);
 
       //Event data comes as an array of data objects - we expect only one (last quiz results)
       this.lastQuizResults = eventData[0];
@@ -58,13 +58,13 @@ export class ContestPage {
     });
 
     this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
-      this.refreshContestChart(eventData[0], false);
+      this.refreshContestChart(eventData[0]);
     });
 
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/contest',{'contestId' : this.contest._id});
+    this.client.logEvent('page/contest', {'contestId': this.contest._id});
   }
 
   ionViewWillLeave() {
@@ -76,9 +76,9 @@ export class ContestPage {
     this.client.openPage('ContestParticipantsPage', {'contest': this.contest, 'source': source});
   }
 
-  refreshContestChart(contest: Contest, animate: boolean) {
+  refreshContestChart(contest:Contest, animation?:string) {
     this.contest = contest;
-    this.contestChartComponent.refresh(contest, animate);
+    this.contestChartComponent.refresh(contest, animation);
   }
 
   share(source) {
@@ -91,7 +91,7 @@ export class ContestPage {
   }
 
   editContest() {
-    this.client.logEvent('contest/edit/click', {'contestId' : this.contest._id});
+    this.client.logEvent('contest/edit/click', {'contestId': this.contest._id});
     this.client.openPage('SetContestPage', {'mode': 'edit', 'contest': this.contest});
   }
 
@@ -111,7 +111,7 @@ export class ContestPage {
     this.playOrLeaderboard('contest/button');
   }
 
-  playOrLeaderboard(source: string) {
+  playOrLeaderboard(source:string) {
     if (this.contest.state === 'play') {
       this.playContest(source);
     }
@@ -129,9 +129,5 @@ export class ContestPage {
     });
 
     this.client.openPage('QuizPage', {'contest': this.contest, 'source': source});
-  }
-
-  onResize() {
-    this.contestChartComponent.onResize();
   }
 }

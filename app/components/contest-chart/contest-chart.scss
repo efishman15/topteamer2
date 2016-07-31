@@ -1,15 +1,7 @@
 .chart {
-  margin: 0px auto;
   background-color: #ffffff;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
-}
-
-.chart-radius {
-  margin: 0px auto;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-  height: 15px;
 }
 
 .chart-timer {
@@ -208,4 +200,64 @@ ion-col[width-5] {
   -ms-flex: 0 0 5%;
   flex: 0 0 5%;
   max-width: 5%;
+}
+
+.contest-chart-team {
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 15px;
+  font-size: 1.8rem;
+}
+
+.contest-chart-team0 {
+  color: #bf0045;
+}
+
+.contest-chart-team0-selected {
+  border: 1px #bf0045 solid;
+}
+
+.contest-chart-team-not-selected {
+  border: 1px #ffffff solid;
+}
+
+.contest-chart-team1 {
+  color: #2888ac;
+}
+
+.contest-chart-team1-selected {
+  border: 1px #2888AC solid;
+}
+
+.contest-chart-team-percent-wrapper {
+  padding-top: 5px;
+}
+
+.contest-chart-team-percent {
+  font-size: 24px;
+}
+
+.contest-chart-team0-percent {
+  color: #bf0045;
+}
+
+.contest-chart-team1-percent {
+  color: #2888ac;
+}
+
+.contest-chart-bar {
+  width: 50px;
+  margin: 0px auto;
+}
+
+.contest-chart-team0-bar {
+  background-color: #d13f78;
+}
+
+.contest-chart-team1-bar {
+  background-color: #0bc2f8;
+}
+
+.contest-chart-complementary-bar {
+  background-color: #dcdcdc;
 }

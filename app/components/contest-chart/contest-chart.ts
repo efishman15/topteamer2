@@ -5,8 +5,6 @@ import * as alertService from '../../providers/alert';
 import * as contestsService from '../../providers/contests';
 import {Contest} from '../../objects/objects';
 
-const WIDTH_MARGIN:number = 2;
-
 @Component({
   selector: 'contest-chart',
   templateUrl: 'build/components/contest-chart/contest-chart.html'
@@ -14,68 +12,38 @@ const WIDTH_MARGIN:number = 2;
 
 export class ContestChartComponent {
 
-  @Input() id:Number;
   @Input() contest:Contest;
   @Input() alternateButtonText:string;
 
-  chartTeamEventHandled:boolean;
   client:Client;
-  chart:any;
-  netChartHeight:number;
-  teamsOrder:Array<number>;
 
   @Output() contestSelected = new EventEmitter();
   @Output() myTeamSelected = new EventEmitter();
   @Output() contestButtonClick = new EventEmitter();
   @Output() joinedContest = new EventEmitter();
 
-
-  events:Object = {
-    'dataplotClick': (eventObj, dataObj) => {
-      var teamId = dataObj.dataIndex;
-      if (this.client.currentLanguage.direction === 'rtl') {
-        teamId = 1 - teamId;
-      }
-      this.teamSelected(teamId, 'teamBar');
-      this.chartTeamEventHandled = true;
-    },
-    'dataLabelClick': (eventObj, dataObj) => {
-      var teamId = dataObj.dataIndex;
-      if (this.client.currentLanguage.direction === 'rtl') {
-        teamId = 1 - teamId;
-      }
-      this.teamSelected(teamId, 'teamPercent');
-      this.chartTeamEventHandled = true;
-    },
-    'annotationClick': (eventObj, dataObj) => {
-      var teamId;
-      if (dataObj.annotationOptions.text === this.contest.teams[0].name) {
-        teamId = 0;
-      }
-      else {
-        teamId = 1;
-      }
-      this.teamSelected(teamId, 'teamName');
-      this.chartTeamEventHandled = true;
-    },
-    'chartClick': (eventObj, dataObj) => {
-      if (!this.chartTeamEventHandled) {
-        this.onContestSelected('chart');
-      }
-      this.chartTeamEventHandled = false;
-    }
-  };
+  animation:string;
+  eventJustHandled: boolean;
 
   constructor() {
     this.client = Client.getInstance();
-
+    this.animation = null;
+    this.eventJustHandled = false;
   }
 
-  onContestSelected(source:string) {
+  onContestSelected(event:Event, source:string) {
+    if (this.eventJustHandled) {
+      this.eventJustHandled = false;
+      return;
+    }
+    if (source !== 'chart') {
+      this.eventJustHandled = true;
+    }
     this.contestSelected.emit({'contest': this.contest, 'source': source});
   }
 
-  teamSelected(teamId:number, source:string) {
+  teamSelected(event:Event, teamId:number, source:string) {
+    this.eventJustHandled = true;
     if (this.contest.state === 'play') {
       if (teamId !== this.contest.myTeam) {
         this.switchTeams(source);
@@ -91,71 +59,16 @@ export class ContestChartComponent {
       }
     }
     else if (this.contest.state !== 'finished') {
-      this.joinContest(teamId, source, false, true,false).then(()=> {
+      this.joinContest(teamId, source, false, true, false).then(()=> {
       }, ()=> {
       });
     }
 
   }
 
-  ngOnInit() {
-    this.initChart();
-  }
-
-  initChart() {
-    if (!this.chart) {
-
-      this.netChartHeight = 1 - (this.client.settings.charts.contest.size.topMarginPercent / 100);
-
-      if (this.client.currentLanguage.direction === 'ltr') {
-        this.teamsOrder = [0, 1];
-      }
-      else {
-        this.teamsOrder = [1, 0];
-      }
-
-      this.adjustScores();
-      window.FusionCharts.ready(() => {
-        this.chart = new window.FusionCharts({
-          type: this.client.settings.charts.contest.type,
-          renderAt: this.id + '-container',
-          width: this.client.chartWidth - WIDTH_MARGIN,
-          height: this.client.chartHeight,
-          dataFormat: 'json',
-          dataSource: this.contest.dataSource,
-          events: this.events
-        });
-
-        this.chart.render();
-
-      });
-    }
-  }
-
-  refresh(contest?:Contest, animate?:boolean) {
-    if (contest) {
-      //new contest object arrived
-      this.contest = contest;
-      this.adjustScores();
-    }
-
-    this.contest.dataSource.chart.animation = (animate ? 1 : 0);
-
-    this.chart.setJSONData(this.contest.dataSource);
-  }
-
-  onResize() {
-    this.chart.resizeTo(this.client.chartWidth - WIDTH_MARGIN, this.client.chartHeight);
-  }
-
-  adjustScores() {
-    //Scores
-    this.contest.dataSource.dataset[0].data[0].value = this.contest.teams[this.teamsOrder[0]].chartValue * this.netChartHeight;
-    this.contest.dataSource.dataset[0].data[1].value = this.contest.teams[this.teamsOrder[1]].chartValue * this.netChartHeight;
-
-    //Others (in grey)
-    this.contest.dataSource.dataset[1].data[0].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[0].value;
-    this.contest.dataSource.dataset[1].data[1].value = this.netChartHeight - this.contest.dataSource.dataset[0].data[1].value;
+  refresh(contest?:Contest, animation?:string) {
+    this.contest = contest;
+    this.animation = animation;
   }
 
   joinContest(team:number, source:string, switchTeams:boolean, showAlert:boolean, delayRankModal:boolean) {
@@ -193,7 +106,7 @@ export class ContestChartComponent {
             else {
               resolve(rankModal);
             }
-            this.client.addXp(data.xpProgress).then(() => {
+            this.client.playerInfoComponent.addXp(data.xpProgress).then(() => {
             }, () => {
               reject();
             })
@@ -234,7 +147,8 @@ export class ContestChartComponent {
     });
   }
 
-  onContestButtonClick() {
+  onContestButtonClick(event:Event) {
+    this.eventJustHandled = true;
     if (this.contest.state === 'join') {
       //Will prompt an alert with 2 buttons with the team names
       //Upon selecting a team - send the user directly to play
@@ -248,7 +162,7 @@ export class ContestChartComponent {
       alertService.alert({'type': 'PLAY_CONTEST_CHOOSE_TEAM'}, [
         {
           'text': this.contest.teams[0].name,
-          'cssClass': cssClass + '-' + this.teamsOrder[0],
+          'cssClass': cssClass + '-0',
           'handler': () => {
             this.joinContest(0, 'button', false, false, true).then((rankModal:Modal) => {
               this.contestButtonClick.emit({'contest': this.contest, 'source': 'button'});
@@ -261,7 +175,7 @@ export class ContestChartComponent {
         },
         {
           'text': this.contest.teams[1].name,
-          'cssClass': cssClass + '-' + this.teamsOrder[1],
+          'cssClass': cssClass + '-1',
           'handler': () => {
             this.joinContest(1, 'button', false, false, true).then((rankModal:Modal) => {
               this.contestButtonClick.emit({'contest': this.contest, 'source': 'button'});

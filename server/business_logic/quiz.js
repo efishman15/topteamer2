@@ -563,7 +563,7 @@ module.exports.answer = function (req, res, next) {
 
       //Update all leaderboards with the score achieved - don't wait for any callbacks of the leaderboard - can
       //be done fully async and continue doing other stuff
-      dalLeaderboard.addScore(data.contest._id, myTeam, data.session.quiz.serverData.score, data.session.facebookUserId, data.session.name, data.session.avatar);
+      dalLeaderboard.addScore(data.contest._id, myTeam, data.session.quiz.serverData.score, data.session.facebookUserId, data.session.name);
 
       myContestUser.score += data.session.quiz.serverData.score;
       myContestUser.teamScores[myTeam] += data.session.quiz.serverData.score;
@@ -581,9 +581,9 @@ module.exports.answer = function (req, res, next) {
 
       // Check if need to replace the contest leader
       // Leader is the participant that has contributed max points for the contest regardless of teams)
-      if (myContestUser.score > data.contest.users[data.contest.leader.userId].score) {
-        data.setData['leader.userId'] = data.session.userId;
-        data.setData['leader.avatar'] = data.session.avatar;
+      if (myContestUser.score > data.contest.users[data.contest.leader.id].score) {
+        data.setData['leader.id'] = data.session.userId;
+        data.setData['leader.facebookUserId'] = data.session.facebookUserId;
         data.setData['leader.name'] = data.session.name;
         setPostStory(data, 'becameContestLeader',
           {
@@ -595,9 +595,9 @@ module.exports.answer = function (req, res, next) {
 
       // Check if need to replace the my team's leader
       // Team leader is the participant that has contributed max points for his/her team)
-      if (!data.contest.teams[myTeam].leader || myContestUser.teamScores[myTeam] > data.contest.users[data.contest.teams[myTeam].leader.userId].teamScores[myTeam]) {
-        data.setData['teams.' + myTeam + '.leader.userId'] = data.session.userId;
-        data.setData['teams.' + myTeam + '.leader.avatar'] = data.session.avatar;
+      if (!data.contest.teams[myTeam].leader || myContestUser.teamScores[myTeam] > data.contest.users[data.contest.teams[myTeam].leader.id].teamScores[myTeam]) {
+        data.setData['teams.' + myTeam + '.leader.id'] = data.session.userId;
+        data.setData['teams.' + myTeam + '.leader.facebookUserId'] = data.session.facebookUserId;
         data.setData['teams.' + myTeam + '.leader.name'] = data.session.name;
         setPostStory(data, 'becameTeamLeader',
           {

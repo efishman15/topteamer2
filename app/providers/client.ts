@@ -3,12 +3,13 @@ import {Http, Response, Headers} from '@angular/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 import {Push} from 'ionic-native';
-import {App,Platform,Config, Nav, Alert, Modal, Events} from 'ionic-angular';
+import {App,Platform,Config, Nav, Alert, Modal, Events, NavController, ViewController} from 'ionic-angular';
 import * as contestsService from './contests';
 import * as facebookService from './facebook';
 import * as alertService from './alert';
 import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo,Contest,ClientShareApp,AppPage} from '../objects/objects';
 import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
+import {PlayerInfoComponent} from '../components/player-info/player-info'
 import * as classesService from './classes';
 
 @Injectable()
@@ -18,29 +19,23 @@ export class Client {
 
   _languageKeys:Array<string>;
 
-  canvas:any;
-  _canvasContext:any;
-  circle:number = Math.PI * 2;
-  quarter:number = Math.PI / 2;
-  canvasCenterX:number;
-  canvasCenterY:number;
-
-  _app:App;
-  _platform:Platform;
-  _config:Config;
-  _events:Events;
-  _nav:Nav;
+  app:App;
+  platform:Platform;
+  config:Config;
+  events:Events;
+  nav:Nav;
   loadingModalComponent:LoadingModalComponent;
-  _user:User;
-  _session:Session;
-  _settings:Settings;
-  _loaded:Boolean = false;
+  playerInfoComponent:PlayerInfoComponent;
+  user:User;
+  session:Session;
+  settings:Settings;
+  loaded:Boolean = false;
   clientInfo:ClientInfo;
   _width:number;
   _chartWidth:number;
   _chartHeight:number;
-  _deepLinkContestId:string;
-  _shareApps:Array<ClientShareApp>;
+  deepLinkContestId:string;
+  shareApps:Array<ClientShareApp>;
   appPreloading:boolean = true;
   serverGateway:ServerGateway;
   pushService:any;
@@ -79,19 +74,20 @@ export class Client {
     return Client.instance;
   }
 
-  init(app:App, platform:Platform, config:Config, events:Events, nav:Nav, loadingModalComponent:LoadingModalComponent) {
+  init(app:App, platform:Platform, config:Config, events:Events, nav:Nav, loadingModalComponent:LoadingModalComponent, playerInfoComponent:PlayerInfoComponent) {
 
     return new Promise((resolve, reject) => {
 
-        this._app = app;
-        this._platform = platform;
-        this._config = config;
-        this._events = events;
-        this._nav = nav;
+        this.app = app;
+        this.platform = platform;
+        this.config = config;
+        this.events = events;
+        this.nav = nav;
         this.loadingModalComponent = loadingModalComponent;
+        this.playerInfoComponent = playerInfoComponent;
 
         if (this.clientInfo.mobile) {
-          this._shareApps = new Array<ClientShareApp>();
+          this.shareApps = new Array<ClientShareApp>();
           if (platform.is('android')) {
             this.clientInfo.platform = 'android';
           }
@@ -110,13 +106,13 @@ export class Client {
         this.getSettings(settingsVersion,language).then((data) => {
 
           if (data['settings']) {
-            this._settings = data['settings'];
+            this.settings = data['settings'];
             //Save new settings in localStorage
             localStorage.setItem('settings',JSON.stringify(data['settings']));
             localStorage.setItem('settingsVersion',data['settings']['version']);
           }
           else {
-            this._settings = JSON.parse(localStorage.getItem('settings'));
+            this.settings = JSON.parse(localStorage.getItem('settings'));
           }
 
           if (!language || language === 'undefined') {
@@ -127,14 +123,9 @@ export class Client {
 
           this.initUser(language, data['geoInfo']);
 
-          this.canvas = document.getElementById('playerInfoRankCanvas');
-          this._canvasContext = this.canvas.getContext('2d');
-
           this.setDirection();
 
-          this._loaded = true;
-
-          this.adjustChartsDeviceSettings();
+          this.loaded = true;
 
           Client.instance = this;
 
@@ -142,24 +133,6 @@ export class Client {
         }, (err) => reject(err));
       }
     );
-  }
-
-  initPlayerInfo() {
-    var navBar = document.getElementsByTagName('ion-navbar')[0];
-    var navBarHeight = navBar['offsetHeight'];
-
-    var playerInfoImage = document.getElementById('playerInfoImage');
-    playerInfoImage.style.top = (navBarHeight - playerInfoImage.offsetHeight) / 2 + 'px';
-
-    //Player info rank canvas
-    this.canvasCenterX = this.settings.xpControl.canvas.width / 2;
-    this.canvasCenterY = this.settings.xpControl.canvas.height / 2;
-    this.canvas.width = this.settings.xpControl.canvas.width;
-    this.canvas.style.width = this.settings.xpControl.canvas.width + 'px';
-    this.canvas.height = this.settings.xpControl.canvas.height;
-    this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
-    this.canvas.style.top = (navBarHeight - this.settings.xpControl.canvas.height) / 2 + 'px';
-
   }
 
   getSettings(settingsVersion:number, localStorageLanguage:string) {
@@ -181,132 +154,14 @@ export class Client {
 
   initUser(language, geoInfo) {
 
-    this._user = new User(language, this.clientInfo, geoInfo);
-  }
-
-  clearXp() {
-    this._canvasContext.clearRect(0, 0, this.settings.xpControl.canvas.width, this.settings.xpControl.canvas.height);
-  }
-
-  initXp() {
-    this.clearXp();
-
-    //-------------------------------------------------------------------------------------
-    // Draw the full circle representing the entire xp required for the next level
-    //-------------------------------------------------------------------------------------
-    this._canvasContext.beginPath();
-
-    this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, 0, this.circle, false);
-    this._canvasContext.fillStyle = this.settings.xpControl.fillColor;
-    this._canvasContext.fill();
-
-    //Full line color
-    this._canvasContext.lineWidth = this.settings.xpControl.lineWidth;
-    this._canvasContext.strokeStyle = this.settings.xpControl.fullLineColor;
-    this._canvasContext.stroke();
-    this._canvasContext.closePath();
-
-    //-------------------------------------------------------------------------------------
-    //Draw the arc representing the xp in the current level
-    //-------------------------------------------------------------------------------------
-    this._canvasContext.beginPath();
-
-    // line color
-    this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, -(this.quarter), ((this.session.xpProgress.current / this.session.xpProgress.max) * this.circle) - this.quarter, false);
-    this._canvasContext.strokeStyle = this.settings.xpControl.progressLineColor;
-    this._canvasContext.stroke();
-
-    //Rank Text
-    var font = '';
-    if (this.settings.xpControl.font.bold) {
-      font += 'bold ';
-    }
-
-    var fontSize;
-    if (this.session.rank < 10) {
-      //1 digit font
-      fontSize = this.settings.xpControl.font.d1;
-    }
-    else if (this.session.rank < 100) {
-      //2 digits font
-      fontSize = this.settings.xpControl.font.d2;
-    }
-    else {
-      fontSize = this.settings.xpControl.font.d3;
-    }
-    font += fontSize + ' ';
-
-    font += this.settings.xpControl.font.name;
-
-    this._canvasContext.font = font;
-
-    // Move it down by half the text height and left by half the text width
-    var rankText = '' + this.session.rank;
-    var textWidth = this._canvasContext.measureText(rankText).width;
-    var textHeight = this._canvasContext.measureText('w').width;
-
-    this._canvasContext.fillStyle = this.settings.xpControl.textColor;
-    this._canvasContext.fillText(rankText, this.canvasCenterX - (textWidth / 2), this.canvasCenterY + (textHeight / 2));
-
-    this._canvasContext.closePath();
-  }
-
-  animateXpAddition(startPoint, endPoint) {
-
-    this._canvasContext.beginPath();
-    this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, (this.circle * startPoint) - this.quarter, (this.circle * endPoint) - this.quarter, false);
-    this._canvasContext.strokeStyle = this.settings.xpControl.progressLineColor;
-    this._canvasContext.stroke();
-    this._canvasContext.closePath();
-  }
-
-  addXp(xpProgress) {
-
-    return new Promise((resolve, reject) => {
-
-      var startPoint = this.session.xpProgress.current / this.session.xpProgress.max;
-
-      //Occurs after xp has already been added to the session
-      var addition = xpProgress.addition;
-      for (var i = 1; i <= addition; i++) {
-        window.myRequestAnimationFrame(() => {
-          var endPoint = (this.session.xpProgress.current + i) / this.session.xpProgress.max;
-          this.animateXpAddition(startPoint, endPoint);
-
-          //Last iteration should be performed after the animation frame event happened
-          if (i >= addition) {
-
-            //Add the actual xp to the client side
-            this.session.xpProgress = xpProgress;
-
-            //Zero the addition
-            this.session.xpProgress.addition = 0;
-
-            if (xpProgress.rankChanged) {
-              this.session.rank = xpProgress.rank;
-              this.initXp();
-            }
-          }
-        })
-      }
-      resolve();
-    });
-
+    this.user = new User(language, this.clientInfo, geoInfo);
   }
 
   setDirection() {
     var dir = document.createAttribute('dir');
     dir.value = this.currentLanguage.direction;
     this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
-
-    var playerInfo = document.getElementById('playerInfo');
-    if (playerInfo) {
-      playerInfo.className = 'player-info-' + this.currentLanguage.direction;
-    }
-
-    this.canvas.className = 'player-info-canvas-' + this.currentLanguage.direction;
     this.config.set('backButtonIcon', this.currentLanguage.backButtonIcon);
-
   }
 
   facebookServerConnect(facebookAuthResponse) {
@@ -329,7 +184,7 @@ export class Client {
 
         this.user.settings = JSON.parse(JSON.stringify(data['session'].settings));
 
-        this._session = data['session'];
+        this.session = data['session'];
         this.serverGateway.token = data['session'].token;
 
         this.setLoggedUserId(data['session'].userId);
@@ -579,6 +434,15 @@ export class Client {
     this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
     this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
 
+    //Check if we have an active modal view and call it's onResize as well
+    let portalNav:NavController = this.nav.getPortal();
+    if (portalNav.hasOverlay()) {
+      let activeView:ViewController = portalNav.getActive();
+      if (activeView && activeView.instance && activeView.instance['onResize']) {
+        activeView.instance['onResize']()
+      }
+    }
+
     //Invoke 'onResize' for each view that has it
     for (var i = 0; i < this.nav.length(); i++) {
       var viewController = this.nav.getByIndex(i);
@@ -616,28 +480,6 @@ export class Client {
     return this._chartHeight;
   }
 
-  adjustChartsDeviceSettings() {
-
-    //Contest charts
-    for (var i = 0; i < this.settings.charts.contest.devices.length; i++) {
-      if (window.devicePixelRatio <= this.settings.charts.contest.devices[i].devicePixelRatio) {
-        this.settings.charts.contest.size.topMarginPercent = this.settings.charts.contest.devices[i].settings.topMarginPercent;
-        this.settings.charts.contest.size.teamNameFontSize = this.settings.charts.contest.devices[i].settings.teamNameFontSize;
-        break;
-      }
-    }
-
-    //Question Stats charts
-    for (var i = 0; i < this.settings.charts.questionStats.devices.length; i++) {
-      if (window.devicePixelRatio <= this.settings.charts.questionStats.devices[i].devicePixelRatio) {
-        this.settings.charts.questionStats.size.legendItemFontSize = this.settings.charts.questionStats.devices[i].settings.legendItemFontSize;
-        this.settings.charts.questionStats.size.labelFontSize = this.settings.charts.questionStats.devices[i].settings.labelFontSize;
-        break;
-      }
-    }
-
-  }
-
   showLoader() {
     if (this.loadingModalComponent && !this.appPreloading) {
       setTimeout(() => {
@@ -652,14 +494,6 @@ export class Client {
         this.loadingModalComponent.hide();
       }, 100);
     }
-  }
-
-  get shareApps():Array<ClientShareApp> {
-    return this._shareApps;
-  }
-
-  set shareApps(value:Array<ClientShareApp>) {
-    this._shareApps = value;
   }
 
   popToRoot() {
@@ -681,73 +515,19 @@ export class Client {
     return language;
   }
 
-  get loaded():Boolean {
-    return this._loaded;
-  }
-
-  get app():App {
-    return this._app;
-  }
-
-  get platform():Platform {
-    return this._platform;
-  }
-
-  get config():Config {
-    return this._config;
-  }
-
-  get events():Events {
-    return this._events;
-  }
-
-  get nav():Nav {
-    return this._nav;
-  }
-
-  get user():User {
-    return this._user;
-  }
-
   get endPoint():String {
     return this.serverGateway.endPoint;
-  }
-
-  get settings():Settings {
-    return this._settings;
-  }
-
-  set settings(value:Settings) {
-    this._settings = value;
-  }
-
-  get session():Session {
-    return this._session;
   }
 
   get currentLanguage():Language {
     return this.settings.languages[this.session ? this.session.settings.language : this.user.settings.language];
   }
 
-  get languageKeys():Array < String > {
-    if (
-      !this._languageKeys
-    ) {
+  get languageKeys():Array<String> {
+    if (!this._languageKeys) {
       this._languageKeys = Object.keys(this.settings.languages);
     }
     return this._languageKeys;
-  }
-
-  get canvasContext():any {
-    return this._canvasContext;
-  }
-
-  get deepLinkContestId():string {
-    return this._deepLinkContestId;
-  }
-
-  set deepLinkContestId(value:string) {
-    this._deepLinkContestId = value;
   }
 
   translate(key:string, params ?:Object) {
@@ -787,8 +567,8 @@ export class Client {
 
   logout() {
     this.serverGateway.token = null;
-    this._session = null;
-    this.clearXp();
+    this.session = null;
+    this.playerInfoComponent.clearXp();
   }
 
   setLoggedUserId(userId:string) {
@@ -923,26 +703,30 @@ export class Client {
 
     }
   }
+
+  getFacebookAvatar(facebookUserId:string) {
+    return this.settings.facebook.avatarTemplate.replace('{{id}}',facebookUserId);
+  }
 }
 
 export class ServerGateway {
 
   http:Http;
-  _endPoint:string;
-  _token:string;
-  _eventQueue:Array<InternalEvent>;
+  endPoint:string;
+  token:string;
+  eventQueue:Array<InternalEvent>;
 
   constructor(http:Http) {
     this.http = http;
 
     if (!window.cordova) {
-      this._endPoint = window.location.protocol + '//' + window.location.host + '/';
+      this.endPoint = window.location.protocol + '//' + window.location.host + '/';
     }
     else {
-      this._endPoint = 'http://www.topteamer.com/'
+      this.endPoint = 'http://www.topteamer.com/'
     }
 
-    this._eventQueue = [];
+    this.eventQueue = [];
   }
 
   get(path, timeout) {
@@ -954,8 +738,8 @@ export class ServerGateway {
         timeout = 10000;
       }
 
-      if (this._token) {
-        headers.append('Authorization', this._token);
+      if (this.token) {
+        headers.append('Authorization', this.token);
       }
 
       this.http.get(path, {headers: headers})
@@ -975,15 +759,15 @@ export class ServerGateway {
       var headers = new Headers();
       headers.append('Content-Type', 'application/json');
 
-      if (this._token) {
-        headers.append('Authorization', this._token);
+      if (this.token) {
+        headers.append('Authorization', this.token);
       }
 
       if (!timeout) {
         timeout = 10000;
       }
 
-      this.http.post(this._endPoint + path, JSON.stringify(postData), {headers: headers})
+      this.http.post(this.endPoint + path, JSON.stringify(postData), {headers: headers})
         .timeout(timeout)
         .map((res:Response) => res.json())
         .subscribe(
@@ -1010,37 +794,15 @@ export class ServerGateway {
         );
     });
   };
-
-  get endPoint():String {
-    return this._endPoint;
-  }
-
-  get eventQueue():Array<InternalEvent> {
-    return this._eventQueue;
-  }
-
-  set token(value:string) {
-    this._token = value;
-  }
-
 }
 
 export class InternalEvent {
-  _eventName:string;
-  _eventData:Object;
+  eventName:string;
+  eventData:Object;
 
   constructor(eventName:string, eventData:Object) {
-    this._eventName = eventName;
-    this._eventData = eventData;
+    this.eventName = eventName;
+    this.eventData = eventData;
   }
-
-  get eventName():string {
-    return this._eventName;
-  }
-
-  get eventData():Object {
-    return this._eventData;
-  }
-
 }
 

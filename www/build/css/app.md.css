@@ -11435,32 +11435,6 @@ body {
   font-size: 1.4rem;
   background-color: #fff; }
 
-.player-info-ltr {
-  position: absolute;
-  top: 0px;
-  right: 0px; }
-
-.player-info-rtl {
-  position: absolute;
-  top: 0px;
-  left: 0px; }
-
-.player-info-avatar {
-  position: relative;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  margin-left: 5px;
-  margin-right: 5px; }
-
-.player-info-canvas-ltr {
-  position: absolute;
-  right: 45px; }
-
-.player-info-canvas-rtl {
-  position: absolute;
-  left: 45px; }
-
 .my-spinner {
   position: absolute;
   top: 50%;
@@ -11563,16 +11537,9 @@ body {
   text-align: center !important; }
 
 .chart {
-  margin: 0px auto;
   background-color: #ffffff;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px; }
-
-.chart-radius {
-  margin: 0px auto;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-  height: 15px; }
 
 .chart-timer {
   position: absolute;
@@ -11740,6 +11707,52 @@ ion-col[width-5] {
   flex: 0 0 5%;
   max-width: 5%; }
 
+.contest-chart-team {
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 15px;
+  font-size: 1.8rem; }
+
+.contest-chart-team0 {
+  color: #bf0045; }
+
+.contest-chart-team0-selected {
+  border: 1px #bf0045 solid; }
+
+.contest-chart-team-not-selected {
+  border: 1px #ffffff solid; }
+
+.contest-chart-team1 {
+  color: #2888ac; }
+
+.contest-chart-team1-selected {
+  border: 1px #2888AC solid; }
+
+.contest-chart-team-percent-wrapper {
+  padding-top: 5px; }
+
+.contest-chart-team-percent {
+  font-size: 24px; }
+
+.contest-chart-team0-percent {
+  color: #bf0045; }
+
+.contest-chart-team1-percent {
+  color: #2888ac; }
+
+.contest-chart-bar {
+  width: 50px;
+  margin: 0px auto; }
+
+.contest-chart-team0-bar {
+  background-color: #d13f78; }
+
+.contest-chart-team1-bar {
+  background-color: #0bc2f8; }
+
+.contest-chart-complementary-bar {
+  background-color: #dcdcdc; }
+
 .button-play-contest {
   background: #0dc9f9;
   background: -webkit-linear-gradient(#01cefd, #01a1f9);
@@ -11882,6 +11895,38 @@ loading-modal .container {
     loading-modal .container ion-spinner.spinner-bubbles circle,
     loading-modal .container ion-spinner.spinner-dots circle {
       fill: #828282; }
+
+.player-info-wrapper {
+  height: 5.6rem; }
+
+.player-info-row {
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  padding-left: 5px;
+  padding-right: 5px; }
+
+.player-info-ltr {
+  position: absolute;
+  top: 0px;
+  right: 0px; }
+
+.player-info-rtl {
+  position: absolute;
+  top: 0px;
+  left: 0px; }
+
+.player-info-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-block; }
+
+.player-info-canvas {
+  width: 40px;
+  height: 40px;
+  display: inline-block; }
 
 .simple-tabs-wrapper {
   margin: 0px auto;
@@ -12157,17 +12202,31 @@ loading-modal .container {
 .hide-item {
   display: none; }
 
-.question-chart-container {
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+.question-stats-wrapper {
   margin: 0px auto;
   background-color: #ffffff; }
 
-.quiz-canvas {
-  width: 90%;
-  margin-top: 10px;
-  margin-left: 5%;
-  margin-right: 5%; }
+.question-chart {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  background-color: #ffffff; }
+
+.question-chart-legend {
+  background-color: #ffffff;
+  padding-top: 10px;
+  padding-bottom: 10px; }
+
+.question-chart-legned-item {
+  font-size: 18px;
+  width: 14.5rem;
+  border-radius: 15px;
+  color: #ffffff;
+  font-weight: bold;
+  white-space: nowrap; }
+
+.quiz-canvas-wrapper {
+  padding-top: 10px;
+  margin: 0px auto; }
 
 .question-text {
   font-size: 20px;

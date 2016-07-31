@@ -290,7 +290,7 @@ function validateContestData(data, callback) {
 
     cleanContest.creator = {
       'id': data.session.userId,
-      'avatar': data.session.avatar,
+      'facebookUserId': data.session.facebookUserId,
       'name': data.session.name,
       'date': now
     };
@@ -512,7 +512,7 @@ function joinToContestObject(contest, teamId, session) {
 
   if (!contest.users) {
     contest.users = {};
-    contest.leader = {'userId': session.userId, 'name': session.name, 'avatar': session.avatar};
+    contest.leader = {'facebookUserId': session.facebookUserId, 'name': session.name};
   }
 
   //Increment participants only if I did not join this contest yet
@@ -523,7 +523,7 @@ function joinToContestObject(contest, teamId, session) {
   }
 
   if (!contest.teams[teamId].leader) {
-    contest.teams[teamId].leader = {'userId': session.userId, 'name': session.name, 'avatar': session.avatar};
+    contest.teams[teamId].leader = {'id': session.facebookUserId, 'name': session.name};
   }
 
   //Actual join
@@ -543,7 +543,7 @@ function joinToContestObject(contest, teamId, session) {
 
   //If edit mode (has _id) - join the user to the contest's leader board (with zero score addition) to this team
   if (contest._id) {
-    dalLeaderboard.addScore(contest._id, teamId, 0, session.facebookUserId, session.name, session.avatar);
+    dalLeaderboard.addScore(contest._id, teamId, 0, session.facebookUserId, session.name);
   }
 
   return newJoin;
@@ -601,7 +601,7 @@ module.exports.setContest = function (req, res, next) {
     function (data, callback) {
       if (data.mode === 'add') {
         //In case of add - contest needed to be added in the previous operation first, to get an _id
-        dalLeaderboard.addScore(data.contest._id, 0, 0, data.session.facebookUserId, data.session.name, data.session.avatar);
+        dalLeaderboard.addScore(data.contest._id, 0, 0, data.session.facebookUserId, data.session.name);
         dalBranchIo.createContestLinks(data, callback);
       }
       else {

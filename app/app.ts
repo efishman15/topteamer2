@@ -1,4 +1,4 @@
-import {Component,provide,ExceptionHandler,ViewChild} from '@angular/core';
+import {Component,provide,ExceptionHandler,ViewChild,ElementRef} from '@angular/core';
 import {MyExceptionHandler} from './providers/exceptions';
 import {ionicBootstrap, App, Platform, Config, Events, Nav, ViewController, NavController} from 'ionic-angular';
 import {Client} from './providers/client';
@@ -6,6 +6,7 @@ import * as facebookService from './providers/facebook';
 import * as contestsService from './providers/contests';
 import * as shareService from './providers/share';
 import {LoadingModalComponent} from './components/loading-modal/loading-modal';
+import {PlayerInfoComponent} from './components/player-info/player-info';
 import * as alertService from './providers/alert';
 import {} from './interfaces/interfaces'
 import {AppVersion} from 'ionic-native';
@@ -13,13 +14,14 @@ import {AppPage,Contest} from './objects/objects'
 
 @Component({
   templateUrl: 'build/app.html',
-  directives: [LoadingModalComponent]
+  directives: [LoadingModalComponent, PlayerInfoComponent]
 })
 export class TopTeamerApp {
 
   client:Client;
   @ViewChild(Nav) nav:Nav;
   @ViewChild(LoadingModalComponent) loadingModalComponent:LoadingModalComponent;
+  @ViewChild(PlayerInfoComponent) playerInfoComponent:PlayerInfoComponent;
 
   app:App;
   platform:Platform;
@@ -36,7 +38,7 @@ export class TopTeamerApp {
   }
 
   ngAfterViewInit() {
-    this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent).then(() => {
+    this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent, this.playerInfoComponent).then(() => {
       this.initApp();
     }, (err) => this.ngAfterViewInit());
   }
@@ -236,6 +238,7 @@ export class TopTeamerApp {
     facebookService.getLoginStatus().then((result) => {
       if (result['connected']) {
         this.client.facebookServerConnect(result['response'].authResponse).then(() => {
+          this.playerInfoComponent.init(this.client);
           let appPages:Array<AppPage> = new Array<AppPage>();
           appPages.push(new AppPage('MainTabsPage', {}));
           if (this.client.deepLinkContestId) {
@@ -243,16 +246,16 @@ export class TopTeamerApp {
               this.client.deepLinkContestId = null;
               appPages.push(new AppPage('ContestPage', {'contest': contest, 'source': 'deepLink'}));
               this.client.setPages(appPages).then(()=>{
-                //VERY IMPORTANT
-                //Since code in MainTabsPage is not excuted and we're jumping
-                //right to the contest view, the preloader must be hidden here
                 this.client.hidePreloader();
               },()=>{
               });
             })
           }
           else {
-            this.client.setPages(appPages);
+            this.client.setPages(appPages).then(()=>{
+              this.client.hidePreloader();
+            },()=>{
+            });
           }
         }, (err) => {
           this.client.nav.setRoot(this.client.getPage('LoginPage'));

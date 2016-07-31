@@ -1,6 +1,24 @@
-.question-chart-container {
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+.question-stats-wrapper {
   margin: 0px auto;
   background-color: #ffffff;
+}
+
+.question-chart {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  background-color: #ffffff;
+}
+.question-chart-legend {
+  background-color: #ffffff;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.question-chart-legned-item {
+  font-size: 18px;
+  width: 14.5rem;
+  border-radius: 15px;
+  color: #ffffff;
+  font-weight: bold;
+  white-space: nowrap;
 }

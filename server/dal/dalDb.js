@@ -76,15 +76,13 @@ function buildQuestionsResult(questions) {
 //
 // data:
 // -----
-// input: DbHelper, user (contains thirdParty (id, accessToken), name, avatar, geoInfo, settings
+// input: DbHelper, user (contains thirdParty (id, accessToken), name, geoInfo, settings
 // output: user
 //------------------------------------------------------------------------------------------------
 function register(data, callback) {
   var usersCollection = data.DbHelper.getCollection('Users');
 
   var now = (new Date()).getTime();
-
-  var avatar = data.user.avatar;
 
   data.user.settings.sound = true;
   var newUser = {
@@ -123,9 +121,6 @@ function register(data, callback) {
       newUser.thirdParty = data.user.thirdParty;
       data.user = newUser;
       data.user.justRegistered = true; //does not need to be in db - just returned back to the client
-
-      //restore avatar - computed field
-      data.user.avatar = avatar;
 
       checkToCloseDb(data);
 
@@ -491,17 +486,12 @@ module.exports.setSession = function (data, callback) {
 //
 // data:
 // -----
-// input: DbHelper, user (contains thirdParty.id, thirdParty.accessToken), avatar
+// input: DbHelper, user (contains thirdParty.id, thirdParty.accessToken)
 // output: user
 //---------------------------------------------------------------------
 module.exports.facebookLogin = function (data, callback) {
 
   var usersCollection = data.DbHelper.getCollection('Users');
-
-  //Save avatar which is a computed field
-  //The findAndModify will bring a 'fresh' user object from db
-  //Put the avatar back later on this fresh object
-  var avatar = data.user.avatar;
 
   var thirdParty = data.user.thirdParty;
   var clientInfo = data.user.clientInfo;
@@ -566,9 +556,6 @@ module.exports.facebookLogin = function (data, callback) {
           user.lastClientInfo = clientInfo;
           data.user = user;
 
-          //restore the avatar back
-          data.user.avatar = avatar;
-
           if (thirdParty) {
             data.user.thirdParty = thirdParty;
           }
@@ -609,7 +596,6 @@ module.exports.createOrUpdateSession = function (data, callback) {
     'facebookAccessToken': data.user.facebookAccessToken,
     'name': data.user.name,
     'ageRange': data.user.ageRange,
-    'avatar': data.user.avatar,
     'created': nowEpoch,
     'expires': new Date(nowEpoch + generalUtils.settings.server.db.sessionExpirationMilliseconds), //must be without getTime() since db internally removes by TTL - and ttl works only when it is actual date and not epoch
     'userToken': userToken,

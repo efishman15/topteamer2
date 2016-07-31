@@ -20,55 +20,34 @@ import {SettingsPage} from '../pages/settings/settings';
 import {SharePage} from '../pages/share/share';
 import {SystemToolsPage} from '../pages/system-tools/system-tools';
 
+let appClasses = {
+  'ContestPage': <any>ContestPage,
+  'ContestParticipantsPage': <any>ContestParticipantsPage,
+  'ContestTypePage': <any>ContestTypePage,
+  'FacebookPostPage': <any>FacebookPostPage,
+  'LeaderboardsPage': <any>LeaderboardsPage,
+  'LoginPage': <any>LoginPage,
+  'MainTabsPage': <any>MainTabsPage,
+  'MyContestsPage': <any>MyContestsPage,
+  'NewRankPage': <any>NewRankPage,
+  'PurchaseSuccessPage': <any>PurchaseSuccessPage,
+  'QuestionEditorPage': <any>QuestionEditorPage,
+  'QuestionStatsPage': <any>QuestionStatsPage,
+  'QuizPage': <any>QuizPage,
+  'RunningContestsPage': <any>RunningContestsPage,
+  'SearchQuestionsPage': <any>SearchQuestionsPage,
+  'ServerPopupPage': <any>ServerPopupPage,
+  'SetContestPage': <any>SetContestPage,
+  'SetContestAdminPage': <any>SetContestAdminPage,
+  'SettingsPage': <any>SettingsPage,
+  'SharePage': <any>SharePage,
+  'SystemToolsPage': <any>SystemToolsPage
+};
+
 //------------------------------------------------------
 //-- get
 //------------------------------------------------------
 export let get = (className:string) => {
-
-  switch (className) {
-
-    case 'ContestPage':
-      return <any>ContestPage;
-    case 'ContestParticipantsPage':
-      return <any>ContestParticipantsPage;
-    case 'ContestTypePage':
-      return <any>ContestTypePage;
-    case 'FacebookPostPage':
-      return <any>FacebookPostPage
-    case 'LeaderboardsPage':
-      return <any>LeaderboardsPage;
-    case 'LoginPage':
-      return <any>LoginPage;
-    case 'MainTabsPage':
-      return <any>MainTabsPage;
-    case 'MyContestsPage':
-      return <any>MyContestsPage;
-    case 'NewRankPage':
-      return <any>NewRankPage;
-    case 'PurchaseSuccessPage':
-      return <any>PurchaseSuccessPage;
-    case 'QuestionEditorPage':
-      return <any>QuestionEditorPage;
-    case 'QuestionStatsPage':
-      return <any>QuestionStatsPage;
-    case 'QuizPage':
-      return <any>QuizPage;
-    case 'RunningContestsPage':
-      return <any>RunningContestsPage;
-    case 'SearchQuestionsPage':
-      return <any>SearchQuestionsPage;
-    case 'ServerPopupPage':
-      return <any>ServerPopupPage;
-    case 'SetContestPage':
-      return <any>SetContestPage;
-    case 'SetContestAdminPage':
-      return <any>SetContestAdminPage;
-    case 'SettingsPage':
-      return <any>SettingsPage;
-    case 'SharePage':
-      return <any>SharePage;
-    case 'SystemToolsPage':
-      return <any>SystemToolsPage;
-  }
+  return appClasses[className];
 }
 

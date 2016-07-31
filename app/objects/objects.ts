@@ -2,10 +2,6 @@ export class BasicListSettings {
   refreshFrequencyInMilliseconds:number;
 }
 
-export class ContestsListSettings extends BasicListSettings {
-  playButtonSize:Size;
-}
-
 export class LeaderboardListSettings {
   friends:BasicListSettings;
   weekly:BasicListSettings;
@@ -13,7 +9,7 @@ export class LeaderboardListSettings {
 }
 
 export class ListSettings {
-  contests:ContestsListSettings;
+  contests:BasicListSettings;
   leaderboards:LeaderboardListSettings;
 }
 
@@ -62,16 +58,6 @@ export class ContestSettings {
   maxTeamsLengthForLargeFonts:number;
 }
 
-export class ContestChartDeviceSettings {
-  devicePixelRatio: number;
-  settings: ContestDeviceConfigurationSettings;
-}
-
-export class ContestDeviceConfigurationSettings {
-  teamNameFontSize: number;
-  topMarginPercent: number;
-}
-
 export class ShareSettings {
   web:ShareWebSettings;
   mobile:ShareMobileSettings;
@@ -117,7 +103,6 @@ export class GoogleGcmSettings {
 }
 
 export class XpControl {
-  canvas:Size;
   radius:number;
   fillColor:string;
   lineWidth:number;
@@ -138,7 +123,6 @@ export class XpControlFont {
 export class GeneralSettings {
   webCanvasWidth:number;
   facebookFanPage:string;
-  debugMode:boolean;
   postErrors:boolean;
 }
 
@@ -147,6 +131,7 @@ export class FacebookSettings {
   appId:string;
   version:string;
   sdk:string;
+  avatarTemplate:string;
 }
 
 export class QuizSettings {
@@ -184,9 +169,9 @@ export class QuizCanvasFontSettings {
 }
 
 export class QuizCanvasSizeSettings {
-  width:number;
   height:number;
   topOffset:number;
+  widthRatio:number;
 }
 
 export class QuizCanvasScoresSettings {
@@ -258,11 +243,6 @@ export class ChartsSettings {
   questionStats:QuestionStatsChartSettings;
 }
 
-export class ChartSettings {
-  type:string;
-  dataSource:any;
-}
-
 export class Size {
   width:number;
   height:number;
@@ -274,40 +254,24 @@ export class ChartSizeSettings extends Size {
   heightRatioFromWidth:number;
 }
 
-export class ContestChartSizeSettings extends ChartSizeSettings {
-  topMarginPercent:number;
-  teamNameFontSize:number;
+export class ContestChartSettings {
+  size:ChartSizeSettings;
+}
+
+export class QuestionStatsChartSettings {
+  size:QuestionStatsChartSizeSettings;
+  colors:QuestionStatsChartSettingsColors;
 }
 
 export class QuestionStatsChartSizeSettings extends ChartSizeSettings {
-  legendItemFontSize:number;
-  labelFontSize:number;
-}
-
-export class ContestChartSettings extends ChartSettings {
-  size:ContestChartSizeSettings;
-  devices:Array<ContestChartDeviceSettings>;
-}
-
-export class QuestionStatsChartSettings extends ChartSettings {
-  size:QuestionStatsChartSizeSettings;
-  colors:QuestionStatsChartSettingsColors;
-  devices:Array<QuestionStatsChartDeviceSettings>
-}
-
-export class QuestionStatsChartDeviceSettings {
-  devicePixelRatio: number;
-  settings: QuestionStatsChartDeviceConfigurationSettings;
-}
-
-export class QuestionStatsChartDeviceConfigurationSettings {
-  legendItemFontSize: number;
-  labelFontSize: number;
+  radiusRatio:number;
+  innerDoughnutRadiusRatio: number;
 }
 
 export class QuestionStatsChartSettingsColors {
   correct:string;
   incorrect:string;
+  innerDoughnut:string;
 }
 
 export class Question {
@@ -405,6 +369,7 @@ export class Session {
   xpProgress:XpProgress;
   gcmRegistrationId:string;
   token:string;
+  thirdParty:ThirdPartyInfo;
 }
 
 export class ClientShareApp {
@@ -523,7 +488,6 @@ export class Contest {
   type:ContestType;
   endOption:string;
   questions:Questions;
-  dataSource:any;
   state:string;
   leadingTeam:number;
   time:ContestTime;
@@ -566,6 +530,7 @@ export class Team {
   name:string;
   score:number;
   chartValue:number;
+  chartPercent:number;
   adminScoreAddition:number;
 
   constructor(name:string) {
@@ -670,6 +635,7 @@ export class XpProgress {
   max:number;
   addition:number;
   rankChanged:number;
+  rank:number;
 }
 
 export class ServerPopup {

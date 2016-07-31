@@ -1,0 +1,9 @@
+<div class="player-info-wrapper player-info-{{client && client.session ? client.currentLanguage.direction : null}}">
+  <div class="player-info-row">
+    <img src="{{myAvatar}}"
+         class="player-info-avatar pointer"
+         (click)="client.popToRoot()">
+    <canvas #playerInfoCanvas width="40" height="40" class="player-info-canvas">
+    </canvas>
+  </div>
+</div>

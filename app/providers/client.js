@@ -20,9 +20,7 @@ var objects_1 = require('../objects/objects');
 var classesService = require('./classes');
 var Client = (function () {
     function Client(http) {
-        this.circle = Math.PI * 2;
-        this.quarter = Math.PI / 2;
-        this._loaded = false;
+        this.loaded = false;
         this.appPreloading = true;
         if (Client.instance) {
             throw new Error('You can\'t call new in Singleton instances! Call Client.getInstance() instead.');
@@ -49,17 +47,18 @@ var Client = (function () {
         }
         return Client.instance;
     };
-    Client.prototype.init = function (app, platform, config, events, nav, loadingModalComponent) {
+    Client.prototype.init = function (app, platform, config, events, nav, loadingModalComponent, playerInfoComponent) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this._app = app;
-            _this._platform = platform;
-            _this._config = config;
-            _this._events = events;
-            _this._nav = nav;
+            _this.app = app;
+            _this.platform = platform;
+            _this.config = config;
+            _this.events = events;
+            _this.nav = nav;
             _this.loadingModalComponent = loadingModalComponent;
+            _this.playerInfoComponent = playerInfoComponent;
             if (_this.clientInfo.mobile) {
-                _this._shareApps = new Array();
+                _this.shareApps = new Array();
                 if (platform.is('android')) {
                     _this.clientInfo.platform = 'android';
                 }
@@ -74,13 +73,13 @@ var Client = (function () {
             }
             _this.getSettings(settingsVersion, language).then(function (data) {
                 if (data['settings']) {
-                    _this._settings = data['settings'];
+                    _this.settings = data['settings'];
                     //Save new settings in localStorage
                     localStorage.setItem('settings', JSON.stringify(data['settings']));
                     localStorage.setItem('settingsVersion', data['settings']['version']);
                 }
                 else {
-                    _this._settings = JSON.parse(localStorage.getItem('settings'));
+                    _this.settings = JSON.parse(localStorage.getItem('settings'));
                 }
                 if (!language || language === 'undefined') {
                     //Language was computed on the server using geoInfo or the fallback to the default language
@@ -88,29 +87,12 @@ var Client = (function () {
                     localStorage.setItem('language', language);
                 }
                 _this.initUser(language, data['geoInfo']);
-                _this.canvas = document.getElementById('playerInfoRankCanvas');
-                _this._canvasContext = _this.canvas.getContext('2d');
                 _this.setDirection();
-                _this._loaded = true;
-                _this.adjustChartsDeviceSettings();
+                _this.loaded = true;
                 Client.instance = _this;
                 resolve();
             }, function (err) { return reject(err); });
         });
-    };
-    Client.prototype.initPlayerInfo = function () {
-        var navBar = document.getElementsByTagName('ion-navbar')[0];
-        var navBarHeight = navBar['offsetHeight'];
-        var playerInfoImage = document.getElementById('playerInfoImage');
-        playerInfoImage.style.top = (navBarHeight - playerInfoImage.offsetHeight) / 2 + 'px';
-        //Player info rank canvas
-        this.canvasCenterX = this.settings.xpControl.canvas.width / 2;
-        this.canvasCenterY = this.settings.xpControl.canvas.height / 2;
-        this.canvas.width = this.settings.xpControl.canvas.width;
-        this.canvas.style.width = this.settings.xpControl.canvas.width + 'px';
-        this.canvas.height = this.settings.xpControl.canvas.height;
-        this.canvas.style.height = this.settings.xpControl.canvas.height + 'px';
-        this.canvas.style.top = (navBarHeight - this.settings.xpControl.canvas.height) / 2 + 'px';
     };
     Client.prototype.getSettings = function (settingsVersion, localStorageLanguage) {
         var postData = { 'clientInfo': this.clientInfo };
@@ -126,103 +108,12 @@ var Client = (function () {
         return this.serverPost('info/settings', postData);
     };
     Client.prototype.initUser = function (language, geoInfo) {
-        this._user = new objects_1.User(language, this.clientInfo, geoInfo);
-    };
-    Client.prototype.clearXp = function () {
-        this._canvasContext.clearRect(0, 0, this.settings.xpControl.canvas.width, this.settings.xpControl.canvas.height);
-    };
-    Client.prototype.initXp = function () {
-        this.clearXp();
-        //-------------------------------------------------------------------------------------
-        // Draw the full circle representing the entire xp required for the next level
-        //-------------------------------------------------------------------------------------
-        this._canvasContext.beginPath();
-        this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, 0, this.circle, false);
-        this._canvasContext.fillStyle = this.settings.xpControl.fillColor;
-        this._canvasContext.fill();
-        //Full line color
-        this._canvasContext.lineWidth = this.settings.xpControl.lineWidth;
-        this._canvasContext.strokeStyle = this.settings.xpControl.fullLineColor;
-        this._canvasContext.stroke();
-        this._canvasContext.closePath();
-        //-------------------------------------------------------------------------------------
-        //Draw the arc representing the xp in the current level
-        //-------------------------------------------------------------------------------------
-        this._canvasContext.beginPath();
-        // line color
-        this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, -(this.quarter), ((this.session.xpProgress.current / this.session.xpProgress.max) * this.circle) - this.quarter, false);
-        this._canvasContext.strokeStyle = this.settings.xpControl.progressLineColor;
-        this._canvasContext.stroke();
-        //Rank Text
-        var font = '';
-        if (this.settings.xpControl.font.bold) {
-            font += 'bold ';
-        }
-        var fontSize;
-        if (this.session.rank < 10) {
-            //1 digit font
-            fontSize = this.settings.xpControl.font.d1;
-        }
-        else if (this.session.rank < 100) {
-            //2 digits font
-            fontSize = this.settings.xpControl.font.d2;
-        }
-        else {
-            fontSize = this.settings.xpControl.font.d3;
-        }
-        font += fontSize + ' ';
-        font += this.settings.xpControl.font.name;
-        this._canvasContext.font = font;
-        // Move it down by half the text height and left by half the text width
-        var rankText = '' + this.session.rank;
-        var textWidth = this._canvasContext.measureText(rankText).width;
-        var textHeight = this._canvasContext.measureText('w').width;
-        this._canvasContext.fillStyle = this.settings.xpControl.textColor;
-        this._canvasContext.fillText(rankText, this.canvasCenterX - (textWidth / 2), this.canvasCenterY + (textHeight / 2));
-        this._canvasContext.closePath();
-    };
-    Client.prototype.animateXpAddition = function (startPoint, endPoint) {
-        this._canvasContext.beginPath();
-        this._canvasContext.arc(this.canvasCenterX, this.canvasCenterY, this.settings.xpControl.radius, (this.circle * startPoint) - this.quarter, (this.circle * endPoint) - this.quarter, false);
-        this._canvasContext.strokeStyle = this.settings.xpControl.progressLineColor;
-        this._canvasContext.stroke();
-        this._canvasContext.closePath();
-    };
-    Client.prototype.addXp = function (xpProgress) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var startPoint = _this.session.xpProgress.current / _this.session.xpProgress.max;
-            //Occurs after xp has already been added to the session
-            var addition = xpProgress.addition;
-            for (var i = 1; i <= addition; i++) {
-                window.myRequestAnimationFrame(function () {
-                    var endPoint = (_this.session.xpProgress.current + i) / _this.session.xpProgress.max;
-                    _this.animateXpAddition(startPoint, endPoint);
-                    //Last iteration should be performed after the animation frame event happened
-                    if (i >= addition) {
-                        //Add the actual xp to the client side
-                        _this.session.xpProgress = xpProgress;
-                        //Zero the addition
-                        _this.session.xpProgress.addition = 0;
-                        if (xpProgress.rankChanged) {
-                            _this.session.rank = xpProgress.rank;
-                            _this.initXp();
-                        }
-                    }
-                });
-            }
-            resolve();
-        });
+        this.user = new objects_1.User(language, this.clientInfo, geoInfo);
     };
     Client.prototype.setDirection = function () {
         var dir = document.createAttribute('dir');
         dir.value = this.currentLanguage.direction;
         this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
-        var playerInfo = document.getElementById('playerInfo');
-        if (playerInfo) {
-            playerInfo.className = 'player-info-' + this.currentLanguage.direction;
-        }
-        this.canvas.className = 'player-info-canvas-' + this.currentLanguage.direction;
         this.config.set('backButtonIcon', this.currentLanguage.backButtonIcon);
     };
     Client.prototype.facebookServerConnect = function (facebookAuthResponse) {
@@ -240,7 +131,7 @@ var Client = (function () {
                     _this.localSwitchLanguage(_this.user.settings.language);
                 }
                 _this.user.settings = JSON.parse(JSON.stringify(data['session'].settings));
-                _this._session = data['session'];
+                _this.session = data['session'];
                 _this.serverGateway.token = data['session'].token;
                 _this.setLoggedUserId(data['session'].userId);
                 if (data['session'].justRegistered) {
@@ -460,6 +351,14 @@ var Client = (function () {
         }
         this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
         this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
+        //Check if we have an active modal view and call it's onResize as well
+        var portalNav = this.nav.getPortal();
+        if (portalNav.hasOverlay()) {
+            var activeView = portalNav.getActive();
+            if (activeView && activeView.instance && activeView.instance['onResize']) {
+                activeView.instance['onResize']();
+            }
+        }
         //Invoke 'onResize' for each view that has it
         for (var i = 0; i < this.nav.length(); i++) {
             var viewController = this.nav.getByIndex(i);
@@ -508,24 +407,6 @@ var Client = (function () {
         enumerable: true,
         configurable: true
     });
-    Client.prototype.adjustChartsDeviceSettings = function () {
-        //Contest charts
-        for (var i = 0; i < this.settings.charts.contest.devices.length; i++) {
-            if (window.devicePixelRatio <= this.settings.charts.contest.devices[i].devicePixelRatio) {
-                this.settings.charts.contest.size.topMarginPercent = this.settings.charts.contest.devices[i].settings.topMarginPercent;
-                this.settings.charts.contest.size.teamNameFontSize = this.settings.charts.contest.devices[i].settings.teamNameFontSize;
-                break;
-            }
-        }
-        //Question Stats charts
-        for (var i = 0; i < this.settings.charts.questionStats.devices.length; i++) {
-            if (window.devicePixelRatio <= this.settings.charts.questionStats.devices[i].devicePixelRatio) {
-                this.settings.charts.questionStats.size.legendItemFontSize = this.settings.charts.questionStats.devices[i].settings.legendItemFontSize;
-                this.settings.charts.questionStats.size.labelFontSize = this.settings.charts.questionStats.devices[i].settings.labelFontSize;
-                break;
-            }
-        }
-    };
     Client.prototype.showLoader = function () {
         var _this = this;
         if (this.loadingModalComponent && !this.appPreloading) {
@@ -542,16 +423,6 @@ var Client = (function () {
             }, 100);
         }
     };
-    Object.defineProperty(Client.prototype, "shareApps", {
-        get: function () {
-            return this._shareApps;
-        },
-        set: function (value) {
-            this._shareApps = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Client.prototype.popToRoot = function () {
         if (this.nav.canGoBack()) {
             this.nav.popToRoot();
@@ -568,75 +439,9 @@ var Client = (function () {
         }
         return language;
     };
-    Object.defineProperty(Client.prototype, "loaded", {
-        get: function () {
-            return this._loaded;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "app", {
-        get: function () {
-            return this._app;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "platform", {
-        get: function () {
-            return this._platform;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "config", {
-        get: function () {
-            return this._config;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "events", {
-        get: function () {
-            return this._events;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "nav", {
-        get: function () {
-            return this._nav;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "user", {
-        get: function () {
-            return this._user;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(Client.prototype, "endPoint", {
         get: function () {
             return this.serverGateway.endPoint;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "settings", {
-        get: function () {
-            return this._settings;
-        },
-        set: function (value) {
-            this._settings = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "session", {
-        get: function () {
-            return this._session;
         },
         enumerable: true,
         configurable: true
@@ -654,23 +459,6 @@ var Client = (function () {
                 this._languageKeys = Object.keys(this.settings.languages);
             }
             return this._languageKeys;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "canvasContext", {
-        get: function () {
-            return this._canvasContext;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Client.prototype, "deepLinkContestId", {
-        get: function () {
-            return this._deepLinkContestId;
-        },
-        set: function (value) {
-            this._deepLinkContestId = value;
         },
         enumerable: true,
         configurable: true
@@ -708,8 +496,8 @@ var Client = (function () {
     };
     Client.prototype.logout = function () {
         this.serverGateway.token = null;
-        this._session = null;
-        this.clearXp();
+        this.session = null;
+        this.playerInfoComponent.clearXp();
     };
     Client.prototype.setLoggedUserId = function (userId) {
         window.FlurryAgent.setUserId(userId);
@@ -824,6 +612,9 @@ var Client = (function () {
             });
         }
     };
+    Client.prototype.getFacebookAvatar = function (facebookUserId) {
+        return this.settings.facebook.avatarTemplate.replace('{{id}}', facebookUserId);
+    };
     Client = __decorate([
         core_1.Injectable(), 
         __metadata('design:paramtypes', [http_1.Http])
@@ -835,12 +626,12 @@ var ServerGateway = (function () {
     function ServerGateway(http) {
         this.http = http;
         if (!window.cordova) {
-            this._endPoint = window.location.protocol + '//' + window.location.host + '/';
+            this.endPoint = window.location.protocol + '//' + window.location.host + '/';
         }
         else {
-            this._endPoint = 'http://www.topteamer.com/';
+            this.endPoint = 'http://www.topteamer.com/';
         }
-        this._eventQueue = [];
+        this.eventQueue = [];
     }
     ServerGateway.prototype.get = function (path, timeout) {
         var _this = this;
@@ -849,8 +640,8 @@ var ServerGateway = (function () {
             if (!timeout) {
                 timeout = 10000;
             }
-            if (_this._token) {
-                headers.append('Authorization', _this._token);
+            if (_this.token) {
+                headers.append('Authorization', _this.token);
             }
             _this.http.get(path, { headers: headers })
                 .timeout(timeout)
@@ -866,13 +657,13 @@ var ServerGateway = (function () {
         return new Promise(function (resolve, reject) {
             var headers = new http_1.Headers();
             headers.append('Content-Type', 'application/json');
-            if (_this._token) {
-                headers.append('Authorization', _this._token);
+            if (_this.token) {
+                headers.append('Authorization', _this.token);
             }
             if (!timeout) {
                 timeout = 10000;
             }
-            _this.http.post(_this._endPoint + path, JSON.stringify(postData), { headers: headers })
+            _this.http.post(_this.endPoint + path, JSON.stringify(postData), { headers: headers })
                 .timeout(timeout)
                 .map(function (res) { return res.json(); })
                 .subscribe(function (res) {
@@ -897,49 +688,14 @@ var ServerGateway = (function () {
         });
     };
     ;
-    Object.defineProperty(ServerGateway.prototype, "endPoint", {
-        get: function () {
-            return this._endPoint;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ServerGateway.prototype, "eventQueue", {
-        get: function () {
-            return this._eventQueue;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ServerGateway.prototype, "token", {
-        set: function (value) {
-            this._token = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
     return ServerGateway;
 })();
 exports.ServerGateway = ServerGateway;
 var InternalEvent = (function () {
     function InternalEvent(eventName, eventData) {
-        this._eventName = eventName;
-        this._eventData = eventData;
+        this.eventName = eventName;
+        this.eventData = eventData;
     }
-    Object.defineProperty(InternalEvent.prototype, "eventName", {
-        get: function () {
-            return this._eventName;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(InternalEvent.prototype, "eventData", {
-        get: function () {
-            return this._eventData;
-        },
-        enumerable: true,
-        configurable: true
-    });
     return InternalEvent;
 })();
 exports.InternalEvent = InternalEvent;

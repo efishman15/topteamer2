@@ -50,10 +50,6 @@ export class MyContestsPage {
     return this.contestList.refresh(forceRefresh);
   }
 
-  onResize() {
-    this.contestList.onResize();
-  }
-
   doRefresh(refresher:Refresher) {
     this.refreshList(true).then(() => {
       refresher.complete();

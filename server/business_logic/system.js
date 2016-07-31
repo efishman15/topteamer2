@@ -5,7 +5,10 @@ var logger = require(path.resolve(__dirname, '../utils/logger'));
 var async = require('async');
 var sessionUtils = require(path.resolve(__dirname, './session'));
 var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
+var dalLeaderboads = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
 var cache = require(path.resolve(__dirname, '../utils/cache'));
+var Leaderboard = require('agoragames-leaderboard');
+var ObjectId = require('mongodb').ObjectID;
 
 //--------------------------------------------------------------------------
 // clearCache
@@ -123,4 +126,124 @@ module.exports.showLog = function (req, res, next) {
     res.download(logFile, fileName);
 
   });
+}
+
+//--------------------------------------------------------------------------
+// fixAvatars
+//
+// data: <NA>
+//--------------------------------------------------------------------------
+module.exports.fixAvatars = function (req, res, next) {
+
+  var token = req.headers.authorization;
+  var data = req.body;
+
+  var operations = [
+
+    //getAdminSession
+    function (callback) {
+      data.token = token;
+      sessionUtils.getAdminSession(data, callback);
+    },
+
+    //Reload settings from database
+    function (data, callback) {
+      var contestsCollection = data.DbHelper.getCollection('Contests');
+      contestsCollection.find({}, {}, function (err, contestsCursor) {
+        contestsCursor.toArray(function (err, contests) {
+          data.contests = contests;
+          for (var i = 0; i < contests.length; i++) {
+            fixLeaderboard(dalLeaderboads.getContestLeaderboard(contests[i]._id));
+            fixLeaderboard(dalLeaderboads.getTeamLeaderboard(contests[i]._id,0));
+            fixLeaderboard(dalLeaderboads.getTeamLeaderboard(contests[i]._id,1));
+
+            fixContest(data, contests[i]);
+          }
+
+          fixLeaderboard(dalLeaderboads.getWeeklyLeaderboard());
+          fixLeaderboard(new Leaderboard('topteamer:general'));
+
+          callback(null, data)
+
+        })});
+    }
+
+  ];
+
+  async.waterfall(operations, function (err) {
+    if (!err) {
+      res.json(generalUtils.okResponse);
+    }
+    else {
+      res.send(err.httpStatus, err);
+    }
+  });
+
+}
+
+function fixLeaderboard(leaderboard) {
+
+  var i = 0;
+  var options = {
+    'withMemberData': true,
+    'sortBy': 'rank',
+    'pageSize': 200
+  };
+
+  leaderboard.leaders(0, options, function (leaders) {
+    for (var j=0; j < leaders.length; j++) {
+      var memberData = leaders[j].member_data.split('|');
+      leaderboard.updateMemberData(leaders[j].member, memberData[memberData.length-1], function () {
+      });
+    }
+  });
+}
+
+function fixContest(data, contest) {
+
+  var contestsCollection = data.DbHelper.getCollection('Contests');
+
+  var updateFields = {$set: {}};
+  updateFields['$unset'] = {}
+
+  if (contest.creator.avatar) {
+    updateFields['$set']['creator.facebookUserId'] = getFacebookUserIdFromAvatar(contest.creator.avatar);
+    updateFields['$unset']['creator.avatar'] = '';
+  }
+
+  if (contest.leader.avatar) {
+    updateFields['$set']['leader.facebookUserId'] = getFacebookUserIdFromAvatar(contest.leader.avatar);
+    updateFields['$unset']['leader.avatar'] = '';
+  }
+
+  if (contest.leader.userId) {
+    updateFields['$set']['leader.id'] = contest.leader.userId;
+    updateFields['$unset']['leader.userId'] = '';
+  }
+
+  if (contest.teams[0].leader) {
+    updateFields['$set']['teams.0.leader.id'] = contest.teams[0].leader.userId;
+    updateFields['$unset']['teams.0.leader.userId'] = '';
+    if (contest.teams[0].leader.avatar) {
+      updateFields['$set']['teams.0.leader.facebookUserId'] = getFacebookUserIdFromAvatar(contest.teams[0].leader.avatar);
+      updateFields['$unset']['teams.0.leader.avatar'] = '';
+    }
+  }
+
+  if (contest.teams[1].leader) {
+    updateFields['$set']['teams.1.leader.id'] = contest.teams[1].leader.userId;
+    updateFields['$unset']['teams.1.leader.userId'] = '';
+    if (contest.teams[1].leader.avatar) {
+      updateFields['$set']['teams.1.leader.facebookUserId'] = getFacebookUserIdFromAvatar(contest.teams[1].leader.avatar);
+      updateFields['$unset']['teams.1.leader.avatar'] = '';
+    }
+  }
+
+  contestsCollection.findAndModify({'_id': ObjectId(contest._id)}, {},
+    updateFields, {w: 1, new: true}, function (err, contest) {
+  });
+}
+
+function getFacebookUserIdFromAvatar(avatar) {
+  return avatar.split('/')[3];
 }

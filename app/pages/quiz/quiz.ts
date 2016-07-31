@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ViewChild, ElementRef} from '@angular/core';
 import {NavParams} from 'ionic-angular';
 import {AnimationListener} from '../../directives/animation-listener/animation-listener';
 import {TransitionListener} from '../../directives/transition-listener/transition-listener';
@@ -7,7 +7,7 @@ import * as contestsService from '../../providers/contests';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
 import * as alertService from '../../providers/alert';
-import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings,ChartSettings} from '../../objects/objects';
+import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings} from '../../objects/objects';
 
 @Component({
   templateUrl: 'build/pages/quiz/quiz.html',
@@ -24,15 +24,16 @@ export class QuizPage {
   correctButtonName:string;
 
   //Canvas vars
-  quizCanvas:any;
-  quizContext:any;
   currentQuestionCircle:any;
-  questionChart:Object;
   pageInitiated:Boolean = false;
   quizStarted:Boolean = false;
   title:string;
   circleOuterRadius:number;
   circleInnerRadius:number;
+
+  @ViewChild('quizCanvas') quizCanvasElementRef:ElementRef;
+  quizCanvas:HTMLCanvasElement;
+  quizContext:CanvasRenderingContext2D;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
@@ -46,39 +47,25 @@ export class QuizPage {
     }
   }
 
-  ngOnInit() {
-    this.init();
+  ngAfterViewInit() {
+    this.quizCanvas = this.quizCanvasElementRef.nativeElement;
+    this.quizContext = this.quizCanvas.getContext('2d');
   }
 
   ionViewWillEnter() {
     this.client.logEvent('page/quiz', {'contestId': this.params.data.contest._id});
-  }
-
-  ionViewDidEnter() {
-
-    //ionViewDidEnter occurs for the first time - BEFORE - ngOnInit - merging into a single 'private' init method
-    if (this.quizStarted) {
-      return;
-    }
-
-    this.init();
-
     this.startQuiz();
-
-  }
-
-  init() {
-    if (this.pageInitiated) {
-      return;
-    }
-
-    this.quizCanvas = document.getElementById('quizCanvas');
-    this.quizContext = this.quizCanvas.getContext('2d');
-
-    this.pageInitiated = true;
   }
 
   startQuiz() {
+
+    if (this.quizStarted) {
+      //could happen if view is cached or returning from questionStats
+      return;
+    }
+
+    this.clearQuizProgress(); //From previous time
+
     this.client.logEvent('quiz/started', {
       'source': this.params.data.source,
       'typeId': this.params.data.contest.type.id
@@ -88,7 +75,7 @@ export class QuizPage {
       this.quizData = data.quiz;
       this.quizData.currentQuestion.answered = false;
 
-      var radius = this.quizCanvas.clientWidth / (2 * data.quiz.totalQuestions + (data.quiz.totalQuestions - 1) * this.client.settings.quiz.canvas.circle.radius.spaceRatio);
+      var radius = this.quizCanvas.width / (2 * data.quiz.totalQuestions + (data.quiz.totalQuestions - 1) * this.client.settings.quiz.canvas.circle.radius.spaceRatio);
       if (radius > this.client.settings.quiz.canvas.circle.radius.max) {
         radius = this.client.settings.quiz.canvas.circle.radius.max;
       }
@@ -234,7 +221,7 @@ export class QuizPage {
   buttonAnimationEnded(event:Event) {
 
     if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
-      this.client.addXp(this.quizData.xpProgress).then(() => {
+      this.client.playerInfoComponent.addXp(this.quizData.xpProgress).then(() => {
         if (this.correctButtonName === event.srcElement['name']) {
           if (!this.quizData.xpProgress.rankChanged) {
             this.quizProceed();
@@ -299,41 +286,8 @@ export class QuizPage {
         this.quizData.currentQuestion.wikipediaHint ||
         this.quizData.currentQuestion.wikipediaAnswer) {
 
-        var questionChart:any;
-
-        if (this.quizData.currentQuestion.correctRatio ||
-          this.quizData.currentQuestion.correctRatio === 0) {
-
-          questionChart = JSON.parse(JSON.stringify(this.client.settings.charts.questionStats.dataSource));
-
-          questionChart.data = [];
-          var roundedCorrectRatio = Math.round(this.quizData.currentQuestion.correctRatio * 100) / 100;
-          var chartData = [
-            {
-              'label': this.client.translate('ANSWERED_CORRECT'),
-              'value': roundedCorrectRatio
-            },
-            {
-              'label': this.client.translate('ANSWERED_INCORRECT'),
-              'value': 1 - roundedCorrectRatio
-            },
-          ];
-
-          if (this.client.currentLanguage.direction === 'ltr') {
-            questionChart.data.push(chartData[0]);
-            questionChart.data.push(chartData[1]);
-            questionChart.chart.paletteColors = this.client.settings.charts.questionStats.colors.correct + ',' + this.client.settings.charts.questionStats.colors.incorrect;
-          }
-          else {
-            questionChart.data.push(chartData[1]);
-            questionChart.data.push(chartData[0]);
-            questionChart.chart.paletteColors = this.client.settings.charts.questionStats.colors.incorrect + ',' + this.client.settings.charts.questionStats.colors.correct;
-          }
-        }
-
         var modal = this.client.createModalPage('QuestionStatsPage', {
-          'question': this.quizData.currentQuestion,
-          'chartDataSource': questionChart
+          'question': this.quizData.currentQuestion
         });
 
         modal.onDismiss((action) => {
@@ -361,7 +315,7 @@ export class QuizPage {
 
   drawQuizProgress() {
 
-    this.quizCanvas.width = this.quizCanvas.clientWidth;
+    this.quizCanvas.width = this.client.width * this.client.settings.quiz.canvas.size.widthRatio;
 
     //Draw connecting line
     this.quizContext.beginPath();
@@ -524,15 +478,11 @@ export class QuizPage {
   }
 
   clearQuizScores() {
-    this.quizContext.beginPath();
     this.quizContext.clearRect(0, 0, this.quizCanvas.width, this.client.settings.quiz.canvas.scores.size.top);
-    this.quizContext.closePath();
   }
 
   clearQuizProgress() {
-    this.quizContext.beginPath();
     this.quizContext.clearRect(0, 0, this.quizCanvas.width, this.quizCanvas.height);
-    this.quizContext.closePath();
   }
 
   drawQuizScores() {
@@ -632,7 +582,6 @@ export class QuizPage {
   }
 
   onResize() {
-    this.clearQuizProgress();
     this.drawQuizProgress();
   }
 

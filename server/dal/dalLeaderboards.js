@@ -43,8 +43,8 @@ function prepareLeaderObject(id, leader, outsideLeaderboard) {
     'id': id,
     'rank': leader.rank,
     'score': leader.score,
-    'avatar': memberDataParts[0],
-    'name': memberDataParts[1],
+    'facebookUserId': leader.member,
+    'name': leader.member_data
   };
 
   if (outsideLeaderboard) {
@@ -68,30 +68,30 @@ function prepareLeaderObject(id, leader, outsideLeaderboard) {
 // @facebookUserId - used as the primary member key in all leaderboards (to be able to retrieve friends leaderboard)
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.addScore = addScore;
-function addScore(contestId, teamId, deltaScore, facebookUserId, name, avatar) {
+function addScore(contestId, teamId, deltaScore, facebookUserId, name) {
 
   var contestGeneralLeaderboard = getContestLeaderboard(contestId);
   var contestTeamLeaderboard = getTeamLeaderboard(contestId, teamId);
   var weeklyLeaderboard = getWeeklyLeaderboard();
 
   generalLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-    generalLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name);
+    generalLeaderboard.updateMemberData(facebookUserId, name);
   });
 
   contestGeneralLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-    contestGeneralLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
+    contestGeneralLeaderboard.updateMemberData(facebookUserId, name, function (reply) {
       contestGeneralLeaderboard.disconnect();
     });
   });
 
   contestTeamLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-    contestTeamLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
+    contestTeamLeaderboard.updateMemberData(facebookUserId, name, function (reply) {
       contestTeamLeaderboard.disconnect();
     });
   });
 
   weeklyLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-    weeklyLeaderboard.updateMemberData(facebookUserId, avatar + '|' + name, function (reply) {
+    weeklyLeaderboard.updateMemberData(facebookUserId, name, function (reply) {
       weeklyLeaderboard.disconnect();
     });
   });
@@ -193,7 +193,7 @@ function getFriends(data, callback) {
       myUserInLeaderboard = {
         score: data.session.score,
         rank: leaders.length,
-        member_data: data.session.avatar + '|' + data.session.name
+        member_data: data.session.name
       }
       data.clientResponse.push(prepareLeaderObject(data.clientResponse.length, myUserInLeaderboard, true));
     }

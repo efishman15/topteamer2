@@ -33,9 +33,5 @@
 </ion-nav>
 
 <loading-modal id="loading"></loading-modal>
-<div id="playerInfo">
-  <img id="playerInfoImage" *ngIf="client.session" src="{{client.session.avatar}}"
-       class="player-info-avatar pointer" (click)="client.popToRoot()">
-  <canvas id="playerInfoRankCanvas">
-  </canvas>
-</div>
+<player-info>
+</player-info>

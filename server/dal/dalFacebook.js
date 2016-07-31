@@ -14,7 +14,7 @@ var httpUtils = require(path.resolve(__dirname, '../utils/http'));
 // data:
 // -----
 // input: user (contains thirdParty.accessToken + thirdParty.id OR thirdParty.signedRequest if in canvas)
-// output: user.avatar, user.name, user.email, user.ageRange, user.thirdParty.payment_mobile_pricepoints (in case of canvas)
+// output: user.name, user.email, user.ageRange, user.thirdParty.payment_mobile_pricepoints (in case of canvas)
 //---------------------------------------------------------------------------------------------------------------------------------
 module.exports.getUserInfo = function (data, callback) {
 
@@ -48,7 +48,6 @@ module.exports.getUserInfo = function (data, callback) {
 
     if (!err && facebookData && facebookData.id) {
       if (facebookData.id === data.user.thirdParty.id) {
-        data.user.avatar = getUserAvatar(data.user.thirdParty.id);
         data.user.name = facebookData.name;
         data.user.email = facebookData.email; //might be null if user removed
         data.user.ageRange = facebookData.age_range;
@@ -77,16 +76,6 @@ module.exports.getUserInfo = function (data, callback) {
     }
   });
 };
-
-//-------------------------------------------------------------------------------------
-// getUserAvatar
-//
-// Returns the facebook avatar
-//-------------------------------------------------------------------------------------
-module.exports.getUserAvatar = getUserAvatar;
-function getUserAvatar(facebookUserId) {
-  return 'https://graph.facebook.com/' + facebookUserId + '/picture?type=square';
-}
 
 //-------------------------------------------------------------------------------------
 // SignedRequest
