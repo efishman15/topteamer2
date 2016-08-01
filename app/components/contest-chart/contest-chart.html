@@ -43,10 +43,10 @@
         <div class="long-animated {{animation}}">
           <div (click)="teamSelected($event, 1,'teamBarComplementary')"
                class="contest-chart-bar contest-chart-complementary-bar"
-               [ngStyle]="{'height': (client.chartHeight * 0.85 * contest.teams[0].chartValue) + 'px'}">
+               [ngStyle]="{'height': (client.chartHeight * client.settings.charts.contest.size.barPercentRatio * contest.teams[0].chartValue) + 'px'}">
           </div>
           <div (click)="teamSelected($event, 1,'teamBar')" class="contest-chart-bar contest-chart-team1-bar"
-               [ngStyle]="{'height': (client.chartHeight * 0.85 * contest.teams[1].chartValue) + 'px'}">
+               [ngStyle]="{'height': (client.chartHeight * client.settings.charts.contest.size.barPercentRatio * contest.teams[1].chartValue) + 'px'}">
           </div>
         </div>
         <div class="contest-chart-team-percent-wrapper">
