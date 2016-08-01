@@ -11,7 +11,7 @@
   <div class="chart pointer" (click)="onContestSelected($event,'chart')">
     <ion-row>
       <ion-col width-50>
-        <div padding-top padding-bottom>
+        <div [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'">
           <span (click)="teamSelected($event, 0,'teamName')"
                 class="contest-chart-team contest-chart-team0"
                 [ngClass]="{'contest-chart-team0-selected': contest.myTeam===0, 'contest-chart-team-not-selected': contest.myTeam!==0}">
@@ -21,10 +21,10 @@
         <div class="long-animated {{animation}}">
           <div (click)="teamSelected($event, 0,'teamBarComplementary')"
                class="contest-chart-bar contest-chart-complementary-bar"
-               [ngStyle]="{'height': (client.chartHeight * 0.85 * contest.teams[1].chartValue) + 'px'}">
+               [ngStyle]="{'height': (client.chartHeight * client.settings.charts.contest.size.barPercentRatio * contest.teams[1].chartValue) + 'px'}">
           </div>
           <div (click)="teamSelected($event, 0,'teamBar')" class="contest-chart-bar contest-chart-team0-bar"
-               [ngStyle]="{'height': (client.chartHeight * 0.85 * contest.teams[0].chartValue) + 'px', 'width': '50px'}">
+               [ngStyle]="{'height': (client.chartHeight * client.settings.charts.contest.size.barPercentRatio * contest.teams[0].chartValue) + 'px', 'width': '50px'}">
           </div>
         </div>
         <div class="contest-chart-team-percent-wrapper">
@@ -33,7 +33,7 @@
         </div>
       </ion-col>
       <ion-col width-50>
-        <div padding-top padding-bottom>
+        <div [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'">
           <span (click)="teamSelected($event, 1,'teamName')"
                 class="contest-chart-team contest-chart-team1"
                 [ngClass]="{'contest-chart-team1-selected': contest.myTeam===1, 'contest-chart-team-not-selected': contest.myTeam!==1}">

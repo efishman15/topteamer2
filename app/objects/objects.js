@@ -263,6 +263,14 @@ var ChartSizeSettings = (function (_super) {
     return ChartSizeSettings;
 })(Size);
 exports.ChartSizeSettings = ChartSizeSettings;
+var ContestChartSizeSettings = (function (_super) {
+    __extends(ContestChartSizeSettings, _super);
+    function ContestChartSizeSettings() {
+        _super.apply(this, arguments);
+    }
+    return ContestChartSizeSettings;
+})(ChartSizeSettings);
+exports.ContestChartSizeSettings = ContestChartSizeSettings;
 var ContestChartSettings = (function () {
     function ContestChartSettings() {
     }

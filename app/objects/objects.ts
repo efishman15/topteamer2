@@ -254,8 +254,14 @@ export class ChartSizeSettings extends Size {
   heightRatioFromWidth:number;
 }
 
+export class ContestChartSizeSettings extends ChartSizeSettings {
+  labelsPadding:number;
+  barPercentRatio;
+}
+
+
 export class ContestChartSettings {
-  size:ChartSizeSettings;
+  size:ContestChartSizeSettings;
 }
 
 export class QuestionStatsChartSettings {
