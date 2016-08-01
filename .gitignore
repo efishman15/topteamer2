@@ -24,6 +24,7 @@ plugins/android.json
 plugins/ios.json
 $RECYCLE.BIN/
 server/backup/
+server/certificates/
 server/logs/
 server/node_modules/
 .DS_Store
