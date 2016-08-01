@@ -11653,18 +11653,42 @@ body {
   font-size: 12px !important; }
 
 .chart-popup-button-team-normal-0 {
-  background-color: #0bc2f8;
-  border: 1px solid #0b98f8;
+  background-color: #d13f78;
+  border: 1px solid #d11678;
   border-radius: 15px;
-  box-shadow: 0 2px 0 0 #0b98f8;
+  box-shadow: 0 2px 0 0 #d11678;
   color: #ffffff;
   display: inline-block;
   padding: 8px 8px;
   font: normal 700 15px/1 "Roboto", "Helvetica Neue", sans-serif;
   text-align: center;
-  text-shadow: 1px 1px 0 #0b98f8; }
+  text-shadow: 1px 1px 0 #d11678; }
 
 .chart-popup-button-team-small-0 {
+  background-color: #d13f78;
+  border: 1px solid #d11678;
+  border-radius: 15px;
+  box-shadow: 0 2px 0 0 #d11678;
+  color: #ffffff;
+  display: inline-block;
+  padding: 8px 8px;
+  font: normal 700 13px/1 "Roboto", "Helvetica Neue", sans-serif;
+  text-align: center;
+  text-shadow: 1px 1px 0 #d11678; }
+
+.chart-popup-button-team-normal-1 {
+  background-color: #0bc2f8;
+  border: 1px solid #0b98f8;
+  border-radius: 15px;
+  box-shadow: 0 2px 0 0 #0b98f8;
+  color: #ffffff;
+  display: inline-block;
+  padding: 8px 8px;
+  font: normal 700 15px/1 "Roboto", "Helvetica Neue", sans-serif;
+  text-align: center;
+  text-shadow: 1px 1px 0 #0b98f8; }
+
+.chart-popup-button-team-small-1 {
   background-color: #0bc2f8;
   border: 1px solid #0b98f8;
   border-radius: 15px;
@@ -11675,30 +11699,6 @@ body {
   font: normal 700 13px/1 "Roboto", "Helvetica Neue", sans-serif;
   text-align: center;
   text-shadow: 1px 1px 0 #0b98f8; }
-
-.chart-popup-button-team-normal-1 {
-  background-color: #d13f78;
-  border: 1px solid #d11678;
-  border-radius: 15px;
-  box-shadow: 0 2px 0 0 #d11678;
-  color: #ffffff;
-  display: inline-block;
-  padding: 8px 8px;
-  font: normal 700 15px/1 "Roboto", "Helvetica Neue", sans-serif;
-  text-align: center;
-  text-shadow: 1px 1px 0 #d11678; }
-
-.chart-popup-button-team-small-1 {
-  background-color: #d13f78;
-  border: 1px solid #d11678;
-  border-radius: 15px;
-  box-shadow: 0 2px 0 0 #d11678;
-  color: #ffffff;
-  display: inline-block;
-  padding: 8px 8px;
-  font: normal 700 13px/1 "Roboto", "Helvetica Neue", sans-serif;
-  text-align: center;
-  text-shadow: 1px 1px 0 #d11678; }
 
 ion-col[width-5] {
   -webkit-box-flex: 0;
