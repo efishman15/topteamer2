@@ -11,7 +11,7 @@
   <div class="chart pointer" (click)="onContestSelected($event,'chart')">
     <ion-row>
       <ion-col width-50>
-        <div [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'">
+        <div [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'}">
           <span (click)="teamSelected($event, 0,'teamName')"
                 class="contest-chart-team contest-chart-team0"
                 [ngClass]="{'contest-chart-team0-selected': contest.myTeam===0, 'contest-chart-team-not-selected': contest.myTeam!==0}">
@@ -33,7 +33,7 @@
         </div>
       </ion-col>
       <ion-col width-50>
-        <div [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'">
+        <div [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'}">
           <span (click)="teamSelected($event, 1,'teamName')"
                 class="contest-chart-team contest-chart-team1"
                 [ngClass]="{'contest-chart-team1-selected': contest.myTeam===1, 'contest-chart-team-not-selected': contest.myTeam!==1}">
