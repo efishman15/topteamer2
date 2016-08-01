@@ -17,7 +17,7 @@ export class ContestPage {
   client:Client;
   contest:Contest;
   lastQuizResults:QuizResults = null;
-  animateLastResults:boolean = false;
+  animateLastResults:number = 0; //0=no animation, 1=enter animation, 2=exit animation
 
   @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
 
@@ -40,13 +40,16 @@ export class ContestPage {
       this.lastQuizResults = eventData[0];
 
       if (this.lastQuizResults.data.facebookPost) {
-        this.animateLastResults = false;
+        this.animateLastResults = 0;
         this.client.showModalPage('FacebookPostPage', {'quizResults': this.lastQuizResults});
       }
       else {
-        this.animateLastResults = true;
+        this.animateLastResults = 1; //Enter animation
         setTimeout(() => {
-          this.animateLastResults = false;
+          this.animateLastResults = 2; //Exit animation
+          setTimeout(() => {
+            this.animateLastResults = 0; //No animation
+          },this.client.settings.quiz.finish.animateResultsExitTimeout)
         }, this.client.settings.quiz.finish.animateResultsTimeout);
       }
 
@@ -68,7 +71,7 @@ export class ContestPage {
   }
 
   ionViewWillLeave() {
-    this.animateLastResults = false;
+    this.animateLastResults = 0;
     this.lastQuizResults = null;
   }
 

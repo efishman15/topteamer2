@@ -143,6 +143,8 @@ export class QuizSettings {
 
 export class FinishQuizSettings {
   animateResultsTimeout:number;
+  animateResultsExitTimeout:number;
+  exitAnimation:string;
 }
 
 export class QuizQuestionsSettings {

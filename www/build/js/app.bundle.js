@@ -2047,7 +2047,7 @@ var ContestPage = (function () {
     function ContestPage(params) {
         var _this = this;
         this.lastQuizResults = null;
-        this.animateLastResults = false;
+        this.animateLastResults = 0; //0=no animation, 1=enter animation, 2=exit animation
         this.client = client_1.Client.getInstance();
         this.contest = params.data.contest;
         this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
@@ -2060,13 +2060,16 @@ var ContestPage = (function () {
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
-                _this.animateLastResults = false;
+                _this.animateLastResults = 0;
                 _this.client.showModalPage('FacebookPostPage', { 'quizResults': _this.lastQuizResults });
             }
             else {
-                _this.animateLastResults = true;
+                _this.animateLastResults = 1; //Enter animation
                 setTimeout(function () {
-                    _this.animateLastResults = false;
+                    _this.animateLastResults = 2; //Exit animation
+                    setTimeout(function () {
+                        _this.animateLastResults = 0; //No animation
+                    }, _this.client.settings.quiz.finish.animateResultsExitTimeout);
                 }, _this.client.settings.quiz.finish.animateResultsTimeout);
             }
             var soundFile = _this.lastQuizResults.data.sound;
@@ -2082,7 +2085,7 @@ var ContestPage = (function () {
         this.client.logEvent('page/contest', { 'contestId': this.contest._id });
     };
     ContestPage.prototype.ionViewWillLeave = function () {
-        this.animateLastResults = false;
+        this.animateLastResults = 0;
         this.lastQuizResults = null;
     };
     ContestPage.prototype.showParticipants = function (source) {
@@ -2132,6 +2135,7 @@ var ContestPage = (function () {
         this.client.openPage('QuizPage', { 'contest': this.contest, 'source': source });
     };
     __decorate([
+        //0=no animation, 1=enter animation, 2=exit animation
         core_1.ViewChild(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', contest_chart_1.ContestChartComponent)
     ], ContestPage.prototype, "contestChartComponent", void 0);

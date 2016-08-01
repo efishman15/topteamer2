@@ -512,7 +512,7 @@ function joinToContestObject(contest, teamId, session) {
 
   if (!contest.users) {
     contest.users = {};
-    contest.leader = {'facebookUserId': session.facebookUserId, 'name': session.name};
+    contest.leader = {'id': session.userId, 'facebookUserId': session.facebookUserId, 'name': session.name};
   }
 
   //Increment participants only if I did not join this contest yet
@@ -523,7 +523,7 @@ function joinToContestObject(contest, teamId, session) {
   }
 
   if (!contest.teams[teamId].leader) {
-    contest.teams[teamId].leader = {'id': session.facebookUserId, 'name': session.name};
+    contest.teams[teamId].leader = {'id': session.userId, 'facebookUserId':session.facebookUserId , 'name': session.name};
   }
 
   //Actual join

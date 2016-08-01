@@ -12221,11 +12221,15 @@ loading-modal .container {
 
 .question-chart-legned-item {
   font-size: 18px;
-  width: 14.5rem;
+  width: 12rem;
   border-radius: 15px;
   color: #ffffff;
   font-weight: bold;
-  white-space: nowrap; }
+  white-space: nowrap;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-left: 5px;
+  margin-right: 5px; }
 
 .quiz-canvas-wrapper {
   padding-top: 10px;

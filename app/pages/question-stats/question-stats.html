@@ -30,17 +30,17 @@
       <div class="question-chart-legend">
         <ion-row>
           <ion-col width-50>
-            <div padding
+            <div
                  class="question-chart-legned-item"
                  [ngStyle]="{'background-color' : client.settings.charts.questionStats.colors.correct, 'float' : client.currentLanguage.oppositeAlign}">
-              {{client.translate('ANSWERED_CORRECT')}} ({{correctRatioRounded}}%)
+              {{client.translate('ANSWERED_CORRECT')}}<BR/>{{correctRatioRounded}}%
             </div>
           </ion-col>
           <ion-col width-50>
-            <div padding
+            <div
                  class="question-chart-legned-item"
                  [ngStyle]="{'background-color' : client.settings.charts.questionStats.colors.incorrect, 'float' : client.currentLanguage.align}">
-              {{client.translate('ANSWERED_INCORRECT')}} ({{100-correctRatioRounded}}%)
+              {{client.translate('ANSWERED_INCORRECT')}}<BR/>{{100-correctRatioRounded}}%
             </div>
           </ion-col>
         </ion-row>
