@@ -56,8 +56,8 @@ export class SharePage {
   mobileShare(appName?:string) {
     this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
     shareService.mobileShare(appName, this.params.data.contest, this.isNewContest).then(() => {
-      this.client.nav.pop();
     }, () => {
     });
+    this.client.nav.pop();
   }
 }

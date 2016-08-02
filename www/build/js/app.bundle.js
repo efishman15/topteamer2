@@ -4345,12 +4345,11 @@ var SharePage = (function () {
         this.client.nav.pop();
     };
     SharePage.prototype.mobileShare = function (appName) {
-        var _this = this;
         this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
         shareService.mobileShare(appName, this.params.data.contest, this.isNewContest).then(function () {
-            _this.client.nav.pop();
         }, function () {
         });
+        this.client.nav.pop();
     };
     SharePage = __decorate([
         core_1.Component({
