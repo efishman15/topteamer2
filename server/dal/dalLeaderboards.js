@@ -180,6 +180,18 @@ function getFriends(data, callback) {
 
   generalLeaderboard.rankedInList(members, options, function (leaders) {
 
+    //Bug of AgoraGames - does NOT return the array sorted
+    leaders.sort(function compare(a, b) {
+      if (a.rank < b.rank) {
+        return -1;
+      }
+      if (a.rank > b.rank) {
+        return 1;
+      }
+      return 0;
+
+    })
+    
     var myUserInPage = false;
     for (var i = 0; i < leaders.length; i++) {
       if (leaders[i].member === data.session.facebookUserId) {
