@@ -62,6 +62,9 @@ module.exports.facebookConnect = function (req, res, next) {
     //Try to login (or register) with the facebook info supplied
     function (connectData, callback) {
       data.DbHelper = connectData.DbHelper;
+      if (data.user && data.user.clientInfo && req.headers['user-agent']) {
+        data.user.clientInfo.userAgent = req.headers['user-agent'];
+      }
       dalDb.facebookLogin(data, callback)
     },
 

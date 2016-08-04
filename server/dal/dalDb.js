@@ -300,7 +300,7 @@ function retrieveSession(data, callback) {
         closeDb(data);
 
         //Serverity 'low' does not exist - thus skipping writing to logs and console
-        callback(new exceptions.ServerException('Error retrieving session - session expired', {'sessionId': data.token}, 'low', 401));
+        callback(new exceptions.ServerException('Error retrieving session - session expired', {'sessionId': data.token}, 'info', 401));
         return;
       }
 
@@ -323,7 +323,7 @@ function retrieveAdminSession(data, callback) {
     }
 
     if (!data.session.isAdmin) {
-      callback(new exceptions.ServerException('This action is permitted for admins only', {'sessionId': data.token}, 'warn', 403));
+      callback(new exceptions.ServerException('This action is permitted for admins only', {'sessionId': data.token}, 'error', 403));
       return;
     }
 

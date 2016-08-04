@@ -55,7 +55,7 @@ function setUserQuestions(questionIndex, data, callback) {
     dalDb.insertQuestion(data, function (err, result) {
 
       if (err) {
-        callback(new exceptions.ServerException('Error adding a new user question', data));
+        callback(new exceptions.ServerException('Error adding a new user question', data, 'error'));
         return;
       }
 
@@ -79,7 +79,7 @@ function setUserQuestions(questionIndex, data, callback) {
 
     dalDb.setQuestion(data, function (err, result) {
       if (err) {
-        callback(new exceptions.ServerException('Error updating question', data));
+        callback(new exceptions.ServerException('Error updating question', data,'error'));
         return;
       }
       setUserQuestions(questionIndex + 1, data, callback);
@@ -129,19 +129,19 @@ function validateContestData(data, callback) {
     callback(new exceptions.ServerException('Attempt to create a new contest without having an eligible rank or feature asset', {
       'session': data.session,
       'contest': data.contest
-    }));
+    },'error'));
     return;
   }
 
   //Required fields
   if (!data.contest.startDate || !data.contest.endDate || !data.contest.teams || !data.contest.type || !data.contest.subject) {
-    callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, type, subject'));
+    callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, type, subject',{},'error'));
     return;
   }
 
   //End date must be AFTER start date
   if (data.contest.startDate > data.contest.endDate) {
-    callback(new exceptions.ServerException('Contest end date must be later than contest start date'));
+    callback(new exceptions.ServerException('Contest end date must be later than contest start date',{},'error'));
     return;
   }
 
@@ -150,19 +150,19 @@ function validateContestData(data, callback) {
 
   //Cannot edit an ended contest
   if (data.contest.endDate < now && !data.session.isAdmin) {
-    callback(new exceptions.ServerException('You cannot edit a contest that has already been finished', {'contestId': data.contest._id}));
+    callback(new exceptions.ServerException('You cannot edit a contest that has already been finished', {'contestId': data.contest._id},'error'));
     return;
   }
 
   //Only 2 teams are allowed
   if (data.contest.teams.length !== 2) {
-    callback(new exceptions.ServerException('Number of teams must be 2'));
+    callback(new exceptions.ServerException('Number of teams must be 2',{},'error'));
     return;
   }
 
   //One or more of the team names is missing
   if (!data.contest.teams[0].name || !data.contest.teams[1].name) {
-    callback(new exceptions.ServerException('One or more of the team names are missing'));
+    callback(new exceptions.ServerException('One or more of the team names are missing',{},'error'));
     return;
   }
 
@@ -174,18 +174,18 @@ function validateContestData(data, callback) {
 
   //Contest _id must be supplied in edit mode
   if (data.mode === 'edit' && !data.contest._id) {
-    callback(new exceptions.ServerException('Contest _id not supplied in edit mode'));
+    callback(new exceptions.ServerException('Contest _id not supplied in edit mode',{},'error'));
     return;
   }
 
   //Illegal contest type
   if (!data.contest.type || !data.contest.type.id) {
-    callback(new exceptions.ServerException('type/type.id must be supplied'));
+    callback(new exceptions.ServerException('type/type.id must be supplied',{},'error'));
     return;
   }
 
   if (!generalUtils.settings.client.newContest.contestTypes[data.contest.type.id]) {
-    callback(new exceptions.ServerException('type id"' + data.contest.type.id + '" is illegal'));
+    callback(new exceptions.ServerException('type id"' + data.contest.type.id + '" is illegal',{},'error'));
     return;
   }
 
@@ -211,7 +211,7 @@ function validateContestData(data, callback) {
 
     //Question list not supplied
     if (!data.contest.type.questions.list || !data.contest.type.questions.list.length) {
-      callback(new exceptions.ServerException('questions.list must contain the array of questions'));
+      callback(new exceptions.ServerException('questions.list must contain the array of questions',{},'error'));
       return;
     }
 
@@ -220,13 +220,13 @@ function validateContestData(data, callback) {
 
       //Question must contain text
       if (!data.contest.type.questions.list[i].text) {
-        callback(new exceptions.ServerException('Question must contain text'));
+        callback(new exceptions.ServerException('Question must contain text',{},'error'));
         return;
       }
 
       //Question must contain answers
       if (!data.contest.type.questions.list[i].answers || !data.contest.type.questions.list[i].answers.length || data.contest.type.questions.list[i].answers.length !== 4) {
-        callback(new exceptions.ServerException('Question must contain 4 answers'));
+        callback(new exceptions.ServerException('Question must contain 4 answers',{},'error'));
         return;
       }
 
@@ -475,13 +475,13 @@ function joinContestTeam(data, callback) {
   //Cannot join a contest that ended
   if (data.contest.endDate < now) {
     data.DbHelper.close();
-    callback(new exceptions.ServerException('Contest has already been finished', data));
+    callback(new exceptions.ServerException('Contest has already been finished', data,'error'));
   }
 
   //Already joined this team - exit
   if (data.contest.users && data.contest.users[data.session.userId] && data.contest.users[data.session.userId].team === data.teamId) {
     data.DbHelper.close();
-    callback(new exceptions.ServerException('Already joined to this team', data));
+    callback(new exceptions.ServerException('Already joined to this team', data,'error'));
     return;
   }
 
@@ -680,7 +680,7 @@ module.exports.removeContest = function (req, res, next) {
     //Check that only admins are allowed to remove a contest
     function (data, callback) {
       if (!data.session.isAdmin) {
-        callback(new exceptions.ServerException('Removing contest is allowed only for administrators', data));
+        callback(new exceptions.ServerException('Removing contest is allowed only for administrators', data,'error'));
         return;
       }
       data.closeConnection = true;

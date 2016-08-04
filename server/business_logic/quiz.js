@@ -440,7 +440,7 @@ module.exports.answer = function (req, res, next) {
       var answers = data.session.quiz.serverData.currentQuestion.answers;
       if (data.id < 0 || data.id > answers.length - 1) {
         dalDb.closeDb(data);
-        callback(new exceptions.ServerException('Invalid answer id', {'answerId': data.id}));
+        callback(new exceptions.ServerException('Invalid answer id', {'answerId': data.id},'error'));
         return;
       }
 
@@ -739,7 +739,7 @@ module.exports.answer = function (req, res, next) {
             dalFacebook.getGeneralProfile(data.passedFriends[0].id, function (err, facebookData) {
               if (err) {
                 dalDb.closeDb(data);
-                callback(new exceptions.ServerException('Error retreiving facebook profile', {'facebookUserId': data.passedFriends[0].id}));
+                callback(new exceptions.ServerException('Error retreiving facebook profile', {'facebookUserId': data.passedFriends[0].id},'error'));
                 return;
               }
 

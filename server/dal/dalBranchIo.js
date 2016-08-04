@@ -40,42 +40,42 @@ function createContestLinks(data, callback) {
 
       //Contest link (primary)
         if (branchData[0].error) {
-            callback(new exceptions.ServerException('Error producing link 0', {'postData': postData[0]}));
+            callback(new exceptions.ServerException('Error producing link 0', {'postData': postData[0]},'error'));
             return;
         }
         data.contest.link = branchData[0].url;
 
         //Contest leader (secondary - for open graph to point to the right og:type object)
         if (branchData[1].error) {
-            callback(new exceptions.ServerException('Error producing link 1', {'postData': postData[1]}));
+            callback(new exceptions.ServerException('Error producing link 1', {'postData': postData[1]},'error'));
             return;
         }
         data.contest.leaderLink = branchData[1].url;
 
         //Team 0 link
         if (branchData[2].error) {
-            callback(new exceptions.ServerException('Error producing link 2', {'postData': postData[2]}));
+            callback(new exceptions.ServerException('Error producing link 2', {'postData': postData[2]},'error'));
             return;
         }
         data.contest.teams[0].link = branchData[2].url;
 
         //Team 0 Leader link
         if (branchData[3].error) {
-            callback(new exceptions.ServerException('Error producing link 3', {'postData': postData[3]}));
+            callback(new exceptions.ServerException('Error producing link 3', {'postData': postData[3]},'error'));
             return;
         }
         data.contest.teams[0].leaderLink = branchData[3].url;
 
         //Team 1 link
         if (branchData[4].error) {
-            callback(new exceptions.ServerException('Error producing link 4', {'postData': postData[4]}));
+            callback(new exceptions.ServerException('Error producing link 4', {'postData': postData[4]},'error'));
             return;
         }
         data.contest.teams[1].link = branchData[4].url;
 
         //Team 1 Leader link
         if (branchData[5].error) {
-            callback(new exceptions.ServerException('Error producing link 5', {'postData': postData[5]}));
+            callback(new exceptions.ServerException('Error producing link 5', {'postData': postData[5]},'error'));
             return;
         }
         data.contest.teams[1].leaderLink = branchData[5].url;

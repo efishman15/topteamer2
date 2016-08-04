@@ -191,7 +191,7 @@ function getFriends(data, callback) {
       return 0;
 
     })
-    
+
     var myUserInPage = false;
     for (var i = 0; i < leaders.length; i++) {
       if (leaders[i].member === data.session.facebookUserId) {

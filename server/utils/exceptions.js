@@ -77,6 +77,11 @@ function ServerException(message, additionalInfo, severity, httpStatus) {
       break;
     case 'error':
       logger.server.error(additionalInfo, message);
+      logger.mail.error(additionalInfo, message);
+      break;
+    case 'fatal':
+      logger.server.fatal(additionalInfo, message);
+      logger.mail.error(additionalInfo, message);
       break;
   }
 

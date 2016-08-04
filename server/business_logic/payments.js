@@ -274,7 +274,7 @@ function innerProcessPayment(data, callback) {
                                 callback(new exceptions.ServerException('Error during DoExpressCheckoutPayment', {
                                     'error': err,
                                     'purchaseData': data.purchaseData
-                                }, 403));
+                                }, 'error', 403));
                             }
 
                             data.paymentData = paypalData;
@@ -331,7 +331,7 @@ function innerProcessPayment(data, callback) {
 
                     jwtClient.authorize(function(err, tokens) {
                         if (err) {
-                            callback(new exceptions.ServerException('Unable to authorize to google with jwt', {'purchaseData': data.purchaseData, 'googleError' : err}));
+                            callback(new exceptions.ServerException('Unable to authorize to google with jwt', {'purchaseData': data.purchaseData, 'googleError' : err},'error'));
                             return;
                         }
 
@@ -345,12 +345,12 @@ function innerProcessPayment(data, callback) {
                         Androidpublisher.purchases.products.get(params, function(purchaseError, purchaseResponse) {
                             // handle err and response
                             if (err) {
-                                callback(new exceptions.ServerException('Unable to verify google purchase', {'purchaseData': data.purchaseData, 'googleError' : purchaseError}));
+                                callback(new exceptions.ServerException('Unable to verify google purchase', {'purchaseData': data.purchaseData, 'googleError' : purchaseError},'error'));
                                 return;
                             }
 
                             if (purchaseResponse.consumptionState !== 0) {
-                                callback(new exceptions.ServerException('This purchase has already been consumed', {'purchaseData': data.purchaseData, 'purchaseResponse' : purchaseResponse}));
+                                callback(new exceptions.ServerException('This purchase has already been consumed', {'purchaseData': data.purchaseData, 'purchaseResponse' : purchaseResponse},'error'));
                                 return;
                             }
 
@@ -422,7 +422,7 @@ function innerProcessPayment(data, callback) {
                             'purchaseData': data.purchaseData,
                             'paymentData': data.paymentData,
                             'actualFacebookId': data.session.facebookUserId
-                        }));
+                        },'error'));
                         return;
                     }
 
@@ -430,7 +430,7 @@ function innerProcessPayment(data, callback) {
                     break;
 
                 default:
-                    callback(new exceptions.ServerException('Method not supported for payment validation', {'method': data.method}, 403));
+                    callback(new exceptions.ServerException('Method not supported for payment validation', {'method': data.method},'error', 403));
                     return;
             }
         },

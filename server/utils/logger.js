@@ -1,5 +1,24 @@
 var path = require('path');
 var logger = require('bunyan');
+var EmailStream = require('bunyan-emailstream').EmailStream;
+
+var emailStream;
+module.exports.initMail = function (nodeMailerSettings) {
+  emailStream = new EmailStream(
+    nodeMailerSettings.mailOptions,
+    nodeMailerSettings.transportOptions
+  );
+
+  module.exports.mail = logger.createLogger({
+    name: 'topTeamerMail',
+    streams: [{
+      type: 'raw', // You should use EmailStream with 'raw' type!
+      stream: emailStream,
+      level: 'error', //And fatal...
+    }
+    ]
+  });
+}
 
 //Server log is dual - both to a file and to the console
 module.exports.server = logger.createLogger({

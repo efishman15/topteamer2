@@ -48,7 +48,7 @@ app.use(function runInsideDomain(req, res, next) {
   });
 
   reqDomain.on('error', function (err) {
-    logger.server.fatal(err, 'app unhandled server exception');
+    exceptions.ServerException('app unhandled server exception',err,'fatal');
     reqDomain.dispose();
     next(err);
   });

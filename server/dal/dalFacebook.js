@@ -24,7 +24,7 @@ module.exports.getUserInfo = function (data, callback) {
     //Coming from canvas
     var verifier = new SignedRequest(generalUtils.settings.server.facebook.secretKey, data.user.thirdParty.signedRequest);
     if (!verifier.verify) {
-      callback(new exceptions.ServerException('Invalid signed request received from facebook', {'signedRequest': data.signedRequest}));
+      callback(new exceptions.ServerException('Invalid signed request received from facebook', {'signedRequest': data.signedRequest},'error'));
       return;
     }
 
@@ -63,7 +63,7 @@ module.exports.getUserInfo = function (data, callback) {
           'facebookResponse': facebookData,
           'facebookAccessToken': data.user.thirdParty.accessToken,
           'actualFacebookId': facebookData.id
-        }));
+        },'error'));
         return;
       }
     }
@@ -147,7 +147,7 @@ module.exports.getPaymentInfo = function (data, callback) {
   httpUtils.get(options, function (err, facebookData) {
 
     if (err) {
-      callback(new exceptions.ServerException('Error invoking payment graph api', {'signedRequest': data.signedRequest}));
+      callback(new exceptions.ServerException('Error invoking payment graph api', {'signedRequest': data.signedRequest},'error'));
       return;
     }
 
@@ -157,7 +157,7 @@ module.exports.getPaymentInfo = function (data, callback) {
     if (data.purchaseData && data.purchaseData.signed_request) {
       var verifier = new SignedRequest(generalUtils.settings.server.facebook.secretKey, data.purchaseData.signed_request);
       if (!verifier.verify) {
-        callback(new exceptions.ServerException('Invalid signed request received from facebook', {'signedRequest': data.signedRequest}));
+        callback(new exceptions.ServerException('Invalid signed request received from facebook', {'signedRequest': data.signedRequest},'error'));
         return;
       }
 
@@ -166,7 +166,7 @@ module.exports.getPaymentInfo = function (data, callback) {
           'facebookData': facebookData,
           'verifier.data': verifier.data,
           'paymentFacebookId': requestIdParts[1]
-        }));
+        },'error'));
         return;
       }
     }
@@ -242,7 +242,7 @@ module.exports.denyDispute = function (data, callback) {
       callback(new exceptions.ServerException('Error recevied from facebook while disputing payment id', {
         'paymentId': data.paymentId,
         'facebookData': facebookData
-      }));
+      },'error'));
     }
 
     callback(null, data);

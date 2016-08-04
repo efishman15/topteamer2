@@ -77,7 +77,7 @@ module.exports.ipn = function (req, res, next) {
         callback(new exceptions.ServerException('Error recevied from paypal while processing ipn', {
             'data': data,
             'error': error
-        }));
+        },'error'));
     });
 
     validateRequest.write(postData);

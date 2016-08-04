@@ -42,7 +42,7 @@ function api(options, method, callback) {
             callback(new exceptions.ServerException('Unsupported method during api', {
                 'options': options,
                 'method' : method
-            }));
+            },'error'));
 
     }
 
@@ -51,7 +51,7 @@ function api(options, method, callback) {
             callback(new exceptions.ServerException('Error during request from api', {
                 'options': options,
                 'error': err
-            }));
+            },'error'));
             return;
         }
         var responseData;
@@ -68,7 +68,7 @@ function api(options, method, callback) {
                 'options': options,
                 'body': body,
                 'error': e
-            }));
+            },'error'));
             return;
         }
 
@@ -76,7 +76,7 @@ function api(options, method, callback) {
             callback(new exceptions.ServerException('Error received from api', {
                 'options': options,
                 'responseData': responseData
-            }));
+            },'error'));
             return;
         }
 
