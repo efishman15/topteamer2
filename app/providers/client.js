@@ -9,8 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var http_1 = require('@angular/http');
+var Rx_1 = require('rxjs/Rx');
 require('rxjs/add/operator/map');
-require('rxjs/add/operator/timeout');
+require('rxjs/add/operator/retryWhen');
 var ionic_native_1 = require('ionic-native');
 var ionic_angular_1 = require('ionic-angular');
 var contestsService = require('./contests');
@@ -81,6 +82,8 @@ var Client = (function () {
                 else {
                     _this.settings = JSON.parse(localStorage.getItem('settings'));
                 }
+                _this.serverGateway.retries = _this.settings.general.network.retries;
+                _this.serverGateway.initialDelay = _this.settings.general.network.initialDelay;
                 if (!language || language === 'undefined') {
                     //Language was computed on the server using geoInfo or the fallback to the default language
                     language = data['language'];
@@ -148,14 +151,11 @@ var Client = (function () {
         });
     };
     ;
-    Client.prototype.serverGet = function (path, timeout) {
-        return this.serverGateway.get(path, timeout);
-    };
-    Client.prototype.serverPost = function (path, postData, timeout, blockUserInterface) {
+    Client.prototype.serverPost = function (path, postData) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this.showLoader();
-            _this.serverGateway.post(path, postData, timeout, blockUserInterface).then(function (data) {
+            _this.serverGateway.post(path, postData).then(function (data) {
                 _this.hideLoader();
                 if (_this.nav && _this.nav.length() > 0) {
                     //GUI is initiated - process the events right away
@@ -168,30 +168,37 @@ var Client = (function () {
                     facebookService.getLoginStatus().then(function (result) {
                         if (result['connected']) {
                             _this.facebookServerConnect(result['response'].authResponse).then(function () {
-                                return _this.serverPost(path, postData, timeout, blockUserInterface).then(function (data) {
+                                return _this.serverPost(path, postData).then(function (data) {
                                     resolve(data);
                                 }, function (err) {
                                     reject(err);
                                 });
+                            }, function () {
                             });
                         }
                         else {
                             facebookService.login(false).then(function (response) {
                                 _this.facebookServerConnect(result['response'].authResponse).then(function () {
-                                    return _this.serverPost(path, postData, timeout, blockUserInterface).then(function (data) {
+                                    return _this.serverPost(path, postData).then(function (data) {
                                         resolve(data);
                                     }, function (err) {
                                         reject(err);
                                     });
+                                }, function () {
                                 });
+                            }, function () {
                             });
                         }
+                    }, function () {
                     });
                 }
-                else if (err.httpStatus) {
+                else if (err.httpStatus || err.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
                     //An error coming from our server
                     //Display an alert or confirm message and continue the reject so further 'catch' blocks
                     //will be invoked if any
+                    if (err.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
+                        err.type = err.message;
+                    }
                     if (!err.additionalInfo || !err.additionalInfo.confirm) {
                         alertService.alert(err).then(function () {
                             reject(err);
@@ -624,6 +631,8 @@ var Client = (function () {
 exports.Client = Client;
 var ServerGateway = (function () {
     function ServerGateway(http) {
+        this.retries = 10;
+        this.initialDelay = 500;
         this.http = http;
         if (!window.cordova) {
             this.endPoint = window.location.protocol + '//' + window.location.host + '/';
@@ -633,26 +642,7 @@ var ServerGateway = (function () {
         }
         this.eventQueue = [];
     }
-    ServerGateway.prototype.get = function (path, timeout) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var headers = new http_1.Headers();
-            if (!timeout) {
-                timeout = 10000;
-            }
-            if (_this.token) {
-                headers.append('Authorization', _this.token);
-            }
-            _this.http.get(path, { headers: headers })
-                .timeout(timeout)
-                .map(function (res) { return res.json(); })
-                .subscribe(function (res) { return resolve(res); }, function (err) {
-                reject(err);
-            });
-        });
-    };
-    ;
-    ServerGateway.prototype.post = function (path, postData, timeout, blockUserInterface) {
+    ServerGateway.prototype.post = function (path, postData) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var headers = new http_1.Headers();
@@ -660,11 +650,19 @@ var ServerGateway = (function () {
             if (_this.token) {
                 headers.append('Authorization', _this.token);
             }
-            if (!timeout) {
-                timeout = 10000;
-            }
             _this.http.post(_this.endPoint + path, JSON.stringify(postData), { headers: headers })
-                .timeout(timeout)
+                .retryWhen(function (attempts) {
+                return Rx_1.Observable.range(1, _this.retries).zip(attempts, function (i) {
+                    return i;
+                }).flatMap(function (i) {
+                    if (i < _this.retries) {
+                        return Rx_1.Observable.timer(i * _this.initialDelay);
+                    }
+                    else {
+                        throw new Error('SERVER_ERROR_NETWORK_TIMEOUT');
+                    }
+                });
+            })
                 .map(function (res) { return res.json(); })
                 .subscribe(function (res) {
                 if (res['serverPopup']) {

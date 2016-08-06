@@ -65,6 +65,7 @@ exports.mobileDiscoverSharingApps = function () {
                 }
             }
         }
+    }, function () {
     });
 };
 exports.mobileDiscoverApp = function (client, shareApp, shareVariables) {

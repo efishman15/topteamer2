@@ -29,9 +29,9 @@ var ContestListComponent = (function () {
                 _this.lastRefreshTime = now;
                 _this.contests = contests;
                 resolve();
-            }), function () {
+            }, function () {
                 reject();
-            };
+            });
         });
     };
     ContestListComponent.prototype.onContestSelected = function (data) {

@@ -104,6 +104,7 @@ var ContestChartComponent = (function () {
                         else {
                             resolve(rankModal);
                         }
+                    }, function () {
                     });
                 }
                 else {

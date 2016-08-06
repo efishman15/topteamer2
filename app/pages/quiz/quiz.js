@@ -191,6 +191,7 @@ var QuizPage = (function () {
                         _this.client.nav.present(modal);
                     }
                 }
+            }, function () {
             });
         }
         else if (this.correctButtonName === event.srcElement['name']) {
@@ -212,6 +213,7 @@ var QuizPage = (function () {
                     _this.client.events.publish('topTeamer:quizFinished', _this.quizData.results);
                     //For next time if view remains cached
                     _this.quizStarted = false;
+                }, function () {
                 });
             }, 1000);
         }

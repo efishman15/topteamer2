@@ -208,7 +208,6 @@ export class QuizPage {
 
       this.client.logEvent('quiz/gotQuestion' + (this.quizData.currentQuestionIndex + 1));
     }, () => {
-
     });
   }
 
@@ -239,6 +238,7 @@ export class QuizPage {
 
           }
         }
+      },()=>{
       });
     }
     else if (this.correctButtonName === event.srcElement['name']) {
@@ -264,6 +264,7 @@ export class QuizPage {
           this.client.events.publish('topTeamer:quizFinished', this.quizData.results);
           //For next time if view remains cached
           this.quizStarted = false;
+        },()=>{
         });
       }, 1000);
 
@@ -571,7 +572,6 @@ export class QuizPage {
           this.quizData.currentQuestion.answers[i].text = result.question.answers[this.quizData.currentQuestion.answers[i].originalIndex];
         }
       }, () => {
-
       })
     })
     this.client.nav.present(modal);

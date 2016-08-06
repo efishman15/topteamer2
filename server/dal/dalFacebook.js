@@ -263,10 +263,6 @@ module.exports.denyDispute = function (data, callback) {
 module.exports.getUserFriends = getUserFriends;
 function getUserFriends(data, callback) {
 
-  if (!data.friends) {
-    data.friends = [];
-  }
-
   if (!data.url) {
     data.url = FACEBOOK_GRAPH_URL + '/me/friends' + '?limit=' + generalUtils.settings.server.facebook.friendsPageSize + '&offset=0&access_token=' + data.user.thirdParty.accessToken;
   }
@@ -285,7 +281,9 @@ function getUserFriends(data, callback) {
       return;
     }
 
-    data.user.thirdParty.friends = {'list': [], 'noPermission': false};
+    if (!data.user.thirdParty.friends) {
+      data.user.thirdParty.friends = {'list': [], 'noPermission': false};
+    }
 
     if (facebookData.data.length > 0) {
       for (var i = 0; i < facebookData.data.length; i++) {

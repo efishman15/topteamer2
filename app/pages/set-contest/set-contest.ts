@@ -155,7 +155,6 @@ export class SetContestPage {
     contestsService.getQuestions(this.contestLocalCopy.type.userQuestions).then((questions) => {
       this.contestLocalCopy.type.questions = {'visibleCount': questions.length, 'list': questions};
     }, () => {
-
     });
   }
 
@@ -191,7 +190,6 @@ export class SetContestPage {
           },
           purchaseData.productId);
       }, () => {
-
       });
 
     });
@@ -228,10 +226,10 @@ export class SetContestPage {
             break;
 
           case 'android':
-            this.processAndroidPurchase(result.data).then((data) => {
+            this.processAndroidPurchase(result.data).then(() => {
                 this.buyInProgress = false;
               },
-              (error) => {
+              () => {
                 this.buyInProgress = false;
               })
             break;
@@ -423,7 +421,6 @@ export class SetContestPage {
           this.client.nav.pop();
         }
       }, () => {
-
       });
     }
     else {

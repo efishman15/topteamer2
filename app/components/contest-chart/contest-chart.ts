@@ -124,6 +124,7 @@ export class ContestChartComponent {
             else {
               resolve(rankModal);
             }
+          },()=> {
           });
         }
         else {

@@ -29,6 +29,7 @@ export class PurchaseSuccessPage {
           this.client.openPage('SetContestPage', this.client.session.features[this.params.data.featurePurchased].view.params);
           break;
       }
+    },()=>{
     });
   }
 

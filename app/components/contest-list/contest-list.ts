@@ -36,9 +36,9 @@ export class ContestListComponent {
         this.lastRefreshTime = now;
         this.contests = contests;
         resolve();
-      }), () => {
+      }, () => {
         reject();
-      };
+      });
     });
   }
 

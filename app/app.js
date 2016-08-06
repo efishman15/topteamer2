@@ -72,6 +72,7 @@ var TopTeamerApp = (function () {
                 //Go back
                 return activeNav.pop();
             });
+        }, function () {
         });
     };
     ;
@@ -134,6 +135,7 @@ var TopTeamerApp = (function () {
             _this.client.user.clientInfo.appVersion = version;
             window.FlurryAgent.setAppVersion('' + version);
             _this.initFacebook();
+        }, function () {
         });
     };
     TopTeamerApp.prototype.initFlurry = function () {
@@ -217,6 +219,7 @@ var TopTeamerApp = (function () {
             else {
                 _this.client.nav.setRoot(_this.client.getPage('LoginPage'));
             }
+        }, function () {
         });
     };
     TopTeamerApp.prototype.declareRequestAnimationFrame = function () {

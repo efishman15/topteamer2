@@ -27,6 +27,7 @@ var PurchaseSuccessPage = (function () {
                     _this.client.openPage('SetContestPage', _this.client.session.features[_this.params.data.featurePurchased].view.params);
                     break;
             }
+        }, function () {
         });
     };
     PurchaseSuccessPage = __decorate([

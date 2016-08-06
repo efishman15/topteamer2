@@ -124,6 +124,12 @@ export class GeneralSettings {
   webCanvasWidth:number;
   facebookFanPage:string;
   postErrors:boolean;
+  network: GeneralNetworkSettings;
+}
+
+export class GeneralNetworkSettings {
+  retries:number;
+  initialDelay:number;
 }
 
 export class FacebookSettings {

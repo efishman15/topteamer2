@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Http, Response, Headers} from '@angular/http';
+import {Observable} from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/timeout';
+import 'rxjs/add/operator/retryWhen';
 import {Push} from 'ionic-native';
 import {App,Platform,Config, Nav, Alert, Modal, Events, NavController, ViewController} from 'ionic-angular';
 import * as contestsService from './contests';
@@ -103,17 +104,20 @@ export class Client {
           settingsVersion = 0;
         }
 
-        this.getSettings(settingsVersion,language).then((data) => {
+        this.getSettings(settingsVersion, language).then((data) => {
 
           if (data['settings']) {
             this.settings = data['settings'];
             //Save new settings in localStorage
-            localStorage.setItem('settings',JSON.stringify(data['settings']));
-            localStorage.setItem('settingsVersion',data['settings']['version']);
+            localStorage.setItem('settings', JSON.stringify(data['settings']));
+            localStorage.setItem('settingsVersion', data['settings']['version']);
           }
           else {
             this.settings = JSON.parse(localStorage.getItem('settings'));
           }
+
+          this.serverGateway.retries = this.settings.general.network.retries;
+          this.serverGateway.initialDelay = this.settings.general.network.initialDelay;
 
           if (!language || language === 'undefined') {
             //Language was computed on the server using geoInfo or the fallback to the default language
@@ -207,14 +211,10 @@ export class Client {
     })
   };
 
-  serverGet(path, timeout) {
-    return this.serverGateway.get(path, timeout);
-  }
-
-  serverPost(path, postData ?, timeout ?, blockUserInterface ?) {
+  serverPost(path:string, postData?:Object) {
     return new Promise((resolve, reject) => {
       this.showLoader();
-      this.serverGateway.post(path, postData, timeout, blockUserInterface).then((data) => {
+      this.serverGateway.post(path, postData).then((data) => {
         this.hideLoader();
         if (this.nav && this.nav.length() > 0) {
           //GUI is initiated - process the events right away
@@ -227,30 +227,37 @@ export class Client {
           facebookService.getLoginStatus().then((result) => {
             if (result['connected']) {
               this.facebookServerConnect(result['response'].authResponse).then(() => {
-                return this.serverPost(path, postData, timeout, blockUserInterface).then((data) => {
+                return this.serverPost(path, postData).then((data) => {
                   resolve(data);
                 }, (err) => {
                   reject(err);
                 })
+              },()=>{
               });
             }
             else {
               facebookService.login(false).then((response) => {
                 this.facebookServerConnect(result['response'].authResponse).then(() => {
-                  return this.serverPost(path, postData, timeout, blockUserInterface).then((data) => {
+                  return this.serverPost(path, postData).then((data) => {
                     resolve(data);
                   }, (err) => {
                     reject(err);
                   })
+                },()=>{
                 })
+              },()=>{
               })
             }
+          },()=>{
           });
         }
-        else if (err.httpStatus) {
+        else if (err.httpStatus || err.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
           //An error coming from our server
           //Display an alert or confirm message and continue the reject so further 'catch' blocks
           //will be invoked if any
+          if (err.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
+            err.type = err.message;
+          }
           if (!err.additionalInfo || !err.additionalInfo.confirm) {
             alertService.alert(err).then(() => {
               reject(err);
@@ -705,7 +712,7 @@ export class Client {
   }
 
   getFacebookAvatar(facebookUserId:string) {
-    return this.settings.facebook.avatarTemplate.replace('{{id}}',facebookUserId);
+    return this.settings.facebook.avatarTemplate.replace('{{id}}', facebookUserId);
   }
 }
 
@@ -715,6 +722,8 @@ export class ServerGateway {
   endPoint:string;
   token:string;
   eventQueue:Array<InternalEvent>;
+  retries:number = 10;
+  initialDelay:number = 500;
 
   constructor(http:Http) {
     this.http = http;
@@ -729,30 +738,7 @@ export class ServerGateway {
     this.eventQueue = [];
   }
 
-  get(path, timeout) {
-
-    return new Promise((resolve, reject) => {
-      var headers = new Headers();
-
-      if (!timeout) {
-        timeout = 10000;
-      }
-
-      if (this.token) {
-        headers.append('Authorization', this.token);
-      }
-
-      this.http.get(path, {headers: headers})
-        .timeout(timeout)
-        .map((res:Response) => res.json())
-        .subscribe((res:Object) => resolve(res),
-          err => {
-            reject(err);
-          });
-    });
-  };
-
-  post(path:string, postData:Object, timeout?:number, blockUserInterface?:boolean) {
+  post(path:string, postData?:Object) {
 
     return new Promise((resolve, reject) => {
 
@@ -763,12 +749,19 @@ export class ServerGateway {
         headers.append('Authorization', this.token);
       }
 
-      if (!timeout) {
-        timeout = 10000;
-      }
-
       this.http.post(this.endPoint + path, JSON.stringify(postData), {headers: headers})
-        .timeout(timeout)
+        .retryWhen((attempts) => {
+          return Observable.range(1, this.retries).zip(attempts, (i) => {
+            return i;
+          }).flatMap((i) => {
+            if (i < this.retries) {
+              return Observable.timer(i * this.initialDelay);
+            }
+            else {
+              throw new Error('SERVER_ERROR_NETWORK_TIMEOUT');
+            }
+          })
+        })
         .map((res:Response) => res.json())
         .subscribe(
           (res:Object) => {

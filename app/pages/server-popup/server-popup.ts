@@ -65,6 +65,7 @@ export class ServerPopupPage {
           contestsService.getContest(button.contestId).then ((contest) => {
             this.viewController.dismiss(button).then(() => {
               this.client.openPage('SharePage', {'contest' : contest, 'source': 'serverPopup'});
+            },()=>{
             });
           }, () => {
             this.viewController.dismiss(button);
@@ -73,6 +74,7 @@ export class ServerPopupPage {
         else {
           this.viewController.dismiss(button).then(() => {
             this.client.openPage('SharePage', {'source': 'serverPopup'});
+          },()=>{
           });
         }
         break;
@@ -87,6 +89,7 @@ export class ServerPopupPage {
           else {
             this.client.openPage(button.screen, button.params)
           }
+        },()=>{
         });
 
         break;

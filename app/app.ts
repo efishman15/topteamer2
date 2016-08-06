@@ -95,6 +95,7 @@ export class TopTeamerApp {
 
       });
 
+    },()=>{
     });
   };
 
@@ -173,6 +174,7 @@ export class TopTeamerApp {
       this.client.user.clientInfo.appVersion = version;
       window.FlurryAgent.setAppVersion('' + version);
       this.initFacebook();
+    },()=>{
     });
   }
 
@@ -264,6 +266,7 @@ export class TopTeamerApp {
       else {
         this.client.nav.setRoot(this.client.getPage('LoginPage'));
       }
+    },()=>{
     });
   }
 

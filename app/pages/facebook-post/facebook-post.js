@@ -24,7 +24,7 @@ var FacebookPostPage = (function () {
     FacebookPostPage.prototype.post = function () {
         var _this = this;
         this.client.logEvent('contest/facebook/post/click');
-        facebookService.post(this.quizResults.data.facebookPost).then(function (response) {
+        facebookService.post(this.quizResults.data.facebookPost).then(function () {
             _this.close(true);
         }, function () {
             //Do nothing - user probably canceled or any other error presented by facebook

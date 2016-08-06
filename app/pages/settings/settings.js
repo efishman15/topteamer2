@@ -51,6 +51,7 @@ var SettingsPage = (function () {
         facebookService.logout().then(function (response) {
             _this.client.logout();
             _this.client.setRootPage('LoginPage');
+        }, function () {
         });
     };
     SettingsPage = __decorate([

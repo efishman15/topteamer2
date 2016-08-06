@@ -123,6 +123,12 @@ var GeneralSettings = (function () {
     return GeneralSettings;
 })();
 exports.GeneralSettings = GeneralSettings;
+var GeneralNetworkSettings = (function () {
+    function GeneralNetworkSettings() {
+    }
+    return GeneralNetworkSettings;
+})();
+exports.GeneralNetworkSettings = GeneralNetworkSettings;
 var FacebookSettings = (function () {
     function FacebookSettings() {
     }

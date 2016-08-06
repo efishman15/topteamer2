@@ -175,9 +175,9 @@ var SetContestPage = (function () {
                     }
                     break;
                 case 'android':
-                    _this.processAndroidPurchase(result.data).then(function (data) {
+                    _this.processAndroidPurchase(result.data).then(function () {
                         _this.buyInProgress = false;
-                    }, function (error) {
+                    }, function () {
                         _this.buyInProgress = false;
                     });
                     break;

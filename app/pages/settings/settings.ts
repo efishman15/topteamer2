@@ -54,6 +54,7 @@ export class SettingsPage {
     facebookService.logout().then((response) => {
       this.client.logout();
       this.client.setRootPage('LoginPage');
+    },()=>{
     });
   }
 

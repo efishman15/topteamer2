@@ -56,6 +56,7 @@ var ServerPopupPage = (function () {
                         contestsService.getContest(button.contestId).then(function (contest) {
                             _this.viewController.dismiss(button).then(function () {
                                 _this.client.openPage('SharePage', { 'contest': contest, 'source': 'serverPopup' });
+                            }, function () {
                             });
                         }, function () {
                             _this.viewController.dismiss(button);
@@ -64,6 +65,7 @@ var ServerPopupPage = (function () {
                     else {
                         this.viewController.dismiss(button).then(function () {
                             _this.client.openPage('SharePage', { 'source': 'serverPopup' });
+                        }, function () {
                         });
                     }
                     break;
@@ -77,6 +79,7 @@ var ServerPopupPage = (function () {
                         else {
                             _this.client.openPage(button.screen, button.params);
                         }
+                    }, function () {
                     });
                     break;
                 }

@@ -26,7 +26,7 @@ export class FacebookPostPage {
 
   post() {
     this.client.logEvent('contest/facebook/post/click');
-    facebookService.post(this.quizResults.data.facebookPost).then((response) => {
+    facebookService.post(this.quizResults.data.facebookPost).then(() => {
       this.close(true);
     }, () => {
       //Do nothing - user probably canceled or any other error presented by facebook
