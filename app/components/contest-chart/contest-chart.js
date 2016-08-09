@@ -18,22 +18,21 @@ var ContestChartComponent = (function () {
         this.myTeamSelected = new core_1.EventEmitter();
         this.contestButtonClick = new core_1.EventEmitter();
         this.joinedContest = new core_1.EventEmitter();
+        this.contestParticipantsClick = new core_1.EventEmitter();
+        this.contestShareClick = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
         this.animation = null;
-        this.eventJustHandled = false;
+        this.lastEventTimeStamp = 0;
     }
     ContestChartComponent.prototype.onContestSelected = function (event, source) {
-        if (this.eventJustHandled) {
-            this.eventJustHandled = false;
+        if (event.timeStamp === this.lastEventTimeStamp) {
             return;
         }
-        if (source !== 'chart') {
-            this.eventJustHandled = true;
-        }
+        this.lastEventTimeStamp = event.timeStamp;
         this.contestSelected.emit({ 'contest': this.contest, 'source': source });
     };
     ContestChartComponent.prototype.teamSelected = function (event, teamId, source) {
-        this.eventJustHandled = true;
+        this.lastEventTimeStamp = event.timeStamp;
         if (this.contest.state === 'play') {
             if (teamId !== this.contest.myTeam) {
                 this.switchTeams(source);
@@ -80,7 +79,7 @@ var ContestChartComponent = (function () {
                             'xpProgress': data.xpProgress
                         });
                         if (!delayRankModal) {
-                            rankModal.onDismiss(function () {
+                            rankModal.onDidDismiss(function () {
                                 resolve();
                             });
                         }
@@ -99,7 +98,7 @@ var ContestChartComponent = (function () {
                         'additionalInfo': { 'team': _this.contest.teams[_this.contest.myTeam].name }
                     }).then(function () {
                         if (rankModal && !delayRankModal) {
-                            _this.client.nav.present(rankModal);
+                            rankModal.present();
                         }
                         else {
                             resolve(rankModal);
@@ -110,7 +109,7 @@ var ContestChartComponent = (function () {
                 else {
                     if (rankModal && !delayRankModal) {
                         //resolve will be called upon dismiss
-                        _this.client.nav.present(rankModal);
+                        rankModal.present();
                     }
                     else {
                         resolve(rankModal);
@@ -128,7 +127,7 @@ var ContestChartComponent = (function () {
     };
     ContestChartComponent.prototype.onContestButtonClick = function (event) {
         var _this = this;
-        this.eventJustHandled = true;
+        this.lastEventTimeStamp = event.timeStamp;
         if (this.contest.state === 'join') {
             //Will prompt an alert with 2 buttons with the team names
             //Upon selecting a team - send the user directly to play
@@ -147,7 +146,7 @@ var ContestChartComponent = (function () {
                         _this.joinContest(0, 'button', false, false, true).then(function (rankModal) {
                             _this.contestButtonClick.emit({ 'contest': _this.contest, 'source': 'button' });
                             if (rankModal) {
-                                _this.client.nav.present(rankModal);
+                                rankModal.present();
                             }
                         }, function () {
                         });
@@ -160,7 +159,7 @@ var ContestChartComponent = (function () {
                         _this.joinContest(1, 'button', false, false, true).then(function (rankModal) {
                             _this.contestButtonClick.emit({ 'contest': _this.contest, 'source': 'button' });
                             if (rankModal) {
-                                _this.client.nav.present(rankModal);
+                                rankModal.present();
                             }
                         }, function () {
                         });
@@ -171,6 +170,13 @@ var ContestChartComponent = (function () {
         else {
             this.contestButtonClick.emit({ 'contest': this.contest, 'source': 'button' });
         }
+    };
+    ContestChartComponent.prototype.onContestParticipantsClick = function (event) {
+        this.lastEventTimeStamp = event.timeStamp;
+        this.contestParticipantsClick.emit({ 'contest': this.contest });
+    };
+    ContestChartComponent.prototype.onContestShareClick = function (event) {
+        this.contestShareClick.emit({ 'contest': this.contest });
     };
     __decorate([
         core_1.Input(), 
@@ -196,6 +202,14 @@ var ContestChartComponent = (function () {
         core_1.Output(), 
         __metadata('design:type', Object)
     ], ContestChartComponent.prototype, "joinedContest", void 0);
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], ContestChartComponent.prototype, "contestParticipantsClick", void 0);
+    __decorate([
+        core_1.Output(), 
+        __metadata('design:type', Object)
+    ], ContestChartComponent.prototype, "contestShareClick", void 0);
     ContestChartComponent = __decorate([
         core_1.Component({
             selector: 'contest-chart',

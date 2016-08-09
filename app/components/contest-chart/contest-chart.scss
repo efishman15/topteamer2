@@ -4,16 +4,21 @@
   border-top-right-radius: 15px;
 }
 
-.chart-timer {
+.chart-share {
   position: absolute;
-  top: -4px;
+  top: -5px;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  color: #ffffff;
+  background-color: transparent;
 }
 
-.chart-timer-ltr {
+.chart-share-ltr {
   right: 0px;
 }
 
-.chart-timer-rtl {
+.chart-share-rtl {
   left: 0px;
 }
 

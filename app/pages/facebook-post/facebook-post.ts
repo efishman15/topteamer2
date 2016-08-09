@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
-import * as facebookService from '../../providers/facebook';
+import * as connectService from '../../providers/connect';
 import {QuizResults} from '../../objects/objects';
 
 @Component({
@@ -26,7 +26,7 @@ export class FacebookPostPage {
 
   post() {
     this.client.logEvent('contest/facebook/post/click');
-    facebookService.post(this.quizResults.data.facebookPost).then(() => {
+    connectService.post(this.quizResults.data.facebookPost).then(() => {
       this.close(true);
     }, () => {
       //Do nothing - user probably canceled or any other error presented by facebook

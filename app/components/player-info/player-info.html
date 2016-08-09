@@ -3,10 +3,10 @@
                   'player-info-rtl': client && client.session && client.currentLanguage.direction==='rtl',
                   'player-info-wrapper-hidden': !client || !client.session}">
   <div class="player-info-row">
+    <canvas #playerInfoCanvas width="40" height="40" class="player-info-canvas">
+    </canvas>
     <img src="{{myAvatar}}"
          class="player-info-avatar pointer"
          (click)="client.popToRoot()">
-    <canvas #playerInfoCanvas width="40" height="40" class="player-info-canvas">
-    </canvas>
   </div>
 </div>

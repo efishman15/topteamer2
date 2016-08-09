@@ -16,7 +16,7 @@ var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
 //--------------------------------------------------------------------------
 // getLeaders
 // input: data.leaderboard
-// output data.clientResponse
+// output data.leaders
 //--------------------------------------------------------------------------
 function getLeaders(data, callback) {
 
@@ -70,7 +70,7 @@ module.exports.getContestLeaders = function (req, res, next) {
 
   getLeaders(data, function (err, data) {
     if (!err) {
-      res.json(data.clientResponse);
+      res.json(data.leaders);
     }
     else {
       res.send(err.httpStatus, err);
@@ -92,7 +92,7 @@ module.exports.getWeeklyLeaders = function (req, res, next) {
 
   getLeaders(data, function (err, data) {
     if (!err) {
-      res.json(data.clientResponse);
+      res.json(data.leaders);
     }
     else {
       res.send(err.httpStatus, err);
@@ -103,7 +103,7 @@ module.exports.getWeeklyLeaders = function (req, res, next) {
 //--------------------------------------------------------------------------
 // getFriends
 //
-// data: friendsPermissionJustGranted (optional boolean)
+// data <NA>
 //--------------------------------------------------------------------------
 module.exports.getFriends = function (req, res, next) {
 
@@ -118,50 +118,42 @@ module.exports.getFriends = function (req, res, next) {
       sessionUtils.getSession(data, callback);
     },
 
-    //If no permission for friends - 2 cases:
-    //1. User 'just granted' the permission - give another try to facebook to validate that and retrieve user friends
-    //2. User did not just grant - return with an error message to the client to ask for the permission
+    //Retrieve friends from facebook
     function (data, callback) {
-      if (data.session.friends.noPermission) {
-        if (!data.friendsPermissionJustGranted) {
-          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION', {'confirm' : true}));
-          return;
-        }
-        else {
-          //User just granted - try to retrieve user friends again from facebook
-          data.user = {'thirdParty': {'accessToken': data.session.facebookAccessToken}};
-          dalFacebook.getUserFriends(data, callback);
-        }
+
+      if (!data.session.facebookUserId) {
+        exceptions.ServerResponseException(res, 'This functionality is not supported in guest mode', null, 'warn', 424);
+        return;
+      }
+
+      if (!data.session.friends) {
+        data.friendsJustRetrieved = true;
+        dalFacebook.getUserFriends(data, callback);
       }
       else {
         callback(null, data);
       }
-
     },
 
-    //If no permission and permission was just granted - store the session with the friends just retrived
+    //Store friends retrieved from facebook in the session in memory
     function (data, callback) {
-      if (data.session.friends.noPermission && data.friendsPermissionJustGranted) {
-
-        data.session.friends = data.user.thirdParty.friends;
-
-        //Still no luck - user gave no permission
-        if (data.session.friends.noPermission) {
-          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION',  {'confirm' : true}));
-          return;
-        }
-        else {
+      if (data.friendsJustRetrieved) {
+        if (!data.session.friends.noPermission) {
           dalDb.storeSession(data, callback);
         }
+        else {
+          callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION', {'confirm': true}));
+          return;
+        }
       }
       else {
         callback(null, data);
       }
     },
 
-    //If permission was just granted - store it in the user's profile as well
+    //If synched friends - store it in the user's profile as well
     function (data, callback) {
-      if (data.friendsPermissionJustGranted) {
+      if (data.friendsJustRetrieved && data.session.friends&& !data.session.friends.noPermission) {
         data.setData = {'friends': data.session.friends};
         data.closeConnection = true;
         dalDb.setUser(data, callback);
@@ -177,7 +169,7 @@ module.exports.getFriends = function (req, res, next) {
 
   async.waterfall(operations, function (err, data) {
     if (!err) {
-      res.json(data.clientResponse);
+      res.json(data.leaders);
     }
     else {
       res.send(err.httpStatus, err);

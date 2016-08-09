@@ -331,12 +331,6 @@ var User = (function () {
     return User;
 })();
 exports.User = User;
-var ThirdPartyInfo = (function () {
-    function ThirdPartyInfo() {
-    }
-    return ThirdPartyInfo;
-})();
-exports.ThirdPartyInfo = ThirdPartyInfo;
 var UserSettings = (function () {
     function UserSettings(language, timezoneOffset) {
         this.language = language;
@@ -598,4 +592,32 @@ var AppPage = (function () {
     return AppPage;
 })();
 exports.AppPage = AppPage;
+var FacebookInfo = (function () {
+    function FacebookInfo(accessToken, userId) {
+        this.accessToken = accessToken;
+        this.userId = userId;
+    }
+    return FacebookInfo;
+})();
+exports.FacebookInfo = FacebookInfo;
+var GuestInfo = (function () {
+    function GuestInfo(uuid) {
+        this.uuid = uuid;
+    }
+    return GuestInfo;
+})();
+exports.GuestInfo = GuestInfo;
+var ConnectInfo = (function () {
+    function ConnectInfo(type) {
+        this.type = type;
+    }
+    return ConnectInfo;
+})();
+exports.ConnectInfo = ConnectInfo;
+var Avatar = (function () {
+    function Avatar() {
+    }
+    return Avatar;
+})();
+exports.Avatar = Avatar;
 //# sourceMappingURL=objects.js.map

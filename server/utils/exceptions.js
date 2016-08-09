@@ -40,8 +40,6 @@ function UnhandledServerException(err) {
   var exception = new ServerMessageException('SERVER_ERROR_GENERAL', null, 500);
   logger.server.fatal(err);
 
-  //TODO: send an email to the operator
-
   return exception;
 }
 

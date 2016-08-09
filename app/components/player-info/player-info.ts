@@ -35,7 +35,7 @@ export class PlayerInfoComponent {
 
   init(client:Client) {
     this.client = client;
-    this.myAvatar = this.client.getFacebookAvatar(this.client.session.thirdParty.id);
+    this.myAvatar = this.client.getAvatarUrl(this.client.session.avatar);
     this.initXp();
     this.hidden = false;
   }
@@ -102,7 +102,14 @@ export class PlayerInfoComponent {
     var textHeight = this.context.measureText('w').width;
 
     this.context.fillStyle = this.client.settings.xpControl.textColor;
-    this.context.fillText(rankText, this.canvasCenterX - (textWidth / 2), this.canvasCenterY + (textHeight / 2));
+    let direction:number;
+    if (this.client.currentLanguage.direction === 'ltr') {
+      direction = 1;
+    }
+    else {
+      direction = -1;
+    }
+    this.context.fillText(rankText, this.canvasCenterX - (direction * (textWidth / 2)), this.canvasCenterY + (textHeight / 2));
 
     this.context.closePath();
   }

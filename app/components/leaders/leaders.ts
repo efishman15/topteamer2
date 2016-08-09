@@ -2,7 +2,7 @@ import {Client} from '../../providers/client';
 import {Component} from '@angular/core';
 import {List, Item} from 'ionic-angular';
 import * as leaderboardsService from '../../providers/leaderboards';
-import * as facebookService from '../../providers/facebook';
+import * as connectService from '../../providers/connect';
 
 
 @Component({
@@ -35,34 +35,37 @@ export class LeadersComponent {
     this.team1ContestLastRefreshTime = 0; //should apply only to the contest currently shown - when view closes and another contest appears - should refresh from server again
   }
 
-  showFriends(friendsPermissionJustGranted?:boolean, forceRefresh?:boolean) {
+  showFriends(forceRefresh?:boolean) {
 
     return new Promise((resolve, reject) => {
-      this.innerShowFriends(resolve, reject, friendsPermissionJustGranted, forceRefresh);
+      this.innerShowFriends(resolve, reject, forceRefresh);
     })
   }
 
-  innerShowFriends(resolve:any, reject:any, friendsPermissionJustGranted?:boolean, forceRefresh?:boolean) {
+  innerShowFriends(resolve:any, reject:any, forceRefresh?:boolean) {
     var now = (new Date()).getTime();
 
     //Check if refresh frequency reached
-    if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !friendsPermissionJustGranted && !forceRefresh) {
+    if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !forceRefresh) {
       this.leaders = this.lastFriendsLeaders;
       resolve();
       return;
     }
-    leaderboardsService.friends(friendsPermissionJustGranted).then((leaders) => {
+    leaderboardsService.friends().then((leaders) => {
       this.friendsLastRefreshTime = now;
       this.leaders = leaders;
       this.lastFriendsLeaders = leaders;
       resolve();
     }, (err) => {
       if (err.type === 'SERVER_ERROR_MISSING_FRIENDS_PERMISSION' && err.additionalInfo && err.additionalInfo.confirmed) {
-        facebookService.login(this.client.settings.facebook.friendsPermission, true).then(() => {
-          this.innerShowFriends(resolve, reject, true, forceRefresh);
+        connectService.login(this.client.settings.facebook.friendsPermissions, true).then(() => {
+          this.innerShowFriends(resolve, reject, forceRefresh);
         }, () => {
           reject();
         })
+      }
+      else {
+        reject();
       }
     });
   }

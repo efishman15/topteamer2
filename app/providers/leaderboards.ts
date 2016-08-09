@@ -3,13 +3,9 @@ import {Client} from './client';
 //------------------------------------------------------
 //-- friends
 //------------------------------------------------------
-export let friends = (friendsPermissionJustGranted : boolean) => {
-  var postData = {};
-  if (friendsPermissionJustGranted) {
-    postData['friendsPermissionJustGranted'] = friendsPermissionJustGranted;
-  }
+export let friends = () => {
   var client = Client.getInstance();
-  return client.serverPost('leaderboard/friends', postData);
+  return client.serverPost('leaderboard/friends');
 }
 
 //------------------------------------------------------

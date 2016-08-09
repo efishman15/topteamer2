@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
-var facebookService = require('../../providers/facebook');
+var connectService = require('../../providers/connect');
 var SettingsPage = (function () {
     function SettingsPage() {
         this.client = client_1.Client.getInstance();
@@ -48,7 +48,7 @@ var SettingsPage = (function () {
     SettingsPage.prototype.logout = function () {
         var _this = this;
         this.client.logEvent('settings/facebookSignOut');
-        facebookService.logout().then(function (response) {
+        connectService.logout().then(function () {
             _this.client.logout();
             _this.client.setRootPage('LoginPage');
         }, function () {

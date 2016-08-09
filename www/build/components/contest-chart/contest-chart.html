@@ -2,8 +2,12 @@
   <div class="chart-top-ribbon">
     <img src="images/contest_top_{{client.currentLanguage.direction}}.png" class="chart-top-ribbon-image"
          [ngStyle]="{'width': client.chartWidth + 'px'}">
-    <img src="images/timer_icon.png" class="chart-timer chart-timer-{{client.currentLanguage.direction}}"
-         [ngStyle]="{'width': client.settings.charts.contest.timer.width + 'px'}">
+
+    <button (click)="onContestShareClick($event)"
+            class="chart-share chart-share-{{client.currentLanguage.direction}}"
+            title="{{client.translate('SHARE')}}">
+      <ion-icon name="share"></ion-icon>
+    </button>
     <span class="chart-type-title chart-type-title-{{client.currentLanguage.direction}}">{{contest.subject}}</span>
     <span class="chart-end-time chart-end-time-{{client.currentLanguage.direction}}"
           [ngClass]="{'contest-end-time-running': contest.status !== 'finished', 'contest-end-time-ended': contest.status === 'finished'}">{{contest.time.end.text}}</span>
@@ -67,7 +71,7 @@
         <ion-col class="no-padding">
           <ion-item no-lines class="no-padding">
             <ion-avatar item-left class="no-padding no-margin">
-              <img src="{{client.getFacebookAvatar(contest.creator.facebookUserId)}}">
+              <img src="{{client.getAvatarUrl(contest.creator.avatar)}}">
             </ion-avatar>
             <div class="contest-creator-wrapper" [ngStyle]="{'text-align': client.currentLanguage.align}">
           <span class="no-wrap-text contest-users">
@@ -81,7 +85,9 @@
         <ion-col width-5>
         </ion-col>
         <ion-col class="no-padding">
-          <div class="contest-participants-area" [ngStyle]="{'float': client.currentLanguage.oppositeAlign}">
+          <div class="contest-participants-area"
+               [ngStyle]="{'float': client.currentLanguage.oppositeAlign}"
+               (click)="onContestParticipantsClick($event)">
             <span [ngStyle]="{'float': client.currentLanguage.align}"
                   class="contest-chart-bottom-ribbon-participants-text">
             <span [ngStyle]="{'float': client.currentLanguage.align}"

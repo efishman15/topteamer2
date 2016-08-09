@@ -66,7 +66,7 @@ export class LeaderboardsPage {
   showFriendsLeaderboard(forceRefresh?:boolean) {
     this.client.logEvent('page/leaderboard/friends');
     this.mode = 'friends';
-    return this.leadersComponent.showFriends(false, forceRefresh);
+    return this.leadersComponent.showFriends(forceRefresh);
   }
 
   displayWeeklyLeaderboardTab() {

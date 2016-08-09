@@ -2,13 +2,9 @@ var client_1 = require('./client');
 //------------------------------------------------------
 //-- friends
 //------------------------------------------------------
-exports.friends = function (friendsPermissionJustGranted) {
-    var postData = {};
-    if (friendsPermissionJustGranted) {
-        postData['friendsPermissionJustGranted'] = friendsPermissionJustGranted;
-    }
+exports.friends = function () {
     var client = client_1.Client.getInstance();
-    return client.serverPost('leaderboard/friends', postData);
+    return client.serverPost('leaderboard/friends');
 };
 //------------------------------------------------------
 //-- weekly

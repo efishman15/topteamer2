@@ -115,7 +115,11 @@ dalDb.loadSettings(null, function (err, data) {
   //----------------------------------------------------
   // API's that do NOT require authentication
   //----------------------------------------------------
+  app.post('/user/connect', credentials.connect);
+
+  //Old legacy call to support older clients
   app.post('/user/facebookConnect', credentials.facebookConnect);
+
   app.post('/info/settings', generalUtils.getSettings);
   app.post('/facebook/canvas', facebookCanvas.canvas);
   app.get('/facebook/product/:productId/:language', facebookCanvas.getProductDetails);

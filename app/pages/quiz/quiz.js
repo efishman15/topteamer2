@@ -185,10 +185,10 @@ var QuizPage = (function () {
                         var modal = _this.client.createModalPage('NewRankPage', {
                             'xpProgress': _this.quizData.xpProgress
                         });
-                        modal.onDismiss(function (okPressed) {
+                        modal.onDidDismiss(function (okPressed) {
                             _this.quizProceed();
                         });
-                        _this.client.nav.present(modal);
+                        modal.present;
                     }
                 }
             }, function () {
@@ -235,7 +235,7 @@ var QuizPage = (function () {
                 var modal = this.client.createModalPage('QuestionStatsPage', {
                     'question': this.quizData.currentQuestion
                 });
-                modal.onDismiss(function (action) {
+                modal.onDidDismiss(function (action) {
                     switch (action) {
                         case 'hint':
                             _this.questionHistory[_this.quizData.currentQuestionIndex].hintUsed = true;
@@ -251,7 +251,7 @@ var QuizPage = (function () {
                             break;
                     }
                 });
-                this.client.nav.present(modal);
+                modal.present();
             }
         }
     };
@@ -460,7 +460,7 @@ var QuizPage = (function () {
             question.answers[this.quizData.currentQuestion.answers[i].originalIndex] = this.quizData.currentQuestion.answers[i].text;
         }
         var modal = this.client.createModalPage('QuestionEditorPage', { 'question': question, 'mode': 'edit' });
-        modal.onDismiss(function (result) {
+        modal.onDidDismiss(function (result) {
             if (!result) {
                 return;
             }
@@ -472,7 +472,7 @@ var QuizPage = (function () {
             }, function () {
             });
         });
-        this.client.nav.present(modal);
+        modal.present();
     };
     QuizPage.prototype.share = function () {
         this.client.share(this.params.data.contest, 'quiz');

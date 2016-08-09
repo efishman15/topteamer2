@@ -13,9 +13,8 @@ var Rx_1 = require('rxjs/Rx');
 require('rxjs/add/operator/map');
 require('rxjs/add/operator/retryWhen');
 var ionic_native_1 = require('ionic-native');
-var ionic_angular_1 = require('ionic-angular');
 var contestsService = require('./contests');
-var facebookService = require('./facebook');
+var connectService = require('./connect');
 var alertService = require('./alert');
 var objects_1 = require('../objects/objects');
 var classesService = require('./classes');
@@ -48,7 +47,7 @@ var Client = (function () {
         }
         return Client.instance;
     };
-    Client.prototype.init = function (app, platform, config, events, nav, loadingModalComponent, playerInfoComponent) {
+    Client.prototype.init = function (app, platform, config, events, nav, alertController, modalController, loadingModalComponent, playerInfoComponent) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             _this.app = app;
@@ -56,6 +55,8 @@ var Client = (function () {
             _this.config = config;
             _this.events = events;
             _this.nav = nav;
+            _this.alertController = alertController;
+            _this.modalController = modalController;
             _this.loadingModalComponent = loadingModalComponent;
             _this.playerInfoComponent = playerInfoComponent;
             if (_this.clientInfo.mobile) {
@@ -114,21 +115,14 @@ var Client = (function () {
         this.user = new objects_1.User(language, this.clientInfo, geoInfo);
     };
     Client.prototype.setDirection = function () {
-        var dir = document.createAttribute('dir');
-        dir.value = this.currentLanguage.direction;
-        this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
+        this.platform.setDir(this.currentLanguage.direction, true);
         this.config.set('backButtonIcon', this.currentLanguage.backButtonIcon);
     };
-    Client.prototype.facebookServerConnect = function (facebookAuthResponse) {
+    Client.prototype.serverConnect = function (connectInfo) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            if (!_this.user.thirdParty) {
-                _this.user.thirdParty = new objects_1.ThirdPartyInfo();
-            }
-            _this.user.thirdParty.type = 'facebook';
-            _this.user.thirdParty.id = facebookAuthResponse.userID;
-            _this.user.thirdParty.accessToken = facebookAuthResponse.accessToken;
-            _this.serverPost('user/facebookConnect', { 'user': _this.user }).then(function (data) {
+            _this.user.credentials = connectInfo;
+            _this.serverPost('user/connect', { user: _this.user }).then(function (data) {
                 if (_this.user.settings.language !== data['session'].settings.language) {
                     _this.user.settings.language = data['session'].settings.language;
                     _this.localSwitchLanguage(_this.user.settings.language);
@@ -165,9 +159,10 @@ var Client = (function () {
             }, function (err) {
                 _this.hideLoader();
                 if (err && err.httpStatus === 401) {
-                    facebookService.getLoginStatus().then(function (result) {
-                        if (result['connected']) {
-                            _this.facebookServerConnect(result['response'].authResponse).then(function () {
+                    connectService.getLoginStatus().then(function (connectInfo) {
+                        if (_this.hasCredentials(connectInfo)) {
+                            _this.serverConnect(connectInfo).then(function () {
+                                //Re-post last request
                                 return _this.serverPost(path, postData).then(function (data) {
                                     resolve(data);
                                 }, function (err) {
@@ -177,8 +172,9 @@ var Client = (function () {
                             });
                         }
                         else {
-                            facebookService.login(false).then(function (response) {
-                                _this.facebookServerConnect(result['response'].authResponse).then(function () {
+                            connectService.login().then(function (connectInfo) {
+                                _this.serverConnect(connectInfo).then(function () {
+                                    //Re-post last request
                                     return _this.serverPost(path, postData).then(function (data) {
                                         resolve(data);
                                     }, function (err) {
@@ -192,13 +188,10 @@ var Client = (function () {
                     }, function () {
                     });
                 }
-                else if (err.httpStatus || err.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
+                else if (err.httpStatus) {
                     //An error coming from our server
                     //Display an alert or confirm message and continue the reject so further 'catch' blocks
                     //will be invoked if any
-                    if (err.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
-                        err.type = err.message;
-                    }
                     if (!err.additionalInfo || !err.additionalInfo.confirm) {
                         alertService.alert(err).then(function () {
                             reject(err);
@@ -240,12 +233,12 @@ var Client = (function () {
         var _this = this;
         this.logEvent('menu/newContest');
         var modal = this.createModalPage('ContestTypePage');
-        modal.onDismiss(function (contestTypeId) {
+        modal.onDidDismiss(function (contestTypeId) {
             if (contestTypeId) {
                 _this.openPage('SetContestPage', { 'mode': 'add', 'typeId': contestTypeId });
             }
         });
-        return this.nav.present(modal);
+        return modal.present();
     };
     Client.prototype.displayContestById = function (contestId) {
         var _this = this;
@@ -316,11 +309,14 @@ var Client = (function () {
         return this.nav.push(classesService.get(name), params);
     };
     Client.prototype.createModalPage = function (name, params) {
-        return ionic_angular_1.Modal.create(classesService.get(name), params);
+        return this.modalController.create(classesService.get(name), params);
     };
     Client.prototype.showModalPage = function (name, params) {
         var modal = this.createModalPage(name, params);
-        return this.nav.present(modal);
+        return modal.present();
+    };
+    Client.prototype.createAlert = function (alertOptions) {
+        return this.alertController.create(alertOptions);
     };
     Client.prototype.setRootPage = function (name, params) {
         return this.nav.setRoot(classesService.get(name), params);
@@ -358,14 +354,6 @@ var Client = (function () {
         }
         this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
         this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
-        //Check if we have an active modal view and call it's onResize as well
-        var portalNav = this.nav.getPortal();
-        if (portalNav.hasOverlay()) {
-            var activeView = portalNav.getActive();
-            if (activeView && activeView.instance && activeView.instance['onResize']) {
-                activeView.instance['onResize']();
-            }
-        }
         //Invoke 'onResize' for each view that has it
         for (var i = 0; i < this.nav.length(); i++) {
             var viewController = this.nav.getByIndex(i);
@@ -619,8 +607,29 @@ var Client = (function () {
             });
         }
     };
-    Client.prototype.getFacebookAvatar = function (facebookUserId) {
-        return this.settings.facebook.avatarTemplate.replace('{{id}}', facebookUserId);
+    Client.prototype.getAvatarUrl = function (avatar) {
+        var template;
+        if (avatar.type === 0) {
+            template = this.settings.facebook.avatarTemplate;
+        }
+        else if (avatar.type === 1) {
+            template = this.settings.general.avatarTemplate;
+        }
+        else {
+            return;
+        }
+        return template.replace('{{id}}', avatar.id);
+    };
+    Client.prototype.hasCredentials = function (connectInfo) {
+        if (connectInfo.type === 'facebook' && connectInfo.facebookInfo) {
+            return true;
+        }
+        else if (connectInfo.type === 'guest' && connectInfo.guestInfo) {
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     Client = __decorate([
         core_1.Injectable(), 
@@ -651,15 +660,36 @@ var ServerGateway = (function () {
                 headers.append('Authorization', _this.token);
             }
             _this.http.post(_this.endPoint + path, JSON.stringify(postData), { headers: headers })
-                .retryWhen(function (attempts) {
-                return Rx_1.Observable.range(1, _this.retries).zip(attempts, function (i) {
+                .catch(function (err) {
+                if (err['_body'] && typeof err['_body'] === 'string') {
+                    //This is an applicative error from our server
+                    try {
+                        var parsedError = JSON.parse(err['_body']);
+                        reject(parsedError);
+                    }
+                    catch (e) {
+                        reject(err);
+                    }
+                    finally {
+                        return Rx_1.Observable.empty();
+                    }
+                }
+                else {
+                    //Other error - ocntinue to the retryWhen
+                    return Rx_1.Observable.throw(err);
+                }
+            })
+                .retryWhen(function (errors) {
+                //Other network error - retry sending
+                return Rx_1.Observable.range(1, _this.retries).zip(errors, function (i) {
                     return i;
                 }).flatMap(function (i) {
                     if (i < _this.retries) {
                         return Rx_1.Observable.timer(i * _this.initialDelay);
                     }
                     else {
-                        throw new Error('SERVER_ERROR_NETWORK_TIMEOUT');
+                        reject({ 'type': 'SERVER_ERROR_NETWORK_TIMEOUT', 'httpStatus': 404 });
+                        return Rx_1.Observable.empty();
                     }
                 });
             })
@@ -669,19 +699,6 @@ var ServerGateway = (function () {
                     _this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res['serverPopup']));
                 }
                 resolve(res);
-            }, function (err) {
-                if (err['_body'] && typeof err['_body'] === 'string') {
-                    try {
-                        var parsedError = JSON.parse(err['_body']);
-                        reject(parsedError);
-                    }
-                    catch (e) {
-                        reject(err);
-                    }
-                }
-                else {
-                    reject(err);
-                }
             });
         });
     };

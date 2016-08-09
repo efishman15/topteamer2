@@ -5,23 +5,29 @@ var dalFacebook = require(path.resolve(__dirname, '../dal/dalFacebook'));
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var sessionUtils = require(path.resolve(__dirname, './session'));
+var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 
 //--------------------------------------------------------------------------
 // private functions
 //--------------------------------------------------------------------------
 function getSessionResponse(session) {
   var clientSession = {
-    'token': session.userToken,
-    'userId': session.userId,
-    'thirdParty': {'id': session.facebookUserId, 'accessToken': session.facebookAccessToken, 'type': 'facebook'},
-    'isAdmin': session.isAdmin,
-    'name': session.name,
-    'score': session.score,
-    'rank': session.rank,
-    'xpProgress': new generalUtils.XpProgress(session.xp, session.rank),
-    'settings': session.settings,
-    'features': session.features
+    token: session.userToken,
+    userId: session.userId,
+    thirdParty: {'id': session.facebookUserId}, //For older clients
+    name: session.name,
+    score: session.score,
+    rank: session.rank,
+    xpProgress: new generalUtils.XpProgress(session.xp, session.rank),
+    settings: session.settings,
+    features: session.features,
+    avatar: commonBusinessLogic.getAvatar(session)
   };
+
+
+  if (session.isAdmin) {
+    clientSession.isAdmin = true;
+  }
 
   if (session.justRegistered) {
     clientSession.justRegistered = true;
@@ -35,23 +41,30 @@ function getSessionResponse(session) {
 }
 
 //-----------------------------------------------------------------------------------------------------------
-// facebookConnect
+// connect
 //
 // data: user - should contain:
-//          thirdParty (id, type, accessToken)
+//          credentials (type (facebook, guest),
+//            - in case of facebook: facebookInfo(userId, accessToken)
+//            - in case of guest: guestInfo(uuid)
 //          clientInfo (platform, appVersion (optional for apps), platformVersion (optional for apps)
 //          gcmRegistrationId (optional)
 //-----------------------------------------------------------------------------------------------------------
-module.exports.facebookConnect = function (req, res, next) {
+module.exports.connect = function (req, res, next) {
   var data = req.body;
 
   var clientResponse = {};
 
   var operations = [
 
-    //Validate token
     function (callback) {
-      dalFacebook.getUserInfo(data, callback);
+      if (data.user.credentials.type === 'facebook') {
+        //Validate facebook access token with facebook
+        dalFacebook.getUserInfo(data, callback);
+      }
+      else {
+        callback(null, data);
+      }
     },
 
     //Open db connection
@@ -65,7 +78,7 @@ module.exports.facebookConnect = function (req, res, next) {
       if (data.user && data.user.clientInfo && req.headers['user-agent']) {
         data.user.clientInfo.userAgent = req.headers['user-agent'];
       }
-      dalDb.facebookLogin(data, callback)
+      dalDb.login(data, callback)
     },
 
     //Compute features and create/update session
@@ -96,8 +109,32 @@ module.exports.facebookConnect = function (req, res, next) {
   });
 };
 
-//--------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------------------
 // facebookConnect
+//
+// data: user - should contain:
+//          thirdParty (id, type, accessToken)
+//          clientInfo (platform, appVersion (optional for apps), platformVersion (optional for apps)
+//          gcmRegistrationId (optional)
+// This is a Legacy function - for older clients - reverting to "connect" method
+//-----------------------------------------------------------------------------------------------------------
+module.exports.facebookConnect = function (req, res, next) {
+
+  //Legacy - revert to "connect" method
+  req.body.user.credentials = {
+    type: 'facebook',
+    facebookInfo: {
+      userId: req.body.user.thirdParty.id,
+      accessToken: req.body.user.thirdParty.accessToken
+    }
+  }
+
+  this.connect(req, res, next);
+}
+
+//--------------------------------------------------------------------------
+// logout
 //
 // data: token
 //--------------------------------------------------------------------------

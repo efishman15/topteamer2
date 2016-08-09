@@ -9,6 +9,20 @@ var generalLeaderboard = new Leaderboard('topteamer:general');
 //---------------------------------------------------------------------------------------------------------------------------
 // private functions
 //---------------------------------------------------------------------------------------------------------------------------
+function getLeaderboardMember(session) {
+
+  var key = session.userId.toString();
+
+  var memberData;
+  if (session.facebookUserId) {
+    memberData = session.name + '|0|' + session.facebookUserId;
+  }
+  else {
+    memberData = session.name + '|1|' + session.avatar;
+  }
+
+  return {key: key, memberData: memberData};
+}
 
 //---------------------------------------------------------------------------------------------------------------------------
 // Get the general contest leaderboard
@@ -40,11 +54,11 @@ function getWeeklyLeaderboard() {
 function prepareLeaderObject(id, leader, outsideLeaderboard) {
   var memberDataParts = leader.member_data.split('|');
   var leaderObject = {
-    'id': id,
-    'rank': leader.rank,
-    'score': leader.score,
-    'facebookUserId': leader.member,
-    'name': leader.member_data
+    id: id,
+    rank: leader.rank,
+    score: leader.score,
+    name: memberDataParts[0],
+    avatar: {type: parseInt(memberDataParts[1],10), id: memberDataParts[2]}
   };
 
   if (outsideLeaderboard) {
@@ -65,33 +79,36 @@ function prepareLeaderObject(id, leader, outsideLeaderboard) {
 // 4. Weekly leaderboard - weekly_<YearWeek>
 //
 // @deltaScore - the score currently achieved which should be increased in all leaderboards
-// @facebookUserId - used as the primary member key in all leaderboards (to be able to retrieve friends leaderboard)
+// @session - facebookUserId (for facebook) or UserId (for guests) as the primary member key in all leaderboards
+// (to be able to retrieve friends leaderboard)
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.addScore = addScore;
-function addScore(contestId, teamId, deltaScore, facebookUserId, name) {
+function addScore(contestId, teamId, deltaScore, session) {
+
+  var leaderboardMember = getLeaderboardMember(session)
 
   var contestGeneralLeaderboard = getContestLeaderboard(contestId);
   var contestTeamLeaderboard = getTeamLeaderboard(contestId, teamId);
   var weeklyLeaderboard = getWeeklyLeaderboard();
 
-  generalLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-    generalLeaderboard.updateMemberData(facebookUserId, name);
+  generalLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
+    generalLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData);
   });
 
-  contestGeneralLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-    contestGeneralLeaderboard.updateMemberData(facebookUserId, name, function (reply) {
+  contestGeneralLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
+    contestGeneralLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData, function (reply) {
       contestGeneralLeaderboard.disconnect();
     });
   });
 
-  contestTeamLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-    contestTeamLeaderboard.updateMemberData(facebookUserId, name, function (reply) {
+  contestTeamLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
+    contestTeamLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData, function (reply) {
       contestTeamLeaderboard.disconnect();
     });
   });
 
-  weeklyLeaderboard.changeScoreFor(facebookUserId, deltaScore, function (reply) {
-    weeklyLeaderboard.updateMemberData(facebookUserId, name, function (reply) {
+  weeklyLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
+    weeklyLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData, function (reply) {
       weeklyLeaderboard.disconnect();
     });
   });
@@ -104,7 +121,7 @@ function addScore(contestId, teamId, deltaScore, facebookUserId, name) {
 // with flagging outside=true.
 //
 // data: leaderboard
-// output: data.clientResponse
+// output: data.leaders
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.getLeaders = getLeaders;
 function getLeaders(data, callback) {
@@ -115,27 +132,29 @@ function getLeaders(data, callback) {
     'pageSize': generalUtils.settings.server.leaderboard.pageSize
   };
 
-  data.clientResponse = [];
+  data.leaders = [];
+
+  var myLeaderboardMember = getLeaderboardMember(data.session);
 
   data.leaderboard.leaders(0, options, function (leaders) {
     for (var i = 0; i < leaders.length; i++) {
 
-      if (leaders[i].member === data.session.facebookUserId) {
+      if (leaders[i].member === myLeaderboardMember.key) {
         data.inLeaderboard = true;
       }
 
-      data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
+      data.leaders.push(prepareLeaderObject(i, leaders[i]));
 
     }
 
-    if (!data.inLeaderboard && data.clientResponse.length > 0) {
+    if (!data.inLeaderboard && data.leaders.length > 0) {
 
       //I am not in the first page of the leaderboard
       var options = {'withMemberData': true, 'sortBy': 'rank', 'pageSize': 1};
-      data.leaderboard.aroundMe(data.session.facebookUserId, options, function (leaders) {
+      data.leaderboard.aroundMe(myLeaderboardMember.key, options, function (leaders) {
         if (leaders && leaders.length > 0) {
           //I am in the leaderboard (not at the first page)
-          data.clientResponse.push(prepareLeaderObject(data.clientResponse.length, leaders[0], true));
+          data.leaders.push(prepareLeaderObject(data.leaders.length, leaders[0], true));
           callback(null, data);
         }
         else {
@@ -157,26 +176,36 @@ function getLeaders(data, callback) {
 // Retrieve me and my friends from the general leaderboard
 //
 // data: session (including friends.list array of id,name objects)
-// output: data.clientResponse
+// output: data.leaders
 //---------------------------------------------------------------------------------------------------------------------------
 module.exports.getFriends = getFriends;
 function getFriends(data, callback) {
 
-  data.clientResponse = [];
+  data.leaders = [];
+
+  //Return if no friends
+  if (!data.session.facebookUserId || !data.session.friends || !data.session.friends.list || data.session.friends.list.length === 0) {
+    callback(null, data);
+    return;
+  }
+
+  var pageSize = data.pageSize ? data.pageSize : generalUtils.settings.server.leaderboard.pageSize;
 
   var options = {
     withMemberData: true,
-    pageSize: generalUtils.settings.server.leaderboard.pageSize,
+    pageSize: pageSize,
     sortBy: 'rank',
     reverse: true
   };
+
+  var myLeaderboardMember = getLeaderboardMember(data.session);
 
   var members = [];
   for (var i = 0; i < data.session.friends.list.length; i++) {
     members.push(data.session.friends.list[i].id);
   }
   //Push myself as well
-  members.push(data.session.facebookUserId);
+  members.push(myLeaderboardMember.key);
 
   generalLeaderboard.rankedInList(members, options, function (leaders) {
 
@@ -192,22 +221,24 @@ function getFriends(data, callback) {
 
     })
 
-    var myUserInPage = false;
+    data.myIndex = -1;
     for (var i = 0; i < leaders.length; i++) {
-      if (leaders[i].member === data.session.facebookUserId) {
-        myUserInPage = true;
-      }
-      if (leaders[i].rank && data.clientResponse.length < generalUtils.settings.server.leaderboard.pageSize) {
-        data.clientResponse.push(prepareLeaderObject(i, leaders[i]));
+      if (leaders[i].rank && data.leaders.length < pageSize) {
+        data.leaders.push(prepareLeaderObject(i, leaders[i]));
+        if (leaders[i].member === myLeaderboardMember.key) {
+          data.myIndex = data.leaders.length - 1;
+        }
       }
     }
-    if (!myUserInPage) {
-      myUserInLeaderboard = {
+    if (data.myIndex === -1) {
+      var myUserInLeaderboard = {
+        member: data.session.facebookUserId,
         score: data.session.score,
-        rank: leaders.length,
+        rank: data.leaders.length,
         member_data: data.session.name
       }
-      data.clientResponse.push(prepareLeaderObject(data.clientResponse.length, myUserInLeaderboard, true));
+      data.leaders.push(prepareLeaderObject(data.leaders.length, myUserInLeaderboard, true));
+      data.myIndex = data.leaders.length - 1;
     }
 
     callback(null, data);
@@ -225,29 +256,21 @@ function getFriends(data, callback) {
 module.exports.getFriendsAboveMe = getFriendsAboveMe;
 function getFriendsAboveMe(data, callback) {
 
-  var options = {
-    'withMemberData': true,
-    'sortBy': 'rank',
-    'pageSize': generalUtils.settings.server.leaderboard.friendsAboveMePageSize
-  };
+  data.pageSize = data.session.friends.list.length + 1; //Me and my friends
+  getFriends(data, function (err, data) {
 
-  data.friendsAboveMe = [];
-
-  generalLeaderboard.aroundMe(data.session.facebookUserId, options, function (leaders) {
-    if (leaders && leaders.length > 0) {
-
-      //I will be in that list as the last one - all my friends that are above me - will be first in the array)
-      //.id property for each item in the friendsAboveMe list is the facebookUserId - for later to compute the passedFriends
-      for (var i = 0; i < leaders.length; i++) {
-        data.friendsAboveMe.push(prepareLeaderObject(leaders[i].member, leaders[i]));
-        if (leaders[i].member === data.session.facebookUserId) {
-          break;
+    if (!err && data.leaders && data.leaders.length > 0 && data.myIndex !== 0) {
+      data.friendsAboveMe = [];
+      for (var i = 0; i < generalUtils.settings.server.leaderboard.friendsAboveMePageSize; i++) {
+        if (data.myIndex - i - 1 >= 0) {
+          data.friendsAboveMe.push(data.leaders[data.myIndex - i - 1]);
         }
       }
+      callback(null, data);
     }
-
-    callback(null, data);
-
+    else {
+      callback(null,data);
+    }
   });
 };
 
@@ -294,4 +317,71 @@ function getPassedFriends(data, callback) {
   });
 
 };
+
+//---------------------------------------------------------------------------------------------------------------------------
+// removeContestLeaderboards
+//
+// data: contestId
+// output: <NA>
+//---------------------------------------------------------------------------------------------------------------------------
+module.exports.removeContestLeaderboards = removeContestLeaderboards;
+function removeContestLeaderboards(data, callback) {
+  var contestLeaderboard = getContestLeaderboard(data.contestId);
+
+  contestLeaderboard.deleteLeaderboard(function () {
+
+    var team0Leaderboard = getTeamLeaderboard(data.contestId, 0);
+    team0Leaderboard.deleteLeaderboard(function () {
+
+      var team1Leaderboard = getTeamLeaderboard(data.contestId, 1);
+      team1Leaderboard.deleteLeaderboard(function () {
+
+        callback(null, data);
+
+      });
+
+    });
+
+  })
+}
+
+//---------------------------------------------------------------------------------------------------------------------------
+// updateMyGuestAvatars
+//
+// data: contests
+// output: <NA>
+//---------------------------------------------------------------------------------------------------------------------------
+module.exports.updateMyGuestAvatars = updateMyGuestAvatars;
+function updateMyGuestAvatars(data, callback) {
+
+  var newLeaderboardMember = getLeaderboardMember(data.session);
+
+  async.forEach(data.contests, function (contest, callbackContest) {
+
+    var contestLeaderboard = getContestLeaderboard(contest._id);
+    contestLeaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+    });
+
+    var team0Leaderboard = getContestLeaderboard(contest._id, 0);
+    team0Leaderboard.memberDataFor(data.session.userId, function (memberData) {
+      if (memberData) {
+        team0Leaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+        });
+      }
+    })
+
+    var team1Leaderboard = getContestLeaderboard(contest._id, 1);
+    team0Leaderboard.memberDataFor(data.session.userId, function (memberData) {
+      if (memberData) {
+        team1Leaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+        });
+      }
+    })
+
+    callbackContest();
+
+  });
+
+  callback(null, data);
+}
 

@@ -41,10 +41,6 @@ var MyExceptionHandler = (function (_super) {
             //might not be initialized yet during app load
             window.myLogError('UnhandledException', errorMessage);
         }
-        if (exception.rejection && exception.rejection.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
-            //No point to post this error - since our server is not reachable...
-            return;
-        }
         var client = client_1.Client.getInstance();
         if (client) {
             //Post errors to server

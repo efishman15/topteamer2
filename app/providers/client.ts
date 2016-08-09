@@ -4,11 +4,11 @@ import {Observable} from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/retryWhen';
 import {Push} from 'ionic-native';
-import {App,Platform,Config, Nav, Alert, Modal, Events, NavController, ViewController} from 'ionic-angular';
+import {App,Platform,Config, Nav, AlertController, ModalController, Events, NavController, ViewController, AlertOptions} from 'ionic-angular';
 import * as contestsService from './contests';
-import * as facebookService from './facebook';
+import * as connectService from './connect';
 import * as alertService from './alert';
-import {User,Session,ClientInfo,Settings,Language,ThirdPartyInfo,Contest,ClientShareApp,AppPage} from '../objects/objects';
+import {User,Session,ClientInfo,Settings,Language,Contest,ClientShareApp,AppPage,ConnectInfo,Avatar} from '../objects/objects';
 import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
 import {PlayerInfoComponent} from '../components/player-info/player-info'
 import * as classesService from './classes';
@@ -25,6 +25,8 @@ export class Client {
   config:Config;
   events:Events;
   nav:Nav;
+  alertController:AlertController;
+  modalController:ModalController;
   loadingModalComponent:LoadingModalComponent;
   playerInfoComponent:PlayerInfoComponent;
   user:User;
@@ -40,6 +42,7 @@ export class Client {
   appPreloading:boolean = true;
   serverGateway:ServerGateway;
   pushService:any;
+  connectInfo:ConnectInfo;
 
   constructor(http:Http) {
 
@@ -75,7 +78,15 @@ export class Client {
     return Client.instance;
   }
 
-  init(app:App, platform:Platform, config:Config, events:Events, nav:Nav, loadingModalComponent:LoadingModalComponent, playerInfoComponent:PlayerInfoComponent) {
+  init(app:App,
+       platform:Platform,
+       config:Config,
+       events:Events,
+       nav:Nav,
+       alertController:AlertController,
+       modalController:ModalController,
+       loadingModalComponent:LoadingModalComponent,
+       playerInfoComponent:PlayerInfoComponent) {
 
     return new Promise((resolve, reject) => {
 
@@ -84,6 +95,8 @@ export class Client {
         this.config = config;
         this.events = events;
         this.nav = nav;
+        this.alertController = alertController;
+        this.modalController = modalController;
         this.loadingModalComponent = loadingModalComponent;
         this.playerInfoComponent = playerInfoComponent;
 
@@ -162,24 +175,16 @@ export class Client {
   }
 
   setDirection() {
-    var dir = document.createAttribute('dir');
-    dir.value = this.currentLanguage.direction;
-    this.nav.getElementRef().nativeElement.attributes.setNamedItem(dir);
+    this.platform.setDir(this.currentLanguage.direction,true);
     this.config.set('backButtonIcon', this.currentLanguage.backButtonIcon);
   }
 
-  facebookServerConnect(facebookAuthResponse) {
+  serverConnect(connectInfo:ConnectInfo) {
 
     return new Promise((resolve, reject) => {
 
-      if (!this.user.thirdParty) {
-        this.user.thirdParty = new ThirdPartyInfo();
-      }
-      this.user.thirdParty.type = 'facebook';
-      this.user.thirdParty.id = facebookAuthResponse.userID;
-      this.user.thirdParty.accessToken = facebookAuthResponse.accessToken;
-
-      this.serverPost('user/facebookConnect', {'user': this.user}).then((data) => {
+      this.user.credentials = connectInfo;
+      this.serverPost('user/connect', {user: this.user}).then((data) => {
 
         if (this.user.settings.language !== data['session'].settings.language) {
           this.user.settings.language = data['session'].settings.language;
@@ -224,40 +229,39 @@ export class Client {
       }, (err) => {
         this.hideLoader();
         if (err && err.httpStatus === 401) {
-          facebookService.getLoginStatus().then((result) => {
-            if (result['connected']) {
-              this.facebookServerConnect(result['response'].authResponse).then(() => {
+          connectService.getLoginStatus().then((connectInfo:ConnectInfo) => {
+            if (this.hasCredentials(connectInfo)) {
+              this.serverConnect(connectInfo).then(() => {
+                //Re-post last request
                 return this.serverPost(path, postData).then((data) => {
                   resolve(data);
                 }, (err) => {
                   reject(err);
                 })
-              },()=>{
+              }, ()=> {
               });
             }
             else {
-              facebookService.login(false).then((response) => {
-                this.facebookServerConnect(result['response'].authResponse).then(() => {
+              connectService.login().then((connectInfo:ConnectInfo) => {
+                this.serverConnect(connectInfo).then(() => {
+                  //Re-post last request
                   return this.serverPost(path, postData).then((data) => {
                     resolve(data);
                   }, (err) => {
                     reject(err);
                   })
-                },()=>{
+                }, ()=> {
                 })
-              },()=>{
+              }, ()=> {
               })
             }
-          },()=>{
+          }, ()=> {
           });
         }
-        else if (err.httpStatus || err.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
+        else if (err.httpStatus) {
           //An error coming from our server
           //Display an alert or confirm message and continue the reject so further 'catch' blocks
           //will be invoked if any
-          if (err.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
-            err.type = err.message;
-          }
           if (!err.additionalInfo || !err.additionalInfo.confirm) {
             alertService.alert(err).then(() => {
               reject(err);
@@ -301,12 +305,12 @@ export class Client {
   openNewContest() {
     this.logEvent('menu/newContest');
     var modal = this.createModalPage('ContestTypePage');
-    modal.onDismiss((contestTypeId) => {
+    modal.onDidDismiss((contestTypeId) => {
       if (contestTypeId) {
         this.openPage('SetContestPage', {'mode': 'add', 'typeId': contestTypeId});
       }
     });
-    return this.nav.present(modal);
+    return modal.present();
   }
 
   displayContestById(contestId:string) {
@@ -387,12 +391,16 @@ export class Client {
   }
 
   createModalPage(name:string, params?:any) {
-    return Modal.create(classesService.get(name), params);
+    return this.modalController.create(classesService.get(name), params);
   }
 
   showModalPage(name:string, params?:any) {
     var modal = this.createModalPage(name, params);
-    return this.nav.present(modal);
+    return modal.present();
+  }
+
+  createAlert(alertOptions: AlertOptions) {
+    return this.alertController.create(alertOptions);
   }
 
   setRootPage(name:string, params?:any) {
@@ -440,15 +448,6 @@ export class Client {
 
     this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
     this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
-
-    //Check if we have an active modal view and call it's onResize as well
-    let portalNav:NavController = this.nav.getPortal();
-    if (portalNav.hasOverlay()) {
-      let activeView:ViewController = portalNav.getActive();
-      if (activeView && activeView.instance && activeView.instance['onResize']) {
-        activeView.instance['onResize']()
-      }
-    }
 
     //Invoke 'onResize' for each view that has it
     for (var i = 0; i < this.nav.length(); i++) {
@@ -711,8 +710,30 @@ export class Client {
     }
   }
 
-  getFacebookAvatar(facebookUserId:string) {
-    return this.settings.facebook.avatarTemplate.replace('{{id}}', facebookUserId);
+  getAvatarUrl(avatar:Avatar) {
+    let template:string;
+    if (avatar.type === 0) {
+      template = this.settings.facebook.avatarTemplate;
+    }
+    else if (avatar.type === 1) {
+      template = this.settings.general.avatarTemplate;
+    }
+    else {
+      return;
+    }
+    return template.replace('{{id}}', avatar.id);
+  }
+
+  hasCredentials(connectInfo:ConnectInfo):boolean {
+    if (connectInfo.type === 'facebook' && connectInfo.facebookInfo) {
+      return true;
+    }
+    else if (connectInfo.type === 'guest' && connectInfo.guestInfo) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 }
 
@@ -750,15 +771,36 @@ export class ServerGateway {
       }
 
       this.http.post(this.endPoint + path, JSON.stringify(postData), {headers: headers})
-        .retryWhen((attempts) => {
-          return Observable.range(1, this.retries).zip(attempts, (i) => {
+        .catch((err) => {
+          if (err['_body'] && typeof err['_body'] === 'string') {
+            //This is an applicative error from our server
+            try {
+              var parsedError = JSON.parse(err['_body']);
+              reject(parsedError);
+            }
+            catch (e) {
+              reject(err);
+            }
+            finally {
+              return Observable.empty();
+            }
+          }
+          else {
+            //Other error - ocntinue to the retryWhen
+            return Observable.throw(err);
+          }
+        })
+        .retryWhen((errors) => {
+          //Other network error - retry sending
+          return Observable.range(1, this.retries).zip(errors, (i) => {
             return i;
           }).flatMap((i) => {
             if (i < this.retries) {
               return Observable.timer(i * this.initialDelay);
             }
             else {
-              throw new Error('SERVER_ERROR_NETWORK_TIMEOUT');
+              reject({'type': 'SERVER_ERROR_NETWORK_TIMEOUT', 'httpStatus': 404});
+              return Observable.empty();
             }
           })
         })
@@ -769,20 +811,6 @@ export class ServerGateway {
               this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res['serverPopup']));
             }
             resolve(res);
-          },
-          (err:Object) => {
-            if (err['_body'] && typeof err['_body'] === 'string') {
-              try {
-                var parsedError = JSON.parse(err['_body']);
-                reject(parsedError);
-              }
-              catch (e) {
-                reject(err);
-              }
-            }
-            else {
-              reject(err);
-            }
           }
         );
     });

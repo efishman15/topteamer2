@@ -1,6 +1,9 @@
 var _this = this;
 var client_1 = require('./client');
-var ionic_angular_1 = require('ionic-angular');
+function getAlignedTitle(title) {
+    var client = client_1.Client.getInstance();
+    return '<span class="app-alert-' + client.currentLanguage.direction + '">' + title + '</span>';
+}
 //------------------------------------------------------
 //-- alert
 //------------------------------------------------------
@@ -26,7 +29,6 @@ exports.alert = function (message, buttons) {
 exports.alertTranslated = function (title, message, buttons) {
     return new Promise(function (resolve, reject) {
         var client = client_1.Client.getInstance();
-        var alert;
         if (!buttons) {
             buttons = [
                 {
@@ -36,14 +38,15 @@ exports.alertTranslated = function (title, message, buttons) {
                 }
             ];
         }
-        alert = ionic_angular_1.Alert.create({
+        var alert = client.createAlert({
             message: message,
-            buttons: buttons
+            buttons: buttons,
+            cssClass: 'app-alert-' + client.currentLanguage.direction
         });
         if (title) {
-            alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');
+            alert.setTitle(getAlignedTitle(title));
         }
-        client.nav.present(alert);
+        alert.present();
     });
 };
 //------------------------------------------------------
@@ -52,9 +55,8 @@ exports.alertTranslated = function (title, message, buttons) {
 exports.confirm = function (title, message, params) {
     return new Promise(function (resolve, reject) {
         var client = client_1.Client.getInstance();
-        var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
-        var alert = ionic_angular_1.Alert.create({
-            title: alignedTitle,
+        var alert = client.createAlert({
+            title: getAlignedTitle(client.translate(title, params)),
             message: client.translate(message, params),
             buttons: [
                 {
@@ -67,7 +69,7 @@ exports.confirm = function (title, message, params) {
                 }
             ]
         });
-        client.nav.present(alert);
+        alert.present();
     });
 };
 //------------------------------------------------------

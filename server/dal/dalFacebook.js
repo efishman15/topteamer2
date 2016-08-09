@@ -13,33 +13,17 @@ var httpUtils = require(path.resolve(__dirname, '../utils/http'));
 //
 // data:
 // -----
-// input: user (contains thirdParty.accessToken + thirdParty.id OR thirdParty.signedRequest if in canvas)
+// input: user (contains credentials.facebookInfo (accessToken,userId)
 // output: user.name, user.email, user.ageRange, user.thirdParty.payment_mobile_pricepoints (in case of canvas)
 //---------------------------------------------------------------------------------------------------------------------------------
 module.exports.getUserInfo = function (data, callback) {
 
   var fields = 'id,name,email,age_range';
 
-  if (data.user.thirdParty.signedRequest) {
-    //Coming from canvas
-    var verifier = new SignedRequest(generalUtils.settings.server.facebook.secretKey, data.user.thirdParty.signedRequest);
-    if (!verifier.verify) {
-      callback(new exceptions.ServerException('Invalid signed request received from facebook', {'signedRequest': data.signedRequest},'error'));
-      return;
-    }
-
-    data.user.thirdParty.accessToken = verifier.data.oauth_token;
-    data.user.thirdParty.id = verifier.data.user_id;
-
-    if (generalUtils.settings.server.payments.facebook.handleMobilePricePoints) {
-      fields += ',payment_mobile_pricepoints,currency';
-    }
-  }
-
   var options = {
     'url': FACEBOOK_GRAPH_URL + '/me',
     'qs': {
-      'access_token': data.user.thirdParty.accessToken,
+      'access_token': data.user.credentials.facebookInfo.accessToken,
       'fields': fields
     }
   };
@@ -47,21 +31,23 @@ module.exports.getUserInfo = function (data, callback) {
   httpUtils.get(options, function (err, facebookData) {
 
     if (!err && facebookData && facebookData.id) {
-      if (facebookData.id === data.user.thirdParty.id) {
+      if (facebookData.id === data.user.credentials.facebookInfo.userId) {
         data.user.name = facebookData.name;
         data.user.email = facebookData.email; //might be null if user removed
         data.user.ageRange = facebookData.age_range;
         if (facebookData.payment_mobile_pricepoints) {
-          data.user.thirdParty.paymentMobilePricepoints = facebookData.payment_mobile_pricepoints;
-          data.user.thirdParty.currency = facebookData.currency;
+          data.user.thirdParty = {
+            paymentMobilePricepoints: facebookData.payment_mobile_pricepoints,
+            currency: facebookData.currency
+          }
         }
 
-        getUserFriends(data, callback);
+        callback(null, data);
       }
       else {
         callback(new exceptions.ServerException('Error validating facebook access token, token belongs to someone else', {
           'facebookResponse': facebookData,
-          'facebookAccessToken': data.user.thirdParty.accessToken,
+          'facebookAccessToken': data.user.credentials.facebookInfo.accessToken,
           'actualFacebookId': facebookData.id
         },'error'));
         return;
@@ -70,7 +56,7 @@ module.exports.getUserInfo = function (data, callback) {
     else {
       callback(new exceptions.ServerMessageException('SERVER_ERROR_INVALID_FACEBOOK_ACCESS_TOKEN', {
         'facebookResponse': facebookData,
-        'facebookAccessToken': data.user.thirdParty.accessToken
+        'facebookAccessToken': data.user.credentials.facebookInfo.accessToken
       }, 424));
       return;
     }
@@ -133,8 +119,6 @@ SignedRequest.prototype.base64decode = function (data) {
 module.exports.getPaymentInfo = function (data, callback) {
 
   var fields = 'id,actions,items,disputes,request_id,user';
-
-  var facebookResponse = '';
 
   var options = {
     'url': FACEBOOK_GRAPH_URL + '/' + data.paymentId,
@@ -257,38 +241,41 @@ module.exports.denyDispute = function (data, callback) {
 //
 // data:
 // -----
-// input: facebookAccessToken
+// input: session
 // output: friends [{name, id},...]
 //---------------------------------------------------------------------------------------------------------------------------------
 module.exports.getUserFriends = getUserFriends;
 function getUserFriends(data, callback) {
 
   if (!data.url) {
-    data.url = FACEBOOK_GRAPH_URL + '/me/friends' + '?limit=' + generalUtils.settings.server.facebook.friendsPageSize + '&offset=0&access_token=' + data.user.thirdParty.accessToken;
+    data.url = FACEBOOK_GRAPH_URL + '/me/friends' + '?limit=' + generalUtils.settings.server.facebook.friendsPageSize + '&offset=0&access_token=' + data.session.facebookAccessToken
+
+    //Initialize friends list in session (even if there was something there before
+    data.session.friends = {'list': [], 'noPermission': false};
   }
 
   var options = {
     'url': data.url
   };
 
+
   httpUtils.get(options, function (err, facebookData) {
 
     if (err || !facebookData.data) {
       callback(new exceptions.ServerException('Unable to retrieve user friends', {
-        'accessToken': data.user.thirdParty.accessToken,
+        'accessToken': data.session.faceookAccessToken,
         'error': facebookData
       }));
       return;
     }
 
-    if (!data.user.thirdParty.friends) {
-      data.user.thirdParty.friends = {'list': [], 'noPermission': false};
-    }
-
     if (facebookData.data.length > 0) {
       for (var i = 0; i < facebookData.data.length; i++) {
-        var friend = {'id': '' + facebookData.data[i].id, 'name': facebookData.data[i].name}
-        data.user.thirdParty.friends.list.push(friend);
+        var friend = {
+          id: '' + facebookData.data[i].id,
+          name: facebookData.data[i].name
+        }
+        data.session.friends.list.push(friend);
       }
       if (facebookData.data.length < generalUtils.settings.server.facebook.friendsPageSize) {
         callback(null, data);
@@ -303,15 +290,15 @@ function getUserFriends(data, callback) {
     }
     else {
       //Possibly lack of permission - check if user_friends permission has been declined
-      if (data.user.thirdParty.friends.list.length === 0) {
+      if (data.session.friends.list.length === 0) {
         var userFriendsOptions = {
           'url': FACEBOOK_GRAPH_URL + '/me/permissions/user_friends',
-          'access_token': data.user.thirdParty.accessToken
+          'access_token': data.session.facebookAccessToken
         };
 
         httpUtils.get(options, function (err, facebookData) {
           if (err || !facebookData.data || facebookData.data.length === 0 || facebookData.data[0].status === 'declined') {
-            data.user.thirdParty.friends.noPermission = true;
+            data.session.friends.noPermission = true;
           }
           callback(null, data);
         });

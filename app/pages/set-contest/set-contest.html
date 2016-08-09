@@ -110,7 +110,7 @@
                     (ionChange)="setEndsIn()">
           <ion-option *ngFor="let endOptionKey of endOptionKeys"
                       value="{{client.settings.newContest.endOptions[endOptionKey].value}}"
-                      checked="contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value">
+                      selected="contestLocalCopy.endOption===client.settings.newContest.endOptions[endOptionKey].value">
             {{client.translate(client.settings.newContest.endOptions[endOptionKey].units, {number:
             client.settings.newContest.endOptions[endOptionKey].number}) }}
           </ion-option>

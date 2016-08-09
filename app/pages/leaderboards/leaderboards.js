@@ -54,7 +54,7 @@ var LeaderboardsPage = (function () {
     LeaderboardsPage.prototype.showFriendsLeaderboard = function (forceRefresh) {
         this.client.logEvent('page/leaderboard/friends');
         this.mode = 'friends';
-        return this.leadersComponent.showFriends(false, forceRefresh);
+        return this.leadersComponent.showFriends(forceRefresh);
     };
     LeaderboardsPage.prototype.displayWeeklyLeaderboardTab = function () {
         this.client.logEvent('page/leaderboard/weekly');

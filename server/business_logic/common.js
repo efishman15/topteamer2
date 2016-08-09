@@ -136,3 +136,21 @@ function getOpenGraphObject(objectType, objectData, isCrawlerMode, isMobile) {
 
 };
 
+//----------------------------------------------------------------------------------------------------------------------
+// getAvatar
+//
+// input: session
+// return avatar object {tyoe: 0 (Facebook), 1(Guest), id: FacebookUserId or AvatarImage (under images/avatars/xxx.png
+//----------------------------------------------------------------------------------------------------------------------
+module.exports.getAvatar = function (session) {
+
+  if (session.facebookUserId) {
+    //Facebook
+    return {type: 0, id: session.facebookUserId};
+  }
+  else {
+    //Guest
+    return {type: 1, id: session.avatar};
+  }
+
+}

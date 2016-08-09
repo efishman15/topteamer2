@@ -23,7 +23,7 @@ var PlayerInfoComponent = (function () {
     };
     PlayerInfoComponent.prototype.init = function (client) {
         this.client = client;
-        this.myAvatar = this.client.getFacebookAvatar(this.client.session.thirdParty.id);
+        this.myAvatar = this.client.getAvatarUrl(this.client.session.avatar);
         this.initXp();
         this.hidden = false;
     };
@@ -77,7 +77,14 @@ var PlayerInfoComponent = (function () {
         var textWidth = this.context.measureText(rankText).width;
         var textHeight = this.context.measureText('w').width;
         this.context.fillStyle = this.client.settings.xpControl.textColor;
-        this.context.fillText(rankText, this.canvasCenterX - (textWidth / 2), this.canvasCenterY + (textHeight / 2));
+        var direction;
+        if (this.client.currentLanguage.direction === 'ltr') {
+            direction = 1;
+        }
+        else {
+            direction = -1;
+        }
+        this.context.fillText(rankText, this.canvasCenterX - (direction * (textWidth / 2)), this.canvasCenterY + (textHeight / 2));
         this.context.closePath();
     };
     PlayerInfoComponent.prototype.animateXpAddition = function (startPoint, endPoint) {

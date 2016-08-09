@@ -10,7 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
-var facebookService = require('../../providers/facebook');
+var connectService = require('../../providers/connect');
 var FacebookPostPage = (function () {
     function FacebookPostPage(params, viewController) {
         this.viewController = viewController;
@@ -24,7 +24,7 @@ var FacebookPostPage = (function () {
     FacebookPostPage.prototype.post = function () {
         var _this = this;
         this.client.logEvent('contest/facebook/post/click');
-        facebookService.post(this.quizResults.data.facebookPost).then(function () {
+        connectService.post(this.quizResults.data.facebookPost).then(function () {
             _this.close(true);
         }, function () {
             //Do nothing - user probably canceled or any other error presented by facebook

@@ -64,7 +64,7 @@
                   (ionChange)="switchLanguage()">
         <ion-option *ngFor="let languageKey of client.languageKeys"
                     value="{{languageKey}}"
-                    checked="languageKey===client.user.settings.language">
+                    selected="languageKey===client.user.settings.language">
           {{client.settings.languages[languageKey].displayNames[languageKey]}}
         </ion-option>
       </ion-select>

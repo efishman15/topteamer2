@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
-import * as facebookService from '../../providers/facebook';
+import * as connectService from '../../providers/connect';
+import {ConnectInfo} from '../../objects/objects';
 
 @Component({
   templateUrl: 'build/pages/login/login.html'
@@ -36,21 +37,31 @@ export class LoginPage {
   }
 
   login() {
-    this.client.logEvent('login/facebookLogin');
-    facebookService.login().then((response) => {
-      this.client.facebookServerConnect(response['authResponse']).then(() => {
+    connectService.login().then((connectInfo:ConnectInfo) => {
+      this.client.serverConnect(connectInfo).then(() => {
         this.client.playerInfoComponent.init(this.client);
         this.client.setRootPage('MainTabsPage');
       }, () => {
       })
     }, ()=> {
     });
+
+  }
+
+  facebookLogin() {
+    this.client.logEvent('login/facebookLogin');
+    this.login();
   };
+
+  registerGuest() {
+    this.client.logEvent('login/guest');
+    connectService.createGuest();
+    this.login();
+  }
 
   changeLanguage(language) {
     this.client.user.settings.language = language;
     localStorage.setItem('language', language);
     this.client.logEvent('login/changeLanguage', {language: language});
   }
-
 }

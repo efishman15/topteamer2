@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
-var facebookService = require('../../providers/facebook');
+var connectService = require('../../providers/connect');
 var LoginPage = (function () {
     function LoginPage() {
         var _this = this;
@@ -33,9 +33,8 @@ var LoginPage = (function () {
     };
     LoginPage.prototype.login = function () {
         var _this = this;
-        this.client.logEvent('login/facebookLogin');
-        facebookService.login().then(function (response) {
-            _this.client.facebookServerConnect(response['authResponse']).then(function () {
+        connectService.login().then(function (connectInfo) {
+            _this.client.serverConnect(connectInfo).then(function () {
                 _this.client.playerInfoComponent.init(_this.client);
                 _this.client.setRootPage('MainTabsPage');
             }, function () {
@@ -43,7 +42,16 @@ var LoginPage = (function () {
         }, function () {
         });
     };
+    LoginPage.prototype.facebookLogin = function () {
+        this.client.logEvent('login/facebookLogin');
+        this.login();
+    };
     ;
+    LoginPage.prototype.registerGuest = function () {
+        this.client.logEvent('login/guest');
+        connectService.createGuest();
+        this.login();
+    };
     LoginPage.prototype.changeLanguage = function (language) {
         this.client.user.settings.language = language;
         localStorage.setItem('language', language);

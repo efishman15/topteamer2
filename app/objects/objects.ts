@@ -29,16 +29,16 @@ export class Settings {
   contest:ContestSettings;
   flurry:FlurrySettings;
   branch:BranchSettings;
-  admin: AdminSettings;
+  admin:AdminSettings;
 }
 
 export class AdminSettings {
-  commands: Array<AdminCommand>;
+  commands:Array<AdminCommand>;
 }
 
 export class AdminCommand {
-  id: string;
-  text: string;
+  id:string;
+  text:string;
   action:string;
   type:string;
   confirm:string;
@@ -124,7 +124,8 @@ export class GeneralSettings {
   webCanvasWidth:number;
   facebookFanPage:string;
   postErrors:boolean;
-  network: GeneralNetworkSettings;
+  network:GeneralNetworkSettings;
+  avatarTemplate:string;
 }
 
 export class GeneralNetworkSettings {
@@ -133,7 +134,7 @@ export class GeneralNetworkSettings {
 }
 
 export class FacebookSettings {
-  friendsPermission:Array<string>;
+  friendsPermissions:Array<string>;
   appId:string;
   version:string;
   sdk:string;
@@ -279,7 +280,7 @@ export class QuestionStatsChartSettings {
 
 export class QuestionStatsChartSizeSettings extends ChartSizeSettings {
   radiusRatio:number;
-  innerDoughnutRadiusRatio: number;
+  innerDoughnutRadiusRatio:number;
 }
 
 export class QuestionStatsChartSettingsColors {
@@ -316,11 +317,11 @@ export class User {
   clientInfo:ClientInfo;
   settings:UserSettings;
   geoInfo:Object;
-  thirdParty:ThirdPartyInfo;
+  credentials:ConnectInfo;
   gcmRegistrationId:string;
 
   constructor(language:string, clientInfo:ClientInfo, geoInfo?:Object) {
-    this.settings = new UserSettings(language,(new Date).getTimezoneOffset());
+    this.settings = new UserSettings(language, (new Date).getTimezoneOffset());
     this.clientInfo = clientInfo;
 
     if (geoInfo) {
@@ -329,19 +330,13 @@ export class User {
   }
 }
 
-export class ThirdPartyInfo {
-  type:string;
-  id:string;
-  accessToken:string;
-}
-
 export class UserSettings {
   language:string;
   timezoneOffset:number;
   sound:boolean;
   notifications:NotificationSettings;
 
-  constructor(language: string, timezoneOffset: number) {
+  constructor(language:string, timezoneOffset:number) {
     this.language = language;
     this.timezoneOffset = timezoneOffset;
     this.sound = true;
@@ -350,7 +345,7 @@ export class UserSettings {
 }
 
 export class NotificationSettings {
-  on: boolean;
+  on:boolean;
   sound:boolean;
   vibrate:boolean;
   endingContests:boolean;
@@ -383,7 +378,7 @@ export class Session {
   xpProgress:XpProgress;
   gcmRegistrationId:string;
   token:string;
-  thirdParty:ThirdPartyInfo;
+  avatar:Avatar;
 }
 
 export class ClientShareApp {
@@ -415,7 +410,7 @@ export class ClientShareAppPlatformPackage {
 export class SessionSettings {
   sound:boolean;
   language:string;
-  notifications: NotificationSettings;
+  notifications:NotificationSettings;
 }
 
 export class Feature {
@@ -683,4 +678,37 @@ export class AppPage {
     this.page = page;
     this.params = params;
   }
+}
+
+export class FacebookInfo {
+  accessToken:string;
+  userId:string;
+
+  constructor(accessToken:string, userId:string) {
+    this.accessToken = accessToken;
+    this.userId = userId;
+  }
+}
+
+export class GuestInfo {
+  uuid:string;
+
+  constructor(uuid:string) {
+    this.uuid = uuid;
+  }
+}
+
+export class ConnectInfo {
+  type:string;
+  facebookInfo:FacebookInfo;
+  guestInfo:GuestInfo;
+
+  constructor(type:string) {
+    this.type = type;
+  }
+}
+
+export class Avatar {
+  type:number;
+  id:string;
 }

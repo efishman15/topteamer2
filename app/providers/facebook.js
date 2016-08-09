@@ -1,17 +1,17 @@
 var client_1 = require('./client');
+var objects_1 = require('../objects/objects');
 //------------------------------------------------------
 //-- getLoginStatus
 //------------------------------------------------------
 exports.getLoginStatus = function () {
     return new Promise(function (resolve, reject) {
+        var connectInfo = new objects_1.ConnectInfo('facebook');
         if (!window.cordova) {
             window.FB.getLoginStatus(function (response) {
-                if (response.status === 'connected') {
-                    resolve({ 'connected': true, 'response': response });
+                if (response && response.status === 'connected') {
+                    connectInfo.facebookInfo = new objects_1.FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
                 }
-                else {
-                    resolve({ 'connected': false, 'response': response });
-                }
+                resolve(connectInfo);
             });
         }
         else {
@@ -21,24 +21,23 @@ exports.getLoginStatus = function () {
                     setTimeout(function () {
                         window.facebookConnectPlugin.getLoginStatus(function (response) {
                             if (response && response.status === 'connected') {
-                                resolve({ 'connected': true, 'response': response });
+                                connectInfo.facebookInfo = new objects_1.FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
                             }
-                            else {
-                                resolve({ 'connected': false, 'response': response });
-                            }
+                            resolve(connectInfo);
                         }, function (error) {
-                            resolve({ 'connected': false, 'error': error });
+                            reject(error);
                         });
                     }, 500);
                 }
                 else if (response && response.status === 'connected') {
-                    resolve({ 'connected': true, 'response': response });
+                    connectInfo.facebookInfo = new objects_1.FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
+                    resolve(connectInfo);
                 }
                 else {
-                    resolve({ 'connected': false, 'response': response });
+                    resolve(connectInfo);
                 }
             }, function (error) {
-                resolve({ 'connected': false, 'error': error });
+                reject(error);
             });
         }
     });
@@ -52,6 +51,7 @@ exports.login = function (permissions, rerequestDeclinedPermissions) {
         if (!permissions) {
             permissions = client.settings.facebook.readPermissions;
         }
+        var connectInfo = new objects_1.ConnectInfo('facebook');
         if (!window.cordova) {
             var permissionObject = {};
             permissionObject['scope'] = permissions.toString();
@@ -59,8 +59,9 @@ exports.login = function (permissions, rerequestDeclinedPermissions) {
                 permissionObject['auth_type'] = 'rerequest';
             }
             window.FB.login(function (response) {
-                if (response.authResponse) {
-                    resolve(response);
+                if (response && response.authResponse) {
+                    connectInfo.facebookInfo = new objects_1.FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
+                    resolve(connectInfo);
                 }
                 else {
                     reject(response.status);
@@ -69,7 +70,10 @@ exports.login = function (permissions, rerequestDeclinedPermissions) {
         }
         else {
             window.facebookConnectPlugin.login(client.settings.facebook.readPermissions, function (response) {
-                resolve(response);
+                if (response && response.authResponse) {
+                    connectInfo.facebookInfo = new objects_1.FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
+                    resolve(connectInfo);
+                }
             }, function (err) {
                 reject(err);
             });

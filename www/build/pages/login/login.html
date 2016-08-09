@@ -6,18 +6,23 @@
   </div>
 
   <div padding text-center>
-    <img src="images/cup.png" width="180" height="180">
+    <img src="images/cup.png" width="120" height="120">
   </div>
 
   <div padding-left padding-right padding-bottom>
-    <button block text-center class="button-facebook" (click)="login()">
+    <button block class="button-facebook" (click)="facebookLogin()">
       {{client.translate('FACEBOOK_CONNECT')}}
+    </button>
+    <div text-center class="base-font facebook-relax-message">
+      {{client.translate('FACEBOOK_CONNECT_RELAX_MESSAGE')}}
+    </div>
+  </div>
+  <div padding-left padding-right padding-top>
+    <button block class="button-guest" (click)="registerGuest()">
+      {{client.translate('GUEST_CONNECT')}}
     </button>
   </div>
 
-  <div class="base-font facebook-relax-message" text-center>
-    {{client.translate('FACEBOOK_CONNECT_RELAX_MESSAGE')}}
-  </div>
 
 </ion-content>
 

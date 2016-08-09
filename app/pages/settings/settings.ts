@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
-import * as facebookService from '../../providers/facebook';
+import * as connectService from '../../providers/connect';
 
 @Component({
   templateUrl: 'build/pages/settings/settings.html'
@@ -51,7 +51,7 @@ export class SettingsPage {
 
   logout() {
     this.client.logEvent('settings/facebookSignOut');
-    facebookService.logout().then((response) => {
+    connectService.logout().then(() => {
       this.client.logout();
       this.client.setRootPage('LoginPage');
     },()=>{

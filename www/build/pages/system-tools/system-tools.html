@@ -20,7 +20,7 @@
                 cancelText="{{client.translate('CANCEL')}}">
       <ion-option *ngFor="let command of client.settings.admin.commands"
                   value="{{command.id}}"
-                  checked="command.id===commandId">
+                  selected="command.id===commandId">
         {{client.translate(command.text)}}
       </ion-option>
     </ion-select>

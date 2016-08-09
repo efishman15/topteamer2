@@ -230,11 +230,11 @@ export class QuizPage {
               'xpProgress': this.quizData.xpProgress
             });
 
-            modal.onDismiss((okPressed) => {
+            modal.onDidDismiss((okPressed) => {
               this.quizProceed();
             });
 
-            this.client.nav.present(modal);
+            modal.present;
 
           }
         }
@@ -291,7 +291,7 @@ export class QuizPage {
           'question': this.quizData.currentQuestion
         });
 
-        modal.onDismiss((action) => {
+        modal.onDidDismiss((action) => {
           switch (action) {
             case 'hint':
               this.questionHistory[this.quizData.currentQuestionIndex].hintUsed = true;
@@ -309,7 +309,7 @@ export class QuizPage {
           }
         });
 
-        this.client.nav.present(modal);
+        modal.present();
       }
     }
   }
@@ -561,7 +561,7 @@ export class QuizPage {
       question.answers[this.quizData.currentQuestion.answers[i].originalIndex] = this.quizData.currentQuestion.answers[i].text;
     }
     var modal = this.client.createModalPage('QuestionEditorPage', {'question': question, 'mode': 'edit'});
-    modal.onDismiss((result) => {
+    modal.onDidDismiss((result) => {
       if (!result) {
         return;
       }
@@ -574,7 +574,7 @@ export class QuizPage {
       }, () => {
       })
     })
-    this.client.nav.present(modal);
+    modal.present();
   }
 
   share() {

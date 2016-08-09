@@ -12,8 +12,124 @@ var randomUtils = require(path.resolve(__dirname, '../utils/random'));
 var jsonTransformer = require('jsonpath-object-transform');
 
 //---------------------------------------------------------------------
-// private functions
+// public functions for other modules
 //---------------------------------------------------------------------
+
+//---------------------------------------------------------------------
+// sendPush
+// users - list of user objects containing gcmRegistrationId each
+// contest - contest Object
+// alertName - name of alert pointing to generalUtils.settings.server.contest.alerts[xxx]
+//---------------------------------------------------------------------
+module.exports.sendPush = sendPush;
+function sendPush(users, contest, alertName, team) {
+
+  var notifications = generalUtils.settings.server.contest.alerts[alertName].notifications;
+
+  //Will pick a random notification from the array
+  var notification = randomUtils.pick(notifications);
+
+  var messageData = {};
+  var titleKey = randomUtils.pick(notification.title);
+  var messageKey = randomUtils.pick(notification.message);
+
+  //All possible params to be replaced in all the texts
+  var params = {'team0': contest.teams[0].name, 'team1': contest.teams[1].name};
+  var winningTeam;
+  if (contest.teams[0].score > contest.teams[1].score) {
+    winningTeam = 0;
+  }
+  else if (contest.teams[0].score < contest.teams[1].score) {
+    winningTeam = 1;
+  }
+  else {
+    //Picks a random team
+    winningTeam = randomUtils.pick([0,1]);
+  }
+
+  params.winningTeam = contest.teams[winningTeam].name;
+  params.losingTeam = contest.teams[1-winningTeam].name;
+
+  //-------------------
+  // time.end
+  //-------------------
+  var number;
+  var units;
+  var minutes;
+
+  var now = (new Date()).getTime();
+  minutes = mathjs.abs(contest.endDate - now) / 1000 / 60;
+  if (minutes >= 60 * 24) {
+    number = mathjs.ceil(minutes / 24 / 60);
+    units = 'DAYS';
+  }
+  else if (minutes >= 60) {
+    number = mathjs.ceil(minutes / 60);
+    units = 'HOURS';
+  }
+  else {
+    number = mathjs.ceil(minutes);
+    units = 'MINUTES';
+  }
+
+  params.contestEndsNumber = number;
+  params.contestEndsUnits = generalUtils.translate(contest.language, units);
+  params.yourTeam = contest.teams[0].name;
+
+  messageData.title = generalUtils.settings.server.contest.alerts.text[contest.language][titleKey].format(params);
+  messageData.message = generalUtils.settings.server.contest.alerts.text[contest.language][messageKey].format(params);
+
+  if (notification.style && notification.style === 'picture') {
+    messageData.style = 'picture';
+    messageData.summaryText = messageData.message;
+    messageData.picture = randomUtils.pick(notification.picture);
+  }
+
+  messageData.contestId = contest._id.toString();
+  messageData.icon = notification.icon;
+  messageData.image = notification.image;
+  messageData.color = notification.color;
+
+  //Split the push into 2 messages - one for each team
+  var users0 = [];
+  var users1 = [];
+  for (var i=0; i<users.length; i++) {
+    if (contest.users[users[i]._id.toString()].team === 0) {
+      users0.push(users[i].gcmRegistrationId)
+    }
+    if (contest.users[users[i]._id.toString()].team === 1) {
+      users1.push(users[i].gcmRegistrationId)
+    }
+  }
+
+  if (users0.length > 0 && (team === undefined || team === null || team===0)) {
+    messageData.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[0].name});
+    messageData.buttonCssClass = 'chart-popup-button-team-small-0';
+
+    //Done async - do not wait for response
+    pushUtils.send(users0, messageData);
+  }
+
+  if (users1.length > 0 && (team === undefined || team === null || team===1)) {
+    var messageData1
+    if (users0.length > 0) {
+      //Clone the message not to change button text and style while prev message is still sending
+      messageData1 = JSON.parse(JSON.stringify(messageData));
+    }
+    else {
+      messageData1 = messageData;
+    }
+    params.yourTeam = contest.teams[1].name;
+    messageData1.title = generalUtils.settings.server.contest.alerts.text[contest.language][titleKey].format(params);
+    messageData1.message = generalUtils.settings.server.contest.alerts.text[contest.language][messageKey].format(params);
+
+    messageData1.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[1].name});
+    messageData1.buttonCssClass = 'chart-popup-button-team-small-1';
+
+    //Done async - do not wait for response
+    pushUtils.send(users1, messageData1);
+  }
+}
 
 //----------------------------------------------------
 // setUserQuestions
@@ -289,10 +405,10 @@ function validateContestData(data, callback) {
     cleanContest.score = 0; //The total score gained for this contest
 
     cleanContest.creator = {
-      'id': data.session.userId,
-      'facebookUserId': data.session.facebookUserId,
-      'name': data.session.name,
-      'date': now
+      id: data.session.userId,
+      name: data.session.name,
+      date: now,
+      avatar: commonBusinessLogic.getAvatar(data.session)
     };
 
     cleanContest.type = {};
@@ -512,7 +628,11 @@ function joinToContestObject(contest, teamId, session) {
 
   if (!contest.users) {
     contest.users = {};
-    contest.leader = {'id': session.userId, 'facebookUserId': session.facebookUserId, 'name': session.name};
+    contest.leader = {
+      id: session.userId,
+      name: session.name,
+      avatar: commonBusinessLogic.getAvatar(session)
+    };
   }
 
   //Increment participants only if I did not join this contest yet
@@ -523,7 +643,11 @@ function joinToContestObject(contest, teamId, session) {
   }
 
   if (!contest.teams[teamId].leader) {
-    contest.teams[teamId].leader = {'id': session.userId, 'facebookUserId':session.facebookUserId , 'name': session.name};
+    contest.teams[teamId].leader = {
+      id: session.userId,
+      name: session.name,
+      avatar: commonBusinessLogic.getAvatar(session)
+    };
   }
 
   //Actual join
@@ -543,7 +667,7 @@ function joinToContestObject(contest, teamId, session) {
 
   //If edit mode (has _id) - join the user to the contest's leader board (with zero score addition) to this team
   if (contest._id) {
-    dalLeaderboard.addScore(contest._id, teamId, 0, session.facebookUserId, session.name);
+    dalLeaderboard.addScore(contest._id, teamId, 0, session);
   }
 
   return newJoin;
@@ -601,7 +725,7 @@ module.exports.setContest = function (req, res, next) {
     function (data, callback) {
       if (data.mode === 'add') {
         //In case of add - contest needed to be added in the previous operation first, to get an _id
-        dalLeaderboard.addScore(data.contest._id, 0, 0, data.session.facebookUserId, data.session.name);
+        dalLeaderboard.addScore(data.contest._id, 0, 0, data.session);
         dalBranchIo.createContestLinks(data, callback);
       }
       else {
@@ -614,8 +738,8 @@ module.exports.setContest = function (req, res, next) {
       if (data.mode === 'add') {
         //In case of add - update the links to the contest and team objects
         data.setData = {
-          'link': data.contest.link,
-          'leaderLink': data.contest.leaderLink,
+          link: data.contest.link,
+          leaderLink: data.contest.leaderLink,
           'teams.0.link': data.contest.teams[0].link,
           'teams.0.leaderLink': data.contest.teams[0].leaderLink,
           'teams.1.link': data.contest.teams[1].link,
@@ -685,7 +809,10 @@ module.exports.removeContest = function (req, res, next) {
       }
       data.closeConnection = true;
       dalDb.removeContest(data, callback);
-    }
+    },
+
+    //Remove contest leaderboards
+    dalLeaderboard.removeContestLeaderboards
   ];
 
   async.waterfall(operations, function (err, data) {
@@ -922,118 +1049,3 @@ function prepareContestForClient(contest, session) {
 };
 
 
-//---------------------------------------------------------------------
-// sendPush
-// users - list of user objects containing gcmRegistrationId each
-// contest - contest Object
-// alertName - name of alert pointing to generalUtils.settings.server.contest.alerts[xxx]
-//---------------------------------------------------------------------
-module.exports.sendPush = sendPush;
-function sendPush(users, contest, alertName, team) {
-
-  var notifications = generalUtils.settings.server.contest.alerts[alertName].notifications;
-
-  //Will pick a random notification from the array
-  var notification = randomUtils.pick(notifications);
-
-  var messageData = {};
-  var titleKey = randomUtils.pick(notification.title);
-  var messageKey = randomUtils.pick(notification.message);
-
-  //All possible params to be replaced in all the texts
-  var params = {'team0': contest.teams[0].name, 'team1': contest.teams[1].name};
-  var winningTeam;
-  if (contest.teams[0].score > contest.teams[1].score) {
-    winningTeam = 0;
-  }
-  else if (contest.teams[0].score < contest.teams[1].score) {
-    winningTeam = 1;
-  }
-  else {
-    //Picks a random team
-    winningTeam = randomUtils.pick([0,1]);
-  }
-
-  params.winningTeam = contest.teams[winningTeam].name;
-  params.losingTeam = contest.teams[1-winningTeam].name;
-
-  //-------------------
-  // time.end
-  //-------------------
-  var number;
-  var units;
-  var minutes;
-
-  var now = (new Date()).getTime();
-  minutes = mathjs.abs(contest.endDate - now) / 1000 / 60;
-  if (minutes >= 60 * 24) {
-    number = mathjs.ceil(minutes / 24 / 60);
-    units = 'DAYS';
-  }
-  else if (minutes >= 60) {
-    number = mathjs.ceil(minutes / 60);
-    units = 'HOURS';
-  }
-  else {
-    number = mathjs.ceil(minutes);
-    units = 'MINUTES';
-  }
-
-  params.contestEndsNumber = number;
-  params.contestEndsUnits = generalUtils.translate(contest.language, units);
-  params.yourTeam = contest.teams[0].name;
-
-  messageData.title = generalUtils.settings.server.contest.alerts.text[contest.language][titleKey].format(params);
-  messageData.message = generalUtils.settings.server.contest.alerts.text[contest.language][messageKey].format(params);
-
-  if (notification.style && notification.style === 'picture') {
-    messageData.style = 'picture';
-    messageData.summaryText = messageData.message;
-    messageData.picture = randomUtils.pick(notification.picture);
-  }
-
-  messageData.contestId = contest._id.toString();
-  messageData.icon = notification.icon;
-  messageData.image = notification.image;
-  messageData.color = notification.color;
-
-  //Split the push into 2 messages - one for each team
-  var users0 = [];
-  var users1 = [];
-  for (var i=0; i<users.length; i++) {
-    if (contest.users[users[i]._id.toString()].team === 0) {
-      users0.push(users[i].gcmRegistrationId)
-    }
-    if (contest.users[users[i]._id.toString()].team === 1) {
-      users1.push(users[i].gcmRegistrationId)
-    }
-  }
-
-  if (users0.length > 0 && (team === undefined || team === null || team===0)) {
-    messageData.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[0].name});
-    messageData.buttonCssClass = 'chart-popup-button-team-small-0';
-
-    //Done async - do not wait for response
-    pushUtils.send(users0, messageData);
-  }
-
-  if (users1.length > 0 && (team === undefined || team === null || team===1)) {
-    var messageData1
-    if (users0.length > 0) {
-      //Clone the message not to change button text and style while prev message is still sending
-      messageData1 = JSON.parse(JSON.stringify(messageData));
-    }
-    else {
-      messageData1 = messageData;
-    }
-    params.yourTeam = contest.teams[1].name;
-    messageData1.title = generalUtils.settings.server.contest.alerts.text[contest.language][titleKey].format(params);
-    messageData1.message = generalUtils.settings.server.contest.alerts.text[contest.language][messageKey].format(params);
-
-    messageData1.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[1].name});
-    messageData1.buttonCssClass = 'chart-popup-button-team-small-1';
-
-    //Done async - do not wait for response
-    pushUtils.send(users1, messageData1);
-  }
-}

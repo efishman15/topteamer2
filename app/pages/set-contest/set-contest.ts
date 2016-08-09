@@ -268,7 +268,7 @@ export class SetContestPage {
       'mode': mode,
       'currentQuestions': this.contestLocalCopy.type.questions
     });
-    modal.onDismiss((result) => {
+    modal.onDidDismiss((result) => {
       if (!result) {
         return;
       }
@@ -287,7 +287,7 @@ export class SetContestPage {
       }
     });
 
-    this.client.nav.present(modal);
+    modal.present();
   }
 
   openSearchQuestions() {

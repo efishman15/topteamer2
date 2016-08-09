@@ -1,5 +1,12 @@
 import {Client} from './client';
-import {Alert, ActionSheet} from 'ionic-angular';
+import {Alert,ActionSheet} from 'ionic-angular';
+
+function getAlignedTitle(title) {
+
+  var client = Client.getInstance();
+
+  return '<span class="app-alert-' + client.currentLanguage.direction + '">' + title + '</span>';
+}
 
 //------------------------------------------------------
 //-- alert
@@ -36,8 +43,6 @@ export let alertTranslated = (title:string, message:string, buttons?:any) => {
 
     var client = Client.getInstance();
 
-    var alert:Alert;
-
     if (!buttons) {
       buttons = [
         {
@@ -48,16 +53,17 @@ export let alertTranslated = (title:string, message:string, buttons?:any) => {
       ];
     }
 
-    alert = Alert.create({
+    let alert:Alert = client.createAlert({
       message: message,
-      buttons: buttons
+      buttons: buttons,
+      cssClass: 'app-alert-' + client.currentLanguage.direction
     });
 
     if (title) {
-      alert.setTitle('<span class="app-alert-title-' + client.currentLanguage.direction + '">' + title + '</span>');
+      alert.setTitle(getAlignedTitle(title));
     }
 
-    client.nav.present(alert);
+    alert.present();
 
   });
 }
@@ -71,10 +77,9 @@ export let confirm = (title:string, message:string, params?:any) => {
   return new Promise((resolve, reject) => {
 
     var client = Client.getInstance();
-    var alignedTitle = '<span class="app-alert-title-' + client.currentLanguage.direction + '">' + client.translate(title, params) + '</span>';
 
-    var alert = Alert.create({
-      title: alignedTitle,
+    let alert:Alert = client.createAlert({
+      title: getAlignedTitle(client.translate(title, params)),
       message: client.translate(message, params),
       buttons: [
         {
@@ -88,7 +93,7 @@ export let confirm = (title:string, message:string, params?:any) => {
       ]
     });
 
-    client.nav.present(alert);
+    alert.present();
 
   });
 }

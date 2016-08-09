@@ -40,11 +40,6 @@ export class MyExceptionHandler extends ExceptionHandler {
       window.myLogError('UnhandledException', errorMessage);
     }
 
-    if (exception.rejection && exception.rejection.message === 'SERVER_ERROR_NETWORK_TIMEOUT') {
-      //No point to post this error - since our server is not reachable...
-      return;
-    }
-
     var client = Client.getInstance();
 
     if (client) {

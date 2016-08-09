@@ -11,7 +11,7 @@ var core_1 = require('@angular/core');
 var exceptions_1 = require('./providers/exceptions');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('./providers/client');
-var facebookService = require('./providers/facebook');
+var connectService = require('./providers/connect');
 var contestsService = require('./providers/contests');
 var shareService = require('./providers/share');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
@@ -20,16 +20,19 @@ var alertService = require('./providers/alert');
 var ionic_native_1 = require('ionic-native');
 var objects_1 = require('./objects/objects');
 var TopTeamerApp = (function () {
-    function TopTeamerApp(app, platform, config, client, events) {
+    function TopTeamerApp(app, platform, config, client, events, alertController, modalController, menuController) {
         this.app = app;
         this.platform = platform;
         this.config = config;
         this.client = client;
         this.events = events;
+        this.alertController = alertController;
+        this.modalController = modalController;
+        this.menuController = menuController;
     }
     TopTeamerApp.prototype.ngAfterViewInit = function () {
         var _this = this;
-        this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent, this.playerInfoComponent).then(function () {
+        this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.alertController, this.modalController, this.loadingModalComponent, this.playerInfoComponent).then(function () {
             _this.initApp();
         }, function (err) { return _this.ngAfterViewInit(); });
     };
@@ -55,22 +58,19 @@ var TopTeamerApp = (function () {
             //Handle hardware back button
             _this.client.platform.registerBackButtonAction(function () {
                 var client = client_1.Client.getInstance();
-                var activeNav = client.nav;
-                //Modal - dismiss
-                var portalNav = activeNav.getPortal();
-                if (portalNav.hasOverlay()) {
-                    var activeView = portalNav.getActive();
-                    if (activeView && activeView.instance && activeView.instance['preventBack'] && activeView.instance['preventBack']()) {
-                        return; //prevent back
-                    }
-                    return activeView.dismiss();
-                }
                 //Root screen - confirm exit app
-                if (!activeNav.canGoBack()) {
-                    return alertService.confirmExitApp();
+                if (!client.nav.canGoBack()) {
+                    if (_this.menuController.isOpen()) {
+                        //if main menu is opened - back will close it
+                        return _this.menuController.close();
+                    }
+                    else {
+                        //Main menu is closed - confirm exit app
+                        return alertService.confirmExitApp();
+                    }
                 }
                 //Go back
-                return activeNav.pop();
+                return client.nav.pop();
             });
         }, function () {
         });
@@ -93,7 +93,7 @@ var TopTeamerApp = (function () {
                 cookie: true,
                 version: _this.client.settings.facebook.version
             });
-            _this.initFacebook();
+            _this.initLoginState();
         };
         (function (d, s, id) {
             var client = client_1.Client.getInstance();
@@ -134,7 +134,7 @@ var TopTeamerApp = (function () {
         ionic_native_1.AppVersion.getVersionNumber().then(function (version) {
             _this.client.user.clientInfo.appVersion = version;
             window.FlurryAgent.setAppVersion('' + version);
-            _this.initFacebook();
+            _this.initLoginState();
         }, function () {
         });
     };
@@ -188,11 +188,11 @@ var TopTeamerApp = (function () {
             window.initBranch();
         }, 2000);
     };
-    TopTeamerApp.prototype.initFacebook = function () {
+    TopTeamerApp.prototype.initLoginState = function () {
         var _this = this;
-        facebookService.getLoginStatus().then(function (result) {
-            if (result['connected']) {
-                _this.client.facebookServerConnect(result['response'].authResponse).then(function () {
+        connectService.getLoginStatus().then(function (connectInfo) {
+            if (_this.client.hasCredentials(connectInfo)) {
+                _this.client.serverConnect(connectInfo).then(function () {
                     _this.playerInfoComponent.init(_this.client);
                     var appPages = new Array();
                     appPages.push(new objects_1.AppPage('MainTabsPage', {}));
@@ -212,7 +212,7 @@ var TopTeamerApp = (function () {
                         }, function () {
                         });
                     }
-                }, function (err) {
+                }, function () {
                     _this.client.nav.setRoot(_this.client.getPage('LoginPage'));
                 });
             }
@@ -220,6 +220,7 @@ var TopTeamerApp = (function () {
                 _this.client.nav.setRoot(_this.client.getPage('LoginPage'));
             }
         }, function () {
+            _this.client.nav.setRoot(_this.client.getPage('LoginPage'));
         });
     };
     TopTeamerApp.prototype.declareRequestAnimationFrame = function () {
@@ -307,7 +308,7 @@ var TopTeamerApp = (function () {
             templateUrl: 'build/app.html',
             directives: [loading_modal_1.LoadingModalComponent, player_info_1.PlayerInfoComponent]
         }), 
-        __metadata('design:paramtypes', [ionic_angular_1.App, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events])
+        __metadata('design:paramtypes', [ionic_angular_1.App, ionic_angular_1.Platform, ionic_angular_1.Config, client_1.Client, ionic_angular_1.Events, ionic_angular_1.AlertController, ionic_angular_1.ModalController, ionic_angular_1.MenuController])
     ], TopTeamerApp);
     return TopTeamerApp;
 })();

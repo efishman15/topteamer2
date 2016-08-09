@@ -146,26 +146,27 @@ module.exports.upgradeDb = function (req, res, next) {
       sessionUtils.getAdminSession(data, callback);
     },
 
-    //Reload settings from database
+    //Run on all contests
     function (data, callback) {
       var contestsCollection = data.DbHelper.getCollection('Contests');
       contestsCollection.find({}, {}, function (err, contestsCursor) {
         contestsCursor.toArray(function (err, contests) {
-          data.contests = contests;
+
           for (var i = 0; i < contests.length; i++) {
-            fixLeaderboard(dalLeaderboads.getContestLeaderboard(contests[i]._id));
-            fixLeaderboard(dalLeaderboads.getTeamLeaderboard(contests[i]._id,0));
-            fixLeaderboard(dalLeaderboads.getTeamLeaderboard(contests[i]._id,1));
+            fixLeaderboard(data, dalLeaderboads.getContestLeaderboard(contests[i]._id.toString()));
+            fixLeaderboard(data, dalLeaderboads.getTeamLeaderboard(contests[i]._id.toString(), 0));
+            fixLeaderboard(data, dalLeaderboads.getTeamLeaderboard(contests[i]._id.toString(), 1));
 
             fixContest(data, contests[i]);
           }
 
-          fixLeaderboard(dalLeaderboads.getWeeklyLeaderboard());
-          fixLeaderboard(new Leaderboard('topteamer:general'));
+          fixLeaderboard(data, dalLeaderboads.getWeeklyLeaderboard());
+          fixLeaderboard(data, new Leaderboard('topteamer:general'));
 
           callback(null, data)
 
-        })});
+        })
+      });
     }
 
   ];
@@ -181,21 +182,32 @@ module.exports.upgradeDb = function (req, res, next) {
 
 }
 
-function fixLeaderboard(leaderboard) {
+function fixLeaderboard(data, leaderboard) {
 
-  var i = 0;
   var options = {
     'withMemberData': true,
     'sortBy': 'rank',
-    'pageSize': 200
+    'pageSize': 1000
   };
 
+  var usersCollection = data.DbHelper.getCollection('Users');
+
   leaderboard.leaders(0, options, function (leaders) {
-    for (var j=0; j < leaders.length; j++) {
-      var memberData = leaders[j].member_data.split('|');
-      leaderboard.updateMemberData(leaders[j].member, memberData[memberData.length-1], function () {
+
+    async.forEach(leaders, function(leader, callback) {
+      usersCollection.findOne({
+        'facebookUserId': leader.member
+      }, {}, function (err, user) {
+        if (!err && user) {
+          leaderboard.removeMember(leader.member, function () {
+            leaderboard.rankMember(user._id.toString(), leader.score, user.name + '|0|' + leader.member, function() {
+              callback();
+            });
+
+          })
+        }
       });
-    }
+    });
   });
 }
 
@@ -206,44 +218,27 @@ function fixContest(data, contest) {
   var updateFields = {$set: {}};
   updateFields['$unset'] = {}
 
-  if (contest.creator.avatar) {
-    updateFields['$set']['creator.facebookUserId'] = getFacebookUserIdFromAvatar(contest.creator.avatar);
-    updateFields['$unset']['creator.avatar'] = '';
+  if (!contest.creator.avatar) {
+    updateFields['$set']['creator.avatar'] = {type: 0, id: contest.creator.facebookUserId};
+    updateFields['$unset']['creator.facebookUserId'] = '';
   }
 
-  if (contest.leader.avatar) {
-    updateFields['$set']['leader.facebookUserId'] = getFacebookUserIdFromAvatar(contest.leader.avatar);
-    updateFields['$unset']['leader.avatar'] = '';
+  if (!contest.leader.avatar) {
+    updateFields['$set']['leader.avatar'] = {type: 0, id: contest.leader.facebookUserId};
+    updateFields['$unset']['leader.facebookUserId'] = '';
   }
 
-  if (contest.leader.userId) {
-    updateFields['$set']['leader.id'] = contest.leader.userId;
-    updateFields['$unset']['leader.userId'] = '';
+  if (contest.teams[0].leader && !contest.teams[0].leader.avatar) {
+    updateFields['$set']['teams.0.leader.avatar'] = {type: 0, id: contest.teams[0].leader.facebookUserId};
+    updateFields['$unset']['teams.0.leader.facebookUserId'] = '';
   }
 
-  if (contest.teams[0].leader) {
-    updateFields['$set']['teams.0.leader.id'] = contest.teams[0].leader.userId;
-    updateFields['$unset']['teams.0.leader.userId'] = '';
-    if (contest.teams[0].leader.avatar) {
-      updateFields['$set']['teams.0.leader.facebookUserId'] = getFacebookUserIdFromAvatar(contest.teams[0].leader.avatar);
-      updateFields['$unset']['teams.0.leader.avatar'] = '';
-    }
-  }
-
-  if (contest.teams[1].leader) {
-    updateFields['$set']['teams.1.leader.id'] = contest.teams[1].leader.userId;
-    updateFields['$unset']['teams.1.leader.userId'] = '';
-    if (contest.teams[1].leader.avatar) {
-      updateFields['$set']['teams.1.leader.facebookUserId'] = getFacebookUserIdFromAvatar(contest.teams[1].leader.avatar);
-      updateFields['$unset']['teams.1.leader.avatar'] = '';
-    }
+  if (contest.teams[1].leader && !contest.teams[1].leader.avatar) {
+    updateFields['$set']['leader.teams.1.avatar'] = {type: 0, id: contest.teams[1].leader.facebookUserId};
+    updateFields['$unset']['leader.teams.1.facebookUserId'] = '';
   }
 
   contestsCollection.findAndModify({'_id': ObjectId(contest._id)}, {},
     updateFields, {w: 1, new: true}, function (err, contest) {
-  });
-}
-
-function getFacebookUserIdFromAvatar(avatar) {
-  return avatar.split('/')[3];
+    });
 }

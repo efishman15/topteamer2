@@ -1,5 +1,5 @@
 import {Client} from './client';
-import * as facebookService from './facebook';
+import * as connectService from './connect';
 import {Feature,PaymentData,PurchaseData} from '../objects/objects';
 
 //------------------------------------------------------
@@ -62,7 +62,7 @@ export let buy = (feature:Feature, isMobile:Boolean) => new Promise((resolve, re
         facebookDialogData['pricepoint_id'] = client.session.features[feature.name].purchaseData.mobilePricepointId;
       }
 
-      facebookService.buy(facebookDialogData).then((data:PurchaseData) => {
+      connectService.buy(facebookDialogData).then((data:PurchaseData) => {
         if (resolve) {
           resolve(new PaymentData(method, data));
         }

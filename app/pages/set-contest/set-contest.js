@@ -210,7 +210,7 @@ var SetContestPage = (function () {
             'mode': mode,
             'currentQuestions': this.contestLocalCopy.type.questions
         });
-        modal.onDismiss(function (result) {
+        modal.onDidDismiss(function (result) {
             if (!result) {
                 return;
             }
@@ -226,7 +226,7 @@ var SetContestPage = (function () {
                 result.question.isDirty = true;
             }
         });
-        this.client.nav.present(modal);
+        modal.present();
     };
     SetContestPage.prototype.openSearchQuestions = function () {
         if (this.maxQuestionsReached()) {

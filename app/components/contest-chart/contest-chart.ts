@@ -21,29 +21,28 @@ export class ContestChartComponent {
   @Output() myTeamSelected = new EventEmitter();
   @Output() contestButtonClick = new EventEmitter();
   @Output() joinedContest = new EventEmitter();
+  @Output() contestParticipantsClick = new EventEmitter();
+  @Output() contestShareClick = new EventEmitter();
 
   animation:string;
-  eventJustHandled: boolean;
+  lastEventTimeStamp:number;
 
   constructor() {
     this.client = Client.getInstance();
     this.animation = null;
-    this.eventJustHandled = false;
+    this.lastEventTimeStamp = 0;
   }
 
   onContestSelected(event:Event, source:string) {
-    if (this.eventJustHandled) {
-      this.eventJustHandled = false;
+    if (event.timeStamp === this.lastEventTimeStamp) {
       return;
     }
-    if (source !== 'chart') {
-      this.eventJustHandled = true;
-    }
+    this.lastEventTimeStamp = event.timeStamp;
     this.contestSelected.emit({'contest': this.contest, 'source': source});
   }
 
   teamSelected(event:Event, teamId:number, source:string) {
-    this.eventJustHandled = true;
+    this.lastEventTimeStamp = event.timeStamp;
     if (this.contest.state === 'play') {
       if (teamId !== this.contest.myTeam) {
         this.switchTeams(source);
@@ -99,7 +98,7 @@ export class ContestChartComponent {
               'xpProgress': data.xpProgress
             });
             if (!delayRankModal) {
-              rankModal.onDismiss(()=> {
+              rankModal.onDidDismiss(()=> {
                 resolve();
               });
             }
@@ -119,18 +118,18 @@ export class ContestChartComponent {
             'additionalInfo': {'team': this.contest.teams[this.contest.myTeam].name}
           }).then(() => {
             if (rankModal && !delayRankModal) {
-              this.client.nav.present(rankModal);
+              rankModal.present();
             }
             else {
               resolve(rankModal);
             }
-          },()=> {
+          }, ()=> {
           });
         }
         else {
           if (rankModal && !delayRankModal) {
             //resolve will be called upon dismiss
-            this.client.nav.present(rankModal);
+            rankModal.present();
           }
           else {
             resolve(rankModal);
@@ -149,7 +148,7 @@ export class ContestChartComponent {
   }
 
   onContestButtonClick(event:Event) {
-    this.eventJustHandled = true;
+    this.lastEventTimeStamp = event.timeStamp;
     if (this.contest.state === 'join') {
       //Will prompt an alert with 2 buttons with the team names
       //Upon selecting a team - send the user directly to play
@@ -168,7 +167,7 @@ export class ContestChartComponent {
             this.joinContest(0, 'button', false, false, true).then((rankModal:Modal) => {
               this.contestButtonClick.emit({'contest': this.contest, 'source': 'button'});
               if (rankModal) {
-                this.client.nav.present(rankModal);
+                rankModal.present();
               }
             }, ()=> {
             });
@@ -181,7 +180,7 @@ export class ContestChartComponent {
             this.joinContest(1, 'button', false, false, true).then((rankModal:Modal) => {
               this.contestButtonClick.emit({'contest': this.contest, 'source': 'button'});
               if (rankModal) {
-                this.client.nav.present(rankModal);
+                rankModal.present();
               }
             }, ()=> {
             });
@@ -193,4 +192,14 @@ export class ContestChartComponent {
       this.contestButtonClick.emit({'contest': this.contest, 'source': 'button'});
     }
   }
+
+  onContestParticipantsClick(event:Event) {
+    this.lastEventTimeStamp = event.timeStamp;
+    this.contestParticipantsClick.emit({'contest': this.contest});
+  }
+
+  onContestShareClick(event:Event) {
+    this.contestShareClick.emit({'contest': this.contest});
+  }
+
 }

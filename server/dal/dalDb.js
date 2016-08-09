@@ -1,7 +1,7 @@
 var path = require('path');
 var CONNECTION_STRING = 'mongodb://localhost:27017/topTeamer';
-
 var mongoClient = require('mongodb').MongoClient;
+var async = require('async');
 var uuid = require('node-uuid');
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var ObjectId = require('mongodb').ObjectID;
@@ -76,7 +76,7 @@ function buildQuestionsResult(questions) {
 //
 // data:
 // -----
-// input: DbHelper, user (contains thirdParty (id, accessToken), name, geoInfo, settings
+// input: DbHelper, user (contains credentials (facebook: userId, accessToken, guest: uuid), name, geoInfo, settings
 // output: user
 //------------------------------------------------------------------------------------------------
 function register(data, callback) {
@@ -84,14 +84,11 @@ function register(data, callback) {
 
   var now = (new Date()).getTime();
 
+  var credentials = data.user.credentials;
+
   data.user.settings.sound = true;
   var newUser = {
-    'facebookUserId': data.user.thirdParty.id,
-    'facebookAccessToken': data.user.thirdParty.accessToken,
-    'name': data.user.name,
-    'email': data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
     'geoInfo': data.user.geoInfo,
-    'ageRange': data.user.ageRange,
     'settings': data.user.settings,
     'score': 0,
     'xp': 0,
@@ -100,6 +97,23 @@ function register(data, callback) {
     'lastLogin': now,
     'lastClientInfo': data.user.clientInfo
   };
+
+  if (data.user.credentials.type === 'facebook') {
+    newUser.facebookUserId = data.user.credentials.facebookInfo.userId;
+    newUser.facebookAccessToken = data.user.credentials.facebookInfo.accessToken
+    newUser.name = data.user.name;
+    newUser.email = data.user.email;  //keep sync with Facebook changes - might be null if user removed email permission
+    newUser.ageRange = data.user.ageRange;
+  }
+  else if (data.user.credentials.type === 'guest') {
+    newUser.uuid = data.user.credentials.guestInfo.uuid;
+    newUser.name = generalUtils.settings.server.guest.defaultName[data.user.settings.language];
+    newUser.avatar = generalUtils.settings.server.guest.defaultAvatar;
+  }
+  else {
+    callback(new exceptions.ServerException('Unsupported credentials type: ' + data.user.credentials.type + '. Supported types are: facebook, guest', {}, 'error'));
+    return;
+  }
 
   if (data.user.gcmRegistrationId) {
     newUser.gcmRegistrationId = data.user.gcmRegistrationId;
@@ -118,8 +132,8 @@ function register(data, callback) {
         return;
       }
 
-      newUser.thirdParty = data.user.thirdParty;
       data.user = newUser;
+      data.user.credentials = credentials;
       data.user.justRegistered = true; //does not need to be in db - just returned back to the client
 
       checkToCloseDb(data);
@@ -356,7 +370,10 @@ module.exports.storeSession = function (data, callback) {
 
         closeDb(data);
 
-        callback(new exceptions.ServerException('Error storing session expired - session expired', {'sessionId': data.session._id, 'error' : err}, 'info', 401));
+        callback(new exceptions.ServerException('Error storing session expired - session expired', {
+          'sessionId': data.session._id,
+          'error': err
+        }, 'info', 401));
         return;
       }
 
@@ -479,26 +496,38 @@ module.exports.setSession = function (data, callback) {
 
 
 //---------------------------------------------------------------------
-// facebookLogin
+// login
 //
-// Validates that the facebookUserId exists, and updates the lastLogin.
-// If user does not exist - register the new facebook user
+// Validates that the credentials id exists, and updates the lastLogin.
+// If user does not exist - register the new user
 //
 // data:
 // -----
-// input: DbHelper, user (contains thirdParty.id, thirdParty.accessToken)
+// input: DbHelper, user (contains credentials
 // output: user
 //---------------------------------------------------------------------
-module.exports.facebookLogin = function (data, callback) {
+module.exports.login = function (data, callback) {
 
   var usersCollection = data.DbHelper.getCollection('Users');
 
-  var thirdParty = data.user.thirdParty;
   var clientInfo = data.user.clientInfo;
+  var credentials = data.user.credentials;
+  var whereClause;
 
-  var now = (new Date()).getTime();
+  if (data.user.credentials.type === 'facebook') {
+    whereClause = {facebookUserId: data.user.credentials.facebookInfo.userId};
+  }
+  else if (data.user.credentials.type === 'guest') {
+    whereClause = {uuid: data.user.credentials.guestInfo.uuid};
+  }
+  else {
+    callback(new exceptions.ServerException('Unsupported credentials type: ' + data.user.credentials.type + ', supported types: facebook, guest', {
+      'user': data.user
+    }, 'error'));
+    return;
+  }
 
-  usersCollection.findOne({'facebookUserId': data.user.thirdParty.id}, {}, function (err, user) {
+  usersCollection.findOne(whereClause, {}, function (err, user) {
       if (err || !user) {
         register(data, callback);
         return;
@@ -520,23 +549,25 @@ module.exports.facebookLogin = function (data, callback) {
       var setObject = {
         '$set': {
           'lastLogin': now,
-          'facebookAccessToken': data.user.thirdParty.accessToken,
-          'name': data.user.name,  //keep sync with Facebook changes
-          'email': data.user.email,  //keep sync with Facebook changes - might be null if user removed email permission
           'ageRange': data.user.ageRange, //keep sync with Facebook changes
           'xp': user.xp,
           'rank': user.rank,
-          'friends': thirdParty.friends,
           'lastClientInfo': data.user.clientInfo
         }
       };
+
+      if (data.user.credentials.type === 'facebook') {
+        setObject['$set'].facebookAccessToken = data.user.credentials.facebookInfo.accessToken;
+        setObject['$set'].name = data.user.name;  //keep sync with Facebook changes
+        setObject['$set'].email = data.user.email;  //keep sync with Facebook changes - might be null if user removed email permission
+      }
+
       if (data.user.gcmRegistrationId) {
         setObject['$set'].gcmRegistrationId = data.user.gcmRegistrationId;
       }
 
       usersCollection.updateOne({'_id': user._id}, setObject
         , function (err, results) {
-
           if (err || results.nModified < 1) {
 
             closeDb(data);
@@ -548,17 +579,18 @@ module.exports.facebookLogin = function (data, callback) {
             return;
           }
 
-          //Update all those fields also locally as previouselly they were only updated in the db
+          //Update all those fields also locally as previously they were only updated in the db
           user.lastLogin = now;
-          user.name = data.user.name;
-          user.email = data.user.email;
-          user.ageRange = data.user.ageRange;
+
+          if (data.user.credentials.type === 'facebook') {
+            user.name = data.user.name;
+            user.email = data.user.email;
+            user.ageRange = data.user.ageRange;
+          }
+
+          user.credentials = credentials;
           user.lastClientInfo = clientInfo;
           data.user = user;
-
-          if (thirdParty) {
-            data.user.thirdParty = thirdParty;
-          }
 
           checkToCloseDb(data);
 
@@ -590,12 +622,8 @@ module.exports.createOrUpdateSession = function (data, callback) {
 
   var setObject = {
     'userId': ObjectId(data.user._id),
-    'facebookUserId': data.user.facebookUserId,
-    'friends': data.user.thirdParty.friends,
     'isAdmin': data.user.isAdmin,
-    'facebookAccessToken': data.user.facebookAccessToken,
     'name': data.user.name,
-    'ageRange': data.user.ageRange,
     'created': nowEpoch,
     'expires': new Date(nowEpoch + generalUtils.settings.server.db.sessionExpirationMilliseconds), //must be without getTime() since db internally removes by TTL - and ttl works only when it is actual date and not epoch
     'userToken': userToken,
@@ -606,6 +634,15 @@ module.exports.createOrUpdateSession = function (data, callback) {
     'features': data.features,
     'clientInfo': data.user.lastClientInfo
   };
+
+  if (data.user.credentials.type === 'facebook') {
+    setObject.facebookAccessToken = data.user.facebookAccessToken;
+    setObject.facebookUserId = data.user.facebookUserId;
+    setObject.ageRange = data.user.ageRange;
+  }
+  else if (data.user.credentials.type === 'guest') {
+    setObject.avatar = data.user.avatar;
+  }
 
   if (data.user.justRegistered) {
     setObject.justRegistered = true;
@@ -1548,7 +1585,7 @@ function getUsers(data, callback) {
 
   var usersCollection = data.DbHelper.getCollection('Users');
 
-  usersCollection.find(data.whereClause, {'gcmRegistrationId' : 1}, function (err, usersCursor) {
+  usersCollection.find(data.whereClause, {'gcmRegistrationId': 1}, function (err, usersCursor) {
 
     if (err || !usersCursor) {
 
@@ -1581,6 +1618,84 @@ function getUsers(data, callback) {
       checkToCloseDb(data);
 
       callback(null, data);
+    });
+
+  });
+}
+
+//------------------------------------------------------------------------------------------------
+// updateContestsWithMyGuestAvatar
+//
+// Updates the avatar in contests in which my guest avatar appears
+//
+// data:
+// -----
+// input: DbHelper, session
+// output: contests
+//------------------------------------------------------------------------------------------------
+
+module.exports.updateContestsWithMyGuestAvatar = updateContestsWithMyGuestAvatar;
+function updateContestsWithMyGuestAvatar(data, callback) {
+
+  var contestsCollection = data.DbHelper.getCollection('Contests');
+
+  var whereClause = {
+    '$or': [
+      {'creator.id': ObjectId(data.session.userId)},
+      {'leader.id': ObjectId(data.session.userId)},
+      {'teams.0.leader.id': ObjectId(data.session.userId)},
+      {'teams.1.leader.id': ObjectId(data.session.userId)}
+    ]
+  };
+  contestsCollection.find(whereClause, {}, function (err, contestsCursor) {
+    if (err || !contestsCursor) {
+
+      closeDb(data);
+
+      callback(new exceptions.ServerException('Error retrieving contests to upgrade guest avatars', {
+        'userId': data.session.userId,
+        'dbError': err
+      }, 'error'));
+
+      return;
+    }
+
+    contestsCollection.toArray(function (err, contests) {
+
+      data.contests = contests;
+
+      async.forEach(contests, function(contest, contestCallback) {
+
+        var setObject = {'$set': {}};
+
+        if (contest.creator.id.toString() === data.session.userId.toString()) {
+          setObject[$set]['creator.avatar.type'] = 0;
+          setObject[$set]['creator.avatar.id'] = data.session.facebookUserId;
+        }
+        if (contest.leader.id.toString() === data.session.userId.toString()) {
+          setObject[$set]['leader.avatar.type'] = 0;
+          setObject[$set]['leader.avatar.id'] = data.session.facebookUserId;
+        }
+        if (contest.teams[0].leader && contest.teams[0].leader.id.toString() === data.session.userId.toString()) {
+          setObject[$set]['teams.0.leader.avatar.type'] = 0;
+          setObject[$set]['teams.0.leader.avatar.id'] = data.session.facebookUserId;
+        }
+        if (contest.teams[1].leader && contest.teams[1].leader.id.toString() === data.session.userId.toString()) {
+          setObject[$set]['teams.1.leader.avatar.type'] = 0;
+          setObject[$set]['teams.1.leader.avatar.id'] = data.session.facebookUserId;
+        }
+
+        contestsCollection.updateOne({'_id': ObjectId(contest._id)}, {},
+          setObject, {w: 1, new: true}, function (err, updatedContest) {
+
+            contestCallback();
+
+          });
+
+      });
+
+      callback(null, data);
+
     });
 
   });

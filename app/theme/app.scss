@@ -87,14 +87,16 @@
   cursor: pointer;
 }
 
-.app-alert-title-ltr {
+.app-alert-ltr {
   float: left;
   text-align: left;
+  direction: ltr;
 }
 
-.app-alert-title-rtl {
+.app-alert-rtl {
   float: right;
   text-align: right;
+  direction: rtl;
 }
 
 .refresher-pulling-icon {

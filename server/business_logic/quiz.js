@@ -27,8 +27,7 @@ function prepareGcmQuery(data, alertName, team, excludeMe) {
     if (
       (!excludeMe || userKeys[i] !== data.session.userId.toString()) &&
       (team === undefined || team === null || data.contest.users[userKeys[i]].team === team)
-    )
-    {
+    ) {
       //If specific team requested - retrieve only its members
       data.userIds.push(ObjectId(userKeys[i]));
     }
@@ -346,12 +345,23 @@ module.exports.start = function (req, res, next) {
 
       data.clientResponse.quiz = data.session.quiz.clientData;
 
-      callback(null, data);
-
+      if (!data.session.friends && data.session.facebookUserId) {
+        dalFacebook.getUserFriends(data, callback);
+      }
+      else {
+        callback(null, data);
+      }
     },
 
-    //Stores some friends above me in the leaderboard
-    dalLeaderboard.getFriendsAboveMe,
+    //find some friends above me in the leaderboard
+    function (data, callback) {
+      if (data.session.facebookUserId && data.session.friends && data.session.friends.list && data.session.friends.list.length > 0) {
+        dalLeaderboard.getFriendsAboveMe(data, callback);
+      }
+      else {
+        callback(null, data);
+      }
+    },
 
     //Stores the friends above me in the quiz
     function (data, callback) {
@@ -440,7 +450,7 @@ module.exports.answer = function (req, res, next) {
       var answers = data.session.quiz.serverData.currentQuestion.answers;
       if (data.id < 0 || data.id > answers.length - 1) {
         dalDb.closeDb(data);
-        callback(new exceptions.ServerException('Invalid answer id', {'answerId': data.id},'error'));
+        callback(new exceptions.ServerException('Invalid answer id', {'answerId': data.id}, 'error'));
         return;
       }
 
@@ -563,7 +573,7 @@ module.exports.answer = function (req, res, next) {
 
       //Update all leaderboards with the score achieved - don't wait for any callbacks of the leaderboard - can
       //be done fully async and continue doing other stuff
-      dalLeaderboard.addScore(data.contest._id, myTeam, data.session.quiz.serverData.score, data.session.facebookUserId, data.session.name);
+      dalLeaderboard.addScore(data.contest._id, myTeam, data.session.quiz.serverData.score, data.session);
 
       myContestUser.score += data.session.quiz.serverData.score;
       myContestUser.teamScores[myTeam] += data.session.quiz.serverData.score;
@@ -583,7 +593,7 @@ module.exports.answer = function (req, res, next) {
       // Leader is the participant that has contributed max points for the contest regardless of teams)
       if (myContestUser.score > data.contest.users[data.contest.leader.id].score) {
         data.setData['leader.id'] = data.session.userId;
-        data.setData['leader.facebookUserId'] = data.session.facebookUserId;
+        data.setData['leader.avatar'] = commonBusinessLogic.getAvatar(data.session);
         data.setData['leader.name'] = data.session.name;
         setPostStory(data, 'becameContestLeader',
           {
@@ -597,7 +607,7 @@ module.exports.answer = function (req, res, next) {
       // Team leader is the participant that has contributed max points for his/her team)
       if (!data.contest.teams[myTeam].leader || myContestUser.teamScores[myTeam] > data.contest.users[data.contest.teams[myTeam].leader.id].teamScores[myTeam]) {
         data.setData['teams.' + myTeam + '.leader.id'] = data.session.userId;
-        data.setData['teams.' + myTeam + '.leader.facebookUserId'] = data.session.facebookUserId;
+        data.setData['teams.' + myTeam + '.leader.avatar'] = commonBusinessLogic.getAvatar(data.session);
         data.setData['teams.' + myTeam + '.leader.name'] = data.session.name;
         setPostStory(data, 'becameTeamLeader',
           {
@@ -739,7 +749,7 @@ module.exports.answer = function (req, res, next) {
             dalFacebook.getGeneralProfile(data.passedFriends[0].id, function (err, facebookData) {
               if (err) {
                 dalDb.closeDb(data);
-                callback(new exceptions.ServerException('Error retreiving facebook profile', {'facebookUserId': data.passedFriends[0].id},'error'));
+                callback(new exceptions.ServerException('Error retreiving facebook profile', {'facebookUserId': data.passedFriends[0].id}, 'error'));
                 return;
               }
 

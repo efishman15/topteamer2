@@ -1,5 +1,5 @@
 var client_1 = require('./client');
-var facebookService = require('./facebook');
+var connectService = require('./connect');
 var objects_1 = require('../objects/objects');
 //------------------------------------------------------
 //-- buy
@@ -51,7 +51,7 @@ exports.buy = function (feature, isMobile) { return new Promise(function (resolv
             if (isMobile && client.session.features[feature.name].purchaseData.mobilePricepointId) {
                 facebookDialogData['pricepoint_id'] = client.session.features[feature.name].purchaseData.mobilePricepointId;
             }
-            facebookService.buy(facebookDialogData).then(function (data) {
+            connectService.buy(facebookDialogData).then(function (data) {
                 if (resolve) {
                     resolve(new objects_1.PaymentData(method, data));
                 }

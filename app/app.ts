@@ -1,8 +1,8 @@
 import {Component,provide,ExceptionHandler,ViewChild,ElementRef} from '@angular/core';
 import {MyExceptionHandler} from './providers/exceptions';
-import {ionicBootstrap, App, Platform, Config, Events, Nav, ViewController, NavController} from 'ionic-angular';
+import {ionicBootstrap, App, Platform, Config, Events, Nav, ViewController, NavController, MenuController, AlertController,ModalController} from 'ionic-angular';
 import {Client} from './providers/client';
-import * as facebookService from './providers/facebook';
+import * as connectService from './providers/connect';
 import * as contestsService from './providers/contests';
 import * as shareService from './providers/share';
 import {LoadingModalComponent} from './components/loading-modal/loading-modal';
@@ -10,7 +10,7 @@ import {PlayerInfoComponent} from './components/player-info/player-info';
 import * as alertService from './providers/alert';
 import {} from './interfaces/interfaces'
 import {AppVersion} from 'ionic-native';
-import {AppPage,Contest} from './objects/objects'
+import {AppPage,Contest,ConnectInfo} from './objects/objects'
 
 @Component({
   templateUrl: 'build/app.html',
@@ -27,18 +27,39 @@ export class TopTeamerApp {
   platform:Platform;
   config:Config;
   events:Events;
+  alertController:AlertController;
+  modalController:ModalController;
+  menuController:MenuController
 
-  constructor(app:App, platform:Platform, config:Config, client:Client, events:Events) {
+  constructor(app:App,
+              platform:Platform,
+              config:Config,
+              client:Client,
+              events:Events,
+              alertController:AlertController,
+              modalController:ModalController,
+              menuController:MenuController) {
 
     this.app = app;
     this.platform = platform;
     this.config = config;
     this.client = client;
     this.events = events;
+    this.alertController = alertController;
+    this.modalController = modalController;
+    this.menuController = menuController;
   }
 
   ngAfterViewInit() {
-    this.client.init(this.app, this.platform, this.config, this.events, this.nav, this.loadingModalComponent, this.playerInfoComponent).then(() => {
+    this.client.init(this.app,
+      this.platform,
+      this.config,
+      this.events,
+      this.nav,
+      this.alertController,
+      this.modalController,
+      this.loadingModalComponent,
+      this.playerInfoComponent).then(() => {
       this.initApp();
     }, (err) => this.ngAfterViewInit());
   }
@@ -73,29 +94,25 @@ export class TopTeamerApp {
       this.client.platform.registerBackButtonAction(() => {
 
         var client = Client.getInstance();
-        var activeNav = client.nav;
-
-        //Modal - dismiss
-        let portalNav:NavController = activeNav.getPortal();
-        if (portalNav.hasOverlay()) {
-          let activeView:ViewController = portalNav.getActive();
-          if (activeView && activeView.instance && activeView.instance['preventBack'] && activeView.instance['preventBack']()) {
-            return; //prevent back
-          }
-          return activeView.dismiss();
-        }
 
         //Root screen - confirm exit app
-        if (!activeNav.canGoBack()) {
-          return alertService.confirmExitApp();
+        if (!client.nav.canGoBack()) {
+          if (this.menuController.isOpen()) {
+            //if main menu is opened - back will close it
+            return this.menuController.close();
+          }
+          else {
+            //Main menu is closed - confirm exit app
+            return alertService.confirmExitApp();
+          }
         }
 
         //Go back
-        return activeNav.pop();
+        return client.nav.pop();
 
       });
 
-    },()=>{
+    }, ()=> {
     });
   };
 
@@ -120,7 +137,7 @@ export class TopTeamerApp {
         version: this.client.settings.facebook.version
       });
 
-      this.initFacebook();
+      this.initLoginState();
     };
 
     (function (d, s, id) {
@@ -173,8 +190,8 @@ export class TopTeamerApp {
     AppVersion.getVersionNumber().then((version) => {
       this.client.user.clientInfo.appVersion = version;
       window.FlurryAgent.setAppVersion('' + version);
-      this.initFacebook();
-    },()=>{
+      this.initLoginState();
+    }, ()=> {
     });
   }
 
@@ -236,10 +253,10 @@ export class TopTeamerApp {
 
   }
 
-  initFacebook() {
-    facebookService.getLoginStatus().then((result) => {
-      if (result['connected']) {
-        this.client.facebookServerConnect(result['response'].authResponse).then(() => {
+  initLoginState() {
+    connectService.getLoginStatus().then((connectInfo:ConnectInfo) => {
+      if (this.client.hasCredentials(connectInfo)) {
+        this.client.serverConnect(connectInfo).then(() => {
           this.playerInfoComponent.init(this.client);
           let appPages:Array<AppPage> = new Array<AppPage>();
           appPages.push(new AppPage('MainTabsPage', {}));
@@ -247,26 +264,27 @@ export class TopTeamerApp {
             contestsService.getContest(this.client.deepLinkContestId).then((contest:Contest) => {
               this.client.deepLinkContestId = null;
               appPages.push(new AppPage('ContestPage', {'contest': contest, 'source': 'deepLink'}));
-              this.client.setPages(appPages).then(()=>{
+              this.client.setPages(appPages).then(()=> {
                 this.client.hidePreloader();
-              },()=>{
+              }, ()=> {
               });
             })
           }
           else {
-            this.client.setPages(appPages).then(()=>{
+            this.client.setPages(appPages).then(()=> {
               this.client.hidePreloader();
-            },()=>{
+            }, ()=> {
             });
           }
-        }, (err) => {
+        }, () => {
           this.client.nav.setRoot(this.client.getPage('LoginPage'));
         })
       }
       else {
         this.client.nav.setRoot(this.client.getPage('LoginPage'));
       }
-    },()=>{
+    }, ()=> {
+      this.client.nav.setRoot(this.client.getPage('LoginPage'));
     });
   }
 

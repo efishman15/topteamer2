@@ -11,7 +11,7 @@ var client_1 = require('../../providers/client');
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var leaderboardsService = require('../../providers/leaderboards');
-var facebookService = require('../../providers/facebook');
+var connectService = require('../../providers/connect');
 var LeadersComponent = (function () {
     function LeadersComponent() {
         this.client = client_1.Client.getInstance();
@@ -21,33 +21,36 @@ var LeadersComponent = (function () {
         this.team0ContestLastRefreshTime = 0; //should apply only to the contest currently shown - when view closes and another contest appears - should refresh from server again
         this.team1ContestLastRefreshTime = 0; //should apply only to the contest currently shown - when view closes and another contest appears - should refresh from server again
     }
-    LeadersComponent.prototype.showFriends = function (friendsPermissionJustGranted, forceRefresh) {
+    LeadersComponent.prototype.showFriends = function (forceRefresh) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.innerShowFriends(resolve, reject, friendsPermissionJustGranted, forceRefresh);
+            _this.innerShowFriends(resolve, reject, forceRefresh);
         });
     };
-    LeadersComponent.prototype.innerShowFriends = function (resolve, reject, friendsPermissionJustGranted, forceRefresh) {
+    LeadersComponent.prototype.innerShowFriends = function (resolve, reject, forceRefresh) {
         var _this = this;
         var now = (new Date()).getTime();
         //Check if refresh frequency reached
-        if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !friendsPermissionJustGranted && !forceRefresh) {
+        if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !forceRefresh) {
             this.leaders = this.lastFriendsLeaders;
             resolve();
             return;
         }
-        leaderboardsService.friends(friendsPermissionJustGranted).then(function (leaders) {
+        leaderboardsService.friends().then(function (leaders) {
             _this.friendsLastRefreshTime = now;
             _this.leaders = leaders;
             _this.lastFriendsLeaders = leaders;
             resolve();
         }, function (err) {
             if (err.type === 'SERVER_ERROR_MISSING_FRIENDS_PERMISSION' && err.additionalInfo && err.additionalInfo.confirmed) {
-                facebookService.login(_this.client.settings.facebook.friendsPermission, true).then(function () {
-                    _this.innerShowFriends(resolve, reject, true, forceRefresh);
+                connectService.login(_this.client.settings.facebook.friendsPermissions, true).then(function () {
+                    _this.innerShowFriends(resolve, reject, forceRefresh);
                 }, function () {
                     reject();
                 });
+            }
+            else {
+                reject();
             }
         });
     };
