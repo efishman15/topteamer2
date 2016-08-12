@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var contestsService = require('../../providers/contests');
 var ServerPopupPage = (function () {
     function ServerPopupPage(params, viewController) {
@@ -25,7 +26,7 @@ var ServerPopupPage = (function () {
     }
     //The only life cycle eve currently called in modals
     ServerPopupPage.prototype.ngAfterViewInit = function () {
-        this.client.logEvent('page/serverPopup', { 'title': this.params.data.serverPopup.title, 'message': this.params.data.serverPopup.message });
+        analyticsService.track('page/serverPopup', { title: this.params.data.serverPopup.title, message: this.params.data.serverPopup.message });
     };
     ServerPopupPage.prototype.preventBack = function () {
         return this.params.data.serverPopup.preventBack;

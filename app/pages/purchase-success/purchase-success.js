@@ -10,13 +10,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var PurchaseSuccessPage = (function () {
     function PurchaseSuccessPage(params) {
         this.client = client_1.Client.getInstance();
         this.params = params;
     }
     PurchaseSuccessPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/purchaseSuccess', { 'feature': this.params.data.featurePurchased });
+        analyticsService.track('page/purchaseSuccess', { 'feature': this.params.data.featurePurchased });
         this.unlockText = this.client.translate(this.client.session.features[this.params.data.featurePurchased].unlockText);
     };
     PurchaseSuccessPage.prototype.proceed = function () {

@@ -461,7 +461,8 @@ function innerProcessPayment(data, callback) {
                     prepareClientResponse(data);
                 }
 
-                dalDb.storeSession(data, callback);
+                data.setData = {assets: data.session.assets, features: data.session.features};
+                dalDb.setSession(data, callback);
             }
             else {
                 callback(null, data);

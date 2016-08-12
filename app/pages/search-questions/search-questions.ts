@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
+import * as analyticsService from '../../providers/analytics';
 import * as alertService from '../../providers/alert';
 import {Questions,Question} from '../../objects/objects';
 
@@ -25,7 +26,7 @@ export class SearchQuestionsPage {
 
   //The only life cycle eve currently called in modals
   ngAfterViewInit() {
-    this.client.logEvent('page/searchQuestions');
+    analyticsService.track('page/searchQuestions');
   }
 
   search(event) {
@@ -55,7 +56,7 @@ export class SearchQuestionsPage {
 
   dismiss(applyChanges) {
 
-    this.client.logEvent('questions/search/' + (applyChanges ? 'select' : 'cancel'));
+    analyticsService.track('questions/search/' + (applyChanges ? 'select' : 'cancel'));
 
     if (applyChanges) {
 

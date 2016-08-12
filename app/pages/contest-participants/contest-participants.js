@@ -14,13 +14,30 @@ var simple_tabs_1 = require('../../components/simple-tabs/simple-tabs');
 var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var core_2 = require('@angular/core');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var ContestParticipantsPage = (function () {
     function ContestParticipantsPage(params) {
+        var _this = this;
         this.client = client_1.Client.getInstance();
         this.params = params;
+        this.client.events.subscribe('topTeamer:leaderboardsUpdated', function () {
+            switch (_this.tabId) {
+                case -1:
+                    _this.showContestParticipants(true).then(function () {
+                    }, function () {
+                    });
+                    break;
+                case 0:
+                case 1:
+                    _this.showTeamParticipants(_this.tabId, true).then(function () {
+                    }, function () {
+                    });
+                    break;
+            }
+        });
     }
     ContestParticipantsPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/contestParticipants', { 'contestId': this.params.data.contest._id });
+        analyticsService.track('page/contestParticipants', { contestId: this.params.data.contest._id });
         if (this.leadersComponent) {
             return this.tabGeneralParticipants();
         }
@@ -34,11 +51,11 @@ var ContestParticipantsPage = (function () {
         return this.showTeamParticipants(teamId, false);
     };
     ContestParticipantsPage.prototype.showContestParticipants = function (forceRefresh) {
-        this.client.logEvent('contest/participants/' + this.params.data.source + '/leaderboard/all');
+        analyticsService.track('contest/participants/' + this.params.data.source + '/leaderboard/all');
         return this.leadersComponent.showContestParticipants(this.params.data.contest._id, null, forceRefresh);
     };
     ContestParticipantsPage.prototype.showTeamParticipants = function (teamId, forceRefresh) {
-        this.client.logEvent('contest/participants/' + this.params.data.source + '/leaderboard/team' + teamId);
+        analyticsService.track('contest/participants/' + this.params.data.source + '/leaderboard/team' + teamId);
         return this.leadersComponent.showContestParticipants(this.params.data.contest._id, teamId, forceRefresh);
     };
     ContestParticipantsPage.prototype.doRefresh = function (refresher) {

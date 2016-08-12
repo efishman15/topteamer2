@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 import * as shareService from '../../providers/share';
 import {Contest,ShareVariables,ShareWebNetwork} from '../../objects/objects';
 
@@ -33,18 +34,18 @@ export class SharePage {
 
   ionViewWillEnter() {
     if (this.params.data.contest) {
-      this.client.logEvent('page/share', {
-        'contestId': this.params.data.contest._id,
-        'source': this.params.data.source
+      analyticsService.track('page/share', {
+        contestId: this.params.data.contest._id,
+        source: this.params.data.source
       });
     }
     else {
-      this.client.logEvent('page/share', {'source': this.params.data.source});
+      analyticsService.track('page/share', {source: this.params.data.source});
     }
   }
 
   webShare(network:any) {
-    this.client.logEvent('share/web/' + network.name);
+    analyticsService.track('share/web/' + network.name);
     window.open(network.url.format({
       url: this.shareVariables.shareUrl,
       subject: this.shareVariables.shareSubject,
@@ -54,7 +55,7 @@ export class SharePage {
   }
 
   mobileShare(appName?:string) {
-    this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
+    analyticsService.track('share/mobile' + (appName ? '/' + appName : ''));
     shareService.mobileShare(appName, this.params.data.contest, this.isNewContest).then(() => {
     }, () => {
     });

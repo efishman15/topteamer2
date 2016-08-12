@@ -1,20 +1,30 @@
-import {Form, FormBuilder, Control, ControlGroup, Validators,FORM_DIRECTIVES} from '@angular/common';
-import {Component,ViewChild} from '@angular/core';
+import {REACTIVE_FORM_DIRECTIVES, FormControl, FormGroup, Validators} from '@angular/forms';
+import {Component,ViewChild,ElementRef} from '@angular/core';
 import {NavParams,ViewController,Content} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import {Question,Questions} from '../../objects/objects';
+import * as analyticsService from '../../providers/analytics';
 
 @Component({
-  templateUrl: 'build/pages/question-editor/question-editor.html'
+  templateUrl: 'build/pages/question-editor/question-editor.html',
+  directives: [REACTIVE_FORM_DIRECTIVES]
 
 })
 export class QuestionEditorPage {
 
   @ViewChild(Content) content: Content;
 
+  //Ionic bug - maxlength property is not copied to the native element, submitted:
+  //https://github.com/driftyco/ionic/issues/7635
+  @ViewChild('questionTextArea') questionTextArea:ElementRef;
+  @ViewChild('answer0TextArea') answer0TextArea:ElementRef;
+  @ViewChild('answer1TextArea') answer1TextArea:ElementRef;
+  @ViewChild('answer2TextArea') answer2TextArea:ElementRef;
+  @ViewChild('answer3TextArea') answer3TextArea:ElementRef;
+
   client:Client;
   question:Question;
-  mode:String;
+  mode:string;
   viewController:ViewController;
   title:String;
   currentQuestions: Questions;
@@ -22,19 +32,13 @@ export class QuestionEditorPage {
   answersError:String;
   submitted:Boolean;
 
-  questionEditorForm: ControlGroup;
-  questionControl: Control;
-  answer0Control: Control;
-  answer1Control: Control;
-  answer2Control: Control;
-  answer3Control: Control;
+  questionEditorForm: FormGroup;
   fieldInFocus: number;
 
-  constructor(params:NavParams, viewController: ViewController, formBuilder:FormBuilder) {
+  constructor(params:NavParams, viewController: ViewController) {
     this.client = Client.getInstance();
     this.viewController = viewController;
     this.fieldInFocus = -1;
-
     this.mode = params.data.mode;
 
     if (this.mode === 'add') {
@@ -46,18 +50,12 @@ export class QuestionEditorPage {
       this.question = params.data.question;
     }
 
-    this.questionControl = new Control('', Validators.compose([Validators.required, Validators.maxLength(this.client.settings.quiz.question.maxLength)]));
-    this.answer0Control = new Control('', Validators.compose([Validators.required, Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]));
-    this.answer1Control = new Control('', Validators.compose([Validators.required, Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]));
-    this.answer2Control = new Control('', Validators.compose([Validators.required, Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]));
-    this.answer3Control = new Control('', Validators.compose([Validators.required, Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]));
-
-    this.questionEditorForm = formBuilder.group({
-      questionControl: this.questionControl,
-      answer0Control: this.answer0Control,
-      answer1Control: this.answer1Control,
-      answer2Control: this.answer2Control,
-      answer3Control: this.answer3Control
+    this.questionEditorForm = new FormGroup({
+      question: new FormControl('',[Validators.required, Validators.maxLength(this.client.settings.quiz.question.maxLength)]),
+      answer0: new FormControl('',[Validators.required, Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]),
+      answer1: new FormControl('',[Validators.required, Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]),
+      answer2: new FormControl('',[Validators.required, Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]),
+      answer3: new FormControl('',[Validators.required, Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]),
     });
 
     this.currentQuestions = params.data.currentQuestions;
@@ -72,13 +70,18 @@ export class QuestionEditorPage {
     if (this.mode === 'edit') {
       eventData['questionId'] = this.question._id;
     }
-    this.client.logEvent('page/questionEditor', eventData);
+    analyticsService.track('page/questionEditor', eventData);
 
+    this.questionTextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.maxLength;
+    this.answer0TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
+    this.answer1TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
+    this.answer2TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
+    this.answer3TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
   }
 
   dismiss(applyChanges) {
 
-    this.client.logEvent('question/' + (applyChanges ? 'set' : 'cancel'));
+    analyticsService.track('question/' + (applyChanges ? 'set' : 'cancel'));
     var result;
     if (applyChanges) {
 

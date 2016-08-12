@@ -7,6 +7,7 @@ import {Push} from 'ionic-native';
 import {App,Platform,Config, Nav, AlertController, ModalController, Events, NavController, ViewController, AlertOptions} from 'ionic-angular';
 import * as contestsService from './contests';
 import * as connectService from './connect';
+import * as analyticsService from './analytics';
 import * as alertService from './alert';
 import {User,Session,ClientInfo,Settings,Language,Contest,ClientShareApp,AppPage,ConnectInfo,Avatar} from '../objects/objects';
 import {LoadingModalComponent} from '../components/loading-modal/loading-modal'
@@ -42,7 +43,6 @@ export class Client {
   appPreloading:boolean = true;
   serverGateway:ServerGateway;
   pushService:any;
-  connectInfo:ConnectInfo;
 
   constructor(http:Http) {
 
@@ -175,16 +175,27 @@ export class Client {
   }
 
   setDirection() {
-    this.platform.setDir(this.currentLanguage.direction,true);
+    this.platform.setDir(this.currentLanguage.direction, true);
     this.config.set('backButtonIcon', this.currentLanguage.backButtonIcon);
   }
 
-  serverConnect(connectInfo:ConnectInfo) {
+  serverConnect(connectInfo?:ConnectInfo) {
 
     return new Promise((resolve, reject) => {
 
-      this.user.credentials = connectInfo;
-      this.serverPost('user/connect', {user: this.user}).then((data) => {
+      let postData:any = {};
+      if (connectInfo) {
+        postData.user = JSON.parse(JSON.stringify(this.user));
+        postData.user.credentials = connectInfo;
+      }
+      else {
+        postData.user = this.user;
+      }
+      this.serverPost('user/connect', postData).then((data) => {
+
+        if (connectInfo) {
+          this.user.credentials = connectInfo;
+        }
 
         if (this.user.settings.language !== data['session'].settings.language) {
           this.user.settings.language = data['session'].settings.language;
@@ -196,13 +207,17 @@ export class Client {
         this.session = data['session'];
         this.serverGateway.token = data['session'].token;
 
-        this.setLoggedUserId(data['session'].userId);
+        analyticsService.identify(data['session'].userId);
+        analyticsService.setUserPermanentData({
+          platform: this.clientInfo.platform,
+          $name: data['session'].name
+        });
 
         if (data['session'].justRegistered) {
-          this.logEvent('server/register');
+          analyticsService.track('server/register')
         }
         else {
-          this.logEvent('server/login');
+          analyticsService.track('server/login')
         }
 
         this.initPushService();
@@ -215,6 +230,60 @@ export class Client {
 
     })
   };
+
+  setUser(userData:any) {
+
+    return new Promise((resolve, reject) => {
+
+      let postData:any = {user: userData};
+      this.serverPost('user/set', postData).then((contests:any) => {
+        this.session.avatar.id = userData.avatar;
+        this.session.name = userData.name;
+        this.session.dob = userData.dob;
+        this.publishProfileChange(contests);
+        resolve();
+      }, ()=> {
+        reject();
+      });
+    });
+  }
+
+  upgradeGuest(connectInfo:ConnectInfo) {
+
+    return new Promise((resolve, reject) => {
+
+      this.serverPost('user/upgradeGuest', {user: {credentials: connectInfo}}).then((data:any) => {
+        this.session.avatar.type = 0; //facebook
+        this.session.avatar.id = connectInfo.facebookInfo.userId;
+        this.session.name = data.name;
+        this.publishProfileChange(data.contests);
+        resolve();
+      }, (err)=> {
+        if (err.type === 'SERVER_ERROR_FACEBOOK_EXISTS_DO_SWITCH' && err.additionalInfo && err.additionalInfo.confirmed) {
+          this.serverConnect(connectInfo).then(() => {
+            this.popToRoot().then(()=> {
+              resolve();
+            }, ()=> {
+              reject();
+            })
+          }, () => {
+            reject();
+          })
+        }
+        else {
+          reject();
+        }
+      });
+    });
+  }
+
+  publishProfileChange(contests) {
+    for (var i = 0; i < contests.length; i++) {
+      contestsService.setContestClientData(contests[i]);
+      this.events.publish('topTeamer:contestUpdated', contests[i], contests[i].status, contests[i].status);
+    }
+    this.events.publish('topTeamer:leaderboardsUpdated');
+  }
 
   serverPost(path:string, postData?:Object) {
     return new Promise((resolve, reject) => {
@@ -231,7 +300,7 @@ export class Client {
         if (err && err.httpStatus === 401) {
           connectService.getLoginStatus().then((connectInfo:ConnectInfo) => {
             if (this.hasCredentials(connectInfo)) {
-              this.serverConnect(connectInfo).then(() => {
+              this.serverConnect().then(() => {
                 //Re-post last request
                 return this.serverPost(path, postData).then((data) => {
                   resolve(data);
@@ -242,8 +311,8 @@ export class Client {
               });
             }
             else {
-              connectService.login().then((connectInfo:ConnectInfo) => {
-                this.serverConnect(connectInfo).then(() => {
+              connectService.login().then(() => {
+                this.serverConnect().then(() => {
                   //Re-post last request
                   return this.serverPost(path, postData).then((data) => {
                     resolve(data);
@@ -303,7 +372,7 @@ export class Client {
   }
 
   openNewContest() {
-    this.logEvent('menu/newContest');
+    analyticsService.track('menu/newContest');
     var modal = this.createModalPage('ContestTypePage');
     modal.onDidDismiss((contestTypeId) => {
       if (contestTypeId) {
@@ -338,7 +407,7 @@ export class Client {
 
       if (contest.state === 'play' && tryRun) {
 
-        this.logEvent('contest/play', eventData);
+        analyticsService.track('contest/play', eventData);
 
         //Joined to a contest - run it immediately (go to the quiz)
         let appPages:Array<AppPage> = new Array<AppPage>();
@@ -362,12 +431,12 @@ export class Client {
       else if (now - contest.lastUpdated < this.settings.contest.refreshTresholdInMilliseconds) {
         //Not joined and no refresh required - enter the contest with the object we have
         resolve();
-        this.logEvent('contest/show', eventData);
+        analyticsService.track('contest/show', eventData);
         this.openPage('ContestPage', {'contest': contest});
       }
       else {
         //Will enter the contest after retrieving it from the server
-        this.logEvent('contest/show', eventData);
+        analyticsService.track('contest/show', eventData);
         this.displayContestById(contest._id).then((serverContest:Contest) => {
           resolve(serverContest);
         }, (err) => {
@@ -378,7 +447,7 @@ export class Client {
   }
 
   share(contest:Contest, source) {
-    this.logEvent('share', {'source': source});
+    analyticsService.track('share', {'source': source});
     this.openPage('SharePage', {'contest': contest, 'source': source});
   }
 
@@ -399,7 +468,7 @@ export class Client {
     return modal.present();
   }
 
-  createAlert(alertOptions: AlertOptions) {
+  createAlert(alertOptions:AlertOptions) {
     return this.alertController.create(alertOptions);
   }
 
@@ -449,13 +518,7 @@ export class Client {
     this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
     this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
 
-    //Invoke 'onResize' for each view that has it
-    for (var i = 0; i < this.nav.length(); i++) {
-      var viewController = this.nav.getByIndex(i);
-      if (viewController && viewController.instance && viewController.instance['onResize']) {
-        viewController.instance['onResize']();
-      }
-    }
+    this.events.publish('topTeamer:resize');
   }
 
   get width():number {
@@ -504,7 +567,10 @@ export class Client {
 
   popToRoot() {
     if (this.nav.canGoBack()) {
-      this.nav.popToRoot();
+      return this.nav.popToRoot();
+    }
+    else {
+      return Promise.resolve();
     }
   }
 
@@ -562,7 +628,7 @@ export class Client {
       this.serverPost('user/switchLanguage', postData).then(() => {
         this.session.settings.language = this.user.settings.language;
         this.localSwitchLanguage(this.user.settings.language);
-        this.logEvent('settings/language/change', {language: this.user.settings.language});
+        analyticsService.track('settings/language/change', {language: this.user.settings.language});
         resolve();
       }, (err) => {
         this.user.settings.language = this.session.settings.language;
@@ -572,22 +638,15 @@ export class Client {
   }
 
   logout() {
-    this.serverGateway.token = null;
-    this.session = null;
-    this.playerInfoComponent.clearXp();
-  }
-
-  setLoggedUserId(userId:string) {
-    window.FlurryAgent.setUserId(userId);
-  }
-
-  logEvent(eventName:string, eventParams?:Object) {
-    if (eventParams) {
-      window.FlurryAgent.logEvent(eventName, eventParams);
-    }
-    else {
-      window.FlurryAgent.logEvent(eventName);
-    }
+    this.serverPost('user/logout').then(()=> {
+      this.serverGateway.token = null;
+      this.session = null;
+      this.playerInfoComponent.clearXp();
+    }, () => {
+      this.serverGateway.token = null;
+      this.session = null;
+      this.playerInfoComponent.clearXp();
+    })
   }
 
   getRecursiveProperty(object:any, property:string):any {
@@ -633,7 +692,7 @@ export class Client {
       );
 
       this.pushService.on('error', (error) => {
-        window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+        analyticsService.logError('PushNotificationError', error);
       });
 
       //Push Service - registration
@@ -711,18 +770,21 @@ export class Client {
   }
 
   getAvatarUrl(avatar:Avatar) {
-    let template:string;
     if (avatar.type === 0) {
-      template = this.settings.facebook.avatarTemplate;
+      return this.settings.facebook.avatarTemplate.replace('{{id}}', avatar.id);
     }
     else if (avatar.type === 1) {
-      template = this.settings.general.avatarTemplate;
+      return this.getGuestAvatarUrl(avatar.id);
     }
     else {
       return;
     }
-    return template.replace('{{id}}', avatar.id);
   }
+
+  getGuestAvatarUrl(avatarId:string) {
+    return this.settings.general.avatarTemplate.replace('{{id}}', avatarId);
+  }
+
 
   hasCredentials(connectInfo:ConnectInfo):boolean {
     if (connectInfo.type === 'facebook' && connectInfo.facebookInfo) {
@@ -753,7 +815,7 @@ export class ServerGateway {
       this.endPoint = window.location.protocol + '//' + window.location.host + '/';
     }
     else {
-      this.endPoint = 'http://www.topteamer.com/'
+      this.endPoint = 'http://dev.topteamer.com/'
     }
 
     this.eventQueue = [];

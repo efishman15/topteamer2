@@ -33,12 +33,14 @@ var LeadersComponent = (function () {
         //Check if refresh frequency reached
         if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !forceRefresh) {
             this.leaders = this.lastFriendsLeaders;
+            this.mode = 'friends';
             resolve();
             return;
         }
         leaderboardsService.friends().then(function (leaders) {
             _this.friendsLastRefreshTime = now;
             _this.leaders = leaders;
+            _this.mode = 'friends';
             _this.lastFriendsLeaders = leaders;
             resolve();
         }, function (err) {
@@ -61,12 +63,14 @@ var LeadersComponent = (function () {
             //Check if refresh frequency reached
             if (now - _this.weeklyLastRefreshTime < _this.client.settings.lists.leaderboards.weekly.refreshFrequencyInMilliseconds && !forceRefresh) {
                 _this.leaders = _this.lastWeeklyLeaders;
+                _this.mode = 'weekly';
                 resolve();
                 return;
             }
             leaderboardsService.weekly().then(function (leaders) {
                 _this.weeklyLastRefreshTime = now;
                 _this.leaders = leaders;
+                _this.mode = 'weekly';
                 _this.lastWeeklyLeaders = leaders;
                 resolve();
             }, function () {
@@ -98,11 +102,13 @@ var LeadersComponent = (function () {
             //Check if refresh frequency reached
             if (now - lastRefreshTime < _this.client.settings.lists.leaderboards.contest.refreshFrequencyInMilliseconds && !forceRefresh) {
                 _this.leaders = lastLeaders;
+                _this.mode = 'contest';
                 resolve();
                 return;
             }
             leaderboardsService.contest(contestId, teamId).then(function (leaders) {
                 _this.leaders = leaders;
+                _this.mode = 'contest';
                 switch (teamId) {
                     case 0:
                         _this.lastTeam0ContestLeaders = leaders;

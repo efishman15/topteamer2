@@ -16,6 +16,7 @@ var contestsService = require('./providers/contests');
 var shareService = require('./providers/share');
 var loading_modal_1 = require('./components/loading-modal/loading-modal');
 var player_info_1 = require('./components/player-info/player-info');
+var analyticsService = require('./providers/analytics');
 var alertService = require('./providers/alert');
 var ionic_native_1 = require('ionic-native');
 var objects_1 = require('./objects/objects');
@@ -43,7 +44,7 @@ var TopTeamerApp = (function () {
             _this.expandStringPrototype();
             _this.declareRequestAnimationFrame();
             _this.expandDatePrototype();
-            _this.initFlurry();
+            _this.initAnalytics();
             if (!window.cordova) {
                 _this.initWeb();
             }
@@ -68,6 +69,11 @@ var TopTeamerApp = (function () {
                         //Main menu is closed - confirm exit app
                         return alertService.confirmExitApp();
                     }
+                }
+                //Check if modal view is displayed, currently accessing non-public members of Ionic App
+                //Waiting for Ionic team to expose checking if a modal view is displayed
+                if (_this.app['_portal']._views && _this.app['_portal']._views.length > 0 && _this.app['_portal']._views && _this.app['_portal']._views[0].hasOverlay) {
+                    return _this.app['_portal']._views && _this.app['_portal']._views[0].dismiss();
                 }
                 //Go back
                 return client.nav.pop();
@@ -123,7 +129,7 @@ var TopTeamerApp = (function () {
         if (this.client.platform.is('android') && typeof window.inappbilling !== 'undefined') {
             window.inappbilling.init(function (resultInit) {
             }, function (errorInit) {
-                window.myLogError('InAppBilling', errorInit);
+                analyticsService.logError('InAppBilling', errorInit);
             }, { showLog: true }, []);
         }
         document.addEventListener('resume', function (event) {
@@ -133,24 +139,21 @@ var TopTeamerApp = (function () {
         });
         ionic_native_1.AppVersion.getVersionNumber().then(function (version) {
             _this.client.user.clientInfo.appVersion = version;
-            window.FlurryAgent.setAppVersion('' + version);
+            //The app version property will be sent on each event tracking
+            analyticsService.register({ appVersion: version });
             _this.initLoginState();
         }, function () {
         });
     };
-    TopTeamerApp.prototype.initFlurry = function () {
-        //FlurryAgent.setDebugLogEnabled(true);
-        window.FlurryAgent.startSession(this.client.settings.flurry.key);
-        window.myLogError = function (errorType, message) {
-            window.FlurryAgent.logError(errorType.substring(0, 255), message.substring(0, 255), 0);
-        };
+    TopTeamerApp.prototype.initAnalytics = function () {
+        analyticsService.init(this.client.settings.analytics.mixpanel.token);
     };
     TopTeamerApp.prototype.initBranch = function () {
         var _this = this;
         window.myHandleBranch = function (err, data) {
             try {
                 if (err) {
-                    window.myLogError('BranchIoError', 'Error received during branch init: ' + err);
+                    analyticsService.logError('BranchIoError', err);
                     return;
                 }
                 if (data.data_parsed && data.data_parsed.contestId) {
@@ -165,7 +168,7 @@ var TopTeamerApp = (function () {
                 }
             }
             catch (e) {
-                window.myLogError('BranchIoError', 'Error parsing data during branch init, data= ' + data + ', parsedData=' + data.data_parsed + ', error: ' + e);
+                analyticsService.logError('BranchIoParseDataError', { data: data, error: e });
             }
         };
         window.initBranch = function () {
@@ -284,11 +287,11 @@ var TopTeamerApp = (function () {
         this.client.share(null, 'menu');
     };
     TopTeamerApp.prototype.settings = function () {
-        this.client.logEvent('menu/settings');
+        analyticsService.track('menu/settings');
         this.client.openPage('SettingsPage');
     };
     TopTeamerApp.prototype.systemTools = function () {
-        this.client.logEvent('menu/systemTools');
+        analyticsService.track('menu/systemTools');
         this.client.openPage('SystemToolsPage');
     };
     __decorate([

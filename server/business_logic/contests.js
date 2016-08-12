@@ -6,10 +6,9 @@ var dalBranchIo = require(path.resolve(__dirname, '../dal/dalBranchIo'));
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
-var dalLeaderboard = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
+var dalLeaderboards = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
 var pushUtils = require(path.resolve(__dirname, '../utils/pushNotifications'));
 var randomUtils = require(path.resolve(__dirname, '../utils/random'));
-var jsonTransformer = require('jsonpath-object-transform');
 
 //---------------------------------------------------------------------
 // public functions for other modules
@@ -44,11 +43,11 @@ function sendPush(users, contest, alertName, team) {
   }
   else {
     //Picks a random team
-    winningTeam = randomUtils.pick([0,1]);
+    winningTeam = randomUtils.pick([0, 1]);
   }
 
   params.winningTeam = contest.teams[winningTeam].name;
-  params.losingTeam = contest.teams[1-winningTeam].name;
+  params.losingTeam = contest.teams[1 - winningTeam].name;
 
   //-------------------
   // time.end
@@ -93,7 +92,7 @@ function sendPush(users, contest, alertName, team) {
   //Split the push into 2 messages - one for each team
   var users0 = [];
   var users1 = [];
-  for (var i=0; i<users.length; i++) {
+  for (var i = 0; i < users.length; i++) {
     if (contest.users[users[i]._id.toString()].team === 0) {
       users0.push(users[i].gcmRegistrationId)
     }
@@ -102,7 +101,7 @@ function sendPush(users, contest, alertName, team) {
     }
   }
 
-  if (users0.length > 0 && (team === undefined || team === null || team===0)) {
+  if (users0.length > 0 && (team === undefined || team === null || team === 0)) {
     messageData.buttonText = generalUtils.translate(contest.language, 'PLAY_FOR_TEAM', {'team': contest.teams[0].name});
     messageData.buttonCssClass = 'chart-popup-button-team-small-0';
 
@@ -110,7 +109,7 @@ function sendPush(users, contest, alertName, team) {
     pushUtils.send(users0, messageData);
   }
 
-  if (users1.length > 0 && (team === undefined || team === null || team===1)) {
+  if (users1.length > 0 && (team === undefined || team === null || team === 1)) {
     var messageData1
     if (users0.length > 0) {
       //Clone the message not to change button text and style while prev message is still sending
@@ -195,7 +194,7 @@ function setUserQuestions(questionIndex, data, callback) {
 
     dalDb.setQuestion(data, function (err, result) {
       if (err) {
-        callback(new exceptions.ServerException('Error updating question', data,'error'));
+        callback(new exceptions.ServerException('Error updating question', data, 'error'));
         return;
       }
       setUserQuestions(questionIndex + 1, data, callback);
@@ -245,19 +244,19 @@ function validateContestData(data, callback) {
     callback(new exceptions.ServerException('Attempt to create a new contest without having an eligible rank or feature asset', {
       'session': data.session,
       'contest': data.contest
-    },'error'));
+    }, 'error'));
     return;
   }
 
   //Required fields
   if (!data.contest.startDate || !data.contest.endDate || !data.contest.teams || !data.contest.type || !data.contest.subject) {
-    callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, type, subject',{},'error'));
+    callback(new exceptions.ServerException('One of the required fields not supplied: startDate, endDate, teams, type, subject', {}, 'error'));
     return;
   }
 
   //End date must be AFTER start date
   if (data.contest.startDate > data.contest.endDate) {
-    callback(new exceptions.ServerException('Contest end date must be later than contest start date',{},'error'));
+    callback(new exceptions.ServerException('Contest end date must be later than contest start date', {}, 'error'));
     return;
   }
 
@@ -266,19 +265,19 @@ function validateContestData(data, callback) {
 
   //Cannot edit an ended contest
   if (data.contest.endDate < now && !data.session.isAdmin) {
-    callback(new exceptions.ServerException('You cannot edit a contest that has already been finished', {'contestId': data.contest._id},'error'));
+    callback(new exceptions.ServerException('You cannot edit a contest that has already been finished', {'contestId': data.contest._id}, 'error'));
     return;
   }
 
   //Only 2 teams are allowed
   if (data.contest.teams.length !== 2) {
-    callback(new exceptions.ServerException('Number of teams must be 2',{},'error'));
+    callback(new exceptions.ServerException('Number of teams must be 2', {}, 'error'));
     return;
   }
 
   //One or more of the team names is missing
   if (!data.contest.teams[0].name || !data.contest.teams[1].name) {
-    callback(new exceptions.ServerException('One or more of the team names are missing',{},'error'));
+    callback(new exceptions.ServerException('One or more of the team names are missing', {}, 'error'));
     return;
   }
 
@@ -290,18 +289,18 @@ function validateContestData(data, callback) {
 
   //Contest _id must be supplied in edit mode
   if (data.mode === 'edit' && !data.contest._id) {
-    callback(new exceptions.ServerException('Contest _id not supplied in edit mode',{},'error'));
+    callback(new exceptions.ServerException('Contest _id not supplied in edit mode', {}, 'error'));
     return;
   }
 
   //Illegal contest type
   if (!data.contest.type || !data.contest.type.id) {
-    callback(new exceptions.ServerException('type/type.id must be supplied',{},'error'));
+    callback(new exceptions.ServerException('type/type.id must be supplied', {}, 'error'));
     return;
   }
 
   if (!generalUtils.settings.client.newContest.contestTypes[data.contest.type.id]) {
-    callback(new exceptions.ServerException('type id"' + data.contest.type.id + '" is illegal',{},'error'));
+    callback(new exceptions.ServerException('type id"' + data.contest.type.id + '" is illegal', {}, 'error'));
     return;
   }
 
@@ -327,7 +326,7 @@ function validateContestData(data, callback) {
 
     //Question list not supplied
     if (!data.contest.type.questions.list || !data.contest.type.questions.list.length) {
-      callback(new exceptions.ServerException('questions.list must contain the array of questions',{},'error'));
+      callback(new exceptions.ServerException('questions.list must contain the array of questions', {}, 'error'));
       return;
     }
 
@@ -336,13 +335,13 @@ function validateContestData(data, callback) {
 
       //Question must contain text
       if (!data.contest.type.questions.list[i].text) {
-        callback(new exceptions.ServerException('Question must contain text',{},'error'));
+        callback(new exceptions.ServerException('Question must contain text', {}, 'error'));
         return;
       }
 
       //Question must contain answers
       if (!data.contest.type.questions.list[i].answers || !data.contest.type.questions.list[i].answers.length || data.contest.type.questions.list[i].answers.length !== 4) {
-        callback(new exceptions.ServerException('Question must contain 4 answers',{},'error'));
+        callback(new exceptions.ServerException('Question must contain 4 answers', {}, 'error'));
         return;
       }
 
@@ -465,7 +464,7 @@ function updateContest(data, callback) {
   if (data.contest.clearEndAlerts) {
     //Sent in case endDate is changed
     data.unsetData = {};
-    data.unsetData['endAlerts'] = '';
+    data.unsetData[endAlerts] = '';
   }
 
   if (data.contest.type.id === 'userTrivia') {
@@ -539,12 +538,13 @@ function joinContest(req, res, next) {
     //Store the session's xp progress in the db
     function (data, callback) {
 
-      data.clientResponse = {'contest': prepareContestForClient(data.contest, data.session)};
+      data.clientResponse = {'contest': commonBusinessLogic.prepareContestForClient(data.contest, data.session)};
 
       if (data.newJoin) {
         commonBusinessLogic.addXp(data, 'joinContest');
         data.clientResponse.xpProgress = data.xpProgress;
-        dalDb.storeSession(data, callback);
+        data.setData = {'xp': data.session.xp, 'rank': data.session.rank};
+        dalDb.setSession(data, callback);
       }
       else {
         callback(null, data);
@@ -555,7 +555,6 @@ function joinContest(req, res, next) {
     function (data, callback) {
       //Save the user to the db - session will be stored at the end of this block
       if (data.newJoin) {
-        data.setData = {'xp': data.session.xp, 'rank': data.session.rank};
         data.closeConnection = true;
         dalDb.setUser(data, callback);
       }
@@ -591,13 +590,13 @@ function joinContestTeam(data, callback) {
   //Cannot join a contest that ended
   if (data.contest.endDate < now) {
     data.DbHelper.close();
-    callback(new exceptions.ServerException('Contest has already been finished', data,'error'));
+    callback(new exceptions.ServerException('Contest has already been finished', data, 'error'));
   }
 
   //Already joined this team - exit
   if (data.contest.users && data.contest.users[data.session.userId] && data.contest.users[data.session.userId].team === data.teamId) {
     data.DbHelper.close();
-    callback(new exceptions.ServerException('Already joined to this team', data,'error'));
+    callback(new exceptions.ServerException('Already joined to this team', data, 'error'));
     return;
   }
 
@@ -667,7 +666,7 @@ function joinToContestObject(contest, teamId, session) {
 
   //If edit mode (has _id) - join the user to the contest's leader board (with zero score addition) to this team
   if (contest._id) {
-    dalLeaderboard.addScore(contest._id, teamId, 0, session);
+    dalLeaderboards.addScore(contest._id, teamId, 0, session);
   }
 
   return newJoin;
@@ -725,7 +724,7 @@ module.exports.setContest = function (req, res, next) {
     function (data, callback) {
       if (data.mode === 'add') {
         //In case of add - contest needed to be added in the previous operation first, to get an _id
-        dalLeaderboard.addScore(data.contest._id, 0, 0, data.session);
+        dalLeaderboards.addScore(data.contest._id, 0, 0, data.session);
         dalBranchIo.createContestLinks(data, callback);
       }
       else {
@@ -757,7 +756,7 @@ module.exports.setContest = function (req, res, next) {
 
     //Transform to client
     function (data, callback) {
-      data.contest = prepareContestForClient(data.contest, data.session);
+      data.contest = commonBusinessLogic.prepareContestForClient(data.contest, data.session);
       callback(null, data);
     },
 
@@ -804,7 +803,7 @@ module.exports.removeContest = function (req, res, next) {
     //Check that only admins are allowed to remove a contest
     function (data, callback) {
       if (!data.session.isAdmin) {
-        callback(new exceptions.ServerException('Removing contest is allowed only for administrators', data,'error'));
+        callback(new exceptions.ServerException('Removing contest is allowed only for administrators', data, 'error'));
         return;
       }
       data.closeConnection = true;
@@ -812,7 +811,7 @@ module.exports.removeContest = function (req, res, next) {
     },
 
     //Remove contest leaderboards
-    dalLeaderboard.removeContestLeaderboards
+    dalLeaderboards.removeContestLeaderboards
   ];
 
   async.waterfall(operations, function (err, data) {
@@ -907,7 +906,7 @@ module.exports.getContest = function (req, res, next) {
 
     //Transform to client
     function (data, callback) {
-      data.contest = prepareContestForClient(data.contest, data.session);
+      data.contest = commonBusinessLogic.prepareContestForClient(data.contest, data.session);
       callback(null, data);
     },
   ];
@@ -1024,28 +1023,4 @@ module.exports.getTeamDistancePercent = function (contest, teamId) {
 
   return (inputTeamPercent - otherTeamPercent);
 };
-
-//---------------------------------------------------------------------
-// prepareContestForClient
-//---------------------------------------------------------------------
-module.exports.prepareContestForClient = prepareContestForClient;
-function prepareContestForClient(contest, session) {
-
-  var contestForClient = jsonTransformer(contest, session.isAdmin ? generalUtils.settings.server.contest.details.adminClientTemplate : generalUtils.settings.server.contest.details.clientTemplate);
-  if (contest.creator.id.toString() === session.userId.toString()) {
-    contestForClient.owner = true;
-  }
-
-  if (contest.users[session.userId.toString()]) {
-    contestForClient.myTeam = contest.users[session.userId.toString()].team;
-  }
-
-  contestForClient.participants = contest.participants + contest.systemParticipants;
-  if (session.isAdmin) {
-    contestForClient.systemParticipants = contest.systemParticipants;
-  }
-
-  return contestForClient;
-};
-
 

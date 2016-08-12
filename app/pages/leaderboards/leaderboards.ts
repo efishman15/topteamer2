@@ -5,6 +5,9 @@ import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {LeadersComponent} from '../../components/leaders/leaders';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
+import * as connectService from '../../providers/connect';
+import {ConnectInfo} from "../../objects/objects";
 
 @Component({
   templateUrl: 'build/pages/leaderboards/leaderboards.html',
@@ -35,6 +38,26 @@ export class LeaderboardsPage {
       }, ()=> {
       });
     });
+
+    this.client.events.subscribe('topTeamer:leaderboardsUpdated', () => {
+      switch (this.mode) {
+        case 'contests':
+          this.contestList.refresh(true).then(() => {
+          }, () => {
+          })
+          break;
+        case 'friends':
+          this.showFriendsLeaderboard(true).then(() => {
+          }, () => {
+          })
+          break;
+        case 'weekly':
+          this.showWeeklyLeaderboard(true).then(() => {
+          }, () => {
+          })
+          break;
+      }
+    });
   }
 
   ionViewWillEnter() {
@@ -42,21 +65,21 @@ export class LeaderboardsPage {
   }
 
   displayRecentlyFinishedContestsTab() {
-    this.client.logEvent('page/leaderboard/contests');
+    analyticsService.track('page/leaderboard/contests');
     this.mode = 'contests';
     this.showRecentlyFinishedContests(false).then(()=> {
-    },()=> {
+    }, ()=> {
     })
   }
 
-  showRecentlyFinishedContests(forceRefresh? : boolean) {
-    this.client.logEvent('page/leaderboard/contests');
+  showRecentlyFinishedContests(forceRefresh?:boolean) {
+    analyticsService.track('page/leaderboard/contests');
     this.mode = 'contests';
     return this.contestList.refresh(forceRefresh);
   }
 
   displayFriendsLeaderboardTab() {
-    this.client.logEvent('page/leaderboard/friends');
+    analyticsService.track('page/leaderboard/friends');
     this.mode = 'friends';
     this.showFriendsLeaderboard(false).then(()=> {
     }, ()=> {
@@ -64,13 +87,13 @@ export class LeaderboardsPage {
   }
 
   showFriendsLeaderboard(forceRefresh?:boolean) {
-    this.client.logEvent('page/leaderboard/friends');
+    analyticsService.track('page/leaderboard/friends');
     this.mode = 'friends';
     return this.leadersComponent.showFriends(forceRefresh);
   }
 
   displayWeeklyLeaderboardTab() {
-    this.client.logEvent('page/leaderboard/weekly');
+    analyticsService.track('page/leaderboard/weekly');
     this.mode = 'weekly';
     this.showWeeklyLeaderboard(false).then(() => {
     }, ()=> {
@@ -78,7 +101,7 @@ export class LeaderboardsPage {
   }
 
   showWeeklyLeaderboard(forceRefresh?:boolean) {
-    this.client.logEvent('page/leaderboard/weekly');
+    analyticsService.track('page/leaderboard/weekly');
     this.mode = 'weekly';
     return this.leadersComponent.showWeekly(forceRefresh);
   }
@@ -112,4 +135,20 @@ export class LeaderboardsPage {
         break;
     }
   }
+
+  facebookLogin() {
+    connectService.facebookLogin().then((connectInfo:ConnectInfo)=> {
+      this.client.upgradeGuest(connectInfo).then(()=> {
+        connectService.storeCredentials(connectInfo);
+        //I am located at the friends tab - refresh since I just upgraded to facebook
+        //Should immediatelly see my friends
+        this.showFriendsLeaderboard(true).then(()=>{
+        },()=>{
+        })
+      }, ()=> {
+      })
+    }, ()=> {
+    });
+  }
+
 }

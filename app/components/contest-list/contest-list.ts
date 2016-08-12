@@ -1,4 +1,4 @@
-import {Component, Input, ViewChildren, QueryList} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {ContestChartComponent} from '../contest-chart/contest-chart';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';

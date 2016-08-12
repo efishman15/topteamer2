@@ -3,6 +3,7 @@ import {NavParams} from 'ionic-angular';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
+import * as analyticsService from '../../providers/analytics';
 import * as alertService from '../../providers/alert';
 import * as soundService from '../../providers/sound';
 import {Contest,QuizResults} from '../../objects/objects';
@@ -67,7 +68,7 @@ export class ContestPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/contest', {'contestId': this.contest._id});
+    analyticsService.track('page/contest', {contestId: this.contest._id});
   }
 
   ionViewWillLeave() {
@@ -89,12 +90,12 @@ export class ContestPage {
   }
 
   like() {
-    this.client.logEvent('like/click');
+    analyticsService.track('like/click');
     window.open(this.client.settings.general.facebookFanPage, '_new');
   }
 
   editContest() {
-    this.client.logEvent('contest/edit/click', {'contestId': this.contest._id});
+    analyticsService.track('contest/edit/click', {contestId: this.contest._id});
     this.client.openPage('SetContestPage', {'mode': 'edit', 'contest': this.contest});
   }
 
@@ -125,10 +126,10 @@ export class ContestPage {
 
   playContest(source) {
 
-    this.client.logEvent('contest/play', {
-      'contestId': this.contest._id,
-      'team': '' + this.contest.myTeam,
-      'sourceClick': source
+    analyticsService.track('contest/play', {
+      contestId: this.contest._id,
+      team: '' + this.contest.myTeam,
+      sourceClick: source
     });
 
     this.client.openPage('QuizPage', {'contest': this.contest, 'source': source});

@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {NavParams, ViewController} from 'ionic-angular';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 import * as contestsService from '../../providers/contests';
 import * as alertService from '../../providers/alert';
 import {CalendarCell} from '../../objects/objects';
@@ -34,7 +35,7 @@ export class SetContestAdminPage {
     if (this.params.data.mode === 'edit') {
       eventData['contestId'] = this.params.data.contestLocalCopy._id;
     }
-    this.client.logEvent('page/setContestAdmin', eventData);
+    analyticsService.track('page/setContestAdmin', eventData);
   }
 
   ionViewDidLeave() {
@@ -66,9 +67,9 @@ export class SetContestAdminPage {
   }
 
   removeContest() {
-    this.client.logEvent('contest/remove/click', {'contestId': this.params.data.contestLocalCopy._id});
+    analyticsService.track('contest/remove/click', {'contestId': this.params.data.contestLocalCopy._id});
     alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', {name: this.params.data.contestName}).then(() => {
-      this.client.logEvent('contest/removed', {'contestId': this.params.data.contestLocalCopy._id});
+      analyticsService.track('contest/removed', {'contestId': this.params.data.contestLocalCopy._id});
       contestsService.removeContest(this.params.data.contestLocalCopy._id).then(() => {
         let now: number = (new Date()).getTime();
         let finishedContest: boolean = (this.params.data.contestLocalCopy.endDate < now);

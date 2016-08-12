@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var alertService = require('../../providers/alert');
 var contestsService = require('../../providers/contests');
 var objects_1 = require('../../objects/objects');
@@ -39,7 +40,7 @@ var ContestChartComponent = (function () {
             }
             else {
                 //My team - start the game
-                this.client.logEvent('contest/myTeam', {
+                analyticsService.track('contest/myTeam', {
                     'contestId': this.contest._id,
                     'team': '' + this.contest.myTeam,
                     'sourceClick': source
@@ -63,10 +64,10 @@ var ContestChartComponent = (function () {
             contestsService.join(_this.contest._id, team).then(function (data) {
                 _this.refresh(data.contest);
                 _this.joinedContest.emit({ 'contest': data.contest });
-                _this.client.logEvent('contest/' + (!switchTeams ? 'join' : 'switchTeams'), {
-                    'contestId': _this.contest._id,
-                    'team': '' + _this.contest.myTeam,
-                    'sourceClick': source
+                analyticsService.track('contest/' + (!switchTeams ? 'join' : 'switchTeams'), {
+                    contestId: _this.contest._id,
+                    team: '' + _this.contest.myTeam,
+                    sourceClick: source
                 });
                 //Notify outside that contest changed
                 _this.client.events.publish('topTeamer:contestUpdated', data.contest, data.contest.status, data.contest.status);

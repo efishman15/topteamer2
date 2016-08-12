@@ -3,6 +3,7 @@ import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import {Question} from '../../objects/objects';
 import {QuizQuestion} from "../../objects/objects";
+import * as analyticsService from '../../providers/analytics';
 
 @Component({
   templateUrl: 'build/pages/question-stats/question-stats.html'
@@ -23,6 +24,13 @@ export class QuestionStatsPage {
     this.client = Client.getInstance();
     this.question = params.data.question;
     this.viewController = viewController;
+
+    this.client.events.subscribe('topTeamer:resize', (eventData) => {
+      if (this.question.correctRatio || this.question.correctRatio === 0) {
+        this.drawChart();
+      }
+    });
+
   }
 
   //The only life cycle eve currently called in modals
@@ -35,13 +43,7 @@ export class QuestionStatsPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/questionStats', {'questionId': this.question._id});
-    if (this.question.correctRatio || this.question.correctRatio === 0) {
-      this.drawChart();
-    }
-  }
-
-  onResize() {
+    analyticsService.track('page/questionStats', {'questionId': this.question._id});
     if (this.question.correctRatio || this.question.correctRatio === 0) {
       this.drawChart();
     }
@@ -78,7 +80,7 @@ export class QuestionStatsPage {
   }
 
   dismiss(action) {
-    this.client.logEvent('quiz/stats/' + (action ? action : 'cancel'));
+    analyticsService.track('quiz/stats/' + (action ? action : 'cancel'));
     this.viewController.dismiss(action);
   }
 

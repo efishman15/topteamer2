@@ -5,10 +5,11 @@ var objects_1 = require('../objects/objects');
 //------------------------------------------------------
 exports.getLoginStatus = function () {
     return new Promise(function (resolve, reject) {
-        var connectInfo = new objects_1.ConnectInfo('facebook');
+        var connectInfo;
         if (!window.cordova) {
             window.FB.getLoginStatus(function (response) {
                 if (response && response.status === 'connected') {
+                    connectInfo = new objects_1.ConnectInfo('facebook');
                     connectInfo.facebookInfo = new objects_1.FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
                 }
                 resolve(connectInfo);
@@ -21,6 +22,7 @@ exports.getLoginStatus = function () {
                     setTimeout(function () {
                         window.facebookConnectPlugin.getLoginStatus(function (response) {
                             if (response && response.status === 'connected') {
+                                connectInfo = new objects_1.ConnectInfo('facebook');
                                 connectInfo.facebookInfo = new objects_1.FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
                             }
                             resolve(connectInfo);
@@ -30,11 +32,12 @@ exports.getLoginStatus = function () {
                     }, 500);
                 }
                 else if (response && response.status === 'connected') {
+                    connectInfo = new objects_1.ConnectInfo('facebook');
                     connectInfo.facebookInfo = new objects_1.FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
                     resolve(connectInfo);
                 }
                 else {
-                    resolve(connectInfo);
+                    reject();
                 }
             }, function (error) {
                 reject(error);

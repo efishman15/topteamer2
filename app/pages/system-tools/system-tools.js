@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var alertService = require('../../providers/alert');
 var SystemToolsPage = (function () {
     function SystemToolsPage() {
@@ -17,7 +18,7 @@ var SystemToolsPage = (function () {
         this.commandId = this.client.settings.admin.commands[0].id;
     }
     SystemToolsPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/systemTools');
+        analyticsService.track('page/systemTools');
     };
     SystemToolsPage.prototype.runCommand = function () {
         var _this = this;

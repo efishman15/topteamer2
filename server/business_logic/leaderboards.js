@@ -122,7 +122,8 @@ module.exports.getFriends = function (req, res, next) {
     function (data, callback) {
 
       if (!data.session.facebookUserId) {
-        exceptions.ServerResponseException(res, 'This functionality is not supported in guest mode', null, 'warn', 424);
+        //Skip guests
+        callback(null, data);
         return;
       }
 
@@ -137,9 +138,16 @@ module.exports.getFriends = function (req, res, next) {
 
     //Store friends retrieved from facebook in the session in memory
     function (data, callback) {
+      if (!data.session.facebookUserId) {
+        //Skip guests
+        callback(null, data);
+        return;
+      }
+
       if (data.friendsJustRetrieved) {
         if (!data.session.friends.noPermission) {
-          dalDb.storeSession(data, callback);
+          data.setData = {friends: data.session.friends}
+          dalDb.setSession(data, callback);
         }
         else {
           callback(new exceptions.ServerMessageException('SERVER_ERROR_MISSING_FRIENDS_PERMISSION', {'confirm': true}));
@@ -153,6 +161,12 @@ module.exports.getFriends = function (req, res, next) {
 
     //If synched friends - store it in the user's profile as well
     function (data, callback) {
+      if (!data.session.facebookUserId) {
+        //Skip guests
+        callback(null, data);
+        return;
+      }
+
       if (data.friendsJustRetrieved && data.session.friends&& !data.session.friends.noPermission) {
         data.setData = {'friends': data.session.friends};
         data.closeConnection = true;

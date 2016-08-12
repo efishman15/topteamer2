@@ -5,6 +5,7 @@ import {SimpleTabsComponent} from '../../components/simple-tabs/simple-tabs';
 import {SimpleTabComponent} from '../../components/simple-tab/simple-tab';
 import {ViewChild} from '@angular/core';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 import * as contestsService from '../../providers/contests';
 import {Contest} from '../../objects/objects';
 
@@ -23,10 +24,26 @@ export class ContestParticipantsPage {
   constructor(params:NavParams) {
     this.client = Client.getInstance();
     this.params = params;
+
+    this.client.events.subscribe('topTeamer:leaderboardsUpdated', () => {
+      switch(this.tabId) {
+        case -1:
+          this.showContestParticipants(true).then(() => {
+          }, () => {
+          });
+          break;
+        case 0:
+        case 1:
+          this.showTeamParticipants(this.tabId, true).then (() => {
+          },() => {
+          });
+          break;
+      }
+    });
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/contestParticipants',{'contestId' : this.params.data.contest._id});
+    analyticsService.track('page/contestParticipants',{contestId : this.params.data.contest._id});
     if (this.leadersComponent) {
       return this.tabGeneralParticipants();
     }
@@ -43,12 +60,12 @@ export class ContestParticipantsPage {
   }
 
   showContestParticipants(forceRefresh? : boolean) {
-    this.client.logEvent('contest/participants/' + this.params.data.source + '/leaderboard/all');
+    analyticsService.track('contest/participants/' + this.params.data.source + '/leaderboard/all');
     return this.leadersComponent.showContestParticipants(this.params.data.contest._id, null, forceRefresh)
   }
 
   showTeamParticipants(teamId, forceRefresh? :boolean) {
-    this.client.logEvent('contest/participants/' + this.params.data.source + '/leaderboard/team' + teamId);
+    analyticsService.track('contest/participants/' + this.params.data.source + '/leaderboard/team' + teamId);
     return this.leadersComponent.showContestParticipants(this.params.data.contest._id, teamId, forceRefresh);
   }
 

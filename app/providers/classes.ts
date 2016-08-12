@@ -16,6 +16,7 @@ import {SearchQuestionsPage} from '../pages/search-questions/search-questions';
 import {ServerPopupPage} from '../pages/server-popup/server-popup';
 import {SetContestPage} from '../pages/set-contest/set-contest';
 import {SetContestAdminPage} from '../pages/set-contest-admin/set-contest-admin';
+import {SetUserPage} from '../pages/set-user/set-user';
 import {SettingsPage} from '../pages/settings/settings';
 import {SharePage} from '../pages/share/share';
 import {SystemToolsPage} from '../pages/system-tools/system-tools';
@@ -39,6 +40,7 @@ let appClasses = {
   'ServerPopupPage': <any>ServerPopupPage,
   'SetContestPage': <any>SetContestPage,
   'SetContestAdminPage': <any>SetContestAdminPage,
+  'SetUserPage': <any>SetUserPage,
   'SettingsPage': <any>SettingsPage,
   'SharePage': <any>SharePage,
   'SystemToolsPage': <any>SystemToolsPage

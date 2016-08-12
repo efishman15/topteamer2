@@ -207,13 +207,12 @@ module.exports.switchLanguage = function (req, res, next) {
 
     //Store the session back
     function (data, callback) {
-      data.session.settings.language = data.language;
-      dalDb.storeSession(data, callback);
+      data.setData = {'settings.language': data.language};
+      dalDb.setSession(data, callback);
     },
 
     //Save the settings to the user object
     function (data, callback) {
-      data.setData = {'settings.language': data.language};
       data.closeConnection = true;
       dalDb.setUser(data, callback);
     }

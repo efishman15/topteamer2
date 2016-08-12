@@ -11,7 +11,6 @@ declare global
     fbAsyncInit() : void;
     inappbilling: any;
     initBranch() : void;
-    FlurryAgent: any;
     myHandleBranch(err:any, data:any) : void;
     branch: any;
     myRequestAnimationFrame(callback:any): void;
@@ -20,8 +19,8 @@ declare global
     FusionCharts: any;
     facebookConnectPlugin: any;
     PushNotification: any;
-    myLogError(errorType:string, message:string): void;
     plugins: any;
+    mixpanel:IMixpanel;
   }
 
   interface Navigator {
@@ -45,3 +44,16 @@ interface IFB {
   login(callback:any, permissions:Object): void;
   logout(callback:any): void;
 }
+
+interface IMixpanel {
+  init(token:string) : void;
+  register(superProperties:any) : void;
+  identify(userId:string) : void;
+  track(eventName:string, eventProperties?:any) : void;
+  people: IMixpanelPeople;
+}
+
+interface IMixpanelPeople {
+  set(data: any) : void;
+}
+

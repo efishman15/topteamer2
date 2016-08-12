@@ -25,6 +25,7 @@ export class LeadersComponent {
   generalContestLastRefreshTime;
   team0ContestLastRefreshTime;
   team1ContestLastRefreshTime;
+  mode:string;
 
   constructor() {
     this.client = Client.getInstance();
@@ -48,12 +49,14 @@ export class LeadersComponent {
     //Check if refresh frequency reached
     if (now - this.friendsLastRefreshTime < this.client.settings.lists.leaderboards.friends.refreshFrequencyInMilliseconds && !forceRefresh) {
       this.leaders = this.lastFriendsLeaders;
+      this.mode = 'friends';
       resolve();
       return;
     }
     leaderboardsService.friends().then((leaders) => {
       this.friendsLastRefreshTime = now;
       this.leaders = leaders;
+      this.mode = 'friends';
       this.lastFriendsLeaders = leaders;
       resolve();
     }, (err) => {
@@ -79,12 +82,14 @@ export class LeadersComponent {
       //Check if refresh frequency reached
       if (now - this.weeklyLastRefreshTime < this.client.settings.lists.leaderboards.weekly.refreshFrequencyInMilliseconds && !forceRefresh) {
         this.leaders = this.lastWeeklyLeaders;
+        this.mode = 'weekly';
         resolve();
         return;
       }
       leaderboardsService.weekly().then((leaders) => {
         this.weeklyLastRefreshTime = now;
         this.leaders = leaders;
+        this.mode = 'weekly';
         this.lastWeeklyLeaders = leaders;
         resolve();
       }, () => {
@@ -121,11 +126,13 @@ export class LeadersComponent {
       //Check if refresh frequency reached
       if (now - lastRefreshTime < this.client.settings.lists.leaderboards.contest.refreshFrequencyInMilliseconds && !forceRefresh) {
         this.leaders = lastLeaders;
+        this.mode = 'contest';
         resolve();
         return;
       }
       leaderboardsService.contest(contestId, teamId).then((leaders) => {
         this.leaders = leaders;
+        this.mode = 'contest';
         switch (teamId) {
           case 0:
             this.lastTeam0ContestLeaders = leaders;

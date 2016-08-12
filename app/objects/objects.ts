@@ -27,9 +27,27 @@ export class Settings {
   lists:ListSettings;
   share:ShareSettings;
   contest:ContestSettings;
-  flurry:FlurrySettings;
   branch:BranchSettings;
   admin:AdminSettings;
+  analytics: AnalyticsSettings;
+}
+
+export class GeneralInputsSettings {
+  name: FormInputSettings;
+}
+
+export class AnalyticsSettings {
+  track:AnalyticsTrackSettings;
+  mixpanel:MixpanelAnalyticsSettings;
+}
+
+export class AnalyticsTrackSettings {
+  events:boolean;
+  errors:boolean;
+}
+
+export class MixpanelAnalyticsSettings {
+  token:string;
 }
 
 export class AdminSettings {
@@ -43,10 +61,6 @@ export class AdminCommand {
   type:string;
   confirm:string;
   returnValue:string;
-}
-
-export class FlurrySettings {
-  key:string;
 }
 
 export class BranchSettings {
@@ -85,6 +99,16 @@ export class NewContestSettings {
   contestTypes:any;
   endOptions:any;
   selectableContestTypes:Array<Array<string>>;
+  inputs: NewContestInputSettings;
+}
+
+export class NewContestInputSettings {
+  team: FormInputSettings;
+  subject: FormInputSettings;
+}
+
+export class FormInputSettings {
+  maxLength:number;
 }
 
 export class NewContestPrivateQuestionsSettings {
@@ -126,6 +150,9 @@ export class GeneralSettings {
   postErrors:boolean;
   network:GeneralNetworkSettings;
   avatarTemplate:string;
+  allowGuest:boolean;
+  avatars:Array<string>;
+  inputs: GeneralInputsSettings;
 }
 
 export class GeneralNetworkSettings {
@@ -379,6 +406,7 @@ export class Session {
   gcmRegistrationId:string;
   token:string;
   avatar:Avatar;
+  dob:number;
 }
 
 export class ClientShareApp {

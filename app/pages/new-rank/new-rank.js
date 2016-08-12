@@ -11,16 +11,17 @@ var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var soundService = require('../../providers/sound');
+var analyticsService = require('../../providers/analytics');
 var NewRankPage = (function () {
     function NewRankPage(params, viewController) {
         this.client = client_1.Client.getInstance();
         this.xpProgress = params.data.xpProgress;
         this.viewController = viewController;
-        this.client.logEvent('page/newRank', { 'rank': this.client.session.rank });
+        analyticsService.track('page/newRank', { 'rank': this.client.session.rank });
     }
     //The only life cycle eve currently called in modals
     NewRankPage.prototype.ngAfterViewInit = function () {
-        this.client.logEvent('page/newRank', { 'rank': this.client.session.rank });
+        analyticsService.track('page/newRank', { 'rank': this.client.session.rank });
         soundService.play('audio/finish_great_1');
     };
     NewRankPage.prototype.dismiss = function (okPressed) {

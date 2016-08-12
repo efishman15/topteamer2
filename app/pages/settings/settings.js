@@ -10,12 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
 var connectService = require('../../providers/connect');
+var analyticsService = require('../../providers/analytics');
 var SettingsPage = (function () {
     function SettingsPage() {
         this.client = client_1.Client.getInstance();
     }
     SettingsPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/settings');
+        analyticsService.track('page/settings');
         this.originalLanguage = this.client.session.settings.language;
     };
     SettingsPage.prototype.ionViewDidLeave = function () {
@@ -29,7 +30,7 @@ var SettingsPage = (function () {
     };
     SettingsPage.prototype.toggleSettings = function (name, initPushService) {
         var _this = this;
-        this.client.logEvent('settings/' + name + '/' + !this.client.session.settings[name]);
+        analyticsService.track('settings/' + name + '/' + !this.client.session.settings[name]);
         this.client.toggleSettings(name).then(function () {
             if (initPushService) {
                 _this.client.initPushService();
@@ -47,7 +48,7 @@ var SettingsPage = (function () {
     };
     SettingsPage.prototype.logout = function () {
         var _this = this;
-        this.client.logEvent('settings/facebookSignOut');
+        analyticsService.track('settings/logout');
         connectService.logout().then(function () {
             _this.client.logout();
             _this.client.setRootPage('LoginPage');

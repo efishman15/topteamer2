@@ -11,6 +11,7 @@ var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
+var analyticsService = require('../../providers/analytics');
 var alertService = require('../../providers/alert');
 var SearchQuestionsPage = (function () {
     function SearchQuestionsPage(params, viewController) {
@@ -21,7 +22,7 @@ var SearchQuestionsPage = (function () {
     }
     //The only life cycle eve currently called in modals
     SearchQuestionsPage.prototype.ngAfterViewInit = function () {
-        this.client.logEvent('page/searchQuestions');
+        analyticsService.track('page/searchQuestions');
     };
     SearchQuestionsPage.prototype.search = function (event) {
         var _this = this;
@@ -44,7 +45,7 @@ var SearchQuestionsPage = (function () {
         });
     };
     SearchQuestionsPage.prototype.dismiss = function (applyChanges) {
-        this.client.logEvent('questions/search/' + (applyChanges ? 'select' : 'cancel'));
+        analyticsService.track('questions/search/' + (applyChanges ? 'select' : 'cancel'));
         if (applyChanges) {
             //Find how many selected
             var selectedCount = 0;

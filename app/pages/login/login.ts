@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
 import * as connectService from '../../providers/connect';
+import * as analyticsService from '../../providers/analytics';
 import {ConnectInfo} from '../../objects/objects';
 
 @Component({
@@ -28,7 +29,7 @@ export class LoginPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/login');
+    analyticsService.track('page/login');
   }
 
   ionViewDidEnter() {
@@ -36,32 +37,41 @@ export class LoginPage {
     this.client.processInternalEvents();
   }
 
-  login() {
-    connectService.login().then((connectInfo:ConnectInfo) => {
+  loginToServer(connectInfo:ConnectInfo) {
+    return new Promise((resolve,reject)=> {
       this.client.serverConnect(connectInfo).then(() => {
         this.client.playerInfoComponent.init(this.client);
         this.client.setRootPage('MainTabsPage');
+        resolve();
       }, () => {
+        reject();
       })
-    }, ()=> {
     });
-
   }
 
   facebookLogin() {
-    this.client.logEvent('login/facebookLogin');
-    this.login();
+    analyticsService.track('login/facebookLogin');
+    connectService.facebookLogin().then((connectInfo:ConnectInfo) => {
+      this.loginToServer(connectInfo).then(()=>{
+        connectService.storeCredentials(connectInfo);
+      });
+    }, ()=> {
+    });
   };
 
   registerGuest() {
-    this.client.logEvent('login/guest');
-    connectService.createGuest();
-    this.login();
+    analyticsService.track('login/guest');
+    connectService.guestLogin().then((connectInfo:ConnectInfo)=> {
+      this.loginToServer(connectInfo).then(()=> {
+      },()=>{
+      });
+    }, ()=> {
+    });
   }
 
   changeLanguage(language) {
     this.client.user.settings.language = language;
     localStorage.setItem('language', language);
-    this.client.logEvent('login/changeLanguage', {language: language});
+    analyticsService.track('login/changeLanguage', {language: language});
   }
 }

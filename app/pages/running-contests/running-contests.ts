@@ -2,6 +2,7 @@ import {Component,ViewChild} from '@angular/core';
 import {Refresher} from 'ionic-angular'
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 
 @Component({
   templateUrl: 'build/pages/running-contests/running-contests.html',
@@ -32,7 +33,7 @@ export class RunningContestsPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/runningContests');
+    analyticsService.track('page/runningContests');
     this.refreshList().then (() => {
     }, () => {
     });

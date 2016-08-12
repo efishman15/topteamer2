@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 import * as alertService from '../../providers/alert';
 import {AdminCommand} from '../../objects/objects';
 
@@ -20,7 +21,7 @@ export class SystemToolsPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/systemTools');
+    analyticsService.track('page/systemTools');
   }
 
   runCommand() {

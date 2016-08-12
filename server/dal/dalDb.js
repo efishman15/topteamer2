@@ -107,7 +107,11 @@ function register(data, callback) {
   }
   else if (data.user.credentials.type === 'guest') {
     newUser.uuid = data.user.credentials.guestInfo.uuid;
-    newUser.name = generalUtils.settings.server.guest.defaultName[data.user.settings.language];
+    newUser.name = generalUtils.settings.client.ui[data.user.settings.language]['GUEST_DEFAULT_NAME'];
+    if (generalUtils.settings.server.guest.name.random.use) {
+      var randomNumber = random.rnd(generalUtils.settings.server.guest.name.random.range.min, generalUtils.settings.server.guest.name.random.range.max);
+      newUser.name += ' ' + randomNumber;
+    }
     newUser.avatar = generalUtils.settings.server.guest.defaultAvatar;
   }
   else {
@@ -345,45 +349,6 @@ function retrieveAdminSession(data, callback) {
   })
 }
 
-
-//---------------------------------------------------------------------
-// storeSession
-//
-// Stores a session back to db
-//
-// data:
-// -----
-// input: DbHelper, session
-// output: <NA>
-//---------------------------------------------------------------------
-module.exports.storeSession = function (data, callback) {
-
-  data.session.expires = new Date((new Date()).getTime() + generalUtils.settings.server.db.sessionExpirationMilliseconds)
-  var sessionsCollection = data.DbHelper.getCollection('Sessions');
-  sessionsCollection.update(
-    {
-      '_id': data.session._id
-    },
-    data.session,
-    function (err, updated) {
-      if (err) {
-
-        closeDb(data);
-
-        callback(new exceptions.ServerException('Error storing session expired - session expired', {
-          'sessionId': data.session._id,
-          'error': err
-        }, 'info', 401));
-        return;
-      }
-
-      checkToCloseDb(data);
-
-      callback(null, data);
-    }
-  )
-};
-
 //---------------------------------------------------------------------
 // setUser
 //
@@ -560,6 +525,7 @@ module.exports.login = function (data, callback) {
         setObject['$set'].facebookAccessToken = data.user.credentials.facebookInfo.accessToken;
         setObject['$set'].name = data.user.name;  //keep sync with Facebook changes
         setObject['$set'].email = data.user.email;  //keep sync with Facebook changes - might be null if user removed email permission
+        setObject['$set'].ageRange = data.user.ageRange;  //keep sync with Facebook changes
       }
 
       if (data.user.gcmRegistrationId) {
@@ -642,6 +608,9 @@ module.exports.createOrUpdateSession = function (data, callback) {
   }
   else if (data.user.credentials.type === 'guest') {
     setObject.avatar = data.user.avatar;
+    if (data.user.dob) {
+      setObject.dob = data.user.dob;
+    }
   }
 
   if (data.user.justRegistered) {
@@ -708,45 +677,27 @@ module.exports.createOrUpdateSession = function (data, callback) {
 //---------------------------------------------------------------------
 module.exports.logout = function (data, callback) {
   var sessionsCollection = data.DbHelper.getCollection('Sessions');
-  sessionsCollection.findOne({
-    'userToken': data.token
-  }, {}, function (err, session) {
-    if (err || !session) {
 
-      closeDb(data);
-
-      callback(new exceptions.ServerException('Error logging out from session - session expired', {
-        'userId': data.token,
-        'dbError': err
-      }, 'info'));
-      return;
+  //Actual logout - remove the session
+  sessionsCollection.remove(
+    {
+      'userToken': data.token
     }
+    , {w: 1, single: true},
+    function (err, numberOfRemovedDocs) {
+      if (err || numberOfRemovedDocs.ok == 0) {
 
-    //Actual logout - remove the session
-    sessionsCollection.remove(
-      {
-        'userToken': data.token
-      }
-      , {w: 1, single: true},
-      function (err, numberOfRemovedDocs) {
-        if (err || numberOfRemovedDocs.ok == 0) {
-          //Session does not exist - stop the call chain
-
-          closeDb(data);
-
-          callback(new exceptions.ServerException('Error logging out from session - session expired', {
-            'userId': data.token,
-            'dbError': err
-          }, 'info'));
-          return;
-        }
-
-        checkToCloseDb(data);
-
+        //Session does not exist - probably expired - not an error
+        closeDb(data);
         callback(null, data);
+        return;
       }
-    );
-  })
+
+      checkToCloseDb(data);
+
+      callback(null, data);
+    }
+  );
 };
 
 //---------------------------------------------------------------------
@@ -1081,15 +1032,18 @@ function prepareContestsQuery(data, callback) {
   var sortClause = {'$sort': {}};
 
   var clientFields;
-  if (data.session.isAdmin) {
-    clientFields = generalUtils.arrayToObject(generalUtils.settings.server.contest.list.adminClientFields, 1);
+  if (!data.session.isAdmin) {
+    clientFields = generalUtils.arrayToObject(generalUtils.settings.server.contest.list.clientFields, 1);
   }
   else {
-    clientFields = generalUtils.arrayToObject(generalUtils.settings.server.contest.list.clientFields, 1);
+    clientFields = generalUtils.arrayToObject(generalUtils.settings.server.contest.list.adminClientFields, 1);
   }
 
   //Will return the user's team if joined to a team or null if not
-  clientFields['myTeam'] = {$cond: [{$eq: ['$users.' + data.session.userId + '.userId', ObjectId(data.session.userId)]}, '$users.' + data.session.userId + '.team', null]};
+  clientFields.myTeam = {$cond: [{$eq: ['$users.' + data.session.userId + '.userId', ObjectId(data.session.userId)]}, '$users.' + data.session.userId + '.team', -1]};
+
+  //Will return true if current user is the owner of the contest or null otherwise
+  clientFields.owner = {$cond: [{$eq: ['$creator.id', ObjectId(data.session.userId)]}, true, false]};
 
   //Will return the total participants including the "system participants"
   clientFields['participants'] = {$add: ['$participants', '$systemParticipants']};
@@ -1624,18 +1578,17 @@ function getUsers(data, callback) {
 }
 
 //------------------------------------------------------------------------------------------------
-// updateContestsWithMyGuestAvatar
+// syncContestsAvatars
 //
-// Updates the avatar in contests in which my guest avatar appears
+// Updates the avatar in contests in which my avatar appears
 //
 // data:
 // -----
 // input: DbHelper, session
 // output: contests
 //------------------------------------------------------------------------------------------------
-
-module.exports.updateContestsWithMyGuestAvatar = updateContestsWithMyGuestAvatar;
-function updateContestsWithMyGuestAvatar(data, callback) {
+module.exports.syncContestsAvatars = syncContestsAvatars;
+function syncContestsAvatars(data, callback) {
 
   var contestsCollection = data.DbHelper.getCollection('Contests');
 
@@ -1660,43 +1613,107 @@ function updateContestsWithMyGuestAvatar(data, callback) {
       return;
     }
 
-    contestsCollection.toArray(function (err, contests) {
+    contestsCursor.toArray(function (err, contests) {
 
       data.contests = contests;
 
-      async.forEach(contests, function(contest, contestCallback) {
+      async.forEach(contests, function (contest, contestCallback) {
 
         var setObject = {'$set': {}};
 
         if (contest.creator.id.toString() === data.session.userId.toString()) {
-          setObject[$set]['creator.avatar.type'] = 0;
-          setObject[$set]['creator.avatar.id'] = data.session.facebookUserId;
+          setObject['$set']['creator.name'] = data.session.name;
+          contest.creator.name = data.session.name;
+          setObject['$set']['creator.avatar.id'] = data.session.avatar;
+          contest.creator.avatar.id = data.session.avatar;
         }
         if (contest.leader.id.toString() === data.session.userId.toString()) {
-          setObject[$set]['leader.avatar.type'] = 0;
-          setObject[$set]['leader.avatar.id'] = data.session.facebookUserId;
+          setObject['$set']['leader.name'] = data.session.name;
+          contest.leader.name = data.session.name;
+          setObject['$set']['leader.avatar.id'] = data.session.avatar;
+          contest.leader.avatar.id = data.session.avatar;
         }
         if (contest.teams[0].leader && contest.teams[0].leader.id.toString() === data.session.userId.toString()) {
-          setObject[$set]['teams.0.leader.avatar.type'] = 0;
-          setObject[$set]['teams.0.leader.avatar.id'] = data.session.facebookUserId;
+          setObject['$set']['teams.0.leader.name'] = data.session.name;
+          contest.teams[0].leader.name = data.session.name;
+          setObject['$set']['teams.0.leader.avatar.id'] = data.session.avatar;
+          contest.teams[0].leader.avatar.id = data.session.avatar;
         }
         if (contest.teams[1].leader && contest.teams[1].leader.id.toString() === data.session.userId.toString()) {
-          setObject[$set]['teams.1.leader.avatar.type'] = 0;
-          setObject[$set]['teams.1.leader.avatar.id'] = data.session.facebookUserId;
+          setObject['$set']['teams.1.leader.name'] = data.session.name;
+          contest.teams[1].leader.name = data.session.name;
+          setObject['$set']['teams.1.leader.avatar.id'] = data.session.avatar;
+          contest.teams[1].leader.avatar.id = data.session.avatar;
         }
 
-        contestsCollection.updateOne({'_id': ObjectId(contest._id)}, {},
-          setObject, {w: 1, new: true}, function (err, updatedContest) {
+        contestsCollection.updateOne({'_id': ObjectId(contest._id)}, setObject,
+          function (err, results) {
 
-            contestCallback();
+            if (err || results.nModified < 1) {
+              contestCallback(); //notify finished itteration
+              callback(new exceptions.ServerException('Error updating contest with id: ', {
+                'userId': data.session.userId,
+                'contestId': contest._id,
+                'dbError': err
+              }, 'error'));
+              return;
+            }
+
+            contestCallback(); //notify finished itteration
 
           });
+      }, function (err) {
+        if (err) {
+          closeDb(data);
+          callback(new exceptions.ServerException('Error synching contest avatars', {
+            'userId': data.session.userId,
+            'dbError': err
+          }, 'error'));
+          return;
+        }
+        checkToCloseDb(data);
 
+        callback(null, data);
       });
-
-      callback(null, data);
 
     });
 
   });
+}
+
+//------------------------------------------------------------------------------------------------
+// checkIfFacebookIdExists
+//
+// Checks if a user with a given facebookUserId is already registered
+// (called in upgradeGuest scenario)
+//
+// data:
+// -----
+// input: DbHelper, session
+// output: facebookExists (boolean)
+//------------------------------------------------------------------------------------------------
+module.exports.checkIfFacebookIdExists = checkIfFacebookIdExists;
+function checkIfFacebookIdExists(data, callback) {
+
+  var usersCollection = data.DbHelper.getCollection('Users');
+
+  usersCollection.findOne({facebookUserId: data.facebookUserId}, {}, function (err, user) {
+    if (err) {
+      closeDb(data);
+      callback(new exceptions.ServerException('Error checking if facebook id exists', {
+        'facebookUserId': facebookUserId,
+        'userId': data.session.userId,
+        'dbError': err
+      }, 'error'));
+      return;
+    }
+
+    if (user) {
+      data.facebookExists = true;
+    }
+
+    callback(null, data);
+  });
+
+
 }

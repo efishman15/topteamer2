@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var connectService = require('../../providers/connect');
 var FacebookPostPage = (function () {
     function FacebookPostPage(params, viewController) {
@@ -19,11 +20,11 @@ var FacebookPostPage = (function () {
     }
     //The only life cycle eve currently called in modals
     FacebookPostPage.prototype.ngAfterViewInit = function () {
-        this.client.logEvent('page/facebookPost', { 'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey });
+        analyticsService.track('page/facebookPost', { 'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey });
     };
     FacebookPostPage.prototype.post = function () {
         var _this = this;
-        this.client.logEvent('contest/facebook/post/click');
+        analyticsService.track('contest/facebook/post/click');
         connectService.post(this.quizResults.data.facebookPost).then(function () {
             _this.close(true);
         }, function () {
@@ -33,7 +34,7 @@ var FacebookPostPage = (function () {
     };
     FacebookPostPage.prototype.close = function (posted) {
         if (!posted) {
-            this.client.logEvent('contest/facebook/post/cancel');
+            analyticsService.track('contest/facebook/post/cancel');
         }
         this.viewController.dismiss();
     };

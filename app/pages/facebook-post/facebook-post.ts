@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 import * as connectService from '../../providers/connect';
 import {QuizResults} from '../../objects/objects';
 
@@ -21,11 +22,11 @@ export class FacebookPostPage {
 
   //The only life cycle eve currently called in modals
   ngAfterViewInit() {
-    this.client.logEvent('page/facebookPost', {'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey});
+    analyticsService.track('page/facebookPost', {'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey});
   }
 
   post() {
-    this.client.logEvent('contest/facebook/post/click');
+    analyticsService.track('contest/facebook/post/click');
     connectService.post(this.quizResults.data.facebookPost).then(() => {
       this.close(true);
     }, () => {
@@ -36,7 +37,7 @@ export class FacebookPostPage {
 
   close(posted: boolean) {
     if (!posted) {
-      this.client.logEvent('contest/facebook/post/cancel');
+      analyticsService.track('contest/facebook/post/cancel');
     }
     this.viewController.dismiss();
   }

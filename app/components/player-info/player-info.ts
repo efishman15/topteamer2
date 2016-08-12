@@ -18,7 +18,6 @@ export class PlayerInfoComponent {
   circle:number = Math.PI * 2;
   quarter:number = Math.PI / 2;
   height:number = 0;
-  myAvatar:string;
   hidden:boolean;
 
   constructor() {
@@ -35,7 +34,6 @@ export class PlayerInfoComponent {
 
   init(client:Client) {
     this.client = client;
-    this.myAvatar = this.client.getAvatarUrl(this.client.session.avatar);
     this.initXp();
     this.hidden = false;
   }
@@ -157,5 +155,10 @@ export class PlayerInfoComponent {
 
   }
 
-
+  myAvatarClick(event: Event) {
+    //Avoid opening 'SetUserPage' twice
+    if (this.client.nav.getActive().componentType.name !== 'SetUserPage') {
+        this.client.openPage('SetUserPage');
+    }
+  }
 }

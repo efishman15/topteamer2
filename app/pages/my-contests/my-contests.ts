@@ -3,6 +3,7 @@ import {Refresher} from 'ionic-angular'
 import {ContestListComponent} from '../../components/contest-list/contest-list';
 import {Client} from '../../providers/client';
 import {Contest} from '../../objects/objects';
+import * as analyticsService from '../../providers/analytics';
 
 @Component({
   templateUrl: 'build/pages/my-contests/my-contests.html',
@@ -34,7 +35,7 @@ export class MyContestsPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/myContests');
+    analyticsService.track('page/myContests');
     this.refreshList().then(() => {
       if (this.contestList.contests.length === 0 && !this.pageLoaded) {
         //On load only - switch to "running contests" if no personal contests

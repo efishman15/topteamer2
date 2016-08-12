@@ -89,6 +89,8 @@ dalDb.loadSettings(null, function (err, data) {
   //----------------------------------------------------
   app.post('/user/logout', isAuthenticated, credentials.logout);
   app.post('/user/setGcmRegistration', sessionUtils.setGcmRegistration);
+  app.post('/user/set', credentials.setUser);
+  app.post('/user/upgradeGuest', credentials.upgradeGuest);
   app.post('/user/toggleSettings', sessionUtils.toggleSettings);
   app.post('/user/switchLanguage', sessionUtils.switchLanguage);
   app.post('/quiz/start', isAuthenticated, quiz.start);

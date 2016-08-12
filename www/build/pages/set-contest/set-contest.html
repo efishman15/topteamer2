@@ -24,31 +24,33 @@
     </button>
   </div>
 
-  <form [ngFormModel]="contestForm" name="contestForm" novalidate="novalidate">
+  <form [formGroup]="contestForm">
 
-    <div ngControlGroup="matchingTeamsControlGroup" padding-left padding-right padding-top>
+    <div formGroupName="teams" padding-left padding-right padding-top>
       <div class="set-contest-against" text-center>{{client.translate('AGAINST')}}</div>
       <ion-row>
         <ion-col width-50>
           <ion-item>
-            <ion-input type="text"
+            <ion-input #team0Input
+                       name="team0"
+                       type="text"
                        class="set-contest-team"
-                       ngControl="team0Control"
+                       formControlName="team0"
                        [(ngModel)]="contestLocalCopy.teams[0].name"
                        placeholder="{{client.translate('TEAM0')}}"
-                       maxlength="15"
                        [disabled]="client.session.features.newContest.locked" autofocus>
             </ion-input>
           </ion-item>
         </ion-col>
         <ion-col width-50>
           <ion-item>
-            <ion-input type="text"
+            <ion-input #team1Input
+                       name="team0"
+                       type="text"
                        class="set-contest-team"
-                       ngControl="team1Control"
+                       formControlName="team1"
                        [(ngModel)]="contestLocalCopy.teams[1].name"
                        placeholder="{{client.translate('TEAM1')}}"
-                       maxlength="15"
                        [disabled]="client.session.features.newContest.locked">
             </ion-input>
           </ion-item>
@@ -57,21 +59,21 @@
       <ion-row>
         <ion-col>
           <div text-center
-               *ngIf="(team0Control.dirty || submitted) && team0Control.errors && team0Control.errors.required"
+               *ngIf="(contestForm.controls.teams.controls.team0.dirty || submitted) && contestForm.controls.teams.controls.team0.errors && contestForm.controls.teams.controls.team0.errors.required"
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
           </div>
         </ion-col>
         <ion-col>
           <div text-center
-               *ngIf="(matchingTeamsControlGroup.dirty || submitted) && matchingTeamsControlGroup.errors && matchingTeamsControlGroup.errors.matchingTeams"
+               *ngIf="(contestForm.controls.teams.dirty || submitted) && contestForm.controls.teams.errors && contestForm.controls.teams.errors.matchingTeams"
                class="invalid-input">
             {{client.translate('SERVER_ERROR_TEAMS_MUST_HAVE_DIFFERENT_NAMES_MESSAGE')}}
           </div>
         </ion-col>
         <ion-col>
           <div text-center
-               *ngIf="(team1Control.dirty || submitted) && team1Control.errors && team1Control.errors.required"
+               *ngIf="(contestForm.controls.teams.controls.team1.dirty || submitted) && contestForm.controls.teams.controls.team1.errors && contestForm.controls.teams.controls.team1.errors.required"
                class="invalid-input">
             {{client.translate('FIELD_REQUIRED')}}
           </div>
@@ -82,17 +84,18 @@
     <div class="set-contest-subject-wrapper">
       <ion-item>
         <ion-label stacked>{{client.translate('SUBJECT')}}</ion-label>
-        <ion-input type="text"
+        <ion-input #subjectInput
+                   name="subject"
+                   type="text"
                    [(ngModel)]="contestLocalCopy.subject"
-                   ngControl="subjectControl"
-                   maxlength="15"
+                   formControlName="subject"
                    (focus)="subjectFocus()"
                    [attr.readonly]="contestLocalCopy.type.id==='systemTrivia' ? true : null">
         </ion-input>
       </ion-item>
     </div>
     <div text-center
-         *ngIf="(subjectControl.dirty || submitted) && subjectControl.errors && subjectControl.errors.required"
+         *ngIf="(contestForm.controls.subject.dirty || submitted) && contestForm.controls.subject.errors && contestForm.controls.subject.errors.required"
          class="invalid-input">
       {{client.translate('FIELD_REQUIRED')}}
     </div>
@@ -100,7 +103,9 @@
     <div class="set-contest-ends-in-{{client.currentLanguage.direction}}" *ngIf="params.data.mode==='add'">
       <ion-item no-lines class="transparent-background">
         <ion-label class="base-font">{{client.translate('ENDS_IN')}}</ion-label>
-        <ion-select interface="action-sheet"
+        <ion-select name="endOption"
+                    formControlame="endOption"
+                    interface="action-sheet"
                     class="base-font"
                     multiple="false"
                     no-lines
@@ -118,7 +123,7 @@
       </ion-item>
     </div>
     <div padding *ngIf="params.data.mode==='edit'">
-      <span class="set-contest-label">{{client.translate('CONTEST_END')}}</span>
+      <span class="form-label">{{client.translate('CONTEST_END')}}</span>
       <date-picker [(currentDateEpoch)]="contestLocalCopy.endDate"
                    [minDate]="contestLocalCopy.startDate"
                    [maxDate]="getMaxEndDate()"
@@ -170,7 +175,10 @@
         <ion-item no-lines class="transparent-background set-contest-questions-random-order">
           <ion-label class="base-font">{{client.translate('SHOW_IN_RANDOM_ORDER')}}
           </ion-label>
-          <ion-checkbox light-purple [(ngModel)]="contestLocalCopy.type.randomOrder"
+          <ion-checkbox light-purple
+                        name="randomOrder"
+                        formControlName="randomOrder"
+                        [(ngModel)]="contestLocalCopy.type.randomOrder"
                         class="set-contest-random-order-checkbox-{{client.currentLanguage.direction}}">
           </ion-checkbox>
         </ion-item>
@@ -194,3 +202,4 @@
   </form>
 
 </ion-content>
+                                                                            

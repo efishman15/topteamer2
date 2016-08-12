@@ -1,6 +1,7 @@
 var _this = this;
 var client_1 = require('./client');
 var objects_1 = require('../objects/objects');
+var analyticsService = require('./analytics');
 var EMAIL_REF = '?ref=shareEmail';
 exports.getVariables = function (contest, isNewContest) {
     var client = client_1.Client.getInstance();
@@ -90,7 +91,7 @@ exports.mobileShare = function (appName, contest, isNewContest) {
                 window.plugins.socialsharing.shareViaWhatsApp(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
                     resolve();
                 }, function (err) {
-                    window.myLogError('WhatsApp Share', err);
+                    analyticsService.logError('WhatsApp Share', err);
                     reject();
                 });
                 break;
@@ -98,7 +99,7 @@ exports.mobileShare = function (appName, contest, isNewContest) {
                 window.plugins.socialsharing.shareViaFacebook(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
                     resolve();
                 }, function (err) {
-                    window.myLogError('Facebook Share', err);
+                    analyticsService.logError('Facebook Share', err);
                     reject();
                 });
                 break;
@@ -106,7 +107,7 @@ exports.mobileShare = function (appName, contest, isNewContest) {
                 window.plugins.socialsharing.shareViaInstagram(shareVariables.shareBody, shareVariables.shareImage, function () {
                     resolve();
                 }, function (err) {
-                    window.myLogError('Instagram Share', err);
+                    analyticsService.logError('Instagram Share', err);
                     reject();
                 });
                 break;
@@ -114,7 +115,7 @@ exports.mobileShare = function (appName, contest, isNewContest) {
                 window.plugins.socialsharing.shareViaTwitter(shareVariables.shareBodyNoUrl, shareVariables.shareImage, shareVariables.shareUrl, function () {
                     resolve();
                 }, function (err) {
-                    window.myLogError('Twitter Share', err);
+                    analyticsService.logError('Twitter Share', err);
                     reject();
                 });
                 break;
@@ -123,7 +124,7 @@ exports.mobileShare = function (appName, contest, isNewContest) {
                 function () {
                     resolve();
                 }, function (err) {
-                    window.myLogError('SMS Share', err);
+                    analyticsService.logError('SMS Share', err);
                     reject();
                 });
                 break;
@@ -134,7 +135,7 @@ exports.mobileShare = function (appName, contest, isNewContest) {
                 shareVariables.shareImage, function () {
                     resolve();
                 }, function (err) {
-                    window.myLogError('Email Share', err);
+                    analyticsService.logError('Email Share', err);
                     reject();
                 });
                 break;
@@ -147,7 +148,7 @@ exports.mobileShare = function (appName, contest, isNewContest) {
                 window.plugins.socialsharing.shareWithOptions(options, function () {
                     resolve();
                 }, function (err) {
-                    window.myLogError('General Mobile Share', err);
+                    analyticsService.logError('General Mobile Share', err);
                     reject();
                 });
                 break;

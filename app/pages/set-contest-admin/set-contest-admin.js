@@ -11,6 +11,7 @@ var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var contestsService = require('../../providers/contests');
 var alertService = require('../../providers/alert');
 var SetContestAdminPage = (function () {
@@ -25,7 +26,7 @@ var SetContestAdminPage = (function () {
         if (this.params.data.mode === 'edit') {
             eventData['contestId'] = this.params.data.contestLocalCopy._id;
         }
-        this.client.logEvent('page/setContestAdmin', eventData);
+        analyticsService.track('page/setContestAdmin', eventData);
     };
     SetContestAdminPage.prototype.ionViewDidLeave = function () {
         //For some reason manipulating the numbers and sliders turns them to strings in the model
@@ -54,9 +55,9 @@ var SetContestAdminPage = (function () {
     };
     SetContestAdminPage.prototype.removeContest = function () {
         var _this = this;
-        this.client.logEvent('contest/remove/click', { 'contestId': this.params.data.contestLocalCopy._id });
+        analyticsService.track('contest/remove/click', { 'contestId': this.params.data.contestLocalCopy._id });
         alertService.confirm('CONFIRM_REMOVE_TITLE', 'CONFIRM_REMOVE_TEMPLATE', { name: this.params.data.contestName }).then(function () {
-            _this.client.logEvent('contest/removed', { 'contestId': _this.params.data.contestLocalCopy._id });
+            analyticsService.track('contest/removed', { 'contestId': _this.params.data.contestLocalCopy._id });
             contestsService.removeContest(_this.params.data.contestLocalCopy._id).then(function () {
                 var now = (new Date()).getTime();
                 var finishedContest = (_this.params.data.contestLocalCopy.endDate < now);

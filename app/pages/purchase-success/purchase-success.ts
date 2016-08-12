@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {NavParams} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 
 @Component({
   templateUrl: 'build/pages/purchase-sucess/purchase-success.html'
@@ -18,7 +19,7 @@ export class PurchaseSuccessPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/purchaseSuccess', {'feature' : this.params.data.featurePurchased});
+    analyticsService.track('page/purchaseSuccess', {'feature' : this.params.data.featurePurchased});
     this.unlockText = this.client.translate(this.client.session.features[this.params.data.featurePurchased].unlockText);
   }
 

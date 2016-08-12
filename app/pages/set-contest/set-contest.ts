@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
-import {Form, FormBuilder, Control, ControlGroup, Validators} from '@angular/common';
+import {Component,ViewChild,ElementRef} from '@angular/core';
+import {REACTIVE_FORM_DIRECTIVES, FormControl, FormGroup, Validators} from '@angular/forms';
 import {NavParams} from 'ionic-angular';
 import {DatePickerComponent} from '../../components/date-picker/date-picker';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 import * as contestsService from '../../providers/contests';
 import * as paymentService from '../../providers/payments';
 import * as alertService from '../../providers/alert';
@@ -10,7 +11,7 @@ import {Contest,ContestName, Questions, Team, PaymentData, AppPage} from '../../
 
 @Component({
   templateUrl: 'build/pages/set-contest/set-contest.html',
-  directives: [DatePickerComponent]
+  directives: [REACTIVE_FORM_DIRECTIVES,DatePickerComponent]
 })
 
 export class SetContestPage {
@@ -22,36 +23,25 @@ export class SetContestPage {
   currentTimeOnlyInMilliseconds:number;
   contestLocalCopy:Contest;
   buyInProgress:boolean;
-  team0Control:Control;
-  team1Control:Control;
-  matchingTeamsControlGroup:ControlGroup;
-  subjectControl:Control;
   endOptionKeys:Array<string>;
   title:string;
-  contestForm:ControlGroup;
   userQuestionsInvalid:string;
   submitted:boolean;
   readOnlySubjectAlerted:boolean;
+  contestForm:FormGroup;
 
-  constructor(params:NavParams, formBuilder:FormBuilder) {
+  //Ionic bug - maxlength property is not copied to the native element, submitted:
+  //https://github.com/driftyco/ionic/issues/7635
+  @ViewChild('team0Input') team0Input:ElementRef;
+  @ViewChild('team1Input') team1Input:ElementRef;
+  @ViewChild('subjectInput') subjectInput:ElementRef;
+
+  constructor(params:NavParams) {
 
     this.client = Client.getInstance();
     this.params = params;
 
     this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
-
-    this.team0Control = new Control('', Validators.required);
-    this.team1Control = new Control('', Validators.required);
-    this.subjectControl = new Control('', Validators.required);
-    this.matchingTeamsControlGroup = formBuilder.group({
-      team0Control: this.team0Control,
-      team1Control: this.team1Control
-    }, {validator: this.matchingTeamsValidator});
-
-    this.contestForm = formBuilder.group({
-      matchingTeamsControlGroup: this.matchingTeamsControlGroup,
-      subjectControl: this.subjectControl
-    });
 
     //Start date is today, end date is by default as set by the server
     var nowWithTime = new Date();
@@ -61,6 +51,7 @@ export class SetContestPage {
     this.currentTimeOnlyInMilliseconds = nowWithTime.getTime() - nowWithoutTime.getTime();
     this.nowWithoutTimeEpoch = nowWithoutTime.getTime();
 
+    var endOption = '';
     if (this.params.data.mode === 'edit') {
       this.contestLocalCopy = contestsService.cloneForEdit(this.params.data.contest);
 
@@ -70,9 +61,8 @@ export class SetContestPage {
     }
     else if (this.params.data.mode === 'add') {
 
-      var endOption;
       for (var i = 0; i < this.endOptionKeys.length; i++) {
-        if (this.client.settings['newContest'].endOptions[this.endOptionKeys[i]].isDefault) {
+        if (this.client.settings.newContest.endOptions[this.endOptionKeys[i]].isDefault) {
           endOption = this.endOptionKeys[i];
           break;
         }
@@ -93,6 +83,17 @@ export class SetContestPage {
       }
 
     }
+
+    //Init form
+    this.contestForm = new FormGroup({
+      teams: new FormGroup({
+        team0: new FormControl('', [Validators.required, Validators.maxLength(this.client.settings.newContest.inputs.team.maxLength)]),
+        team1: new FormControl('', [Validators.required, Validators.maxLength(this.client.settings.newContest.inputs.team.maxLength)]),
+      }, null, this.matchingTeamsValidator),
+      subject: new FormControl('', [Validators.required, Validators.maxLength(this.client.settings.newContest.inputs.subject.maxLength)]),
+      endOption: new FormControl(endOption),
+      randomOrder: new FormControl(false)
+    });
 
     this.client.session.features['newContest'].purchaseData.retrieved = false;
 
@@ -127,12 +128,12 @@ export class SetContestPage {
                 }
               },
               (error) => {
-                window.myLogError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
+                analyticsService.logError('AndroidBillingRetrieveUnconsumedItems', error);
               });
 
           },
           function (msg) {
-            this.client.logError('AndroidBillingError', 'Error getting product details: ' + msg);
+            analyticsService.logError('AndroidBillingProductDetailsError', msg);
           }, this.client.session.features['newContest'].purchaseData.productId);
       }
     }
@@ -142,12 +143,18 @@ export class SetContestPage {
 
   }
 
+  ngAfterViewInit() {
+    this.team0Input['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.team.maxLength;
+    this.team1Input['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.team.maxLength;
+    this.subjectInput['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.subject.maxLength;
+  }
+
   ionViewWillEnter() {
     var eventData = {'mode': this.params.data.mode};
     if (this.params.data.mode === 'edit') {
       eventData['contestId'] = this.params.data.contest._id;
     }
-    this.client.logEvent('page/setContest', eventData);
+    analyticsService.track('page/setContest', eventData);
     this.submitted = false;
   }
 
@@ -183,7 +190,7 @@ export class SetContestPage {
           }, (error) => {
 
             this.client.hideLoader();
-            window.myLogError('AndroidBilling', 'Error consuming product: ' + error);
+            analyticsService.logError('AndroidBillingConsumeProductError', error);
             if (reject) {
               reject();
             }
@@ -321,7 +328,7 @@ export class SetContestPage {
 
   setContest() {
 
-    this.client.logEvent('contest/set');
+    analyticsService.track('contest/set');
     this.submitted = true;
     if (!this.contestForm.valid) {
       return;
@@ -402,7 +409,7 @@ export class SetContestPage {
         };
 
         if (this.params.data.mode === 'add') {
-          this.client.logEvent('contest/created', contestParams);
+          analyticsService.track('contest/created', contestParams);
           this.client.events.publish('topTeamer:contestCreated', contest);
           this.client.nav.pop({animate: false}).then(() => {
             let appPages : Array<AppPage> = new Array<AppPage>();
@@ -413,7 +420,7 @@ export class SetContestPage {
           });
         }
         else {
-          this.client.logEvent('contest/updated', contestParams);
+          analyticsService.track('contest/updated', contestParams);
           let now:number = (new Date).getTime();
           let currentStatus: string = contestsService.getContestStatus(this.contestLocalCopy);
           let previousStatus: string = contestsService.getContestStatus(this.params.data.contest);
@@ -428,7 +435,7 @@ export class SetContestPage {
     }
   }
 
-  matchingTeamsValidator(group:ControlGroup) {
+  matchingTeamsValidator(group:FormGroup) {
 
     let value;
     let valid = true;
@@ -460,7 +467,7 @@ export class SetContestPage {
 
   setEndsIn() {
     this.contestLocalCopy.endDate = this.getEndDateAccordingToEndsIn(this.contestLocalCopy.endOption);
-    this.client.logEvent('newContest/endsIn/click', {'endsIn': this.contestLocalCopy.endOption});
+    analyticsService.track('newContest/endsIn/click', {'endsIn': this.contestLocalCopy.endOption});
   }
 
   getEndDateAccordingToEndsIn(endsIn:string) {

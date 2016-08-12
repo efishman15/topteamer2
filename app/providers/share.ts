@@ -1,5 +1,6 @@
 import {Client} from './client';
 import {ShareVariables,ClientShareApp,ClientShareDiscoverApp,Contest} from '../objects/objects';
+import * as analyticsService from './analytics';
 
 const EMAIL_REF:string = '?ref=shareEmail';
 
@@ -122,7 +123,7 @@ export let mobileShare = (appName?:string, contest?:Contest, isNewContest?:boole
             resolve();
           },
           (err) => {
-            window.myLogError('WhatsApp Share', err);
+            analyticsService.logError('WhatsApp Share', err);
             reject();
           }
         )
@@ -135,7 +136,7 @@ export let mobileShare = (appName?:string, contest?:Contest, isNewContest?:boole
             resolve();
           },
           (err) => {
-            window.myLogError('Facebook Share', err);
+            analyticsService.logError('Facebook Share', err);
             reject();
           }
         )
@@ -147,7 +148,7 @@ export let mobileShare = (appName?:string, contest?:Contest, isNewContest?:boole
             resolve();
           },
           (err) => {
-            window.myLogError('Instagram Share', err);
+            analyticsService.logError('Instagram Share', err);
             reject();
           }
         )
@@ -160,7 +161,7 @@ export let mobileShare = (appName?:string, contest?:Contest, isNewContest?:boole
             resolve();
           },
           (err) => {
-            window.myLogError('Twitter Share', err);
+            analyticsService.logError('Twitter Share', err);
             reject();
           }
         )
@@ -172,7 +173,7 @@ export let mobileShare = (appName?:string, contest?:Contest, isNewContest?:boole
             resolve();
           },
           (err) => {
-            window.myLogError('SMS Share', err);
+            analyticsService.logError('SMS Share', err);
             reject();
           }
         )
@@ -188,7 +189,7 @@ export let mobileShare = (appName?:string, contest?:Contest, isNewContest?:boole
             resolve();
           },
           (err) => {
-            window.myLogError('Email Share', err);
+            analyticsService.logError('Email Share', err);
             reject();
           }
         )
@@ -206,7 +207,7 @@ export let mobileShare = (appName?:string, contest?:Contest, isNewContest?:boole
             resolve();
           },
           (err) => {
-            window.myLogError('General Mobile Share', err);
+            analyticsService.logError('General Mobile Share', err);
             reject();
           }
         )

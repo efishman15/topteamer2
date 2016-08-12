@@ -12,6 +12,7 @@ var ionic_angular_1 = require('ionic-angular');
 var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
+var analyticsService = require('../../providers/analytics');
 var soundService = require('../../providers/sound');
 var ContestPage = (function () {
     function ContestPage(params) {
@@ -52,7 +53,7 @@ var ContestPage = (function () {
         });
     }
     ContestPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/contest', { 'contestId': this.contest._id });
+        analyticsService.track('page/contest', { contestId: this.contest._id });
     };
     ContestPage.prototype.ionViewWillLeave = function () {
         this.animateLastResults = 0;
@@ -69,11 +70,11 @@ var ContestPage = (function () {
         this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
     };
     ContestPage.prototype.like = function () {
-        this.client.logEvent('like/click');
+        analyticsService.track('like/click');
         window.open(this.client.settings.general.facebookFanPage, '_new');
     };
     ContestPage.prototype.editContest = function () {
-        this.client.logEvent('contest/edit/click', { 'contestId': this.contest._id });
+        analyticsService.track('contest/edit/click', { contestId: this.contest._id });
         this.client.openPage('SetContestPage', { 'mode': 'edit', 'contest': this.contest });
     };
     ContestPage.prototype.switchTeams = function () {
@@ -97,10 +98,10 @@ var ContestPage = (function () {
         }
     };
     ContestPage.prototype.playContest = function (source) {
-        this.client.logEvent('contest/play', {
-            'contestId': this.contest._id,
-            'team': '' + this.contest.myTeam,
-            'sourceClick': source
+        analyticsService.track('contest/play', {
+            contestId: this.contest._id,
+            team: '' + this.contest.myTeam,
+            sourceClick: source
         });
         this.client.openPage('QuizPage', { 'contest': this.contest, 'source': source });
     };

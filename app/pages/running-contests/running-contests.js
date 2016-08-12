@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var RunningContestsPage = (function () {
     function RunningContestsPage() {
         var _this = this;
@@ -27,7 +28,7 @@ var RunningContestsPage = (function () {
         });
     }
     RunningContestsPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/runningContests');
+        analyticsService.track('page/runningContests');
         this.refreshList().then(function () {
         }, function () {
         });

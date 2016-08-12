@@ -16,6 +16,7 @@ var search_questions_1 = require('../pages/search-questions/search-questions');
 var server_popup_1 = require('../pages/server-popup/server-popup');
 var set_contest_1 = require('../pages/set-contest/set-contest');
 var set_contest_admin_1 = require('../pages/set-contest-admin/set-contest-admin');
+var set_user_1 = require('../pages/set-user/set-user');
 var settings_1 = require('../pages/settings/settings');
 var share_1 = require('../pages/share/share');
 var system_tools_1 = require('../pages/system-tools/system-tools');
@@ -38,6 +39,7 @@ var appClasses = {
     'ServerPopupPage': server_popup_1.ServerPopupPage,
     'SetContestPage': set_contest_1.SetContestPage,
     'SetContestAdminPage': set_contest_admin_1.SetContestAdminPage,
+    'SetUserPage': set_user_1.SetUserPage,
     'SettingsPage': settings_1.SettingsPage,
     'SharePage': share_1.SharePage,
     'SystemToolsPage': system_tools_1.SystemToolsPage

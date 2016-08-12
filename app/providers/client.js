@@ -15,6 +15,7 @@ require('rxjs/add/operator/retryWhen');
 var ionic_native_1 = require('ionic-native');
 var contestsService = require('./contests');
 var connectService = require('./connect');
+var analyticsService = require('./analytics');
 var alertService = require('./alert');
 var objects_1 = require('../objects/objects');
 var classesService = require('./classes');
@@ -121,8 +122,18 @@ var Client = (function () {
     Client.prototype.serverConnect = function (connectInfo) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.user.credentials = connectInfo;
-            _this.serverPost('user/connect', { user: _this.user }).then(function (data) {
+            var postData = {};
+            if (connectInfo) {
+                postData.user = JSON.parse(JSON.stringify(_this.user));
+                postData.user.credentials = connectInfo;
+            }
+            else {
+                postData.user = _this.user;
+            }
+            _this.serverPost('user/connect', postData).then(function (data) {
+                if (connectInfo) {
+                    _this.user.credentials = connectInfo;
+                }
                 if (_this.user.settings.language !== data['session'].settings.language) {
                     _this.user.settings.language = data['session'].settings.language;
                     _this.localSwitchLanguage(_this.user.settings.language);
@@ -130,12 +141,16 @@ var Client = (function () {
                 _this.user.settings = JSON.parse(JSON.stringify(data['session'].settings));
                 _this.session = data['session'];
                 _this.serverGateway.token = data['session'].token;
-                _this.setLoggedUserId(data['session'].userId);
+                analyticsService.identify(data['session'].userId);
+                analyticsService.setUserPermanentData({
+                    platform: _this.clientInfo.platform,
+                    $name: data['session'].name
+                });
                 if (data['session'].justRegistered) {
-                    _this.logEvent('server/register');
+                    analyticsService.track('server/register');
                 }
                 else {
-                    _this.logEvent('server/login');
+                    analyticsService.track('server/login');
                 }
                 _this.initPushService();
                 resolve();
@@ -145,6 +160,55 @@ var Client = (function () {
         });
     };
     ;
+    Client.prototype.setUser = function (userData) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var postData = { user: userData };
+            _this.serverPost('user/set', postData).then(function (contests) {
+                _this.session.avatar.id = userData.avatar;
+                _this.session.name = userData.name;
+                _this.session.dob = userData.dob;
+                _this.publishProfileChange(contests);
+                resolve();
+            }, function () {
+                reject();
+            });
+        });
+    };
+    Client.prototype.upgradeGuest = function (connectInfo) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.serverPost('user/upgradeGuest', { user: { credentials: connectInfo } }).then(function (data) {
+                _this.session.avatar.type = 0; //facebook
+                _this.session.avatar.id = connectInfo.facebookInfo.userId;
+                _this.session.name = data.name;
+                _this.publishProfileChange(data.contests);
+                resolve();
+            }, function (err) {
+                if (err.type === 'SERVER_ERROR_FACEBOOK_EXISTS_DO_SWITCH' && err.additionalInfo && err.additionalInfo.confirmed) {
+                    _this.serverConnect(connectInfo).then(function () {
+                        _this.popToRoot().then(function () {
+                            resolve();
+                        }, function () {
+                            reject();
+                        });
+                    }, function () {
+                        reject();
+                    });
+                }
+                else {
+                    reject();
+                }
+            });
+        });
+    };
+    Client.prototype.publishProfileChange = function (contests) {
+        for (var i = 0; i < contests.length; i++) {
+            contestsService.setContestClientData(contests[i]);
+            this.events.publish('topTeamer:contestUpdated', contests[i], contests[i].status, contests[i].status);
+        }
+        this.events.publish('topTeamer:leaderboardsUpdated');
+    };
     Client.prototype.serverPost = function (path, postData) {
         var _this = this;
         return new Promise(function (resolve, reject) {
@@ -161,7 +225,7 @@ var Client = (function () {
                 if (err && err.httpStatus === 401) {
                     connectService.getLoginStatus().then(function (connectInfo) {
                         if (_this.hasCredentials(connectInfo)) {
-                            _this.serverConnect(connectInfo).then(function () {
+                            _this.serverConnect().then(function () {
                                 //Re-post last request
                                 return _this.serverPost(path, postData).then(function (data) {
                                     resolve(data);
@@ -172,8 +236,8 @@ var Client = (function () {
                             });
                         }
                         else {
-                            connectService.login().then(function (connectInfo) {
-                                _this.serverConnect(connectInfo).then(function () {
+                            connectService.login().then(function () {
+                                _this.serverConnect().then(function () {
                                     //Re-post last request
                                     return _this.serverPost(path, postData).then(function (data) {
                                         resolve(data);
@@ -231,7 +295,7 @@ var Client = (function () {
     };
     Client.prototype.openNewContest = function () {
         var _this = this;
-        this.logEvent('menu/newContest');
+        analyticsService.track('menu/newContest');
         var modal = this.createModalPage('ContestTypePage');
         modal.onDidDismiss(function (contestTypeId) {
             if (contestTypeId) {
@@ -261,7 +325,7 @@ var Client = (function () {
                 'sourceClick': source
             };
             if (contest.state === 'play' && tryRun) {
-                _this.logEvent('contest/play', eventData);
+                analyticsService.track('contest/play', eventData);
                 //Joined to a contest - run it immediately (go to the quiz)
                 var appPages = new Array();
                 if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
@@ -284,12 +348,12 @@ var Client = (function () {
             else if (now - contest.lastUpdated < _this.settings.contest.refreshTresholdInMilliseconds) {
                 //Not joined and no refresh required - enter the contest with the object we have
                 resolve();
-                _this.logEvent('contest/show', eventData);
+                analyticsService.track('contest/show', eventData);
                 _this.openPage('ContestPage', { 'contest': contest });
             }
             else {
                 //Will enter the contest after retrieving it from the server
-                _this.logEvent('contest/show', eventData);
+                analyticsService.track('contest/show', eventData);
                 _this.displayContestById(contest._id).then(function (serverContest) {
                     resolve(serverContest);
                 }, function (err) {
@@ -299,7 +363,7 @@ var Client = (function () {
         });
     };
     Client.prototype.share = function (contest, source) {
-        this.logEvent('share', { 'source': source });
+        analyticsService.track('share', { 'source': source });
         this.openPage('SharePage', { 'contest': contest, 'source': source });
     };
     Client.prototype.getPage = function (name) {
@@ -354,13 +418,7 @@ var Client = (function () {
         }
         this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
         this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
-        //Invoke 'onResize' for each view that has it
-        for (var i = 0; i < this.nav.length(); i++) {
-            var viewController = this.nav.getByIndex(i);
-            if (viewController && viewController.instance && viewController.instance['onResize']) {
-                viewController.instance['onResize']();
-            }
-        }
+        this.events.publish('topTeamer:resize');
     };
     Object.defineProperty(Client.prototype, "width", {
         get: function () {
@@ -420,7 +478,10 @@ var Client = (function () {
     };
     Client.prototype.popToRoot = function () {
         if (this.nav.canGoBack()) {
-            this.nav.popToRoot();
+            return this.nav.popToRoot();
+        }
+        else {
+            return Promise.resolve();
         }
     };
     Client.prototype.getDefaultLanguage = function () {
@@ -481,7 +542,7 @@ var Client = (function () {
             _this.serverPost('user/switchLanguage', postData).then(function () {
                 _this.session.settings.language = _this.user.settings.language;
                 _this.localSwitchLanguage(_this.user.settings.language);
-                _this.logEvent('settings/language/change', { language: _this.user.settings.language });
+                analyticsService.track('settings/language/change', { language: _this.user.settings.language });
                 resolve();
             }, function (err) {
                 _this.user.settings.language = _this.session.settings.language;
@@ -490,20 +551,16 @@ var Client = (function () {
         });
     };
     Client.prototype.logout = function () {
-        this.serverGateway.token = null;
-        this.session = null;
-        this.playerInfoComponent.clearXp();
-    };
-    Client.prototype.setLoggedUserId = function (userId) {
-        window.FlurryAgent.setUserId(userId);
-    };
-    Client.prototype.logEvent = function (eventName, eventParams) {
-        if (eventParams) {
-            window.FlurryAgent.logEvent(eventName, eventParams);
-        }
-        else {
-            window.FlurryAgent.logEvent(eventName);
-        }
+        var _this = this;
+        this.serverPost('user/logout').then(function () {
+            _this.serverGateway.token = null;
+            _this.session = null;
+            _this.playerInfoComponent.clearXp();
+        }, function () {
+            _this.serverGateway.token = null;
+            _this.session = null;
+            _this.playerInfoComponent.clearXp();
+        });
     };
     Client.prototype.getRecursiveProperty = function (object, property) {
         if (object && property) {
@@ -544,7 +601,7 @@ var Client = (function () {
                 'android': this.settings.google.gcm
             });
             this.pushService.on('error', function (error) {
-                window.myLogError('PushNotificationError', 'Error during push: ' + error.message);
+                analyticsService.logError('PushNotificationError', error);
             });
             //Push Service - registration
             this.pushService.on('registration', function (registrationData) {
@@ -608,17 +665,18 @@ var Client = (function () {
         }
     };
     Client.prototype.getAvatarUrl = function (avatar) {
-        var template;
         if (avatar.type === 0) {
-            template = this.settings.facebook.avatarTemplate;
+            return this.settings.facebook.avatarTemplate.replace('{{id}}', avatar.id);
         }
         else if (avatar.type === 1) {
-            template = this.settings.general.avatarTemplate;
+            return this.getGuestAvatarUrl(avatar.id);
         }
         else {
             return;
         }
-        return template.replace('{{id}}', avatar.id);
+    };
+    Client.prototype.getGuestAvatarUrl = function (avatarId) {
+        return this.settings.general.avatarTemplate.replace('{{id}}', avatarId);
     };
     Client.prototype.hasCredentials = function (connectInfo) {
         if (connectInfo.type === 'facebook' && connectInfo.facebookInfo) {
@@ -647,7 +705,7 @@ var ServerGateway = (function () {
             this.endPoint = window.location.protocol + '//' + window.location.host + '/';
         }
         else {
-            this.endPoint = 'http://www.topteamer.com/';
+            this.endPoint = 'http://dev.topteamer.com/';
         }
         this.eventQueue = [];
     }

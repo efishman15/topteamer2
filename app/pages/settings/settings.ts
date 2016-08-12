@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {Client} from '../../providers/client';
 import * as connectService from '../../providers/connect';
+import * as analyticsService from '../../providers/analytics';
 
 @Component({
   templateUrl: 'build/pages/settings/settings.html'
@@ -16,7 +17,7 @@ export class SettingsPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/settings');
+    analyticsService.track('page/settings');
     this.originalLanguage = this.client.session.settings.language;
   }
 
@@ -31,7 +32,7 @@ export class SettingsPage {
   }
 
   toggleSettings(name: string, initPushService?:boolean) {
-    this.client.logEvent('settings/' + name + '/' + !this.client.session.settings[name]);
+    analyticsService.track('settings/' + name + '/' + !this.client.session.settings[name]);
     this.client.toggleSettings(name).then(() => {
       if (initPushService) {
         this.client.initPushService();
@@ -50,7 +51,7 @@ export class SettingsPage {
   }
 
   logout() {
-    this.client.logEvent('settings/facebookSignOut');
+    analyticsService.track('settings/logout');
     connectService.logout().then(() => {
       this.client.logout();
       this.client.setRootPage('LoginPage');

@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 
 @Component({
   templateUrl: 'build/pages/contest-type/contest-type.html'
@@ -17,14 +18,14 @@ export class ContestTypePage {
 
   //The only life cycle event currently called in modals
   ngAfterViewInit() {
-    this.client.logEvent('page/contestType');
+    analyticsService.track('page/contestType');
   }
 
   selectContestContent(contestTypeId) {
     if (contestTypeId && this.client.settings.newContest.contestTypes[contestTypeId].disabled) {
       return;
     }
-    this.client.logEvent('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
+    analyticsService.track('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
     this.viewController.dismiss(contestTypeId);
   }
 

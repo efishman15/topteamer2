@@ -6,6 +6,7 @@ import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as quizService from '../../providers/quiz';
 import * as soundService from '../../providers/sound';
+import * as analyticsService from '../../providers/analytics';
 import * as alertService from '../../providers/alert';
 import {QuizData,QuizQuestion,QuizCanvasCircleStateSettings} from '../../objects/objects';
 
@@ -45,6 +46,11 @@ export class QuizPage {
     else {
       this.title = this.client.translate('QUIZ_VIEW_TITLE', {'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name});
     }
+
+    this.client.events.subscribe('topTeamer:resize', (eventData) => {
+      this.drawQuizProgress();
+    });
+
   }
 
   ngAfterViewInit() {
@@ -53,7 +59,7 @@ export class QuizPage {
   }
 
   ionViewWillEnter() {
-    this.client.logEvent('page/quiz', {'contestId': this.params.data.contest._id});
+    analyticsService.track('page/quiz', {'contestId': this.params.data.contest._id});
     this.startQuiz();
   }
 
@@ -66,7 +72,7 @@ export class QuizPage {
 
     this.clearQuizProgress(); //From previous time
 
-    this.client.logEvent('quiz/started', {
+    analyticsService.track('quiz/started', {
       'source': this.params.data.source,
       'typeId': this.params.data.contest.type.id
     });
@@ -161,7 +167,7 @@ export class QuizPage {
 
       if (data.question.correct) {
 
-        this.client.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/correct');
+        analyticsService.track('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/correct');
 
         correctAnswerId = answerId;
         this.quizData.currentQuestion.answers[answerId].answeredCorrectly = true;
@@ -169,7 +175,7 @@ export class QuizPage {
         soundService.play('audio/click_ok');
       }
       else {
-        this.client.logEvent('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
+        analyticsService.track('quiz/question' + (this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
         soundService.play('audio/click_wrong');
         correctAnswerId = data.question.correctAnswerId;
         this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
@@ -206,7 +212,7 @@ export class QuizPage {
 
       this.drawQuizProgress();
 
-      this.client.logEvent('quiz/gotQuestion' + (this.quizData.currentQuestionIndex + 1));
+      analyticsService.track('quiz/gotQuestion' + (this.quizData.currentQuestionIndex + 1));
     }, () => {
     });
   }
@@ -252,7 +258,7 @@ export class QuizPage {
       this.drawQuizProgress();
       this.client.session.score += this.quizData.results.data.score;
 
-      this.client.logEvent('quiz/finished',
+      analyticsService.track('quiz/finished',
         {
           'score': '' + this.quizData.results.data.score,
           'message': this.quizData.results.data.clientKey
@@ -579,10 +585,6 @@ export class QuizPage {
 
   share() {
     this.client.share(this.params.data.contest, 'quiz');
-  }
-
-  onResize() {
-    this.drawQuizProgress();
   }
 
   getCanvasFont(bold:boolean, size:string, name:string) {

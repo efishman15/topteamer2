@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var shareService = require('../../providers/share');
 var SharePage = (function () {
     function SharePage(params) {
@@ -26,17 +27,17 @@ var SharePage = (function () {
     }
     SharePage.prototype.ionViewWillEnter = function () {
         if (this.params.data.contest) {
-            this.client.logEvent('page/share', {
-                'contestId': this.params.data.contest._id,
-                'source': this.params.data.source
+            analyticsService.track('page/share', {
+                contestId: this.params.data.contest._id,
+                source: this.params.data.source
             });
         }
         else {
-            this.client.logEvent('page/share', { 'source': this.params.data.source });
+            analyticsService.track('page/share', { source: this.params.data.source });
         }
     };
     SharePage.prototype.webShare = function (network) {
-        this.client.logEvent('share/web/' + network.name);
+        analyticsService.track('share/web/' + network.name);
         window.open(network.url.format({
             url: this.shareVariables.shareUrl,
             subject: this.shareVariables.shareSubject,
@@ -45,7 +46,7 @@ var SharePage = (function () {
         this.client.nav.pop();
     };
     SharePage.prototype.mobileShare = function (appName) {
-        this.client.logEvent('share/mobile' + (appName ? '/' + appName : ''));
+        analyticsService.track('share/mobile' + (appName ? '/' + appName : ''));
         shareService.mobileShare(appName, this.params.data.contest, this.isNewContest).then(function () {
         }, function () {
         });

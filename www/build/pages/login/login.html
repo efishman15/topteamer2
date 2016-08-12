@@ -17,7 +17,7 @@
       {{client.translate('FACEBOOK_CONNECT_RELAX_MESSAGE')}}
     </div>
   </div>
-  <div padding-left padding-right padding-top>
+  <div *ngIf="client.settings.general.allowGuest" padding-left padding-right padding-top>
     <button block class="button-guest" (click)="registerGuest()">
       {{client.translate('GUEST_CONNECT')}}
     </button>

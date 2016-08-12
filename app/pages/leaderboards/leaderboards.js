@@ -13,6 +13,8 @@ var simple_tab_1 = require('../../components/simple-tab/simple-tab');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var leaders_1 = require('../../components/leaders/leaders');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
+var connectService = require('../../providers/connect');
 var LeaderboardsPage = (function () {
     function LeaderboardsPage() {
         var _this = this;
@@ -28,43 +30,62 @@ var LeaderboardsPage = (function () {
             }, function () {
             });
         });
+        this.client.events.subscribe('topTeamer:leaderboardsUpdated', function () {
+            switch (_this.mode) {
+                case 'contests':
+                    _this.contestList.refresh(true).then(function () {
+                    }, function () {
+                    });
+                    break;
+                case 'friends':
+                    _this.showFriendsLeaderboard(true).then(function () {
+                    }, function () {
+                    });
+                    break;
+                case 'weekly':
+                    _this.showWeeklyLeaderboard(true).then(function () {
+                    }, function () {
+                    });
+                    break;
+            }
+        });
     }
     LeaderboardsPage.prototype.ionViewWillEnter = function () {
         this.simpleTabsComponent.switchToTab(0);
     };
     LeaderboardsPage.prototype.displayRecentlyFinishedContestsTab = function () {
-        this.client.logEvent('page/leaderboard/contests');
+        analyticsService.track('page/leaderboard/contests');
         this.mode = 'contests';
         this.showRecentlyFinishedContests(false).then(function () {
         }, function () {
         });
     };
     LeaderboardsPage.prototype.showRecentlyFinishedContests = function (forceRefresh) {
-        this.client.logEvent('page/leaderboard/contests');
+        analyticsService.track('page/leaderboard/contests');
         this.mode = 'contests';
         return this.contestList.refresh(forceRefresh);
     };
     LeaderboardsPage.prototype.displayFriendsLeaderboardTab = function () {
-        this.client.logEvent('page/leaderboard/friends');
+        analyticsService.track('page/leaderboard/friends');
         this.mode = 'friends';
         this.showFriendsLeaderboard(false).then(function () {
         }, function () {
         });
     };
     LeaderboardsPage.prototype.showFriendsLeaderboard = function (forceRefresh) {
-        this.client.logEvent('page/leaderboard/friends');
+        analyticsService.track('page/leaderboard/friends');
         this.mode = 'friends';
         return this.leadersComponent.showFriends(forceRefresh);
     };
     LeaderboardsPage.prototype.displayWeeklyLeaderboardTab = function () {
-        this.client.logEvent('page/leaderboard/weekly');
+        analyticsService.track('page/leaderboard/weekly');
         this.mode = 'weekly';
         this.showWeeklyLeaderboard(false).then(function () {
         }, function () {
         });
     };
     LeaderboardsPage.prototype.showWeeklyLeaderboard = function (forceRefresh) {
-        this.client.logEvent('page/leaderboard/weekly');
+        analyticsService.track('page/leaderboard/weekly');
         this.mode = 'weekly';
         return this.leadersComponent.showWeekly(forceRefresh);
     };
@@ -95,6 +116,21 @@ var LeaderboardsPage = (function () {
                 });
                 break;
         }
+    };
+    LeaderboardsPage.prototype.facebookLogin = function () {
+        var _this = this;
+        connectService.facebookLogin().then(function (connectInfo) {
+            _this.client.upgradeGuest(connectInfo).then(function () {
+                connectService.storeCredentials(connectInfo);
+                //I am located at the friends tab - refresh since I just upgraded to facebook
+                //Should immediatelly see my friends
+                _this.showFriendsLeaderboard(true).then(function () {
+                }, function () {
+                });
+            }, function () {
+            });
+        }, function () {
+        });
     };
     __decorate([
         core_1.ViewChild(simple_tabs_1.SimpleTabsComponent), 

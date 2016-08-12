@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var ContestTypePage = (function () {
     function ContestTypePage(viewController) {
         this.client = client_1.Client.getInstance();
@@ -17,13 +18,13 @@ var ContestTypePage = (function () {
     }
     //The only life cycle event currently called in modals
     ContestTypePage.prototype.ngAfterViewInit = function () {
-        this.client.logEvent('page/contestType');
+        analyticsService.track('page/contestType');
     };
     ContestTypePage.prototype.selectContestContent = function (contestTypeId) {
         if (contestTypeId && this.client.settings.newContest.contestTypes[contestTypeId].disabled) {
             return;
         }
-        this.client.logEvent('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
+        analyticsService.track('newContest/type/' + (contestTypeId ? contestTypeId : 'cancel'));
         this.viewController.dismiss(contestTypeId);
     };
     ContestTypePage = __decorate([

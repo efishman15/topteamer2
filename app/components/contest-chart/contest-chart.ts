@@ -1,6 +1,7 @@
 import {Component, Input, EventEmitter, Output} from '@angular/core';
 import {Modal} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 import * as alertService from '../../providers/alert';
 import * as contestsService from '../../providers/contests';
 import {Contest} from '../../objects/objects';
@@ -49,7 +50,7 @@ export class ContestChartComponent {
       }
       else {
         //My team - start the game
-        this.client.logEvent('contest/myTeam', {
+        analyticsService.track('contest/myTeam', {
           'contestId': this.contest._id,
           'team': '' + this.contest.myTeam,
           'sourceClick': source
@@ -80,10 +81,10 @@ export class ContestChartComponent {
 
         this.joinedContest.emit({'contest': data.contest});
 
-        this.client.logEvent('contest/' + (!switchTeams ? 'join' : 'switchTeams'), {
-          'contestId': this.contest._id,
-          'team': '' + this.contest.myTeam,
-          'sourceClick': source
+        analyticsService.track('contest/' + (!switchTeams ? 'join' : 'switchTeams'), {
+          contestId: this.contest._id,
+          team: '' + this.contest.myTeam,
+          sourceClick: source
         });
 
         //Notify outside that contest changed

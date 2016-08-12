@@ -10,11 +10,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var QuestionStatsPage = (function () {
     function QuestionStatsPage(params, viewController) {
+        var _this = this;
         this.client = client_1.Client.getInstance();
         this.question = params.data.question;
         this.viewController = viewController;
+        this.client.events.subscribe('topTeamer:resize', function (eventData) {
+            if (_this.question.correctRatio || _this.question.correctRatio === 0) {
+                _this.drawChart();
+            }
+        });
     }
     //The only life cycle eve currently called in modals
     QuestionStatsPage.prototype.ngAfterViewInit = function () {
@@ -25,12 +32,7 @@ var QuestionStatsPage = (function () {
         }
     };
     QuestionStatsPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/questionStats', { 'questionId': this.question._id });
-        if (this.question.correctRatio || this.question.correctRatio === 0) {
-            this.drawChart();
-        }
-    };
-    QuestionStatsPage.prototype.onResize = function () {
+        analyticsService.track('page/questionStats', { 'questionId': this.question._id });
         if (this.question.correctRatio || this.question.correctRatio === 0) {
             this.drawChart();
         }
@@ -61,7 +63,7 @@ var QuestionStatsPage = (function () {
         this.drawQuestionStatsCircle(radius * this.client.settings.charts.questionStats.size.innerDoughnutRadiusRatio, this.client.settings.charts.questionStats.colors.innerDoughnut);
     };
     QuestionStatsPage.prototype.dismiss = function (action) {
-        this.client.logEvent('quiz/stats/' + (action ? action : 'cancel'));
+        analyticsService.track('quiz/stats/' + (action ? action : 'cancel'));
         this.viewController.dismiss(action);
     };
     QuestionStatsPage.prototype.drawQuestionStatsCircle = function (radius, color, startAngle, endAngle, counterClockwise) {

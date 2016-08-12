@@ -62,6 +62,10 @@ function ServerException(message, additionalInfo, severity, httpStatus) {
 
   var exception = new ServerMessageException('SERVER_ERROR_GENERAL', additionalInfo, httpStatus);
 
+  if (httpStatus === 401) {
+    return; //Do not log this error - intended for the client only to re-login
+  }
+
   if (!severity) {
     severity = 'info';
   }

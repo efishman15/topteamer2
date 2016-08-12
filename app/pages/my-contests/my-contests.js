@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var contest_list_1 = require('../../components/contest-list/contest-list');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var MyContestsPage = (function () {
     function MyContestsPage() {
         var _this = this;
@@ -28,7 +29,7 @@ var MyContestsPage = (function () {
     }
     MyContestsPage.prototype.ionViewWillEnter = function () {
         var _this = this;
-        this.client.logEvent('page/myContests');
+        analyticsService.track('page/myContests');
         this.refreshList().then(function () {
             if (_this.contestList.contests.length === 0 && !_this.pageLoaded) {
                 //On load only - switch to "running contests" if no personal contests

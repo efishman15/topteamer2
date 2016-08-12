@@ -8,7 +8,7 @@ var dalDb = require(path.resolve(__dirname, '../dal/dalDb'));
 var dalFacebook = require(path.resolve(__dirname, '../dal/dalFacebook'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var contestsBusinessLogic = require(path.resolve(__dirname, '../business_logic/contests'));
-var dalLeaderboard = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
+var dalLeaderboards = require(path.resolve(__dirname, '../dal/dalLeaderboards'));
 var ObjectId = require('mongodb').ObjectID;
 var commonBusinessLogic = require(path.resolve(__dirname, './common'));
 
@@ -356,7 +356,7 @@ module.exports.start = function (req, res, next) {
     //find some friends above me in the leaderboard
     function (data, callback) {
       if (data.session.facebookUserId && data.session.friends && data.session.friends.list && data.session.friends.list.length > 0) {
-        dalLeaderboard.getFriendsAboveMe(data, callback);
+        dalLeaderboards.getFriendsAboveMe(data, callback);
       }
       else {
         callback(null, data);
@@ -393,7 +393,8 @@ module.exports.start = function (req, res, next) {
     //Stores the session with the quiz in the db
     function (data, callback) {
       data.closeConnection = true;
-      dalDb.storeSession(data, callback);
+      data.setData = {quiz: data.session.quiz};
+      dalDb.setSession(data, callback);
     }
   ];
 
@@ -537,7 +538,13 @@ module.exports.answer = function (req, res, next) {
       }
 
       if (store) {
-        dalDb.storeSession(data, callback);
+        data.setData = {
+          score: data.session.score,
+          xp: data.session.xp,
+          rank: data.session.rank,
+          quiz: data.session.quiz
+        };
+        dalDb.setSession(data, callback);
       }
       else {
         callback(null, data);
@@ -547,11 +554,10 @@ module.exports.answer = function (req, res, next) {
     //Check to save the score into the users object as well - when quiz is finished or when got a correct answer (which gives score and/or xp
     function (data, callback) {
       if (data.session.quiz.clientData.finished || (data.xpProgress && data.xpProgress.addition > 0)) {
-
         data.setData = {
-          'score': data.session.score,
-          'xp': data.session.xp,
-          'rank': data.session.rank
+          score: data.session.score,
+          xp: data.session.xp,
+          rank: data.session.rank,
         };
         dalDb.setUser(data, callback);
       }
@@ -573,7 +579,7 @@ module.exports.answer = function (req, res, next) {
 
       //Update all leaderboards with the score achieved - don't wait for any callbacks of the leaderboard - can
       //be done fully async and continue doing other stuff
-      dalLeaderboard.addScore(data.contest._id, myTeam, data.session.quiz.serverData.score, data.session);
+      dalLeaderboards.addScore(data.contest._id, myTeam, data.session.quiz.serverData.score, data.session);
 
       myContestUser.score += data.session.quiz.serverData.score;
       myContestUser.teamScores[myTeam] += data.session.quiz.serverData.score;
@@ -708,7 +714,7 @@ module.exports.answer = function (req, res, next) {
       )
       ) {
         data.friendsAboveMe = data.session.quiz.serverData.share.data.friendsAboveMe;
-        dalLeaderboard.getPassedFriends(data, callback);
+        dalLeaderboards.getPassedFriends(data, callback);
       }
       else {
         callback(null, data);
@@ -872,7 +878,7 @@ module.exports.answer = function (req, res, next) {
         }
 
         data.clientResponse.results = {
-          'contest': contestsBusinessLogic.prepareContestForClient(data.contest, data.session),
+          'contest': commonBusinessLogic.prepareContestForClient(data.contest, data.session),
           'data': {}
         };
 
@@ -937,10 +943,11 @@ module.exports.nextQuestion = function (req, res, next) {
     //Sets the direction of the question
     setQuestionDirection,
 
-    //Pick animatoin and store the session with the quiz in the db
+    //Pick animation and store the session with the quiz in the db
     function (data, callback) {
       data.closeConnection = true;
-      dalDb.storeSession(data, callback);
+      data.setData = {quiz: data.session.quiz};
+      dalDb.setSession(data, callback);
     }
   ];
 

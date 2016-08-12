@@ -5,11 +5,13 @@ import {ConnectInfo,GuestInfo} from '../objects/objects';
 const CONNECT_INFO_KEY = 'connectInfo';
 
 //------------------------------------------------------
+//-- private functions
+//------------------------------------------------------
+
+//------------------------------------------------------
 //-- createGuest
 //------------------------------------------------------
-export let createGuest = () => {
-
-  var client = Client.getInstance();
+function createGuest() {
 
   var d = new Date().getTime();
   var uuid = 'xxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -19,51 +21,44 @@ export let createGuest = () => {
   });
   let connectInfo:ConnectInfo = new ConnectInfo('guest');
   connectInfo.guestInfo = new GuestInfo(uuid);
-  localStorage.setItem(CONNECT_INFO_KEY, JSON.stringify(connectInfo));
-
-  client.connectInfo = connectInfo;
 
   return connectInfo;
-};
+}
 
 //------------------------------------------------------
-//-- getLoginStatus
+//-- getInfo
 //------------------------------------------------------
-export let getInfo = () => {
+function getInfo() {
 
   return new Promise((resolve, reject) => {
 
     var client = Client.getInstance();
 
-    if (client.connectInfo) {
-      resolve(client.connectInfo);
+    if (client.user.credentials) {
+      resolve(client.user.credentials);
       return;
     }
 
     let connectInfoString:string = localStorage.getItem(CONNECT_INFO_KEY);
     if (connectInfoString) {
-      client.connectInfo = JSON.parse(connectInfoString);
-      resolve(client.connectInfo);
+      client.user.credentials = JSON.parse(connectInfoString);
+      resolve(client.user.credentials);
       return;
     }
 
     //Legacy code - for old clients which are connected to facebook but still
-    //do not have
+    //do not have anything in localStorage
     facebookService.getLoginStatus().then((connectInfo:ConnectInfo) => {
-      if (connectInfo.facebookInfo) {
-        localStorage.setItem(CONNECT_INFO_KEY, JSON.stringify({type: 'facebook'}));
-        client.connectInfo = connectInfo;
-        resolve(connectInfo);
-      }
-      else {
-        //No connect type yet
-        reject();
-      }
-    }, ()=> {
+      resolve(connectInfo);
+    },()=>{
       reject();
-    })
+    });
   });
 }
+
+//------------------------------------------------------
+//-- public functions
+//------------------------------------------------------
 
 //------------------------------------------------------
 //-- getLoginStatus
@@ -107,22 +102,51 @@ export let login = (permissions?, rerequestDeclinedPermissions?) => {
   return new Promise((resolve, reject) => {
 
     getInfo().then((connectInfo:ConnectInfo) => {
-      switch (connectInfo.type) {
-        case 'facebook':
-          facebookService.login(permissions, rerequestDeclinedPermissions).then((connectInfo:ConnectInfo) => {
-            resolve(connectInfo);
-          }, () => {
-            reject();
-          });
-          break;
-        case 'guest':
-          //Immediate resolve, connectionInfo will include the uuid
-          resolve(connectInfo);
-          break;
-      }
+      specificLogin(connectInfo, permissions, rerequestDeclinedPermissions).then((connectInfo:ConnectInfo) => {
+        resolve(connectInfo);
+      },()=>{
+        reject();
+      });
     }, () => {
       reject();
     });
+  });
+}
+
+export let facebookLogin = () => {
+  return this.specificLogin(new ConnectInfo('facebook'));
+}
+
+export let guestLogin = () => {
+  return this.specificLogin(createGuest());
+}
+
+export let specificLogin = (connectInfo:ConnectInfo,
+                            permissions?:any,
+                            rerequestDeclinedPermissions?:boolean) => {
+
+  return new Promise((resolve, reject) => {
+
+    var client = Client.getInstance();
+
+    switch (connectInfo.type) {
+      case 'facebook':
+        facebookService.login(permissions, rerequestDeclinedPermissions).then((connectInfo:ConnectInfo) => {
+          resolve(connectInfo);
+        }, () => {
+          reject();
+        });
+        break;
+      case 'guest':
+        //Immediate resolve, connectionInfo will include the uuid
+        //Immediatelly store credentials - new guest should not fail to connect/register in the server
+        storeCredentials(connectInfo);
+        resolve(connectInfo);
+        break;
+      default:
+        reject();
+        break;
+    }
   });
 }
 
@@ -133,14 +157,18 @@ export let logout = () => {
 
   return new Promise((resolve, reject) => {
 
+    var client = Client.getInstance();
+
     getInfo().then((connectInfo:ConnectInfo) => {
       switch (connectInfo.type) {
         case 'facebook':
           facebookService.logout().then(()=> {
+            client.user.credentials = null;
             localStorage.removeItem(CONNECT_INFO_KEY);
             resolve();
           });
         case 'guest':
+          client.user.credentials = null;
           localStorage.removeItem(CONNECT_INFO_KEY);
           resolve();
       }
@@ -198,4 +226,25 @@ export let buy = (purchaseDialogData:any) => {
       reject();
     });
   });
+};
+
+
+//------------------------------------------------------
+//-- storeCredentials
+//------------------------------------------------------
+export let storeCredentials = (connectInfo:ConnectInfo) => {
+
+  var client = Client.getInstance();
+  var storedConnectInfo;
+  if (connectInfo.type === 'facebook') {
+    //For facebook - do not store in our storage any access token / user id
+    storedConnectInfo = new ConnectInfo('facebook');
+  }
+  else {
+    storedConnectInfo = connectInfo;
+  }
+
+  localStorage.setItem(CONNECT_INFO_KEY, JSON.stringify(storedConnectInfo));
+  client.user.credentials = connectInfo;
+
 };

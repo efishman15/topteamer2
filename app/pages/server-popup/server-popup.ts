@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
+import * as analyticsService from '../../providers/analytics';
 import * as contestsService from '../../providers/contests';
 import {ServerPopup} from '../../objects/objects';
 
@@ -30,7 +31,7 @@ export class ServerPopupPage {
 
   //The only life cycle eve currently called in modals
   ngAfterViewInit() {
-    this.client.logEvent('page/serverPopup', {'title' : this.params.data.serverPopup.title, 'message' : this.params.data.serverPopup.message});
+    analyticsService.track('page/serverPopup', {title : this.params.data.serverPopup.title, message : this.params.data.serverPopup.message});
   }
 
   preventBack() {

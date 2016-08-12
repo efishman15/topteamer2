@@ -11601,6 +11601,39 @@ body {
 .action-sheet-title {
   text-align: center !important; }
 
+.form-label {
+  font-size: 16px !important;
+  color: #ffffff !important;
+  background-color: transparent; }
+
+.date-picker-button {
+  font-size: 16px;
+  background-color: #847fd9;
+  border: 1px solid #2c2c52;
+  box-shadow: 0 2px 0 0 #2c2c52;
+  color: #ffffff;
+  display: inline-block;
+  padding: 8px 20px;
+  font: normal 700 20px/1 "Roboto", "Helvetica Neue", sans-serif;
+  text-align: center;
+  text-shadow: 1px 1px 0 #2c2c52; }
+
+.invalid-input {
+  color: #ffff00;
+  font-weight: bolder; }
+
+.button-facebook {
+  background-color: #4c7fea;
+  border: 1px solid #264da3;
+  border-radius: 15px;
+  box-shadow: 0 2px 0 0 #264da3;
+  color: #ffffff;
+  display: inline-block;
+  padding: 8px 20px;
+  font: normal 700 24px/1 "Calibri", sans-serif;
+  text-align: center;
+  text-shadow: 1px 1px 0 #264da3; }
+
 .chart {
   background-color: #ffffff;
   border-top-left-radius: 15px;
@@ -12169,18 +12202,6 @@ loading-modal .container {
   font-weight: bolder;
   color: #73d9ff; }
 
-.button-facebook {
-  background-color: #4c7fea;
-  border: 1px solid #264da3;
-  border-radius: 15px;
-  box-shadow: 0 2px 0 0 #264da3;
-  color: #ffffff;
-  display: inline-block;
-  padding: 8px 20px;
-  font: normal 700 24px/1 "Calibri", sans-serif;
-  text-align: center;
-  text-shadow: 1px 1px 0 #264da3; }
-
 .button-not-now {
   font-size: 18px;
   color: #ffffff;
@@ -12191,6 +12212,9 @@ loading-modal .container {
 
 .has-refresher > scroll-content {
   border-top: none; }
+
+.leaderboards-encourage-facebook-message {
+  padding-top: 30px; }
 
 .game-header {
   color: #ffffff;
@@ -12405,30 +12429,9 @@ loading-modal .container {
   padding-left: 25px;
   margin-right: -10px; }
 
-.invalid-input {
-  color: #ffff00;
-  font-weight: bolder; }
-
 .feature-locked-text {
   font-size: 14px;
   color: red; }
-
-.set-contest-label {
-  font-size: 16px !important;
-  color: #ffffff !important;
-  background-color: transparent; }
-
-.date-picker-button {
-  font-size: 16px;
-  background-color: #847fd9;
-  border: 1px solid #2c2c52;
-  box-shadow: 0 2px 0 0 #2c2c52;
-  color: #ffffff;
-  display: inline-block;
-  padding: 8px 20px;
-  font: normal 700 20px/1 "Roboto", "Helvetica Neue", sans-serif;
-  text-align: center;
-  text-shadow: 1px 1px 0 #2c2c52; }
 
 .set-contest-question-buttons {
   background-color: #61c2ec;
@@ -12528,6 +12531,27 @@ loading-modal .container {
   font: normal 700 20px/1 "Calibri", sans-serif;
   text-align: center;
   text-shadow: 1px 1px 0 #2c2c52; }
+
+.set-user-avatars-wrapper {
+  border: 1px solid #ffffff; }
+
+.set-user-avatars-scroll-wrapper {
+  height: 100px;
+  background-color: transparent; }
+
+.set-user-avatar {
+  width: 50px;
+  height: 50px; }
+
+.set-user-avatar-selected {
+  border: 1px solid #ffffff; }
+
+.set-user-avatar-not-selected {
+  border-radius: 50%; }
+
+.set-user-birthdate-note {
+  font-size: 12px;
+  color: #ffffff; }
 
 .settings-notifications-off {
   opacity: 0.8;

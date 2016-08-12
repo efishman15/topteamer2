@@ -8,37 +8,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var common_1 = require('@angular/common');
+var forms_1 = require('@angular/forms');
 var ionic_angular_1 = require('ionic-angular');
 var date_picker_1 = require('../../components/date-picker/date-picker');
 var client_1 = require('../../providers/client');
+var analyticsService = require('../../providers/analytics');
 var contestsService = require('../../providers/contests');
 var paymentService = require('../../providers/payments');
 var alertService = require('../../providers/alert');
 var objects_1 = require('../../objects/objects');
 var SetContestPage = (function () {
-    function SetContestPage(params, formBuilder) {
+    function SetContestPage(params) {
         var _this = this;
         this.client = client_1.Client.getInstance();
         this.params = params;
         this.endOptionKeys = Object.keys(this.client.settings.newContest.endOptions);
-        this.team0Control = new common_1.Control('', common_1.Validators.required);
-        this.team1Control = new common_1.Control('', common_1.Validators.required);
-        this.subjectControl = new common_1.Control('', common_1.Validators.required);
-        this.matchingTeamsControlGroup = formBuilder.group({
-            team0Control: this.team0Control,
-            team1Control: this.team1Control
-        }, { validator: this.matchingTeamsValidator });
-        this.contestForm = formBuilder.group({
-            matchingTeamsControlGroup: this.matchingTeamsControlGroup,
-            subjectControl: this.subjectControl
-        });
         //Start date is today, end date is by default as set by the server
         var nowWithTime = new Date();
         var nowWithoutTime = new Date();
         nowWithoutTime.clearTime();
         this.currentTimeOnlyInMilliseconds = nowWithTime.getTime() - nowWithoutTime.getTime();
         this.nowWithoutTimeEpoch = nowWithoutTime.getTime();
+        var endOption = '';
         if (this.params.data.mode === 'edit') {
             this.contestLocalCopy = contestsService.cloneForEdit(this.params.data.contest);
             if (this.contestLocalCopy.type.id === 'userTrivia') {
@@ -46,9 +37,8 @@ var SetContestPage = (function () {
             }
         }
         else if (this.params.data.mode === 'add') {
-            var endOption;
             for (var i = 0; i < this.endOptionKeys.length; i++) {
-                if (this.client.settings['newContest'].endOptions[this.endOptionKeys[i]].isDefault) {
+                if (this.client.settings.newContest.endOptions[this.endOptionKeys[i]].isDefault) {
                     endOption = this.endOptionKeys[i];
                     break;
                 }
@@ -65,6 +55,16 @@ var SetContestPage = (function () {
                 this.contestLocalCopy.type.questions = new objects_1.Questions();
             }
         }
+        //Init form
+        this.contestForm = new forms_1.FormGroup({
+            teams: new forms_1.FormGroup({
+                team0: new forms_1.FormControl('', [forms_1.Validators.required, forms_1.Validators.maxLength(this.client.settings.newContest.inputs.team.maxLength)]),
+                team1: new forms_1.FormControl('', [forms_1.Validators.required, forms_1.Validators.maxLength(this.client.settings.newContest.inputs.team.maxLength)]),
+            }, null, this.matchingTeamsValidator),
+            subject: new forms_1.FormControl('', [forms_1.Validators.required, forms_1.Validators.maxLength(this.client.settings.newContest.inputs.subject.maxLength)]),
+            endOption: new forms_1.FormControl(endOption),
+            randomOrder: new forms_1.FormControl(false)
+        });
         this.client.session.features['newContest'].purchaseData.retrieved = false;
         //-------------------------------------------------------------------------------------------------------------
         //Android Billing
@@ -93,10 +93,10 @@ var SetContestPage = (function () {
                             }
                         }
                     }, function (error) {
-                        window.myLogError('AndroidBillingError', 'Error retrieving unconsumed items: ' + error);
+                        analyticsService.logError('AndroidBillingRetrieveUnconsumedItems', error);
                     });
                 }, function (msg) {
-                    this.client.logError('AndroidBillingError', 'Error getting product details: ' + msg);
+                    analyticsService.logError('AndroidBillingProductDetailsError', msg);
                 }, this.client.session.features['newContest'].purchaseData.productId);
             }
         }
@@ -104,12 +104,17 @@ var SetContestPage = (function () {
             this.client.session.features['newContest'].purchaseData.retrieved = true;
         }
     }
+    SetContestPage.prototype.ngAfterViewInit = function () {
+        this.team0Input['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.team.maxLength;
+        this.team1Input['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.team.maxLength;
+        this.subjectInput['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.subject.maxLength;
+    };
     SetContestPage.prototype.ionViewWillEnter = function () {
         var eventData = { 'mode': this.params.data.mode };
         if (this.params.data.mode === 'edit') {
             eventData['contestId'] = this.params.data.contest._id;
         }
-        this.client.logEvent('page/setContest', eventData);
+        analyticsService.track('page/setContest', eventData);
         this.submitted = false;
     };
     SetContestPage.prototype.retrieveUserQuestions = function () {
@@ -137,7 +142,7 @@ var SetContestPage = (function () {
                     paymentService.showPurchaseSuccess(serverPurchaseData);
                 }, function (error) {
                     _this.client.hideLoader();
-                    window.myLogError('AndroidBilling', 'Error consuming product: ' + error);
+                    analyticsService.logError('AndroidBillingConsumeProductError', error);
                     if (reject) {
                         reject();
                     }
@@ -255,7 +260,7 @@ var SetContestPage = (function () {
     };
     SetContestPage.prototype.setContest = function () {
         var _this = this;
-        this.client.logEvent('contest/set');
+        analyticsService.track('contest/set');
         this.submitted = true;
         if (!this.contestForm.valid) {
             return;
@@ -327,7 +332,7 @@ var SetContestPage = (function () {
                     'typeId': _this.contestLocalCopy.type.id
                 };
                 if (_this.params.data.mode === 'add') {
-                    _this.client.logEvent('contest/created', contestParams);
+                    analyticsService.track('contest/created', contestParams);
                     _this.client.events.publish('topTeamer:contestCreated', contest);
                     _this.client.nav.pop({ animate: false }).then(function () {
                         var appPages = new Array();
@@ -338,7 +343,7 @@ var SetContestPage = (function () {
                     });
                 }
                 else {
-                    _this.client.logEvent('contest/updated', contestParams);
+                    analyticsService.track('contest/updated', contestParams);
                     var now = (new Date).getTime();
                     var currentStatus = contestsService.getContestStatus(_this.contestLocalCopy);
                     var previousStatus = contestsService.getContestStatus(_this.params.data.contest);
@@ -377,7 +382,7 @@ var SetContestPage = (function () {
     };
     SetContestPage.prototype.setEndsIn = function () {
         this.contestLocalCopy.endDate = this.getEndDateAccordingToEndsIn(this.contestLocalCopy.endOption);
-        this.client.logEvent('newContest/endsIn/click', { 'endsIn': this.contestLocalCopy.endOption });
+        analyticsService.track('newContest/endsIn/click', { 'endsIn': this.contestLocalCopy.endOption });
     };
     SetContestPage.prototype.getEndDateAccordingToEndsIn = function (endsIn) {
         var endOption = this.client.settings['newContest'].endOptions[endsIn];
@@ -450,12 +455,24 @@ var SetContestPage = (function () {
             });
         }
     };
+    __decorate([
+        core_1.ViewChild('team0Input'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], SetContestPage.prototype, "team0Input", void 0);
+    __decorate([
+        core_1.ViewChild('team1Input'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], SetContestPage.prototype, "team1Input", void 0);
+    __decorate([
+        core_1.ViewChild('subjectInput'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], SetContestPage.prototype, "subjectInput", void 0);
     SetContestPage = __decorate([
         core_1.Component({
             templateUrl: 'build/pages/set-contest/set-contest.html',
-            directives: [date_picker_1.DatePickerComponent]
+            directives: [forms_1.REACTIVE_FORM_DIRECTIVES, date_picker_1.DatePickerComponent]
         }), 
-        __metadata('design:paramtypes', [ionic_angular_1.NavParams, common_1.FormBuilder])
+        __metadata('design:paramtypes', [ionic_angular_1.NavParams])
     ], SetContestPage);
     return SetContestPage;
 })();

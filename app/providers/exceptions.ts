@@ -1,5 +1,6 @@
 import {ExceptionHandler} from '@angular/core';
 import {Client} from './client';
+import * as analyticsService from './analytics';
 
 export class MyArrayLogger {
   res:Array<any> = [];
@@ -35,47 +36,11 @@ export class MyExceptionHandler extends ExceptionHandler {
       errorMessage += ', ' + exception.wrapperStack;
     }
 
-    if (window.myLogError) {
-      //might not be initialized yet during app load
-      window.myLogError('UnhandledException', errorMessage);
-    }
+    analyticsService.logError('UnhandledException', {exception: exception, stack: stackTrace});
 
     var client = Client.getInstance();
-
-    if (client) {
-
-      //Post errors to server
-      if (
-        (
-          (!client.settings) ||
-          (client.settings && client.settings.general && client.settings.general.postErrors) ||
-          (client.session && client.session.isAdmin)
-        )) {
-
-        //Will also try to post errors to the server
-        let postData:any = {};
-        if (exception) {
-          postData.exception = exception;
-        }
-        if (stackTrace) {
-          postData.stack = stackTrace;
-        }
-        if (reason) {
-          postData.reason = reason;
-        }
-        if (client.clientInfo) {
-          postData.clientInfo = client.clientInfo;
-        }
-        if (client.session) {
-          postData.sessionId = client.session.token;
-        }
-
-        client.serverPost('client/error', postData).then(()=> {
-        }, ()=> {
-        });
-
-      }
-
+    if (client && client.session && client.session.isAdmin) {
+      super.call(exception, stackTrace, reason);
     }
   }
 }

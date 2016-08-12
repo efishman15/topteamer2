@@ -27,6 +27,30 @@ var Settings = (function () {
     return Settings;
 })();
 exports.Settings = Settings;
+var GeneralInputsSettings = (function () {
+    function GeneralInputsSettings() {
+    }
+    return GeneralInputsSettings;
+})();
+exports.GeneralInputsSettings = GeneralInputsSettings;
+var AnalyticsSettings = (function () {
+    function AnalyticsSettings() {
+    }
+    return AnalyticsSettings;
+})();
+exports.AnalyticsSettings = AnalyticsSettings;
+var AnalyticsTrackSettings = (function () {
+    function AnalyticsTrackSettings() {
+    }
+    return AnalyticsTrackSettings;
+})();
+exports.AnalyticsTrackSettings = AnalyticsTrackSettings;
+var MixpanelAnalyticsSettings = (function () {
+    function MixpanelAnalyticsSettings() {
+    }
+    return MixpanelAnalyticsSettings;
+})();
+exports.MixpanelAnalyticsSettings = MixpanelAnalyticsSettings;
 var AdminSettings = (function () {
     function AdminSettings() {
     }
@@ -39,12 +63,6 @@ var AdminCommand = (function () {
     return AdminCommand;
 })();
 exports.AdminCommand = AdminCommand;
-var FlurrySettings = (function () {
-    function FlurrySettings() {
-    }
-    return FlurrySettings;
-})();
-exports.FlurrySettings = FlurrySettings;
 var BranchSettings = (function () {
     function BranchSettings() {
     }
@@ -87,6 +105,18 @@ var NewContestSettings = (function () {
     return NewContestSettings;
 })();
 exports.NewContestSettings = NewContestSettings;
+var NewContestInputSettings = (function () {
+    function NewContestInputSettings() {
+    }
+    return NewContestInputSettings;
+})();
+exports.NewContestInputSettings = NewContestInputSettings;
+var FormInputSettings = (function () {
+    function FormInputSettings() {
+    }
+    return FormInputSettings;
+})();
+exports.FormInputSettings = FormInputSettings;
 var NewContestPrivateQuestionsSettings = (function () {
     function NewContestPrivateQuestionsSettings() {
     }

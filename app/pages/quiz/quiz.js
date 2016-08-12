@@ -15,10 +15,12 @@ var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var quizService = require('../../providers/quiz');
 var soundService = require('../../providers/sound');
+var analyticsService = require('../../providers/analytics');
 var alertService = require('../../providers/alert');
 var objects_1 = require('../../objects/objects');
 var QuizPage = (function () {
     function QuizPage(params) {
+        var _this = this;
         this.questionHistory = [];
         this.pageInitiated = false;
         this.quizStarted = false;
@@ -30,13 +32,16 @@ var QuizPage = (function () {
         else {
             this.title = this.client.translate('QUIZ_VIEW_TITLE', { 'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name });
         }
+        this.client.events.subscribe('topTeamer:resize', function (eventData) {
+            _this.drawQuizProgress();
+        });
     }
     QuizPage.prototype.ngAfterViewInit = function () {
         this.quizCanvas = this.quizCanvasElementRef.nativeElement;
         this.quizContext = this.quizCanvas.getContext('2d');
     };
     QuizPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/quiz', { 'contestId': this.params.data.contest._id });
+        analyticsService.track('page/quiz', { 'contestId': this.params.data.contest._id });
         this.startQuiz();
     };
     QuizPage.prototype.startQuiz = function () {
@@ -46,7 +51,7 @@ var QuizPage = (function () {
             return;
         }
         this.clearQuizProgress(); //From previous time
-        this.client.logEvent('quiz/started', {
+        analyticsService.track('quiz/started', {
             'source': this.params.data.source,
             'typeId': this.params.data.contest.type.id
         });
@@ -127,13 +132,13 @@ var QuizPage = (function () {
                 _this.quizData.xpProgress = null;
             }
             if (data.question.correct) {
-                _this.client.logEvent('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/correct');
+                analyticsService.track('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/correct');
                 correctAnswerId = answerId;
                 _this.quizData.currentQuestion.answers[answerId].answeredCorrectly = true;
                 soundService.play('audio/click_ok');
             }
             else {
-                _this.client.logEvent('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
+                analyticsService.track('quiz/question' + (_this.quizData.currentQuestionIndex + 1) + '/answered/incorrect');
                 soundService.play('audio/click_wrong');
                 correctAnswerId = data.question.correctAnswerId;
                 _this.quizData.currentQuestion.answers[answerId].answeredCorrectly = false;
@@ -164,7 +169,7 @@ var QuizPage = (function () {
             _this.quizData.currentQuestion.answered = false;
             _this.quizData.currentQuestion.doAnimation = true; //Animation end will trigger quiz proceed
             _this.drawQuizProgress();
-            _this.client.logEvent('quiz/gotQuestion' + (_this.quizData.currentQuestionIndex + 1));
+            analyticsService.track('quiz/gotQuestion' + (_this.quizData.currentQuestionIndex + 1));
         }, function () {
         });
     };
@@ -203,7 +208,7 @@ var QuizPage = (function () {
         if (this.quizData.finished) {
             this.drawQuizProgress();
             this.client.session.score += this.quizData.results.data.score;
-            this.client.logEvent('quiz/finished', {
+            analyticsService.track('quiz/finished', {
                 'score': '' + this.quizData.results.data.score,
                 'message': this.quizData.results.data.clientKey
             });
@@ -476,9 +481,6 @@ var QuizPage = (function () {
     };
     QuizPage.prototype.share = function () {
         this.client.share(this.params.data.contest, 'quiz');
-    };
-    QuizPage.prototype.onResize = function () {
-        this.drawQuizProgress();
     };
     QuizPage.prototype.getCanvasFont = function (bold, size, name) {
         var font = '';

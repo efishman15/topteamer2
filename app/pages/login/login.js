@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var client_1 = require('../../providers/client');
 var connectService = require('../../providers/connect');
+var analyticsService = require('../../providers/analytics');
 var LoginPage = (function () {
     function LoginPage() {
         var _this = this;
@@ -25,37 +26,49 @@ var LoginPage = (function () {
         this.client.setPageTitle('GAME_NAME');
     };
     LoginPage.prototype.ionViewWillEnter = function () {
-        this.client.logEvent('page/login');
+        analyticsService.track('page/login');
     };
     LoginPage.prototype.ionViewDidEnter = function () {
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
     };
-    LoginPage.prototype.login = function () {
+    LoginPage.prototype.loginToServer = function (connectInfo) {
         var _this = this;
-        connectService.login().then(function (connectInfo) {
+        return new Promise(function (resolve, reject) {
             _this.client.serverConnect(connectInfo).then(function () {
                 _this.client.playerInfoComponent.init(_this.client);
                 _this.client.setRootPage('MainTabsPage');
+                resolve();
+            }, function () {
+                reject();
+            });
+        });
+    };
+    LoginPage.prototype.facebookLogin = function () {
+        var _this = this;
+        analyticsService.track('login/facebookLogin');
+        connectService.facebookLogin().then(function (connectInfo) {
+            _this.loginToServer(connectInfo).then(function () {
+                connectService.storeCredentials(connectInfo);
+            });
+        }, function () {
+        });
+    };
+    ;
+    LoginPage.prototype.registerGuest = function () {
+        var _this = this;
+        analyticsService.track('login/guest');
+        connectService.guestLogin().then(function (connectInfo) {
+            _this.loginToServer(connectInfo).then(function () {
             }, function () {
             });
         }, function () {
         });
     };
-    LoginPage.prototype.facebookLogin = function () {
-        this.client.logEvent('login/facebookLogin');
-        this.login();
-    };
-    ;
-    LoginPage.prototype.registerGuest = function () {
-        this.client.logEvent('login/guest');
-        connectService.createGuest();
-        this.login();
-    };
     LoginPage.prototype.changeLanguage = function (language) {
         this.client.user.settings.language = language;
         localStorage.setItem('language', language);
-        this.client.logEvent('login/changeLanguage', { language: language });
+        analyticsService.track('login/changeLanguage', { language: language });
     };
     LoginPage = __decorate([
         core_1.Component({

@@ -5,12 +5,14 @@ import {ConnectInfo,FacebookInfo} from '../objects/objects'
 //-- getLoginStatus
 //------------------------------------------------------
 export let getLoginStatus = () => {
+
   return new Promise((resolve, reject) => {
 
-    let connectInfo:ConnectInfo = new ConnectInfo('facebook');
+    let connectInfo:ConnectInfo;
     if (!window.cordova) {
       window.FB.getLoginStatus((response:any) => {
         if (response && response.status === 'connected') {
+          connectInfo = new ConnectInfo('facebook');
           connectInfo.facebookInfo = new FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
         }
         resolve(connectInfo);
@@ -23,6 +25,7 @@ export let getLoginStatus = () => {
           setTimeout(() => {
             window.facebookConnectPlugin.getLoginStatus((response) => {
               if (response && response.status === 'connected') {
+                connectInfo = new ConnectInfo('facebook');
                 connectInfo.facebookInfo = new FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
               }
               resolve(connectInfo);
@@ -32,11 +35,12 @@ export let getLoginStatus = () => {
           }, 500);
         }
         else if (response && response.status === 'connected') {
+          connectInfo = new ConnectInfo('facebook');
           connectInfo.facebookInfo = new FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
           resolve(connectInfo);
         }
         else {
-          resolve(connectInfo);
+          reject();
         }
 
       }, (error) => {

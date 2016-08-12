@@ -23,7 +23,6 @@ var PlayerInfoComponent = (function () {
     };
     PlayerInfoComponent.prototype.init = function (client) {
         this.client = client;
-        this.myAvatar = this.client.getAvatarUrl(this.client.session.avatar);
         this.initXp();
         this.hidden = false;
     };
@@ -119,6 +118,12 @@ var PlayerInfoComponent = (function () {
             }
             resolve();
         });
+    };
+    PlayerInfoComponent.prototype.myAvatarClick = function (event) {
+        //Avoid opening 'SetUserPage' twice
+        if (this.client.nav.getActive().componentType.name !== 'SetUserPage') {
+            this.client.openPage('SetUserPage');
+        }
     };
     __decorate([
         core_1.ViewChild('playerInfoCanvas'), 

@@ -5,6 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var core_1 = require('@angular/core');
 var client_1 = require('./client');
+var analyticsService = require('./analytics');
 var MyArrayLogger = (function () {
     function MyArrayLogger() {
         this.res = [];
@@ -37,37 +38,10 @@ var MyExceptionHandler = (function (_super) {
         if (exception.wrapperStack) {
             errorMessage += ', ' + exception.wrapperStack;
         }
-        if (window.myLogError) {
-            //might not be initialized yet during app load
-            window.myLogError('UnhandledException', errorMessage);
-        }
+        analyticsService.logError('UnhandledException', { exception: exception, stack: stackTrace });
         var client = client_1.Client.getInstance();
-        if (client) {
-            //Post errors to server
-            if (((!client.settings) ||
-                (client.settings && client.settings.general && client.settings.general.postErrors) ||
-                (client.session && client.session.isAdmin))) {
-                //Will also try to post errors to the server
-                var postData = {};
-                if (exception) {
-                    postData.exception = exception;
-                }
-                if (stackTrace) {
-                    postData.stack = stackTrace;
-                }
-                if (reason) {
-                    postData.reason = reason;
-                }
-                if (client.clientInfo) {
-                    postData.clientInfo = client.clientInfo;
-                }
-                if (client.session) {
-                    postData.sessionId = client.session.token;
-                }
-                client.serverPost('client/error', postData).then(function () {
-                }, function () {
-                });
-            }
+        if (client && client.session && client.session.isAdmin) {
+            _super.prototype.call.call(this, exception, stackTrace, reason);
         }
     };
     return MyExceptionHandler;

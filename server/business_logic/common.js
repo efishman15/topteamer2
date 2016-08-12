@@ -1,6 +1,7 @@
 var path = require('path');
 var util = require('util');
 var mathjs = require('mathjs');
+var jsonTransformer = require('jsonpath-object-transform');
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 
 //----------------------------------------------------
@@ -154,3 +155,26 @@ module.exports.getAvatar = function (session) {
   }
 
 }
+
+//---------------------------------------------------------------------
+// prepareContestForClient
+//---------------------------------------------------------------------
+module.exports.prepareContestForClient = prepareContestForClient;
+function prepareContestForClient(contest, session) {
+
+  var contestForClient = jsonTransformer(contest, session.isAdmin ? generalUtils.settings.server.contest.details.adminClientTemplate : generalUtils.settings.server.contest.details.clientTemplate);
+  if (contest.creator.id.toString() === session.userId.toString()) {
+    contestForClient.owner = true;
+  }
+
+  if (contest.users[session.userId.toString()]) {
+    contestForClient.myTeam = contest.users[session.userId.toString()].team;
+  }
+
+  contestForClient.participants = contest.participants + contest.systemParticipants;
+  if (session.isAdmin) {
+    contestForClient.systemParticipants = contest.systemParticipants;
+  }
+
+  return contestForClient;
+};

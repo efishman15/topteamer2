@@ -1,4 +1,5 @@
 var path = require('path');
+var async = require('async');
 var exceptions = require(path.resolve(__dirname, '../utils/exceptions'));
 var generalUtils = require(path.resolve(__dirname, '../utils/general'));
 var Leaderboard = require('agoragames-leaderboard');
@@ -89,11 +90,6 @@ function addScore(contestId, teamId, deltaScore, session) {
 
   var contestGeneralLeaderboard = getContestLeaderboard(contestId);
   var contestTeamLeaderboard = getTeamLeaderboard(contestId, teamId);
-  var weeklyLeaderboard = getWeeklyLeaderboard();
-
-  generalLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
-    generalLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData);
-  });
 
   contestGeneralLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
     contestGeneralLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData, function (reply) {
@@ -107,11 +103,41 @@ function addScore(contestId, teamId, deltaScore, session) {
     });
   });
 
+  addScoreToGeneralLeaderboards(deltaScore, session);
+
+};
+
+//---------------------------------------------------------------------------------------------------------------------------
+// addScore
+//
+// The following leaderboards are updated:
+// =======================================
+// 1. Contest general leaderboard - 'contest_<contestId>'
+// 2. Contest team leaderboard - 'contest_<contestId>_team_<teamId>'
+// 3. General Leaderboard (ever) - 'general' (will be used to display my friends' scores)
+// 4. Weekly leaderboard - weekly_<YearWeek>
+//
+// @deltaScore - the score currently achieved which should be increased in all leaderboards
+// @session - facebookUserId (for facebook) or UserId (for guests) as the primary member key in all leaderboards
+// (to be able to retrieve friends leaderboard)
+//---------------------------------------------------------------------------------------------------------------------------
+module.exports.addScoreToGeneralLeaderboards = addScoreToGeneralLeaderboards;
+function addScoreToGeneralLeaderboards(deltaScore, session) {
+
+  var leaderboardMember = getLeaderboardMember(session)
+
+  var weeklyLeaderboard = getWeeklyLeaderboard();
+
   weeklyLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
     weeklyLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData, function (reply) {
       weeklyLeaderboard.disconnect();
     });
   });
+
+  generalLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
+    generalLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData);
+  });
+
 };
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -183,12 +209,6 @@ function getFriends(data, callback) {
 
   data.leaders = [];
 
-  //Return if no friends
-  if (!data.session.facebookUserId || !data.session.friends || !data.session.friends.list || data.session.friends.list.length === 0) {
-    callback(null, data);
-    return;
-  }
-
   var pageSize = data.pageSize ? data.pageSize : generalUtils.settings.server.leaderboard.pageSize;
 
   var options = {
@@ -201,9 +221,14 @@ function getFriends(data, callback) {
   var myLeaderboardMember = getLeaderboardMember(data.session);
 
   var members = [];
-  for (var i = 0; i < data.session.friends.list.length; i++) {
-    members.push(data.session.friends.list[i].id);
+
+  //add my friends - for guest mode - it will show only myself in the general leaderboard
+  if (data.session.facebookUserId && data.session.friends && data.session.friends.list & data.session.friends.list.length > 0) {
+    for (var i = 0; i < data.session.friends.list.length; i++) {
+      members.push(data.session.friends.list[i].id);
+    }
   }
+
   //Push myself as well
   members.push(myLeaderboardMember.key);
 
@@ -230,6 +255,7 @@ function getFriends(data, callback) {
         }
       }
     }
+
     if (data.myIndex === -1) {
       var myUserInLeaderboard = {
         member: data.session.facebookUserId,
@@ -346,15 +372,24 @@ function removeContestLeaderboards(data, callback) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
-// updateMyGuestAvatars
+// syncAvatars
 //
-// data: contests
+// data: contests, session, user (name, avatar, dob)
 // output: <NA>
 //---------------------------------------------------------------------------------------------------------------------------
-module.exports.updateMyGuestAvatars = updateMyGuestAvatars;
-function updateMyGuestAvatars(data, callback) {
+module.exports.syncAvatars = syncAvatars;
+function syncAvatars(data, callback) {
 
   var newLeaderboardMember = getLeaderboardMember(data.session);
+
+  //Sync weekly leaderboard
+  var weeklyLeaderboard = getWeeklyLeaderboard();
+  weeklyLeaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+  });
+
+  //Sync general leaderboard
+  generalLeaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+  });
 
   async.forEach(data.contests, function (contest, callbackContest) {
 
@@ -362,7 +397,7 @@ function updateMyGuestAvatars(data, callback) {
     contestLeaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
     });
 
-    var team0Leaderboard = getContestLeaderboard(contest._id, 0);
+    var team0Leaderboard = getTeamLeaderboard(contest._id, 0);
     team0Leaderboard.memberDataFor(data.session.userId, function (memberData) {
       if (memberData) {
         team0Leaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
@@ -370,7 +405,7 @@ function updateMyGuestAvatars(data, callback) {
       }
     })
 
-    var team1Leaderboard = getContestLeaderboard(contest._id, 1);
+    var team1Leaderboard = getTeamLeaderboard(contest._id, 1);
     team0Leaderboard.memberDataFor(data.session.userId, function (memberData) {
       if (memberData) {
         team1Leaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
@@ -380,8 +415,18 @@ function updateMyGuestAvatars(data, callback) {
 
     callbackContest();
 
+  }, function(err) {
+
+    if (err) {
+      callback(new exceptions.ServerException('Error synching leaderboard avatars', {
+        'userId': data.session.userId,
+        'dbError': err
+      }, 'error'));
+      return;
+    }
+    callback(null, data);
+
   });
 
-  callback(null, data);
 }
 

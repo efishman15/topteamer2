@@ -7,13 +7,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var common_1 = require('@angular/common');
+var forms_1 = require('@angular/forms');
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var objects_1 = require('../../objects/objects');
+var analyticsService = require('../../providers/analytics');
 var QuestionEditorPage = (function () {
-    function QuestionEditorPage(params, viewController, formBuilder) {
+    function QuestionEditorPage(params, viewController) {
         this.client = client_1.Client.getInstance();
         this.viewController = viewController;
         this.fieldInFocus = -1;
@@ -26,17 +27,12 @@ var QuestionEditorPage = (function () {
             this.title = this.client.translate('EDIT_QUESTION');
             this.question = params.data.question;
         }
-        this.questionControl = new common_1.Control('', common_1.Validators.compose([common_1.Validators.required, common_1.Validators.maxLength(this.client.settings.quiz.question.maxLength)]));
-        this.answer0Control = new common_1.Control('', common_1.Validators.compose([common_1.Validators.required, common_1.Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]));
-        this.answer1Control = new common_1.Control('', common_1.Validators.compose([common_1.Validators.required, common_1.Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]));
-        this.answer2Control = new common_1.Control('', common_1.Validators.compose([common_1.Validators.required, common_1.Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]));
-        this.answer3Control = new common_1.Control('', common_1.Validators.compose([common_1.Validators.required, common_1.Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]));
-        this.questionEditorForm = formBuilder.group({
-            questionControl: this.questionControl,
-            answer0Control: this.answer0Control,
-            answer1Control: this.answer1Control,
-            answer2Control: this.answer2Control,
-            answer3Control: this.answer3Control
+        this.questionEditorForm = new forms_1.FormGroup({
+            question: new forms_1.FormControl('', [forms_1.Validators.required, forms_1.Validators.maxLength(this.client.settings.quiz.question.maxLength)]),
+            answer0: new forms_1.FormControl('', [forms_1.Validators.required, forms_1.Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]),
+            answer1: new forms_1.FormControl('', [forms_1.Validators.required, forms_1.Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]),
+            answer2: new forms_1.FormControl('', [forms_1.Validators.required, forms_1.Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]),
+            answer3: new forms_1.FormControl('', [forms_1.Validators.required, forms_1.Validators.maxLength(this.client.settings.quiz.question.answer.maxLength)]),
         });
         this.currentQuestions = params.data.currentQuestions;
         this.submitted = false;
@@ -47,10 +43,15 @@ var QuestionEditorPage = (function () {
         if (this.mode === 'edit') {
             eventData['questionId'] = this.question._id;
         }
-        this.client.logEvent('page/questionEditor', eventData);
+        analyticsService.track('page/questionEditor', eventData);
+        this.questionTextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.maxLength;
+        this.answer0TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
+        this.answer1TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
+        this.answer2TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
+        this.answer3TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
     };
     QuestionEditorPage.prototype.dismiss = function (applyChanges) {
-        this.client.logEvent('question/' + (applyChanges ? 'set' : 'cancel'));
+        analyticsService.track('question/' + (applyChanges ? 'set' : 'cancel'));
         var result;
         if (applyChanges) {
             this.submitted = true;
@@ -98,11 +99,32 @@ var QuestionEditorPage = (function () {
         core_1.ViewChild(ionic_angular_1.Content), 
         __metadata('design:type', ionic_angular_1.Content)
     ], QuestionEditorPage.prototype, "content", void 0);
+    __decorate([
+        core_1.ViewChild('questionTextArea'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], QuestionEditorPage.prototype, "questionTextArea", void 0);
+    __decorate([
+        core_1.ViewChild('answer0TextArea'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], QuestionEditorPage.prototype, "answer0TextArea", void 0);
+    __decorate([
+        core_1.ViewChild('answer1TextArea'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], QuestionEditorPage.prototype, "answer1TextArea", void 0);
+    __decorate([
+        core_1.ViewChild('answer2TextArea'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], QuestionEditorPage.prototype, "answer2TextArea", void 0);
+    __decorate([
+        core_1.ViewChild('answer3TextArea'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], QuestionEditorPage.prototype, "answer3TextArea", void 0);
     QuestionEditorPage = __decorate([
         core_1.Component({
-            templateUrl: 'build/pages/question-editor/question-editor.html'
+            templateUrl: 'build/pages/question-editor/question-editor.html',
+            directives: [forms_1.REACTIVE_FORM_DIRECTIVES]
         }), 
-        __metadata('design:paramtypes', [ionic_angular_1.NavParams, ionic_angular_1.ViewController, common_1.FormBuilder])
+        __metadata('design:paramtypes', [ionic_angular_1.NavParams, ionic_angular_1.ViewController])
     ], QuestionEditorPage);
     return QuestionEditorPage;
 })();
