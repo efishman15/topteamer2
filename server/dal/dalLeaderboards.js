@@ -223,7 +223,7 @@ function getFriends(data, callback) {
   var members = [];
 
   //add my friends - for guest mode - it will show only myself in the general leaderboard
-  if (data.session.facebookUserId && data.session.friends && data.session.friends.list & data.session.friends.list.length > 0) {
+  if (data.session.facebookUserId && data.session.friends && data.session.friends.list && data.session.friends.list.length > 0) {
     for (var i = 0; i < data.session.friends.list.length; i++) {
       members.push(data.session.friends.list[i].id);
     }

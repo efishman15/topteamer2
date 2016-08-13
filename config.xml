@@ -49,4 +49,8 @@
     <plugin name="phonegap-plugin-push" source="npm" spec="~1.7.4">
         <param name="SENDER_ID" value="742205400669" />
     </plugin>
+    <preference name="xwalkVersion" value="19+" />
+    <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
+    <preference name="xwalkMode" value="embedded" />
+    <preference name="xwalkMultipleApk" value="true" />
 </widget>
