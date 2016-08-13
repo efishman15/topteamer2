@@ -10,12 +10,15 @@ var generalLeaderboard = new Leaderboard('topteamer:general');
 //---------------------------------------------------------------------------------------------------------------------------
 // private functions
 //---------------------------------------------------------------------------------------------------------------------------
-function getLeaderboardMember(session) {
+function getLeaderboardMember(session, isGeneralLeaderboard) {
 
   var key = session.userId.toString();
 
   var memberData;
   if (session.facebookUserId) {
+    if (isGeneralLeaderboard) {
+      key = session.facebookUserId;
+    }
     memberData = session.name + '|0|' + session.facebookUserId;
   }
   else {
@@ -86,7 +89,7 @@ function prepareLeaderObject(id, leader, outsideLeaderboard) {
 module.exports.addScore = addScore;
 function addScore(contestId, teamId, deltaScore, session) {
 
-  var leaderboardMember = getLeaderboardMember(session)
+  var leaderboardMember = getLeaderboardMember(session, false);
 
   var contestGeneralLeaderboard = getContestLeaderboard(contestId);
   var contestTeamLeaderboard = getTeamLeaderboard(contestId, teamId);
@@ -124,8 +127,7 @@ function addScore(contestId, teamId, deltaScore, session) {
 module.exports.addScoreToGeneralLeaderboards = addScoreToGeneralLeaderboards;
 function addScoreToGeneralLeaderboards(deltaScore, session) {
 
-  var leaderboardMember = getLeaderboardMember(session)
-
+  var leaderboardMember = getLeaderboardMember(session, false);
   var weeklyLeaderboard = getWeeklyLeaderboard();
 
   weeklyLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
@@ -134,8 +136,9 @@ function addScoreToGeneralLeaderboards(deltaScore, session) {
     });
   });
 
-  generalLeaderboard.changeScoreFor(leaderboardMember.key, deltaScore, function (reply) {
-    generalLeaderboard.updateMemberData(leaderboardMember.key, leaderboardMember.memberData);
+  var generalLeaderboardMember = getLeaderboardMember(session, true);
+  generalLeaderboard.changeScoreFor(generalLeaderboardMember.key, deltaScore, function (reply) {
+    generalLeaderboard.updateMemberData(generalLeaderboardMember.key, generalLeaderboardMember.memberData);
   });
 
 };
@@ -160,7 +163,7 @@ function getLeaders(data, callback) {
 
   data.leaders = [];
 
-  var myLeaderboardMember = getLeaderboardMember(data.session);
+  var myLeaderboardMember = getLeaderboardMember(data.session, false);
 
   data.leaderboard.leaders(0, options, function (leaders) {
     for (var i = 0; i < leaders.length; i++) {
@@ -218,7 +221,7 @@ function getFriends(data, callback) {
     reverse: true
   };
 
-  var myLeaderboardMember = getLeaderboardMember(data.session);
+  var myLeaderboardMember = getLeaderboardMember(data.session, true);
 
   var members = [];
 
@@ -380,35 +383,49 @@ function removeContestLeaderboards(data, callback) {
 module.exports.syncAvatars = syncAvatars;
 function syncAvatars(data, callback) {
 
-  var newLeaderboardMember = getLeaderboardMember(data.session);
+  var leaderboardMember = getLeaderboardMember(data.session, false);
 
   //Sync weekly leaderboard
   var weeklyLeaderboard = getWeeklyLeaderboard();
-  weeklyLeaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+  weeklyLeaderboard.updateMemberData(data.session.userId, leaderboardMember.memberData, function () {
   });
 
+  var generalLeaderboardMember = getLeaderboardMember(data.session, true);
+
   //Sync general leaderboard
-  generalLeaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
-  });
+  if (data.session.facebookUserId) {
+    //Change key in the general leaderboard to the facebookUserId so we can work with friends
+    generalLeaderboard.scoreFor(data.session.userId.toString(), function(score) {
+      generalLeaderboard.removeMember(data.session.userId.toString(), function () {
+        generalLeaderboard.rankMember(data.session.facebookUserId, score, generalLeaderboardMember.memberData, function () {
+        });
+      })
+    })
+  }
+  else {
+    console.log('leaving same id for: ' + data.session.userId.toString());
+    generalLeaderboard.updateMemberData(data.session.userId, generalLeaderboardMember.memberData, function () {
+    });
+  }
 
   async.forEach(data.contests, function (contest, callbackContest) {
 
     var contestLeaderboard = getContestLeaderboard(contest._id);
-    contestLeaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+    contestLeaderboard.updateMemberData(data.session.userId, leaderboardMember.memberData, function () {
     });
 
     var team0Leaderboard = getTeamLeaderboard(contest._id, 0);
     team0Leaderboard.memberDataFor(data.session.userId, function (memberData) {
       if (memberData) {
-        team0Leaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+        team0Leaderboard.updateMemberData(data.session.userId, leaderboardMember.memberData, function () {
         });
       }
     })
 
     var team1Leaderboard = getTeamLeaderboard(contest._id, 1);
-    team0Leaderboard.memberDataFor(data.session.userId, function (memberData) {
+    team1Leaderboard.memberDataFor(data.session.userId, function (memberData) {
       if (memberData) {
-        team1Leaderboard.updateMemberData(data.session.userId, newLeaderboardMember.memberData, function () {
+        team1Leaderboard.updateMemberData(data.session.userId, leaderboardMember.memberData, function () {
         });
       }
     })

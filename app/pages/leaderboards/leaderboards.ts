@@ -22,6 +22,10 @@ export class LeaderboardsPage {
   @ViewChild(ContestListComponent) contestList:ContestListComponent;
   @ViewChild(LeadersComponent) leadersComponent:LeadersComponent;
 
+  nextTimeForceRefreshContests:boolean;
+  nextTimeForceRefreshFriends:boolean;
+  nextTimeForceRefreshWeekly:boolean;
+
   constructor() {
     this.client = Client.getInstance();
 
@@ -37,6 +41,32 @@ export class LeaderboardsPage {
       this.refreshList(true).then(()=> {
       }, ()=> {
       });
+    });
+
+    this.client.events.subscribe('topTeamer:switchedToFacebook', () => {
+      switch (this.mode) {
+        case 'contests':
+          this.nextTimeForceRefreshFriends = true;
+          this.nextTimeForceRefreshWeekly = true;
+          this.contestList.refresh(true).then(() => {
+          }, () => {
+          })
+          break;
+        case 'friends':
+          this.nextTimeForceRefreshContests = true;
+          this.nextTimeForceRefreshWeekly = true;
+          this.showFriendsLeaderboard(true).then(() => {
+          }, () => {
+          })
+          break;
+        case 'weekly':
+          this.nextTimeForceRefreshContests = true;
+          this.nextTimeForceRefreshFriends = true;
+          this.showWeeklyLeaderboard(true).then(() => {
+          }, () => {
+          })
+          break;
+      }
     });
 
     this.client.events.subscribe('topTeamer:leaderboardsUpdated', () => {
@@ -67,7 +97,12 @@ export class LeaderboardsPage {
   displayRecentlyFinishedContestsTab() {
     analyticsService.track('page/leaderboard/contests');
     this.mode = 'contests';
-    this.showRecentlyFinishedContests(false).then(()=> {
+    let forceRefresh:boolean = false;
+    if (this.nextTimeForceRefreshContests) {
+      this.nextTimeForceRefreshContests = false;
+      forceRefresh = true;
+    }
+    this.showRecentlyFinishedContests(forceRefresh).then(()=> {
     }, ()=> {
     })
   }
@@ -81,7 +116,12 @@ export class LeaderboardsPage {
   displayFriendsLeaderboardTab() {
     analyticsService.track('page/leaderboard/friends');
     this.mode = 'friends';
-    this.showFriendsLeaderboard(false).then(()=> {
+    let forceRefresh:boolean = false;
+    if (this.nextTimeForceRefreshFriends) {
+      this.nextTimeForceRefreshFriends = false;
+      forceRefresh = true;
+    }
+    this.showFriendsLeaderboard(forceRefresh).then(()=> {
     }, ()=> {
     })
   }
@@ -95,7 +135,12 @@ export class LeaderboardsPage {
   displayWeeklyLeaderboardTab() {
     analyticsService.track('page/leaderboard/weekly');
     this.mode = 'weekly';
-    this.showWeeklyLeaderboard(false).then(() => {
+    let forceRefresh:boolean = false;
+    if (this.nextTimeForceRefreshWeekly) {
+      this.nextTimeForceRefreshWeekly = false;
+      forceRefresh = true;
+    }
+    this.showWeeklyLeaderboard(forceRefresh).then(() => {
     }, ()=> {
     });
   }

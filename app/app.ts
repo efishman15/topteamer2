@@ -96,6 +96,12 @@ export class TopTeamerApp {
 
         var client = Client.getInstance();
 
+        //Check if modal view is displayed, currently accessing non-public members of Ionic App
+        //Waiting for Ionic team to expose checking if a modal view is displayed
+        if (this.app['_portal']._views && this.app['_portal']._views.length > 0 && this.app['_portal']._views[0].isOverlay) {
+          return this.app['_portal']._views[0].dismiss();
+        }
+
         //Root screen - confirm exit app
         if (!client.nav.canGoBack()) {
           if (this.menuController.isOpen()) {
@@ -106,12 +112,6 @@ export class TopTeamerApp {
             //Main menu is closed - confirm exit app
             return alertService.confirmExitApp();
           }
-        }
-
-        //Check if modal view is displayed, currently accessing non-public members of Ionic App
-        //Waiting for Ionic team to expose checking if a modal view is displayed
-        if (this.app['_portal']._views && this.app['_portal']._views.length > 0 && this.app['_portal']._views && this.app['_portal']._views[0].hasOverlay) {
-          return this.app['_portal']._views && this.app['_portal']._views[0].dismiss();
         }
 
         //Go back

@@ -146,29 +146,56 @@ module.exports.upgradeDb = function (req, res, next) {
       sessionUtils.getAdminSession(data, callback);
     },
 
-    //Run on all contests
+    //Fix general leaderboard
     function (data, callback) {
-      var contestsCollection = data.DbHelper.getCollection('Contests');
-      contestsCollection.find({}, {}, function (err, contestsCursor) {
-        contestsCursor.toArray(function (err, contests) {
 
-          for (var i = 0; i < contests.length; i++) {
-            fixLeaderboard(data, dalLeaderboads.getContestLeaderboard(contests[i]._id.toString()));
-            fixLeaderboard(data, dalLeaderboads.getTeamLeaderboard(contests[i]._id.toString(), 0));
-            fixLeaderboard(data, dalLeaderboads.getTeamLeaderboard(contests[i]._id.toString(), 1));
+      var options = {
+        'withMemberData': true,
+        'sortBy': 'rank',
+        'pageSize': 1000
+      };
 
-            fixContest(data, contests[i]);
+      var usersCollection = data.DbHelper.getCollection('Users');
+
+      var generalLeaderboard = new Leaderboard('topteamer:general');
+
+      generalLeaderboard.leaders(0, options, function (leaders) {
+
+        async.forEach(leaders, function (leader, callbackLeader) {
+
+          if (/^\d+$/.test(leader.member)) {
+            //this is a numeric only --> facebook user - skip
+            callbackLeader();
+            return;
           }
 
-          fixLeaderboard(data, dalLeaderboads.getWeeklyLeaderboard());
-          fixLeaderboard(data, new Leaderboard('topteamer:general'));
+          usersCollection.findOne({
+            '_id': ObjectId(leader.member)
+          }, {}, function (err, user) {
+            if (!err && user) {
+              if (user && user.facebookUserId) {
+                generalLeaderboard.removeMember(leader.member, function () {
+                  generalLeaderboard.rankMember(user.facebookUserId, leader.score, user.name + '|0|' + user.facebookUserId, function () {
+                    callbackLeader();
+                  });
 
-          callback(null, data)
-
-        })
+                })
+              }
+              else {
+                //User is still a guest
+                callbackLeader();
+              }
+            }
+            else {
+              //No such user
+              callbackLeader();
+            }
+          });
+        }, function() {
+          callback(null, data);
+        });
       });
     }
-
   ];
 
   async.waterfall(operations, function (err) {
@@ -179,66 +206,5 @@ module.exports.upgradeDb = function (req, res, next) {
       res.send(err.httpStatus, err);
     }
   });
-
 }
 
-function fixLeaderboard(data, leaderboard) {
-
-  var options = {
-    'withMemberData': true,
-    'sortBy': 'rank',
-    'pageSize': 1000
-  };
-
-  var usersCollection = data.DbHelper.getCollection('Users');
-
-  leaderboard.leaders(0, options, function (leaders) {
-
-    async.forEach(leaders, function(leader, callback) {
-      usersCollection.findOne({
-        'facebookUserId': leader.member
-      }, {}, function (err, user) {
-        if (!err && user) {
-          leaderboard.removeMember(leader.member, function () {
-            leaderboard.rankMember(user._id.toString(), leader.score, user.name + '|0|' + leader.member, function() {
-              callback();
-            });
-
-          })
-        }
-      });
-    });
-  });
-}
-
-function fixContest(data, contest) {
-
-  var contestsCollection = data.DbHelper.getCollection('Contests');
-
-  var updateFields = {$set: {}};
-  updateFields['$unset'] = {}
-
-  if (!contest.creator.avatar) {
-    updateFields['$set']['creator.avatar'] = {type: 0, id: contest.creator.facebookUserId};
-    updateFields['$unset']['creator.facebookUserId'] = '';
-  }
-
-  if (!contest.leader.avatar) {
-    updateFields['$set']['leader.avatar'] = {type: 0, id: contest.leader.facebookUserId};
-    updateFields['$unset']['leader.facebookUserId'] = '';
-  }
-
-  if (contest.teams[0].leader && !contest.teams[0].leader.avatar) {
-    updateFields['$set']['teams.0.leader.avatar'] = {type: 0, id: contest.teams[0].leader.facebookUserId};
-    updateFields['$unset']['teams.0.leader.facebookUserId'] = '';
-  }
-
-  if (contest.teams[1].leader && !contest.teams[1].leader.avatar) {
-    updateFields['$set']['leader.teams.1.avatar'] = {type: 0, id: contest.teams[1].leader.facebookUserId};
-    updateFields['$unset']['leader.teams.1.facebookUserId'] = '';
-  }
-
-  contestsCollection.findAndModify({'_id': ObjectId(contest._id)}, {},
-    updateFields, {w: 1, new: true}, function (err, contest) {
-    });
-}

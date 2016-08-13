@@ -30,6 +30,31 @@ var LeaderboardsPage = (function () {
             }, function () {
             });
         });
+        this.client.events.subscribe('topTeamer:switchedToFacebook', function () {
+            switch (_this.mode) {
+                case 'contests':
+                    _this.nextTimeForceRefreshFriends = true;
+                    _this.nextTimeForceRefreshWeekly = true;
+                    _this.contestList.refresh(true).then(function () {
+                    }, function () {
+                    });
+                    break;
+                case 'friends':
+                    _this.nextTimeForceRefreshContests = true;
+                    _this.nextTimeForceRefreshWeekly = true;
+                    _this.showFriendsLeaderboard(true).then(function () {
+                    }, function () {
+                    });
+                    break;
+                case 'weekly':
+                    _this.nextTimeForceRefreshContests = true;
+                    _this.nextTimeForceRefreshFriends = true;
+                    _this.showWeeklyLeaderboard(true).then(function () {
+                    }, function () {
+                    });
+                    break;
+            }
+        });
         this.client.events.subscribe('topTeamer:leaderboardsUpdated', function () {
             switch (_this.mode) {
                 case 'contests':
@@ -56,7 +81,12 @@ var LeaderboardsPage = (function () {
     LeaderboardsPage.prototype.displayRecentlyFinishedContestsTab = function () {
         analyticsService.track('page/leaderboard/contests');
         this.mode = 'contests';
-        this.showRecentlyFinishedContests(false).then(function () {
+        var forceRefresh = false;
+        if (this.nextTimeForceRefreshContests) {
+            this.nextTimeForceRefreshContests = false;
+            forceRefresh = true;
+        }
+        this.showRecentlyFinishedContests(forceRefresh).then(function () {
         }, function () {
         });
     };
@@ -68,7 +98,12 @@ var LeaderboardsPage = (function () {
     LeaderboardsPage.prototype.displayFriendsLeaderboardTab = function () {
         analyticsService.track('page/leaderboard/friends');
         this.mode = 'friends';
-        this.showFriendsLeaderboard(false).then(function () {
+        var forceRefresh = false;
+        if (this.nextTimeForceRefreshFriends) {
+            this.nextTimeForceRefreshFriends = false;
+            forceRefresh = true;
+        }
+        this.showFriendsLeaderboard(forceRefresh).then(function () {
         }, function () {
         });
     };
@@ -80,7 +115,12 @@ var LeaderboardsPage = (function () {
     LeaderboardsPage.prototype.displayWeeklyLeaderboardTab = function () {
         analyticsService.track('page/leaderboard/weekly');
         this.mode = 'weekly';
-        this.showWeeklyLeaderboard(false).then(function () {
+        var forceRefresh = false;
+        if (this.nextTimeForceRefreshWeekly) {
+            this.nextTimeForceRefreshWeekly = false;
+            forceRefresh = true;
+        }
+        this.showWeeklyLeaderboard(forceRefresh).then(function () {
         }, function () {
         });
     };

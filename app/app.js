@@ -59,6 +59,11 @@ var TopTeamerApp = (function () {
             //Handle hardware back button
             _this.client.platform.registerBackButtonAction(function () {
                 var client = client_1.Client.getInstance();
+                //Check if modal view is displayed, currently accessing non-public members of Ionic App
+                //Waiting for Ionic team to expose checking if a modal view is displayed
+                if (_this.app['_portal']._views && _this.app['_portal']._views.length > 0 && _this.app['_portal']._views[0].isOverlay) {
+                    return _this.app['_portal']._views[0].dismiss();
+                }
                 //Root screen - confirm exit app
                 if (!client.nav.canGoBack()) {
                     if (_this.menuController.isOpen()) {
@@ -69,11 +74,6 @@ var TopTeamerApp = (function () {
                         //Main menu is closed - confirm exit app
                         return alertService.confirmExitApp();
                     }
-                }
-                //Check if modal view is displayed, currently accessing non-public members of Ionic App
-                //Waiting for Ionic team to expose checking if a modal view is displayed
-                if (_this.app['_portal']._views && _this.app['_portal']._views.length > 0 && _this.app['_portal']._views && _this.app['_portal']._views[0].hasOverlay) {
-                    return _this.app['_portal']._views && _this.app['_portal']._views[0].dismiss();
                 }
                 //Go back
                 return client.nav.pop();
