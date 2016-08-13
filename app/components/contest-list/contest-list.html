@@ -1,10 +1,8 @@
 <div *ngFor="let contest of contests, let i=index">
-  <contest-chart id="{{tab}}-{{contest._id}}"
+  <contest-chart id="{{tab}}-{{contests[i]._id}}"
                  [(contest)]="contests[i]"
                  (contestSelected)="onContestSelected($event)"
                  (myTeamSelected)="onMyTeamSelected($event)"
-                 (contestButtonClick)="onContestButtonClick($event)"
-                 (contestParticipantsClick)="onContestParticipantsClick($event)"
-                 (contestShareClick)="onContestShareClick($event)">
+                 (contestButtonClick)="onContestButtonClick($event)">
   </contest-chart>
 </div>

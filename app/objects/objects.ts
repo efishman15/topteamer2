@@ -526,6 +526,7 @@ export class Contest {
   endOption:string;
   questions:Questions;
   state:string;
+  owner:boolean;
   leadingTeam:number;
   time:ContestTime;
   lastUpdated:number;

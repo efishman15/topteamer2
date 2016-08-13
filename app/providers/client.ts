@@ -261,6 +261,7 @@ export class Client {
       }, (err)=> {
         if (err.type === 'SERVER_ERROR_FACEBOOK_EXISTS_DO_SWITCH' && err.additionalInfo && err.additionalInfo.confirmed) {
           this.serverConnect(connectInfo).then(() => {
+            this.events.publish('topTeamer:switchedToFacebook');
             this.popToRoot().then(()=> {
               resolve();
             }, ()=> {
@@ -815,7 +816,7 @@ export class ServerGateway {
       this.endPoint = window.location.protocol + '//' + window.location.host + '/';
     }
     else {
-      this.endPoint = 'http://dev.topteamer.com/'
+      this.endPoint = 'http://www.topteamer.com/'
     }
 
     this.eventQueue = [];

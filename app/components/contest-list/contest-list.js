@@ -62,12 +62,6 @@ var ContestListComponent = (function () {
                 break;
         }
     };
-    ContestListComponent.prototype.onContestParticipantsClick = function (data) {
-        this.client.openPage('ContestParticipantsPage', { 'contest': data.contest, 'source': 'list/participants' });
-    };
-    ContestListComponent.prototype.onContestShareClick = function (data) {
-        this.client.openPage('SharePage', { 'contest': data.contest, 'source': 'list/share' });
-    };
     ContestListComponent.prototype.findContestIndex = function (contestId) {
         if (this.contests && this.contests.length > 0) {
             for (var i = 0; i < this.contests.length; i++) {

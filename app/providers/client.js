@@ -187,6 +187,7 @@ var Client = (function () {
             }, function (err) {
                 if (err.type === 'SERVER_ERROR_FACEBOOK_EXISTS_DO_SWITCH' && err.additionalInfo && err.additionalInfo.confirmed) {
                     _this.serverConnect(connectInfo).then(function () {
+                        _this.events.publish('topTeamer:switchedToFacebook');
                         _this.popToRoot().then(function () {
                             resolve();
                         }, function () {
@@ -705,7 +706,7 @@ var ServerGateway = (function () {
             this.endPoint = window.location.protocol + '//' + window.location.host + '/';
         }
         else {
-            this.endPoint = 'http://dev.topteamer.com/';
+            this.endPoint = 'http://www.topteamer.com/';
         }
         this.eventQueue = [];
     }

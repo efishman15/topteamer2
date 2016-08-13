@@ -73,14 +73,6 @@ export class ContestListComponent {
     }
   }
 
-  onContestParticipantsClick(data:any) {
-    this.client.openPage('ContestParticipantsPage', {'contest': data.contest, 'source': 'list/participants'});
-  }
-
-  onContestShareClick(data:any) {
-    this.client.openPage('SharePage', {'contest': data.contest, 'source': 'list/share'});
-  }
-
   findContestIndex(contestId:string) {
     if (this.contests && this.contests.length > 0) {
       for (var i = 0; i < this.contests.length; i++) {

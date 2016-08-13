@@ -18,9 +18,6 @@ var ContestChartComponent = (function () {
         this.contestSelected = new core_1.EventEmitter();
         this.myTeamSelected = new core_1.EventEmitter();
         this.contestButtonClick = new core_1.EventEmitter();
-        this.joinedContest = new core_1.EventEmitter();
-        this.contestParticipantsClick = new core_1.EventEmitter();
-        this.contestShareClick = new core_1.EventEmitter();
         this.client = client_1.Client.getInstance();
         this.animation = null;
         this.lastEventTimeStamp = 0;
@@ -58,12 +55,20 @@ var ContestChartComponent = (function () {
         this.contest = contest;
         this.animation = animation;
     };
+    ContestChartComponent.prototype.isOwner = function () {
+        if ((this.contest && this.contest.owner && this.contest.status !== 'finished') ||
+            (this.client && this.client.session && this.client.session.isAdmin)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
     ContestChartComponent.prototype.joinContest = function (team, source, switchTeams, showAlert, delayRankModal) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             contestsService.join(_this.contest._id, team).then(function (data) {
                 _this.refresh(data.contest);
-                _this.joinedContest.emit({ 'contest': data.contest });
                 analyticsService.track('contest/' + (!switchTeams ? 'join' : 'switchTeams'), {
                     contestId: _this.contest._id,
                     team: '' + _this.contest.myTeam,
@@ -172,12 +177,16 @@ var ContestChartComponent = (function () {
             this.contestButtonClick.emit({ 'contest': this.contest, 'source': 'button' });
         }
     };
+    ContestChartComponent.prototype.onContestEdit = function (event) {
+        analyticsService.track('contest/edit/click', { contestId: this.contest._id });
+        this.client.openPage('SetContestPage', { mode: 'edit', contest: this.contest });
+    };
     ContestChartComponent.prototype.onContestParticipantsClick = function (event) {
         this.lastEventTimeStamp = event.timeStamp;
-        this.contestParticipantsClick.emit({ 'contest': this.contest });
+        this.client.openPage('ContestParticipantsPage', { contest: this.contest, source: 'contest/participants' });
     };
     ContestChartComponent.prototype.onContestShareClick = function (event) {
-        this.contestShareClick.emit({ 'contest': this.contest });
+        this.client.openPage('SharePage', { contest: this.contest, source: 'contest/share' });
     };
     __decorate([
         core_1.Input(), 
@@ -199,18 +208,6 @@ var ContestChartComponent = (function () {
         core_1.Output(), 
         __metadata('design:type', Object)
     ], ContestChartComponent.prototype, "contestButtonClick", void 0);
-    __decorate([
-        core_1.Output(), 
-        __metadata('design:type', Object)
-    ], ContestChartComponent.prototype, "joinedContest", void 0);
-    __decorate([
-        core_1.Output(), 
-        __metadata('design:type', Object)
-    ], ContestChartComponent.prototype, "contestParticipantsClick", void 0);
-    __decorate([
-        core_1.Output(), 
-        __metadata('design:type', Object)
-    ], ContestChartComponent.prototype, "contestShareClick", void 0);
     ContestChartComponent = __decorate([
         core_1.Component({
             selector: 'contest-chart',

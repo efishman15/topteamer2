@@ -357,8 +357,19 @@ export class TopTeamerApp {
     }
   }
 
+  newContest() {
+    analyticsService.track('menu/newContest');
+    this.client.openNewContest();
+  }
+
   share() {
+    analyticsService.track('menu/share');
     this.client.share(null, 'menu');
+  }
+
+  like() {
+    analyticsService.track('like/click');
+    window.open(this.client.settings.general.facebookFanPage, '_new');
   }
 
   settings() {

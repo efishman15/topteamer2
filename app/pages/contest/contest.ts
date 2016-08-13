@@ -1,5 +1,5 @@
 import {Component,ViewChild} from '@angular/core';
-import {NavParams} from 'ionic-angular';
+import {NavParams,Modal} from 'ionic-angular';
 import {ContestChartComponent} from '../../components/contest-chart/contest-chart';
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
@@ -41,8 +41,14 @@ export class ContestPage {
       this.lastQuizResults = eventData[0];
 
       if (this.lastQuizResults.data.facebookPost) {
-        this.animateLastResults = 0;
-        this.client.showModalPage('FacebookPostPage', {'quizResults': this.lastQuizResults});
+        let shareSuccessModal:Modal = this.client.createModalPage('ShareSuccessPage', {'quizResults': this.lastQuizResults});
+        shareSuccessModal.onDidDismiss((doShare:boolean) => {
+          this.animateLastResults = 0;
+          if (doShare) {
+            this.share('shareSuccess');
+          }
+        });
+        shareSuccessModal.present();
       }
       else {
         this.animateLastResults = 1; //Enter animation
@@ -61,19 +67,10 @@ export class ContestPage {
 
     });
 
-    this.client.events.subscribe('topTeamer:contestUpdated', (eventData) => {
-      this.refreshContestChart(eventData[0]);
-    });
-
   }
 
   ionViewWillEnter() {
     analyticsService.track('page/contest', {contestId: this.contest._id});
-  }
-
-  ionViewWillLeave() {
-    this.animateLastResults = 0;
-    this.lastQuizResults = null;
   }
 
   showParticipants(source) {
@@ -87,20 +84,6 @@ export class ContestPage {
 
   share(source) {
     this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
-  }
-
-  like() {
-    analyticsService.track('like/click');
-    window.open(this.client.settings.general.facebookFanPage, '_new');
-  }
-
-  editContest() {
-    analyticsService.track('contest/edit/click', {contestId: this.contest._id});
-    this.client.openPage('SetContestPage', {'mode': 'edit', 'contest': this.contest});
-  }
-
-  switchTeams() {
-    this.contestChartComponent.switchTeams('contest/switchTeams');
   }
 
   onContestSelected() {

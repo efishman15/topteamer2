@@ -37,15 +37,18 @@
   top: 2px;
   font-size: 17px;
   color: #ffffff;
-  white-space: pre;
+}
+
+.chart-type-title-link {
+  text-decoration: underline;
 }
 
 .chart-type-title-ltr {
-  left: 4.5%;
+  left: 28px;
 }
 
 .chart-type-title-rtl {
-  right: 4.5%;
+  right: 28px;
 }
 
 .chart-end-time {
@@ -73,6 +76,43 @@
 .chart-margin-top {
   margin: 0px auto;
 }
+
+.button-play-contest {
+  border-radius: 999px;
+  display: inline-block;
+  padding: 8px 20px;
+  font-size: 20px;
+  text-align: center;
+  text-shadow: 1px 1px 0 #032c30;
+  height: 40px;
+  text-transform: none !important;
+  color: #ffffff;
+}
+
+.button-play-contest-not-joined {
+  background: #847fd9;
+  background: -webkit-linear-gradient(#847fd9, #5b297d);
+  background: linear-gradient(#847fd9, #5b297d);
+  border: 1px solid #774896;
+  box-shadow: 0 2px 0 0 #370955;
+}
+
+.button-play-contest-team0 {
+  background: #d13f78;
+  background: -webkit-linear-gradient(#d13f78, #803838);
+  background: linear-gradient(#d13f78, #803838);
+  border: 1px solid #7f2626;
+  box-shadow: 0 2px 0 0 #6b0e0e;
+}
+
+.button-play-contest-team1 {
+  background: #0bc2f8;
+  background: -webkit-linear-gradient(#0bc2f8, #286d81);
+  background: linear-gradient(#0bc2f8, #0bc2f8);
+  border: 1px solid #1e5c6f;
+  box-shadow: 0 2px 0 0 #296071;
+}
+
 
 .chart-bottom-area {
   background-color: #ffffff;
@@ -126,6 +166,7 @@
 .contest-chart-bottom-ribbon-participants-text {
   color: #303030;
   font-size: 12px;
+  text-decoration: underline;
 }
 
 .contest-chart-bottom-ribbon-participants-number {

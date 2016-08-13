@@ -193,7 +193,7 @@ var QuizPage = (function () {
                         modal.onDidDismiss(function (okPressed) {
                             _this.quizProceed();
                         });
-                        modal.present;
+                        modal.present();
                     }
                 }
             }, function () {

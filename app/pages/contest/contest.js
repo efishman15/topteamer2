@@ -31,8 +31,14 @@ var ContestPage = (function () {
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
-                _this.animateLastResults = 0;
-                _this.client.showModalPage('FacebookPostPage', { 'quizResults': _this.lastQuizResults });
+                var shareSuccessModal = _this.client.createModalPage('ShareSuccessPage', { 'quizResults': _this.lastQuizResults });
+                shareSuccessModal.onDidDismiss(function (doShare) {
+                    _this.animateLastResults = 0;
+                    if (doShare) {
+                        _this.share('shareSuccess');
+                    }
+                });
+                shareSuccessModal.present();
             }
             else {
                 _this.animateLastResults = 1; //Enter animation
@@ -48,16 +54,9 @@ var ContestPage = (function () {
                 soundService.play(soundFile);
             }, 500);
         });
-        this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
-            _this.refreshContestChart(eventData[0]);
-        });
     }
     ContestPage.prototype.ionViewWillEnter = function () {
         analyticsService.track('page/contest', { contestId: this.contest._id });
-    };
-    ContestPage.prototype.ionViewWillLeave = function () {
-        this.animateLastResults = 0;
-        this.lastQuizResults = null;
     };
     ContestPage.prototype.showParticipants = function (source) {
         this.client.openPage('ContestParticipantsPage', { 'contest': this.contest, 'source': source });
@@ -68,17 +67,6 @@ var ContestPage = (function () {
     };
     ContestPage.prototype.share = function (source) {
         this.client.share(this.contest.status !== 'finished' ? this.contest : null, source);
-    };
-    ContestPage.prototype.like = function () {
-        analyticsService.track('like/click');
-        window.open(this.client.settings.general.facebookFanPage, '_new');
-    };
-    ContestPage.prototype.editContest = function () {
-        analyticsService.track('contest/edit/click', { contestId: this.contest._id });
-        this.client.openPage('SetContestPage', { 'mode': 'edit', 'contest': this.contest });
-    };
-    ContestPage.prototype.switchTeams = function () {
-        this.contestChartComponent.switchTeams('contest/switchTeams');
     };
     ContestPage.prototype.onContestSelected = function () {
         this.playOrLeaderboard('contest/chart');

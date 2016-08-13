@@ -424,6 +424,7 @@ export class SetContestPage {
           let now:number = (new Date).getTime();
           let currentStatus: string = contestsService.getContestStatus(this.contestLocalCopy);
           let previousStatus: string = contestsService.getContestStatus(this.params.data.contest);
+
           this.client.events.publish('topTeamer:contestUpdated', contest, previousStatus, currentStatus);
           this.client.nav.pop();
         }

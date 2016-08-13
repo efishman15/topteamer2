@@ -240,7 +240,7 @@ export class QuizPage {
               this.quizProceed();
             });
 
-            modal.present;
+            modal.present();
 
           }
         }

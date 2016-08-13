@@ -21,9 +21,6 @@ export class ContestChartComponent {
   @Output() contestSelected = new EventEmitter();
   @Output() myTeamSelected = new EventEmitter();
   @Output() contestButtonClick = new EventEmitter();
-  @Output() joinedContest = new EventEmitter();
-  @Output() contestParticipantsClick = new EventEmitter();
-  @Output() contestShareClick = new EventEmitter();
 
   animation:string;
   lastEventTimeStamp:number;
@@ -71,6 +68,18 @@ export class ContestChartComponent {
     this.animation = animation;
   }
 
+  isOwner() {
+    if (
+      (this.contest && this.contest.owner && this.contest.status !== 'finished') ||
+      (this.client && this.client.session && this.client.session.isAdmin)
+    ) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   joinContest(team:number, source:string, switchTeams:boolean, showAlert:boolean, delayRankModal:boolean) {
 
     return new Promise((resolve:any, reject:any) => {
@@ -78,8 +87,6 @@ export class ContestChartComponent {
       contestsService.join(this.contest._id, team).then((data:any) => {
 
         this.refresh(data.contest);
-
-        this.joinedContest.emit({'contest': data.contest});
 
         analyticsService.track('contest/' + (!switchTeams ? 'join' : 'switchTeams'), {
           contestId: this.contest._id,
@@ -194,13 +201,18 @@ export class ContestChartComponent {
     }
   }
 
+  onContestEdit(event:Event) {
+    analyticsService.track('contest/edit/click', {contestId: this.contest._id});
+    this.client.openPage('SetContestPage', {mode: 'edit', contest: this.contest});
+  }
+
   onContestParticipantsClick(event:Event) {
     this.lastEventTimeStamp = event.timeStamp;
-    this.contestParticipantsClick.emit({'contest': this.contest});
+    this.client.openPage('ContestParticipantsPage', {contest: this.contest, source: 'contest/participants'});
   }
 
   onContestShareClick(event:Event) {
-    this.contestShareClick.emit({'contest': this.contest});
+    this.client.openPage('SharePage', {contest: this.contest, source: 'contest/share'});
   }
 
 }

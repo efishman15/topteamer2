@@ -1,7 +1,7 @@
 import {ContestPage} from '../pages/contest/contest';
 import {ContestParticipantsPage} from '../pages/contest-participants/contest-participants';
 import {ContestTypePage} from '../pages/contest-type/contest-type';
-import {FacebookPostPage} from '../pages/facebook-post/facebook-post';
+import {ShareSuccessPage} from '../pages/share-success/share-success';
 import {LeaderboardsPage} from '../pages/leaderboards/leaderboards';
 import {LoginPage} from '../pages/login/login';
 import {MainTabsPage} from '../pages/main-tabs/main-tabs';
@@ -25,7 +25,7 @@ let appClasses = {
   'ContestPage': <any>ContestPage,
   'ContestParticipantsPage': <any>ContestParticipantsPage,
   'ContestTypePage': <any>ContestTypePage,
-  'FacebookPostPage': <any>FacebookPostPage,
+  'ShareSuccessPage': <any>ShareSuccessPage,
   'LeaderboardsPage': <any>LeaderboardsPage,
   'LoginPage': <any>LoginPage,
   'MainTabsPage': <any>MainTabsPage,

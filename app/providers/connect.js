@@ -54,6 +54,10 @@ function getInfo() {
 exports.getLoginStatus = function () {
     return new Promise(function (resolve, reject) {
         getInfo().then(function (connectInfo) {
+            if (!connectInfo) {
+                reject();
+                return;
+            }
             switch (connectInfo.type) {
                 case 'facebook':
                     if (connectInfo.facebookInfo) {
@@ -103,7 +107,6 @@ exports.guestLogin = function () {
 };
 exports.specificLogin = function (connectInfo, permissions, rerequestDeclinedPermissions) {
     return new Promise(function (resolve, reject) {
-        var client = client_1.Client.getInstance();
         switch (connectInfo.type) {
             case 'facebook':
                 facebookService.login(permissions, rerequestDeclinedPermissions).then(function (connectInfo) {
@@ -138,10 +141,12 @@ exports.logout = function () {
                         localStorage.removeItem(CONNECT_INFO_KEY);
                         resolve();
                     });
+                    break;
                 case 'guest':
                     client.user.credentials = null;
                     localStorage.removeItem(CONNECT_INFO_KEY);
                     resolve();
+                    break;
             }
         }, function () {
             reject();

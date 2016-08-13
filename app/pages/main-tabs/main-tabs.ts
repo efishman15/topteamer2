@@ -52,6 +52,13 @@ export class MainTabsPage {
       }
     });
 
+    this.client.events.subscribe('topTeamer:switchedToFacebook', (eventData) => {
+      //Just refresh the contests to reflect the new language
+      this.publishActionToTab(0,ACTION_FORCE_REFRESH);
+      this.publishActionToTab(1,ACTION_FORCE_REFRESH);
+      this.publishActionToTab(2,ACTION_FORCE_REFRESH);
+    });
+
     this.client.events.subscribe('topTeamer:serverPopup', (eventData) => {
       this.client.showModalPage('ServerPopupPage', {'serverPopup': eventData[0]});
     });

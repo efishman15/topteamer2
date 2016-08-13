@@ -50,7 +50,7 @@ function getInfo() {
     //do not have anything in localStorage
     facebookService.getLoginStatus().then((connectInfo:ConnectInfo) => {
       resolve(connectInfo);
-    },()=>{
+    }, ()=> {
       reject();
     });
   });
@@ -68,6 +68,12 @@ export let getLoginStatus = () => {
   return new Promise((resolve, reject) => {
 
     getInfo().then((connectInfo:ConnectInfo) => {
+
+      if (!connectInfo) {
+        reject();
+        return;
+      }
+
       switch (connectInfo.type) {
         case 'facebook':
           if (connectInfo.facebookInfo) {
@@ -104,7 +110,7 @@ export let login = (permissions?, rerequestDeclinedPermissions?) => {
     getInfo().then((connectInfo:ConnectInfo) => {
       specificLogin(connectInfo, permissions, rerequestDeclinedPermissions).then((connectInfo:ConnectInfo) => {
         resolve(connectInfo);
-      },()=>{
+      }, ()=> {
         reject();
       });
     }, () => {
@@ -126,8 +132,6 @@ export let specificLogin = (connectInfo:ConnectInfo,
                             rerequestDeclinedPermissions?:boolean) => {
 
   return new Promise((resolve, reject) => {
-
-    var client = Client.getInstance();
 
     switch (connectInfo.type) {
       case 'facebook':
@@ -167,10 +171,12 @@ export let logout = () => {
             localStorage.removeItem(CONNECT_INFO_KEY);
             resolve();
           });
+          break;
         case 'guest':
           client.user.credentials = null;
           localStorage.removeItem(CONNECT_INFO_KEY);
           resolve();
+          break;
       }
     }, ()=> {
       reject();

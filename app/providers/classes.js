@@ -1,7 +1,7 @@
 var contest_1 = require('../pages/contest/contest');
 var contest_participants_1 = require('../pages/contest-participants/contest-participants');
 var contest_type_1 = require('../pages/contest-type/contest-type');
-var facebook_post_1 = require('../pages/facebook-post/facebook-post');
+var share_success_1 = require('../pages/share-success/share-success');
 var leaderboards_1 = require('../pages/leaderboards/leaderboards');
 var login_1 = require('../pages/login/login');
 var main_tabs_1 = require('../pages/main-tabs/main-tabs');
@@ -24,7 +24,7 @@ var appClasses = {
     'ContestPage': contest_1.ContestPage,
     'ContestParticipantsPage': contest_participants_1.ContestParticipantsPage,
     'ContestTypePage': contest_type_1.ContestTypePage,
-    'FacebookPostPage': facebook_post_1.FacebookPostPage,
+    'ShareSuccessPage': share_success_1.ShareSuccessPage,
     'LeaderboardsPage': leaderboards_1.LeaderboardsPage,
     'LoginPage': login_1.LoginPage,
     'MainTabsPage': main_tabs_1.MainTabsPage,

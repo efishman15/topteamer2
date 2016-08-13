@@ -41,6 +41,12 @@ var MainTabsPage = (function () {
                 _this.publishActionToTab(2, ACTION_FORCE_REFRESH);
             }
         });
+        this.client.events.subscribe('topTeamer:switchedToFacebook', function (eventData) {
+            //Just refresh the contests to reflect the new language
+            _this.publishActionToTab(0, ACTION_FORCE_REFRESH);
+            _this.publishActionToTab(1, ACTION_FORCE_REFRESH);
+            _this.publishActionToTab(2, ACTION_FORCE_REFRESH);
+        });
         this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
             _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
         });

@@ -283,8 +283,17 @@ var TopTeamerApp = (function () {
             };
         }
     };
+    TopTeamerApp.prototype.newContest = function () {
+        analyticsService.track('menu/newContest');
+        this.client.openNewContest();
+    };
     TopTeamerApp.prototype.share = function () {
+        analyticsService.track('menu/share');
         this.client.share(null, 'menu');
+    };
+    TopTeamerApp.prototype.like = function () {
+        analyticsService.track('like/click');
+        window.open(this.client.settings.general.facebookFanPage, '_new');
     };
     TopTeamerApp.prototype.settings = function () {
         analyticsService.track('menu/settings');

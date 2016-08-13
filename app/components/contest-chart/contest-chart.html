@@ -8,14 +8,19 @@
             title="{{client.translate('SHARE')}}">
       <ion-icon name="share"></ion-icon>
     </button>
-    <span class="chart-type-title chart-type-title-{{client.currentLanguage.direction}}">{{contest.subject}}</span>
+    <span class="chart-type-title chart-type-title-{{client.currentLanguage.direction}}"
+          [ngClass]="{'pointer': isOwner(), 'chart-type-title-link': isOwner()}"
+          (click)="isOwner() && onContestEdit($event)">
+      {{contest.subject}}
+    </span>
     <span class="chart-end-time chart-end-time-{{client.currentLanguage.direction}}"
           [ngClass]="{'contest-end-time-running': contest.status !== 'finished', 'contest-end-time-ended': contest.status === 'finished'}">{{contest.time.end.text}}</span>
   </div>
   <div class="chart pointer" (click)="onContestSelected($event,'chart')">
     <ion-row>
       <ion-col width-50>
-        <div [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'}">
+        <div
+          [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'}">
           <span (click)="teamSelected($event, 0,'teamName')"
                 class="contest-chart-team contest-chart-team0"
                 [ngClass]="{'contest-chart-team0-selected': contest.myTeam===0, 'contest-chart-team-not-selected': contest.myTeam!==0}">
@@ -37,7 +42,8 @@
         </div>
       </ion-col>
       <ion-col width-50>
-        <div [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'}">
+        <div
+          [ngStyle]="{'padding-top': client.settings.charts.contest.size.labelsPadding + 'px', 'padding-bottom': client.settings.charts.contest.size.labelsPadding + 'px'}">
           <span (click)="teamSelected($event, 1,'teamName')"
                 class="contest-chart-team contest-chart-team1"
                 [ngClass]="{'contest-chart-team1-selected': contest.myTeam===1, 'contest-chart-team-not-selected': contest.myTeam!==1}">
@@ -60,7 +66,9 @@
       </ion-col>
     </ion-row>
     <div padding-bottom>
-      <button *ngIf="contest.status !== 'starting'" class="button-play-contest no-wrap-text"
+      <button *ngIf="contest.status !== 'starting'"
+              class="button-play-contest no-wrap-text"
+              [ngClass]="{'button-play-contest-not-joined': contest.myTeam!==0 && contest.myTeam !==1, 'button-play-contest-team0': contest.myTeam===0, 'button-play-contest-team1': contest.myTeam===1}"
               (click)="onContestButtonClick($event)">{{alternateButtonText ? alternateButtonText : contest.buttonText}}
       </button>
     </div>
