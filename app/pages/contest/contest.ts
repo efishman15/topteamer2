@@ -4,6 +4,7 @@ import {ContestChartComponent} from '../../components/contest-chart/contest-char
 import {Client} from '../../providers/client';
 import * as contestsService from '../../providers/contests';
 import * as analyticsService from '../../providers/analytics';
+import * as connectService from '../../providers/connect';
 import * as alertService from '../../providers/alert';
 import * as soundService from '../../providers/sound';
 import {Contest,QuizResults} from '../../objects/objects';
@@ -42,10 +43,17 @@ export class ContestPage {
 
       if (this.lastQuizResults.data.facebookPost) {
         let shareSuccessModal:Modal = this.client.createModalPage('ShareSuccessPage', {'quizResults': this.lastQuizResults});
-        shareSuccessModal.onDidDismiss((doShare:boolean) => {
+        shareSuccessModal.onDidDismiss((action:string) => {
           this.animateLastResults = 0;
-          if (doShare) {
-            this.share('shareSuccess');
+          switch (action) {
+            case 'post':
+              connectService.post(this.lastQuizResults.data.facebookPost).then(()=> {
+              }, ()=> {
+              });
+              break;
+            case 'share':
+              this.share('shareSuccess');
+              break;
           }
         });
         shareSuccessModal.present();
@@ -56,7 +64,7 @@ export class ContestPage {
           this.animateLastResults = 2; //Exit animation
           setTimeout(() => {
             this.animateLastResults = 0; //No animation
-          },this.client.settings.quiz.finish.animateResultsExitTimeout)
+          }, this.client.settings.quiz.finish.animateResultsExitTimeout)
         }, this.client.settings.quiz.finish.animateResultsTimeout);
       }
 

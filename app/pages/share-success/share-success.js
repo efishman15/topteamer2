@@ -11,7 +11,6 @@ var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var client_1 = require('../../providers/client');
 var analyticsService = require('../../providers/analytics');
-var connectService = require('../../providers/connect');
 var ShareSuccessPage = (function () {
     function ShareSuccessPage(params, viewController) {
         this.viewController = viewController;
@@ -23,23 +22,20 @@ var ShareSuccessPage = (function () {
         analyticsService.track('page/shareSuccess', { 'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey });
     };
     ShareSuccessPage.prototype.share = function () {
-        var _this = this;
         if (this.client.user.credentials.type === 'facebook') {
             analyticsService.track('contest/shareSuccess/facebookPost/click');
-            connectService.post(this.quizResults.data.facebookPost).then(function () {
-                _this.close(false);
-            }, function () {
-                //Do nothing - user probably canceled or any other error presented by facebook
-                //Stay on screen
-            });
+            this.close('post');
         }
         else {
             analyticsService.track('contest/shareSuccess/share/click');
-            this.close(true);
+            this.close('share');
         }
     };
-    ShareSuccessPage.prototype.close = function (doShare) {
-        return this.viewController.dismiss(doShare);
+    ShareSuccessPage.prototype.close = function (action) {
+        if (action === 'cancel') {
+            analyticsService.track('contest/shareSuccess/cancel/click');
+        }
+        return this.viewController.dismiss(action);
     };
     ShareSuccessPage = __decorate([
         core_1.Component({

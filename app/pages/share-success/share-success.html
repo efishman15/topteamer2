@@ -4,7 +4,7 @@
       {{client.translate(client.user.credentials.type === 'facebook' ? 'FACEBOOK_POST_TITLE' : 'SHARE_WITH_FRIENDS_TITLE')}}
     </ion-title>
     <ion-buttons left>
-      <button (click)="close(false)">
+      <button (click)="close('cancel')">
         <ion-icon name="close-circle"></ion-icon>
       </button>
     </ion-buttons>
@@ -31,7 +31,7 @@
       </button>
     </div>
 
-    <div padding-top text-center class="pointer button-not-now" (click)="close(false)">{{client.translate('NOT_NOW')}}
+    <div padding-top text-center class="pointer button-not-now" (click)="close('cancel')">{{client.translate('NOT_NOW')}}
     </div>
 
   </div>

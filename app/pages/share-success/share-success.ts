@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {NavParams,ViewController} from 'ionic-angular';
 import {Client} from '../../providers/client';
 import * as analyticsService from '../../providers/analytics';
-import * as connectService from '../../providers/connect';
 import {QuizResults} from '../../objects/objects';
 
 @Component({
@@ -28,20 +27,18 @@ export class ShareSuccessPage {
   share() {
     if (this.client.user.credentials.type === 'facebook') {
       analyticsService.track('contest/shareSuccess/facebookPost/click');
-      connectService.post(this.quizResults.data.facebookPost).then(() => {
-        this.close(false);
-      }, () => {
-        //Do nothing - user probably canceled or any other error presented by facebook
-        //Stay on screen
-      })
+      this.close('post');
     }
     else {
       analyticsService.track('contest/shareSuccess/share/click');
-      this.close(true);
+      this.close('share');
     }
   }
 
-  close(doShare:boolean) {
-    return this.viewController.dismiss(doShare);
+  close(action:string) {
+    if (action === 'cancel') {
+      analyticsService.track('contest/shareSuccess/cancel/click');
+    }
+    return this.viewController.dismiss(action);
   }
 }

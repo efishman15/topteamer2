@@ -13,6 +13,7 @@ var contest_chart_1 = require('../../components/contest-chart/contest-chart');
 var client_1 = require('../../providers/client');
 var contestsService = require('../../providers/contests');
 var analyticsService = require('../../providers/analytics');
+var connectService = require('../../providers/connect');
 var soundService = require('../../providers/sound');
 var ContestPage = (function () {
     function ContestPage(params) {
@@ -32,10 +33,17 @@ var ContestPage = (function () {
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
                 var shareSuccessModal = _this.client.createModalPage('ShareSuccessPage', { 'quizResults': _this.lastQuizResults });
-                shareSuccessModal.onDidDismiss(function (doShare) {
+                shareSuccessModal.onDidDismiss(function (action) {
                     _this.animateLastResults = 0;
-                    if (doShare) {
-                        _this.share('shareSuccess');
+                    switch (action) {
+                        case 'post':
+                            connectService.post(_this.lastQuizResults.data.facebookPost).then(function () {
+                            }, function () {
+                            });
+                            break;
+                        case 'share':
+                            _this.share('shareSuccess');
+                            break;
                     }
                 });
                 shareSuccessModal.present();
