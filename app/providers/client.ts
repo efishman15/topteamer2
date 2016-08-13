@@ -482,7 +482,7 @@ export class Client {
       index = -1; //Will insert at the end of the stack
     }
 
-    this.nav.insertPages(index, this.getNavPages(pages));
+    return this.nav.insertPages(index, this.getNavPages(pages));
   }
 
   setPages(pages:Array<AppPage>) {
@@ -520,6 +520,24 @@ export class Client {
     this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
 
     this.events.publish('topTeamer:resize');
+  }
+
+  subscribeUniqueEvent(eventName:string, handler:any) {
+    //Bypass to what seems to be an IONIC bug since we "skip" views using insertPages
+    //events are defined twice and more and when publish occurs, this subscription is
+    //being called too many times...
+    if (this.events['_channels'] && this.events['_channels'][eventName]) {
+      for(var i=0; i<this.events['_channels'][eventName].length; i++) {
+        if (this.events['_channels'][eventName][i].toString() === handler.toString()) {
+          this.events['_channels'][eventName][i] = handler;
+          return;
+        }
+      }
+    }
+    else {
+      this.events.subscribe(eventName, handler);
+    }
+
   }
 
   get width():number {

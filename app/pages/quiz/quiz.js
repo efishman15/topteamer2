@@ -20,7 +20,6 @@ var alertService = require('../../providers/alert');
 var objects_1 = require('../../objects/objects');
 var QuizPage = (function () {
     function QuizPage(params) {
-        var _this = this;
         this.questionHistory = [];
         this.pageInitiated = false;
         this.quizStarted = false;
@@ -32,10 +31,13 @@ var QuizPage = (function () {
         else {
             this.title = this.client.translate('QUIZ_VIEW_TITLE', { 'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name });
         }
-        this.client.events.subscribe('topTeamer:resize', function (eventData) {
+    }
+    QuizPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.client.subscribeUniqueEvent('topTeamer:resize', function (eventData) {
             _this.drawQuizProgress();
         });
-    }
+    };
     QuizPage.prototype.ngAfterViewInit = function () {
         this.quizCanvas = this.quizCanvasElementRef.nativeElement;
         this.quizContext = this.quizCanvas.getContext('2d');

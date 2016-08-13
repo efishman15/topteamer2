@@ -13,12 +13,11 @@ var client_1 = require('../../providers/client');
 var analyticsService = require('../../providers/analytics');
 var ShareSuccessPage = (function () {
     function ShareSuccessPage(params, viewController) {
-        this.viewController = viewController;
         this.client = client_1.Client.getInstance();
         this.quizResults = params.data.quizResults;
+        this.viewController = viewController;
     }
-    //The only life cycle eve currently called in modals
-    ShareSuccessPage.prototype.ngAfterViewInit = function () {
+    ShareSuccessPage.prototype.ionViewWillEnter = function () {
         analyticsService.track('page/shareSuccess', { 'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey });
     };
     ShareSuccessPage.prototype.share = function () {
@@ -35,7 +34,9 @@ var ShareSuccessPage = (function () {
         if (action === 'cancel') {
             analyticsService.track('contest/shareSuccess/cancel/click');
         }
-        return this.viewController.dismiss(action);
+        this.viewController.dismiss(action).then(function () {
+        }, function () {
+        });
     };
     ShareSuccessPage = __decorate([
         core_1.Component({

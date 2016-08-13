@@ -24,63 +24,55 @@ export class ContestPage {
   @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
 
   constructor(params:NavParams) {
-
     this.client = Client.getInstance();
     this.contest = params.data.contest;
+  }
 
-    this.client.events.subscribe('topTeamer:quizFinished', (eventData) => {
+  ionViewLoaded() {
+    this.client.subscribeUniqueEvent('topTeamer:quizFinished', (eventData) => {
 
-      //Prepare some client calculated fields on the contest
-      contestsService.setContestClientData(eventData[0].contest);
+        //Prepare some client calculated fields on the contest
+        contestsService.setContestClientData(eventData[0].contest);
 
-      //Refresh the contest chart and the contest details
-      //This is the only case where we want to animate the chart
-      //right after a quiz so the user will notice the socre changes
-      this.refreshContestChart(eventData[0].contest, eventData[0].data.animation);
+        //Refresh the contest chart and the contest details
+        //This is the only case where we want to animate the chart
+        //right after a quiz so the user will notice the socre changes
+        this.refreshContestChart(eventData[0].contest, eventData[0].data.animation);
 
-      //Event data comes as an array of data objects - we expect only one (last quiz results)
-      this.lastQuizResults = eventData[0];
+        //Event data comes as an array of data objects - we expect only one (last quiz results)
+        this.lastQuizResults = eventData[0];
 
-      if (this.lastQuizResults.data.facebookPost) {
-        let shareSuccessModal:Modal = this.client.createModalPage('ShareSuccessPage', {'quizResults': this.lastQuizResults});
-        shareSuccessModal.onDidDismiss((action:string) => {
-          this.animateLastResults = 0;
-          switch (action) {
-            case 'post':
-              //Ionic bug - let the modal dialog enough time to close
-              setTimeout(()=> {
+        if (this.lastQuizResults.data.facebookPost) {
+          let shareSuccessModal:Modal = this.client.createModalPage('ShareSuccessPage', {quizResults: this.lastQuizResults})
+          shareSuccessModal.onDidDismiss((action:string)=> {
+            switch (action) {
+              case 'post':
                 connectService.post(this.lastQuizResults.data.facebookPost).then(()=> {
                 }, ()=> {
                 });
-              },500);
-              break;
-            case 'share':
-              //Ionic bug - let the modal dialog enough time to close
-              setTimeout(()=>{
-                this.share('shareSuccess');
-              },500);
-              break;
-          }
-        });
-        shareSuccessModal.present();
-      }
-      else {
-        this.animateLastResults = 1; //Enter animation
-        setTimeout(() => {
-          this.animateLastResults = 2; //Exit animation
+                break;
+              case 'share':
+                this.client.share(this.contest, 'shareSuccess');
+                break;
+            }
+          });
+          shareSuccessModal.present();
+        }
+        else {
+          this.animateLastResults = 1; //Enter animation
           setTimeout(() => {
-            this.animateLastResults = 0; //No animation
-          }, this.client.settings.quiz.finish.animateResultsExitTimeout)
-        }, this.client.settings.quiz.finish.animateResultsTimeout);
-      }
+            this.animateLastResults = 2; //Exit animation
+            setTimeout(() => {
+              this.animateLastResults = 0; //No animation
+            }, this.client.settings.quiz.finish.animateResultsExitTimeout)
+          }, this.client.settings.quiz.finish.animateResultsTimeout);
+        }
 
-      var soundFile = this.lastQuizResults.data.sound;
-      setTimeout(() => {
-        soundService.play(soundFile);
-      }, 500);
-
-    });
-
+        var soundFile = this.lastQuizResults.data.sound;
+        setTimeout(() => {
+          soundService.play(soundFile);
+        }, 500);
+      });
   }
 
   ionViewWillEnter() {
@@ -129,6 +121,6 @@ export class ContestPage {
       sourceClick: source
     });
 
-    this.client.openPage('QuizPage', {'contest': this.contest, 'source': source});
+    this.client.openPage('QuizPage', {contest: this.contest, source: source});
   }
 }

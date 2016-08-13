@@ -17,12 +17,14 @@ var connectService = require('../../providers/connect');
 var soundService = require('../../providers/sound');
 var ContestPage = (function () {
     function ContestPage(params) {
-        var _this = this;
         this.lastQuizResults = null;
         this.animateLastResults = 0; //0=no animation, 1=enter animation, 2=exit animation
         this.client = client_1.Client.getInstance();
         this.contest = params.data.contest;
-        this.client.events.subscribe('topTeamer:quizFinished', function (eventData) {
+    }
+    ContestPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.client.subscribeUniqueEvent('topTeamer:quizFinished', function (eventData) {
             //Prepare some client calculated fields on the contest
             contestsService.setContestClientData(eventData[0].contest);
             //Refresh the contest chart and the contest details
@@ -32,23 +34,16 @@ var ContestPage = (function () {
             //Event data comes as an array of data objects - we expect only one (last quiz results)
             _this.lastQuizResults = eventData[0];
             if (_this.lastQuizResults.data.facebookPost) {
-                var shareSuccessModal = _this.client.createModalPage('ShareSuccessPage', { 'quizResults': _this.lastQuizResults });
+                var shareSuccessModal = _this.client.createModalPage('ShareSuccessPage', { quizResults: _this.lastQuizResults });
                 shareSuccessModal.onDidDismiss(function (action) {
-                    _this.animateLastResults = 0;
                     switch (action) {
                         case 'post':
-                            //Ionic bug - let the modal dialog enough time to close
-                            setTimeout(function () {
-                                connectService.post(_this.lastQuizResults.data.facebookPost).then(function () {
-                                }, function () {
-                                });
-                            }, 500);
+                            connectService.post(_this.lastQuizResults.data.facebookPost).then(function () {
+                            }, function () {
+                            });
                             break;
                         case 'share':
-                            //Ionic bug - let the modal dialog enough time to close
-                            setTimeout(function () {
-                                _this.share('shareSuccess');
-                            }, 500);
+                            _this.client.share(_this.contest, 'shareSuccess');
                             break;
                     }
                 });
@@ -68,7 +63,7 @@ var ContestPage = (function () {
                 soundService.play(soundFile);
             }, 500);
         });
-    }
+    };
     ContestPage.prototype.ionViewWillEnter = function () {
         analyticsService.track('page/contest', { contestId: this.contest._id });
     };
@@ -105,7 +100,7 @@ var ContestPage = (function () {
             team: '' + this.contest.myTeam,
             sourceClick: source
         });
-        this.client.openPage('QuizPage', { 'contest': this.contest, 'source': source });
+        this.client.openPage('QuizPage', { contest: this.contest, source: source });
     };
     __decorate([
         //0=no animation, 1=enter animation, 2=exit animation

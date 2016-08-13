@@ -46,11 +46,12 @@ export class QuizPage {
     else {
       this.title = this.client.translate('QUIZ_VIEW_TITLE', {'team': this.params.data.contest.teams[this.params.data.contest.leadingTeam].name});
     }
+  }
 
-    this.client.events.subscribe('topTeamer:resize', (eventData) => {
+  ionViewLoaded() {
+    this.client.subscribeUniqueEvent('topTeamer:resize', (eventData) => {
       this.drawQuizProgress();
     });
-
   }
 
   ngAfterViewInit() {
@@ -111,7 +112,7 @@ export class QuizPage {
 
       if (this.quizData.reviewMode && this.quizData.reviewMode.reason) {
         alertService.alert(this.client.translate(this.quizData.reviewMode.reason)).then(()=> {
-        },()=>{
+        }, ()=> {
         });
       }
 
@@ -124,11 +125,11 @@ export class QuizPage {
           //additionalInfo contains the updated contest object from the server
           contestsService.setContestClientData(err.additionalInfo.contest);
           setTimeout(()=> {
-            this.client.nav.pop().then(()=>{
-              this.client.events.publish('topTeamer:contestUpdated',err.additionalInfo.contest,this.params.data.contest.status,err.additionalInfo.contest.status);
-            },() => {
+            this.client.nav.pop().then(()=> {
+              this.client.events.publish('topTeamer:contestUpdated', err.additionalInfo.contest, this.params.data.contest.status, err.additionalInfo.contest.status);
+            }, () => {
             });
-          },1000);
+          }, 1000);
           break;
         default:
           //Allow the user to answer again - probably timeout error
@@ -224,7 +225,6 @@ export class QuizPage {
   }
 
   buttonAnimationEnded(event:Event) {
-
     if (this.quizData.xpProgress && this.quizData.xpProgress.addition > 0) {
       this.client.playerInfoComponent.addXp(this.quizData.xpProgress).then(() => {
         if (this.correctButtonName === event.srcElement['name']) {
@@ -244,7 +244,7 @@ export class QuizPage {
 
           }
         }
-      },()=>{
+      }, ()=> {
       });
     }
     else if (this.correctButtonName === event.srcElement['name']) {
@@ -270,7 +270,7 @@ export class QuizPage {
           this.client.events.publish('topTeamer:quizFinished', this.quizData.results);
           //For next time if view remains cached
           this.quizStarted = false;
-        },()=>{
+        }, ()=> {
         });
       }, 1000);
 

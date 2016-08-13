@@ -390,7 +390,7 @@ var Client = (function () {
         if (index === undefined) {
             index = -1; //Will insert at the end of the stack
         }
-        this.nav.insertPages(index, this.getNavPages(pages));
+        return this.nav.insertPages(index, this.getNavPages(pages));
     };
     Client.prototype.setPages = function (pages) {
         return this.nav.setPages(this.getNavPages(pages));
@@ -420,6 +420,22 @@ var Client = (function () {
         this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
         this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
         this.events.publish('topTeamer:resize');
+    };
+    Client.prototype.subscribeUniqueEvent = function (eventName, handler) {
+        //Bypass to what seems to be an IONIC bug since we "skip" views using insertPages
+        //events are defined twice and more and when publish occurs, this subscription is
+        //being called too many times...
+        if (this.events['_channels'] && this.events['_channels'][eventName]) {
+            for (var i = 0; i < this.events['_channels'][eventName].length; i++) {
+                if (this.events['_channels'][eventName][i].toString() === handler.toString()) {
+                    this.events['_channels'][eventName][i] = handler;
+                    return;
+                }
+            }
+        }
+        else {
+            this.events.subscribe(eventName, handler);
+        }
     };
     Object.defineProperty(Client.prototype, "width", {
         get: function () {

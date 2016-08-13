@@ -14,13 +14,12 @@ export class ShareSuccessPage {
   viewController:ViewController;
 
   constructor(params:NavParams, viewController:ViewController) {
-    this.viewController = viewController
     this.client = Client.getInstance();
     this.quizResults = params.data.quizResults;
+    this.viewController = viewController;
   }
 
-  //The only life cycle eve currently called in modals
-  ngAfterViewInit() {
+  ionViewWillEnter() {
     analyticsService.track('page/shareSuccess', {'contestId': this.quizResults.contest._id, 'story': this.quizResults.data.clientKey});
   }
 
@@ -39,6 +38,8 @@ export class ShareSuccessPage {
     if (action === 'cancel') {
       analyticsService.track('contest/shareSuccess/cancel/click');
     }
-    return this.viewController.dismiss(action);
+    this.viewController.dismiss(action).then(()=>{
+    },()=>{
+    });
   }
 }
