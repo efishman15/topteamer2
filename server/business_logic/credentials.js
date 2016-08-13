@@ -55,7 +55,8 @@ function getSessionResponse(session) {
 //          clientInfo (platform, appVersion (optional for apps), platformVersion (optional for apps)
 //          gcmRegistrationId (optional)
 //-----------------------------------------------------------------------------------------------------------
-module.exports.connect = function (req, res, next) {
+module.exports.connect = connect;
+function connect(req, res, next) {
   var data = req.body;
 
   var clientResponse = {};
@@ -134,7 +135,7 @@ module.exports.facebookConnect = function (req, res, next) {
     }
   }
 
-  this.connect(req, res, next);
+  connect(req, res, next);
 }
 
 //-----------------------------------------------------------------------------------------------------------
