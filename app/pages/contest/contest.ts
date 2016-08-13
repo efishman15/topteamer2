@@ -47,12 +47,18 @@ export class ContestPage {
           this.animateLastResults = 0;
           switch (action) {
             case 'post':
-              connectService.post(this.lastQuizResults.data.facebookPost).then(()=> {
-              }, ()=> {
-              });
+              //Ionic bug - let the modal dialog enough time to close
+              setTimeout(()=> {
+                connectService.post(this.lastQuizResults.data.facebookPost).then(()=> {
+                }, ()=> {
+                });
+              },500);
               break;
             case 'share':
-              this.share('shareSuccess');
+              //Ionic bug - let the modal dialog enough time to close
+              setTimeout(()=>{
+                this.share('shareSuccess');
+              },500);
               break;
           }
         });

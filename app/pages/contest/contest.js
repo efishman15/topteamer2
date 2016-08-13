@@ -37,12 +37,18 @@ var ContestPage = (function () {
                     _this.animateLastResults = 0;
                     switch (action) {
                         case 'post':
-                            connectService.post(_this.lastQuizResults.data.facebookPost).then(function () {
-                            }, function () {
-                            });
+                            //Ionic bug - let the modal dialog enough time to close
+                            setTimeout(function () {
+                                connectService.post(_this.lastQuizResults.data.facebookPost).then(function () {
+                                }, function () {
+                                });
+                            }, 500);
                             break;
                         case 'share':
-                            _this.share('shareSuccess');
+                            //Ionic bug - let the modal dialog enough time to close
+                            setTimeout(function () {
+                                _this.share('shareSuccess');
+                            }, 500);
                             break;
                     }
                 });
