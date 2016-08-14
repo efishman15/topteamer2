@@ -845,8 +845,6 @@ module.exports.getContests = function (req, res, next) {
   var token = req.headers.authorization;
   var data = req.body;
 
-  throw new Error('raising intentional unhandled error');
-
   var operations = [
 
     //Connect to the database (so connection will stay open until we decide to close it)
