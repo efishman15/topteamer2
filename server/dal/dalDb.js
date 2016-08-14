@@ -199,7 +199,7 @@ function loadSettings(data, callback) {
   if (!data || !data.DbHelper) {
     connect(function (err, connectData) {
       if (!data) {
-        data = {'closeConnection': true};
+        data = {closeConnection: true};
       }
       data.DbHelper = connectData.DbHelper;
       loadSettings(data, callback);
@@ -260,6 +260,9 @@ module.exports.getTopic = function (data, callback) {
           }, 'error'));
           return;
         }
+
+        closeDb(connectData);
+
         topics['' + data.topicId] = topic;
 
         data.topic = topic;
@@ -1009,6 +1012,8 @@ function getContest(data, callback) {
       return;
     }
 
+    checkToCloseDb(data);
+
     data.contest = contest;
 
     callback(null, data);
@@ -1122,7 +1127,10 @@ function getContests(data, callback) {
         return;
       }
 
+      checkToCloseDb(data);
+
       data.contests = contests;
+
       callback(null, data);
 
     });

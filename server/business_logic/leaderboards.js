@@ -24,6 +24,7 @@ function getLeaders(data, callback) {
 
     //getSession
     function (callback) {
+      data.closeConnection = true;
       sessionUtils.getSession(data, callback);
     },
 
