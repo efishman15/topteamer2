@@ -49,7 +49,7 @@ module.exports.injectSettings = function (dbSettings) {
   }
 
   //Init the mail logger that sends mail on server severe (error,fatal) errors
-  logger.initMail(settings.server.general.nodeMailer);
+  logger.initMail(settings.server.general.mailgun);
 
   module.exports.settings = settings;
 

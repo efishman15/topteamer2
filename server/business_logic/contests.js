@@ -384,7 +384,12 @@ function validateContestData(data, callback) {
       },
     ];
 
-    cleanContest.subject = data.contest.subject;
+    if (data.contest.type.id === 'systemTrivia') {
+      cleanContest.subject = generalUtils.translate(data.session.settings.language, generalUtils.settings.client.newContest.contestTypes['systemTrivia'].text.name, {name: data.session.name});
+    }
+    else {
+      cleanContest.subject = data.contest.subject;
+    }
 
     cleanContest.participants = 0;
     if (data.contest.systemParticipants) {
@@ -458,8 +463,12 @@ function updateContest(data, callback) {
   //Non admin fields
   data.setData['teams.0.name'] = data.contest.teams[0].name;
   data.setData['teams.1.name'] = data.contest.teams[1].name;
-  data.setData['subject'] = data.contest.subject;
-  data.setData.endDate = data.contest.endDate;
+
+  //Subject can be updated by admins only or by contest owners but only for userTrivia
+  if (data.session.isAdmin || data.contest.type.id === 'userTrivia') {
+    data.setData['subject'] = data.contest.subject;
+    data.setData.endDate = data.contest.endDate;
+  }
 
   if (data.contest.clearEndAlerts) {
     //Sent in case endDate is changed
@@ -835,6 +844,8 @@ module.exports.removeContest = function (req, res, next) {
 module.exports.getContests = function (req, res, next) {
   var token = req.headers.authorization;
   var data = req.body;
+
+  throw new Error('raising intentional unhandled error');
 
   var operations = [
 

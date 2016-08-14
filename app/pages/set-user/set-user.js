@@ -69,8 +69,18 @@ var SetUserPage = (function () {
     };
     SetUserPage.prototype.setUser = function () {
         var _this = this;
-        analyticsService.track('user/set');
+        analyticsService.track('user/set/click');
         this.submitted = true;
+        if (!this.userForm.valid) {
+            return;
+        }
+        //If nothing changed - close page without saving
+        if (this.user.name === this.client.session.name &&
+            this.user.dob === this.client.session.dob &&
+            this.user.avatar === this.client.session.avatar.id) {
+            this.client.nav.pop();
+            return;
+        }
         this.client.setUser(this.user).then(function (contests) {
             _this.client.nav.pop();
         }, function () {

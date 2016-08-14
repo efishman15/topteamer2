@@ -39,6 +39,7 @@ function UnhandledServerException(err) {
 
   var exception = new ServerMessageException('SERVER_ERROR_GENERAL', null, 500);
   logger.server.fatal(err);
+  logger.mail.fatal(err);
 
   return exception;
 }
@@ -83,7 +84,7 @@ function ServerException(message, additionalInfo, severity, httpStatus) {
       break;
     case 'fatal':
       logger.server.fatal(additionalInfo, message);
-      logger.mail.error(additionalInfo, message);
+      logger.mail.fatal(additionalInfo, message);
       break;
   }
 

@@ -12127,15 +12127,16 @@ loading-modal .container {
   text-shadow: 1px 1px 0 #2c2c52; }
 
 .set-user-avatars-wrapper {
-  border: 1px solid #ffffff; }
+  margin-left: -22px;
+  margin-right: -22px; }
 
 .set-user-avatars-scroll-wrapper {
-  height: 100px;
+  height: 60px;
   background-color: transparent; }
 
 .set-user-avatar {
-  width: 50px;
-  height: 50px; }
+  width: 40px;
+  height: 40px; }
 
 .set-user-avatar-selected {
   border: 1px solid #ffffff; }

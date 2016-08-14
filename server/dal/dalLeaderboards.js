@@ -403,7 +403,6 @@ function syncAvatars(data, callback) {
     })
   }
   else {
-    console.log('leaving same id for: ' + data.session.userId.toString());
     generalLeaderboard.updateMemberData(data.session.userId, generalLeaderboardMember.memberData, function () {
     });
   }

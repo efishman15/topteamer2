@@ -1,22 +1,17 @@
 var path = require('path');
 var logger = require('bunyan');
-var EmailStream = require('bunyan-emailstream').EmailStream;
+BunyanMailgun = require('bunyan-mailgun');
 
 var emailStream;
-module.exports.initMail = function (nodeMailerSettings) {
-  emailStream = new EmailStream(
-    nodeMailerSettings.mailOptions,
-    nodeMailerSettings.transportOptions
-  );
+module.exports.initMail = function (mailgunSettings) {
+  emailStream = new BunyanMailgun(mailgunSettings);
 
   module.exports.mail = logger.createLogger({
     name: 'topTeamerMail',
     streams: [{
       type: 'raw', // You should use EmailStream with 'raw' type!
-      stream: emailStream,
-      level: 'error', //And fatal...
-    }
-    ]
+      stream: emailStream
+    }]
   });
 }
 

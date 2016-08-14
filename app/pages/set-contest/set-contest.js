@@ -108,6 +108,9 @@ var SetContestPage = (function () {
         this.team0Input['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.team.maxLength;
         this.team1Input['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.team.maxLength;
         this.subjectInput['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.subject.maxLength;
+        if (this.contestLocalCopy.type.id === 'systemTrivia' && !this.client.session.isAdmin) {
+            this.subjectInput['_native']._elementRef.nativeElement.readOnly = true;
+        }
     };
     SetContestPage.prototype.ionViewWillEnter = function () {
         var eventData = { 'mode': this.params.data.mode };
@@ -448,7 +451,7 @@ var SetContestPage = (function () {
         }
     };
     SetContestPage.prototype.subjectFocus = function () {
-        if (!this.readOnlySubjectAlerted && this.contestLocalCopy.type.id === 'systemTrivia') {
+        if (!this.readOnlySubjectAlerted && this.contestLocalCopy.type.id === 'systemTrivia' && !this.client.session.isAdmin) {
             this.readOnlySubjectAlerted = true;
             alertService.alert({
                 'type': 'SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA'

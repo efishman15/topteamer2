@@ -231,7 +231,7 @@ module.exports.getTeamLeaderDetails = function (req, res, next) {
 //----------------------------------------------------
 module.exports.getChallenge = function (req, res, next) {
 
-  console.log('facebook coming 2...');
+  console.log('facebook coming challenge...');
   var hubChallenge = req.query['hub.challenge'];
   if (hubChallenge) {
     res.send(200, hubChallenge);

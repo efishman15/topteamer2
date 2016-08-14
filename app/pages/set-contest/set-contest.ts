@@ -30,7 +30,7 @@ export class SetContestPage {
   readOnlySubjectAlerted:boolean;
   contestForm:FormGroup;
 
-  //Ionic bug - maxlength property is not copied to the native element, submitted:
+  //Ionic bug - maxlength/readonly properties are not copied to the native element, submitted:
   //https://github.com/driftyco/ionic/issues/7635
   @ViewChild('team0Input') team0Input:ElementRef;
   @ViewChild('team1Input') team1Input:ElementRef;
@@ -147,6 +147,9 @@ export class SetContestPage {
     this.team0Input['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.team.maxLength;
     this.team1Input['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.team.maxLength;
     this.subjectInput['_native']._elementRef.nativeElement.maxLength = this.client.settings.newContest.inputs.subject.maxLength;
+    if (this.contestLocalCopy.type.id === 'systemTrivia' && !this.client.session.isAdmin) {
+      this.subjectInput['_native']._elementRef.nativeElement.readOnly = true;
+    }
   }
 
   ionViewWillEnter() {
@@ -545,7 +548,7 @@ export class SetContestPage {
   }
 
   subjectFocus() {
-    if (!this.readOnlySubjectAlerted && this.contestLocalCopy.type.id === 'systemTrivia') {
+    if (!this.readOnlySubjectAlerted && this.contestLocalCopy.type.id === 'systemTrivia' && !this.client.session.isAdmin) {
       this.readOnlySubjectAlerted = true;
       alertService.alert({
         'type': 'SERVER_ERROR_SUBJECT_DISABLED_IN_SYSTEM_TRIVIA'
