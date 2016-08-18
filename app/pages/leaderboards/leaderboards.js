@@ -17,20 +17,22 @@ var analyticsService = require('../../providers/analytics');
 var connectService = require('../../providers/connect');
 var LeaderboardsPage = (function () {
     function LeaderboardsPage() {
-        var _this = this;
         this.client = client_1.Client.getInstance();
-        this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestUpdated', function (eventData) {
+    }
+    LeaderboardsPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.contestUpdatedHandler = function (eventData) {
             _this.contestList.updateContest(eventData[0]);
-        });
-        this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestRemoved', function (eventData) {
+        };
+        this.contestRemovedHandler = function (eventData) {
             _this.contestList.removeContest(eventData[0]);
-        });
-        this.client.events.subscribe('topTeamer:recentlyFinishedContests:forceRefresh', function () {
+        };
+        this.forceRefreshHandler = function () {
             _this.refreshList(true).then(function () {
             }, function () {
             });
-        });
-        this.client.events.subscribe('topTeamer:switchedToFacebook', function () {
+        };
+        this.switchedToFacebookHandler = function () {
             switch (_this.mode) {
                 case 'contests':
                     _this.nextTimeForceRefreshFriends = true;
@@ -54,8 +56,8 @@ var LeaderboardsPage = (function () {
                     });
                     break;
             }
-        });
-        this.client.events.subscribe('topTeamer:leaderboardsUpdated', function () {
+        };
+        this.leaderboardsUpdatedHandler = function () {
             switch (_this.mode) {
                 case 'contests':
                     _this.contestList.refresh(true).then(function () {
@@ -73,8 +75,20 @@ var LeaderboardsPage = (function () {
                     });
                     break;
             }
-        });
-    }
+        };
+        this.client.events.subscribe('app:recentlyFinishedContests:contestUpdated', this.contestUpdatedHandler);
+        this.client.events.subscribe('app:recentlyFinishedContests:contestRemoved', this.contestRemovedHandler);
+        this.client.events.subscribe('app:recentlyFinishedContests:forceRefresh', this.forceRefreshHandler);
+        this.client.events.subscribe('app:switchedToFacebook', this.switchedToFacebookHandler);
+        this.client.events.subscribe('app:leaderboardsUpdated', this.leaderboardsUpdatedHandler);
+    };
+    LeaderboardsPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:recentlyFinishedContests:contestUpdated', this.contestUpdatedHandler);
+        this.client.events.unsubscribe('app:recentlyFinishedContests:contestRemoved', this.contestRemovedHandler);
+        this.client.events.unsubscribe('app:recentlyFinishedContests:forceRefresh', this.forceRefreshHandler);
+        this.client.events.unsubscribe('app:switchedToFacebook', this.switchedToFacebookHandler);
+        this.client.events.unsubscribe('app:leaderboardsUpdated', this.leaderboardsUpdatedHandler);
+    };
     LeaderboardsPage.prototype.ionViewWillEnter = function () {
         this.simpleTabsComponent.switchToTab(0);
     };

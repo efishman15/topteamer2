@@ -15,22 +15,106 @@ var ACTION_REMOVE_CONTEST = 'contestRemoved';
 var ACTION_FORCE_REFRESH = 'forceRefresh';
 var MainTabsPage = (function () {
     function MainTabsPage() {
-        var _this = this;
         this.client = client_1.Client.getInstance();
         // set the root pages for each tab
         this.rootMyContestsPage = this.client.getPage('MyContestsPage');
         this.rootRunningContestsPage = this.client.getPage('RunningContestsPage');
         this.rootLeaderboardsPage = this.client.getPage('LeaderboardsPage');
-        this.client.events.subscribe('topTeamer:contestCreated', function () {
-            _this.handleContestCreated();
-        });
-        this.client.events.subscribe('topTeamer:contestUpdated', function (eventData) {
-            _this.handleContestUpdated(eventData[0], eventData[1], eventData[2]);
-        });
-        this.client.events.subscribe('topTeamer:contestRemoved', function (eventData) {
-            _this.handleContestRemoved(eventData[0], eventData[1]);
-        });
-        this.client.events.subscribe('topTeamer:languageChanged', function (eventData) {
+    }
+    MainTabsPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.contestCreatedHandler = function () {
+            //Force refresh my contests only - leading contests will hardly be influenced by a new
+            //contest just created
+            _this.publishActionToTab(0, ACTION_FORCE_REFRESH);
+        };
+        this.contestUpdatedHandler = function (eventData) {
+            var contest = eventData[0];
+            var previousStatus = eventData[1];
+            var currentStatus = eventData[2];
+            if (previousStatus === currentStatus) {
+                //Was finished and remained finished, or was running and still running...
+                switch (currentStatus) {
+                    case 'starting':
+                        //For admins - future contests - appear only in "my Contests"
+                        _this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
+                        break;
+                    case 'running':
+                        //Appears in my contests / running contests
+                        _this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
+                        _this.publishActionToTab(1, ACTION_UPDATE_CONTEST, contest);
+                        break;
+                    case 'finished':
+                        //Appears in recently finished contests
+                        _this.publishActionToTab(2, ACTION_UPDATE_CONTEST, contest);
+                        break;
+                }
+            }
+            else {
+                switch (previousStatus) {
+                    case 'starting':
+                        if (currentStatus === 'running') {
+                            //Update my contests
+                            _this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
+                            //Refresh running contests - might appear there
+                            _this.publishActionToTab(1, ACTION_FORCE_REFRESH);
+                        }
+                        else {
+                            //finished
+                            //Remove from my contests
+                            _this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contest._id);
+                            //Refresh recently finished contests
+                            _this.publishActionToTab(2, ACTION_FORCE_REFRESH);
+                        }
+                        break;
+                    case 'running':
+                        if (currentStatus === 'starting') {
+                            //Update my contests
+                            _this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
+                            //Remove from running contests
+                            _this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contest._id);
+                        }
+                        else {
+                            //finished
+                            //Remove from my contests and from running contests
+                            _this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contest._id);
+                            _this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contest._id);
+                            //Refresh recently finished contests
+                            _this.publishActionToTab(2, ACTION_FORCE_REFRESH);
+                        }
+                        break;
+                    case 'finished':
+                        //Remove from finished contests
+                        _this.publishActionToTab(2, ACTION_REMOVE_CONTEST, contest._id);
+                        if (currentStatus === 'starting') {
+                            //Refresh my contests
+                            _this.publishActionToTab(0, ACTION_FORCE_REFRESH);
+                        }
+                        else {
+                            //running
+                            //Refresh my contests
+                            _this.publishActionToTab(0, ACTION_FORCE_REFRESH);
+                            //Refresh running contests
+                            _this.publishActionToTab(1, ACTION_FORCE_REFRESH);
+                        }
+                        break;
+                }
+            }
+        };
+        this.contestRemovedHandler = function (eventData) {
+            var contestId = eventData[0];
+            var finishedContest = eventData[1];
+            if (!finishedContest) {
+                //Try to remove it from 'my contests' and 'running contests' tabs
+                _this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contestId);
+                _this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contestId);
+            }
+            else {
+                //Try to remove it from the recently finished tab
+                _this.publishActionToTab(2, ACTION_REMOVE_CONTEST, contestId);
+            }
+        };
+        this.languageChangedHandler = function (eventData) {
             if (eventData[0]) {
                 window.location.reload();
             }
@@ -40,23 +124,41 @@ var MainTabsPage = (function () {
                 _this.publishActionToTab(1, ACTION_FORCE_REFRESH);
                 _this.publishActionToTab(2, ACTION_FORCE_REFRESH);
             }
-        });
-        this.client.events.subscribe('topTeamer:switchedToFacebook', function (eventData) {
-            //Just refresh the contests to reflect the new language
+        };
+        this.switchedToFacebookHandler = function () {
+            //Just refresh the contests to reflect the user
             _this.publishActionToTab(0, ACTION_FORCE_REFRESH);
             _this.publishActionToTab(1, ACTION_FORCE_REFRESH);
             _this.publishActionToTab(2, ACTION_FORCE_REFRESH);
-        });
-        this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
-            _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
-        });
-        this.client.events.subscribe('topTeamer:noPersonalContests', function () {
+        };
+        this.serverPopupHandler = function (eventData) {
+            return _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
+        };
+        this.noPersonalContestsHandler = function () {
             _this.mainTabs.select(1); //Switch to "Running contests"
-        });
-        this.client.events.subscribe('topTeamer:showLeadingContests', function () {
+        };
+        this.showLeaderContestsHandler = function () {
             _this.mainTabs.select(1); //Switch to "Running contests"
-        });
-    }
+        };
+        this.client.events.subscribe('app:contestCreated', this.contestCreatedHandler);
+        this.client.events.subscribe('app:contestUpdated', this.contestUpdatedHandler);
+        this.client.events.subscribe('app:contestRemoved', this.contestRemovedHandler);
+        this.client.events.subscribe('app:languageChanged', this.languageChangedHandler);
+        this.client.events.subscribe('app:switchedToFacebook', this.switchedToFacebookHandler);
+        this.client.events.subscribe('app:serverPopup', this.serverPopupHandler);
+        this.client.events.subscribe('app:noPersonalContests', this.noPersonalContestsHandler);
+        this.client.events.subscribe('app:showLeadingContests', this.showLeaderContestsHandler);
+    };
+    MainTabsPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:contestCreated', this.contestCreatedHandler);
+        this.client.events.unsubscribe('app:contestUpdated', this.contestUpdatedHandler);
+        this.client.events.unsubscribe('app:contestRemoved', this.contestRemovedHandler);
+        this.client.events.unsubscribe('app:languageChanged', this.languageChangedHandler);
+        this.client.events.unsubscribe('app:switchedToFacebook', this.switchedToFacebookHandler);
+        this.client.events.unsubscribe('app:serverPopup', this.serverPopupHandler);
+        this.client.events.unsubscribe('app:noPersonalContests', this.noPersonalContestsHandler);
+        this.client.events.unsubscribe('app:showLeadingContests', this.showLeaderContestsHandler);
+    };
     MainTabsPage.prototype.ionViewDidEnter = function () {
         //Events here could be serverPopup just as the app loads - the page should be fully visible
         this.client.processInternalEvents();
@@ -70,7 +172,7 @@ var MainTabsPage = (function () {
         }
     };
     MainTabsPage.prototype.publishActionToTab = function (index, action, param) {
-        var eventName = 'topTeamer:';
+        var eventName = 'app:';
         switch (index) {
             case 0:
                 eventName += 'myContests';
@@ -88,91 +190,6 @@ var MainTabsPage = (function () {
         }
         else {
             this.client.events.publish(eventName);
-        }
-    };
-    MainTabsPage.prototype.handleContestCreated = function () {
-        //Force refresh my contests
-        this.publishActionToTab(0, ACTION_FORCE_REFRESH);
-    };
-    MainTabsPage.prototype.handleContestUpdated = function (contest, previousStatus, currentStatus) {
-        if (previousStatus === currentStatus) {
-            //Was finished and remained finished, or was running and still running...
-            switch (currentStatus) {
-                case 'starting':
-                    //For admins - future contests - appear only in "my Contests"
-                    this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
-                    break;
-                case 'running':
-                    //Appears in my contests / running contests
-                    this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
-                    this.publishActionToTab(1, ACTION_UPDATE_CONTEST, contest);
-                    break;
-                case 'finished':
-                    //Appears in recently finished contests
-                    this.publishActionToTab(2, ACTION_UPDATE_CONTEST, contest);
-                    break;
-            }
-        }
-        else {
-            switch (previousStatus) {
-                case 'starting':
-                    if (currentStatus === 'running') {
-                        //Update my contests
-                        this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
-                        //Refresh running contests - might appear there
-                        this.publishActionToTab(1, ACTION_FORCE_REFRESH);
-                    }
-                    else {
-                        //finished
-                        //Remove from my contests
-                        this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contest._id);
-                        //Refresh recently finished contests
-                        this.publishActionToTab(2, ACTION_FORCE_REFRESH);
-                    }
-                    break;
-                case 'running':
-                    if (currentStatus === 'starting') {
-                        //Update my contests
-                        this.publishActionToTab(0, ACTION_UPDATE_CONTEST, contest);
-                        //Remove from running contests
-                        this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contest._id);
-                    }
-                    else {
-                        //finished
-                        //Remove from my contests and from running contests
-                        this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contest._id);
-                        this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contest._id);
-                        //Refresh recently finished contests
-                        this.publishActionToTab(2, ACTION_FORCE_REFRESH);
-                    }
-                    break;
-                case 'finished':
-                    //Remove from finished contests
-                    this.publishActionToTab(2, ACTION_REMOVE_CONTEST, contest._id);
-                    if (currentStatus === 'starting') {
-                        //Refresh my contests
-                        this.publishActionToTab(0, ACTION_FORCE_REFRESH);
-                    }
-                    else {
-                        //running
-                        //Refresh my contests
-                        this.publishActionToTab(0, ACTION_FORCE_REFRESH);
-                        //Refresh running contests
-                        this.publishActionToTab(1, ACTION_FORCE_REFRESH);
-                    }
-                    break;
-            }
-        }
-    };
-    MainTabsPage.prototype.handleContestRemoved = function (contestId, finishedContest) {
-        if (!finishedContest) {
-            //Try to remove it from 'my contests' and 'running contests' tabs
-            this.publishActionToTab(0, ACTION_REMOVE_CONTEST, contestId);
-            this.publishActionToTab(1, ACTION_REMOVE_CONTEST, contestId);
-        }
-        else {
-            //Try to remove it from the recently finished tab
-            this.publishActionToTab(2, ACTION_REMOVE_CONTEST, contestId);
         }
     };
     __decorate([

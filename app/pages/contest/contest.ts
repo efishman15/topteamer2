@@ -20,6 +20,8 @@ export class ContestPage {
   contest:Contest;
   lastQuizResults:QuizResults = null;
   animateLastResults:number = 0; //0=no animation, 1=enter animation, 2=exit animation
+  private quizFinishedHandler : (eventData:any) => void;
+  private contestUpdatedHandler: (eventData:any) => void;
 
   @ViewChild(ContestChartComponent) contestChartComponent:ContestChartComponent;
 
@@ -29,50 +31,59 @@ export class ContestPage {
   }
 
   ionViewLoaded() {
-    this.client.subscribeUniqueEvent('topTeamer:quizFinished', (eventData) => {
+    this.quizFinishedHandler = (eventData:any) => {
+      //Prepare some client calculated fields on the contest
+      contestsService.setContestClientData(eventData[0].contest);
 
-        //Prepare some client calculated fields on the contest
-        contestsService.setContestClientData(eventData[0].contest);
+      //Refresh the contest chart and the contest details
+      //This is the only case where we want to animate the chart
+      //right after a quiz so the user will notice the socre changes
+      this.refreshContestChart(eventData[0].contest, eventData[0].data.animation);
 
-        //Refresh the contest chart and the contest details
-        //This is the only case where we want to animate the chart
-        //right after a quiz so the user will notice the socre changes
-        this.refreshContestChart(eventData[0].contest, eventData[0].data.animation);
+      //Event data comes as an array of data objects - we expect only one (last quiz results)
+      this.lastQuizResults = eventData[0];
 
-        //Event data comes as an array of data objects - we expect only one (last quiz results)
-        this.lastQuizResults = eventData[0];
-
-        if (this.lastQuizResults.data.facebookPost) {
-          let shareSuccessModal:Modal = this.client.createModalPage('ShareSuccessPage', {quizResults: this.lastQuizResults})
-          shareSuccessModal.onDidDismiss((action:string)=> {
-            switch (action) {
-              case 'post':
-                connectService.post(this.lastQuizResults.data.facebookPost).then(()=> {
-                }, ()=> {
-                });
-                break;
-              case 'share':
-                this.client.share(this.contest, 'shareSuccess');
-                break;
-            }
-          });
-          shareSuccessModal.present();
-        }
-        else {
-          this.animateLastResults = 1; //Enter animation
-          setTimeout(() => {
-            this.animateLastResults = 2; //Exit animation
-            setTimeout(() => {
-              this.animateLastResults = 0; //No animation
-            }, this.client.settings.quiz.finish.animateResultsExitTimeout)
-          }, this.client.settings.quiz.finish.animateResultsTimeout);
-        }
-
-        var soundFile = this.lastQuizResults.data.sound;
+      if (this.lastQuizResults.data.facebookPost) {
+        let shareSuccessModal:Modal = this.client.createModalPage('ShareSuccessPage', {quizResults: this.lastQuizResults})
+        shareSuccessModal.onDidDismiss((action:string)=> {
+          switch (action) {
+            case 'post':
+              connectService.post(this.lastQuizResults.data.facebookPost).then(()=> {
+              }, ()=> {
+              });
+              break;
+            case 'share':
+              this.client.share(this.contest, 'shareSuccess');
+              break;
+          }
+        });
+        shareSuccessModal.present();
+      }
+      else {
+        this.animateLastResults = 1; //Enter animation
         setTimeout(() => {
-          soundService.play(soundFile);
-        }, 500);
-      });
+          this.animateLastResults = 2; //Exit animation
+          setTimeout(() => {
+            this.animateLastResults = 0; //No animation
+          }, this.client.settings.quiz.finish.animateResultsExitTimeout)
+        }, this.client.settings.quiz.finish.animateResultsTimeout);
+      }
+
+      var soundFile = this.lastQuizResults.data.sound;
+      setTimeout(() => {
+        soundService.play(soundFile);
+      }, 500);
+    }
+    this.contestUpdatedHandler = (eventData:any) => {
+      this.refreshContestChart(eventData[0]);
+    }
+    this.client.events.subscribe('app:quizFinished', this.quizFinishedHandler);
+    this.client.events.subscribe('app:contestUpdated', this.contestUpdatedHandler);
+  }
+
+  ionViewWillUnload() {
+    this.client.events.unsubscribe('app:quizFinished', this.quizFinishedHandler);
+    this.client.events.unsubscribe('app:contestUpdated', this.contestUpdatedHandler);
   }
 
   ionViewWillEnter() {

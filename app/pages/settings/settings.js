@@ -25,7 +25,7 @@ var SettingsPage = (function () {
             if (this.client.settings.languages[this.client.session.settings.language].direction !== this.client.settings.languages[this.originalLanguage].direction) {
                 directionChanged = true;
             }
-            this.client.events.publish('topTeamer:languageChanged', directionChanged);
+            this.client.events.publish('app:languageChanged', directionChanged);
         }
     };
     SettingsPage.prototype.toggleSettings = function (name, initPushService) {

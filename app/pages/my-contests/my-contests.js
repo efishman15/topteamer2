@@ -13,27 +13,37 @@ var client_1 = require('../../providers/client');
 var analyticsService = require('../../providers/analytics');
 var MyContestsPage = (function () {
     function MyContestsPage() {
-        var _this = this;
         this.client = client_1.Client.getInstance();
-        this.client.events.subscribe('topTeamer:myContests:contestUpdated', function (eventData) {
+    }
+    MyContestsPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.updateContestHandler = function (eventData) {
             _this.contestList.updateContest(eventData[0]);
-        });
-        this.client.events.subscribe('topTeamer:myContests:contestRemoved', function (eventData) {
+        };
+        this.removeContestHandler = function (eventData) {
             _this.contestList.removeContest(eventData[0]);
-        });
-        this.client.events.subscribe('topTeamer:myContests:forceRefresh', function () {
+        };
+        this.forceRefreshHandler = function () {
             _this.refreshList(true).then(function () {
             }, function () {
             });
-        });
-    }
+        };
+        this.client.events.subscribe('app:myContests:contestUpdated', this.updateContestHandler);
+        this.client.events.subscribe('app:myContests:contestRemoved', this.removeContestHandler);
+        this.client.events.subscribe('app:myContests:forceRefresh', this.forceRefreshHandler);
+    };
+    MyContestsPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:myContests:contestUpdated', this.updateContestHandler);
+        this.client.events.unsubscribe('app:myContests:contestRemoved', this.removeContestHandler);
+        this.client.events.unsubscribe('app:myContests:forceRefresh', this.forceRefreshHandler);
+    };
     MyContestsPage.prototype.ionViewWillEnter = function () {
         var _this = this;
         analyticsService.track('page/myContests');
         this.refreshList().then(function () {
             if (_this.contestList.contests.length === 0 && !_this.pageLoaded) {
                 //On load only - switch to "running contests" if no personal contests
-                _this.client.events.publish('topTeamer:noPersonalContests');
+                _this.client.events.publish('app:noPersonalContests');
             }
             _this.pageLoaded = true;
         }, function () {
@@ -50,7 +60,7 @@ var MyContestsPage = (function () {
         });
     };
     MyContestsPage.prototype.showLeadingContests = function () {
-        this.client.events.publish('topTeamer:showLeadingContests');
+        this.client.events.publish('app:showLeadingContests');
     };
     __decorate([
         core_1.ViewChild(contest_list_1.ContestListComponent), 

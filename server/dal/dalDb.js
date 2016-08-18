@@ -149,7 +149,7 @@ function register(data, callback) {
 //---------------------------------------------------------------------
 // closeDb
 //
-// Connects to the database
+// Closes connection to the database
 //
 // data:
 // -----
@@ -180,7 +180,7 @@ function connect(callback) {
       return;
     }
 
-    callback(null, {'DbHelper': new DbHelper(db)});
+    callback(null, {DbHelper: new DbHelper(db)});
   })
 }
 
@@ -200,6 +200,9 @@ function loadSettings(data, callback) {
     connect(function (err, connectData) {
       if (!data) {
         data = {closeConnection: true};
+      }
+      else {
+        data.closeConnection = true;
       }
       data.DbHelper = connectData.DbHelper;
       loadSettings(data, callback);
@@ -339,14 +342,18 @@ function retrieveAdminSession(data, callback) {
 
   retrieveSession(data, function (err, data) {
     if (err) {
+      closeDb(data);
       callback(err);
       return;
     }
 
     if (!data.session.isAdmin) {
+      closeDb(data);
       callback(new exceptions.ServerException('This action is permitted for admins only', {'sessionId': data.token}, 'error', 403));
       return;
     }
+
+    checkToCloseDb(data);
 
     callback(null, data);
   })
@@ -810,6 +817,7 @@ function getQuestionsCount(data, callback) {
   var questionsCollection = data.DbHelper.getCollection('Questions');
   questionsCollection.count(data.questionCriteria, function (err, count) {
     if (err || count === 0) {
+      closeDb(data);
       callback(new exceptions.ServerException('Error retrieving number of questions from the database', {
         'count': count,
         'questionCriteria': data.questionCriteria,
@@ -817,6 +825,8 @@ function getQuestionsCount(data, callback) {
       }, 'error'));
       return;
     }
+
+    checkToCloseDb(data);
 
     data.questionsCount = count;
 
@@ -848,6 +858,7 @@ function getNextQuestion(data, callback) {
   var questionsCollection = data.DbHelper.getCollection('Questions');
   questionsCollection.findOne(data.questionCriteria, {skip: skip}, function (err, question) {
     if (err || !question) {
+      closeDb(data);
       callback(new exceptions.ServerException('Error retrieving next question from database', {
         'questionsCount': data.questionsCount,
         'questionCriteria': data.questionCriteria,
@@ -856,6 +867,8 @@ function getNextQuestion(data, callback) {
       }, 'error'));
       return;
     }
+
+    checkToCloseDb(data);
 
     callback(null, question);
   })
@@ -888,6 +901,8 @@ function addContest(data, callback) {
         }, 'error'));
         return;
       }
+
+      checkToCloseDb(data);
 
       callback(null, data);
     });
@@ -1119,6 +1134,7 @@ function getContests(data, callback) {
     function (err, contests) {
       if (err || !contests) {
 
+        closeDb(data);
         callback(new exceptions.ServerException('Error retrieving contests', {
           'contestQuery': data.contestQuery,
           'dbError': err
@@ -1237,6 +1253,7 @@ function insertPurchase(data, callback) {
     connect(function (err, connectData) {
 
       data.DbHelper = connectData.DbHelper;
+      data.closeConnection = true;
 
       insertPurchase(data, callback);
     });
@@ -1244,48 +1261,6 @@ function insertPurchase(data, callback) {
   }
 
   var purchasesCollection = data.DbHelper.getCollection('Purchases');
-
-  data.newPurchase.created = (new Date()).getTime();
-
-  purchasesCollection.insert(data.newPurchase
-    , {}, function (err, insertResult) {
-      if (err) {
-        if (err.code !== 11000) {
-
-          closeDb(data);
-
-          callback(new exceptions.ServerException('Error inserting purchase record', {
-            'purchaseRecord': data.newPurchase,
-            'dbError': err
-          }, 'error'));
-
-          return;
-        }
-        else {
-          data.duplicatePurchase = true;
-        }
-      }
-
-      checkToCloseDb(data);
-
-      callback(null, data);
-    });
-}
-
-//--------------------------------------------------------------------------------------------------------------
-// getContestTopParticipants
-//
-// Retrieve the leaders of a contest
-//
-// data:
-// -----
-// input: DbHelper, contestId
-// output: participants (array)
-//--------------------------------------------------------------------------------------------------------------
-module.exports.getContestTopParticipants = getContestTopParticipants;
-function getContestTopParticipants(data, callback) {
-
-  var contestsCollection = data.DbHelper.getCollection('Contests');
 
   data.newPurchase.created = (new Date()).getTime();
 
@@ -1600,14 +1575,10 @@ function syncContestsAvatars(data, callback) {
 
   var contestsCollection = data.DbHelper.getCollection('Contests');
 
-  var whereClause = {
-    '$or': [
-      {'creator.id': ObjectId(data.session.userId)},
-      {'leader.id': ObjectId(data.session.userId)},
-      {'teams.0.leader.id': ObjectId(data.session.userId)},
-      {'teams.1.leader.id': ObjectId(data.session.userId)}
-    ]
-  };
+  var whereClause = {};
+  //I joined this contest (covers case where I created it or leading the contest or any team
+  whereClause['users.' + data.session.userId] = {$exists: true};
+
   contestsCollection.find(whereClause, {}, function (err, contestsCursor) {
     if (err || !contestsCursor) {
 
@@ -1628,30 +1599,40 @@ function syncContestsAvatars(data, callback) {
       async.forEach(contests, function (contest, contestCallback) {
 
         var setObject = {'$set': {}};
+        var setThisContest = false;
 
         if (contest.creator.id.toString() === data.session.userId.toString()) {
           setObject['$set']['creator.name'] = data.session.name;
           contest.creator.name = data.session.name;
           setObject['$set']['creator.avatar.id'] = data.session.avatar;
           contest.creator.avatar.id = data.session.avatar;
+          setThisContest = true;
         }
         if (contest.leader.id.toString() === data.session.userId.toString()) {
           setObject['$set']['leader.name'] = data.session.name;
           contest.leader.name = data.session.name;
           setObject['$set']['leader.avatar.id'] = data.session.avatar;
           contest.leader.avatar.id = data.session.avatar;
+          setThisContest = true;
         }
         if (contest.teams[0].leader && contest.teams[0].leader.id.toString() === data.session.userId.toString()) {
           setObject['$set']['teams.0.leader.name'] = data.session.name;
           contest.teams[0].leader.name = data.session.name;
           setObject['$set']['teams.0.leader.avatar.id'] = data.session.avatar;
           contest.teams[0].leader.avatar.id = data.session.avatar;
+          setThisContest = true;
         }
         if (contest.teams[1].leader && contest.teams[1].leader.id.toString() === data.session.userId.toString()) {
           setObject['$set']['teams.1.leader.name'] = data.session.name;
           contest.teams[1].leader.name = data.session.name;
           setObject['$set']['teams.1.leader.avatar.id'] = data.session.avatar;
           contest.teams[1].leader.avatar.id = data.session.avatar;
+          setThisContest = true;
+        }
+
+        if (!setThisContest) {
+          contestCallback();
+          return;
         }
 
         contestsCollection.updateOne({'_id': ObjectId(contest._id)}, setObject,
@@ -1719,6 +1700,8 @@ function checkIfFacebookIdExists(data, callback) {
     if (user) {
       data.facebookExists = true;
     }
+
+    checkToCloseDb(data);
 
     callback(null, data);
   });

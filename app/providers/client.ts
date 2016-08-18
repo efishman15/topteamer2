@@ -261,7 +261,7 @@ export class Client {
       }, (err)=> {
         if (err.type === 'SERVER_ERROR_FACEBOOK_EXISTS_DO_SWITCH' && err.additionalInfo && err.additionalInfo.confirmed) {
           this.serverConnect(connectInfo).then(() => {
-            this.events.publish('topTeamer:switchedToFacebook');
+            this.events.publish('app:switchedToFacebook');
             this.popToRoot().then(()=> {
               resolve();
             }, ()=> {
@@ -281,9 +281,9 @@ export class Client {
   publishProfileChange(contests) {
     for (var i = 0; i < contests.length; i++) {
       contestsService.setContestClientData(contests[i]);
-      this.events.publish('topTeamer:contestUpdated', contests[i], contests[i].status, contests[i].status);
+      this.events.publish('app:contestUpdated', contests[i], contests[i].status, contests[i].status);
     }
-    this.events.publish('topTeamer:leaderboardsUpdated');
+    this.events.publish('app:leaderboardsUpdated');
   }
 
   serverPost(path:string, postData?:Object) {
@@ -519,25 +519,7 @@ export class Client {
     this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
     this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
 
-    this.events.publish('topTeamer:resize');
-  }
-
-  subscribeUniqueEvent(eventName:string, handler:any) {
-    //Bypass to what seems to be an IONIC bug since we "skip" views using insertPages
-    //events are defined twice and more and when publish occurs, this subscription is
-    //being called too many times...
-    if (this.events['_channels'] && this.events['_channels'][eventName]) {
-      for(var i=0; i<this.events['_channels'][eventName].length; i++) {
-        if (this.events['_channels'][eventName][i].toString() === handler.toString()) {
-          this.events['_channels'][eventName][i] = handler;
-          return;
-        }
-      }
-    }
-    else {
-      this.events.subscribe(eventName, handler);
-    }
-
+    this.events.publish('app:resize');
   }
 
   get width():number {
@@ -889,7 +871,7 @@ export class ServerGateway {
         .subscribe(
           (res:Object) => {
             if (res['serverPopup']) {
-              this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res['serverPopup']));
+              this.eventQueue.push(new InternalEvent('app:serverPopup', res['serverPopup']));
             }
             resolve(res);
           }

@@ -26,24 +26,29 @@ export class LeaderboardsPage {
   nextTimeForceRefreshFriends:boolean;
   nextTimeForceRefreshWeekly:boolean;
 
+  private contestUpdatedHandler : (eventData:any) => void;
+  private contestRemovedHandler : (eventData:any) => void;
+  private forceRefreshHandler : () => void;
+  private switchedToFacebookHandler : () => void;
+  private leaderboardsUpdatedHandler : () => void;
+
   constructor() {
     this.client = Client.getInstance();
+  }
 
-    this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestUpdated', (eventData) => {
+  ionViewLoaded() {
+    this.contestUpdatedHandler = (eventData:any) => {
       this.contestList.updateContest(eventData[0]);
-    });
-
-    this.client.events.subscribe('topTeamer:recentlyFinishedContests:contestRemoved', (eventData) => {
+    }
+    this.contestRemovedHandler = (eventData:any) => {
       this.contestList.removeContest(eventData[0]);
-    });
-
-    this.client.events.subscribe('topTeamer:recentlyFinishedContests:forceRefresh', () => {
-      this.refreshList(true).then(()=> {
-      }, ()=> {
+    }
+    this.forceRefreshHandler = () => {
+      this.refreshList(true).then(()=>{
+      },()=>{
       });
-    });
-
-    this.client.events.subscribe('topTeamer:switchedToFacebook', () => {
+    }
+    this.switchedToFacebookHandler = () => {
       switch (this.mode) {
         case 'contests':
           this.nextTimeForceRefreshFriends = true;
@@ -67,9 +72,8 @@ export class LeaderboardsPage {
           })
           break;
       }
-    });
-
-    this.client.events.subscribe('topTeamer:leaderboardsUpdated', () => {
+    }
+    this.leaderboardsUpdatedHandler = () => {
       switch (this.mode) {
         case 'contests':
           this.contestList.refresh(true).then(() => {
@@ -87,7 +91,21 @@ export class LeaderboardsPage {
           })
           break;
       }
-    });
+    }
+
+    this.client.events.subscribe('app:recentlyFinishedContests:contestUpdated', this.contestUpdatedHandler);
+    this.client.events.subscribe('app:recentlyFinishedContests:contestRemoved', this.contestRemovedHandler);
+    this.client.events.subscribe('app:recentlyFinishedContests:forceRefresh', this.forceRefreshHandler);
+    this.client.events.subscribe('app:switchedToFacebook', this.switchedToFacebookHandler);
+    this.client.events.subscribe('app:leaderboardsUpdated', this.leaderboardsUpdatedHandler);
+  }
+
+  ionViewWillUnload() {
+    this.client.events.unsubscribe('app:recentlyFinishedContests:contestUpdated', this.contestUpdatedHandler);
+    this.client.events.unsubscribe('app:recentlyFinishedContests:contestRemoved', this.contestRemovedHandler);
+    this.client.events.unsubscribe('app:recentlyFinishedContests:forceRefresh', this.forceRefreshHandler);
+    this.client.events.unsubscribe('app:switchedToFacebook', this.switchedToFacebookHandler);
+    this.client.events.unsubscribe('app:leaderboardsUpdated', this.leaderboardsUpdatedHandler);
   }
 
   ionViewWillEnter() {

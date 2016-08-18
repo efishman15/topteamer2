@@ -336,7 +336,7 @@ var SetContestPage = (function () {
                 };
                 if (_this.params.data.mode === 'add') {
                     analyticsService.track('contest/created', contestParams);
-                    _this.client.events.publish('topTeamer:contestCreated', contest);
+                    _this.client.events.publish('app:contestCreated', contest);
                     _this.client.nav.pop({ animate: false }).then(function () {
                         var appPages = new Array();
                         appPages.push(new objects_1.AppPage('ContestPage', { 'contest': contest }));
@@ -350,7 +350,7 @@ var SetContestPage = (function () {
                     var now = (new Date).getTime();
                     var currentStatus = contestsService.getContestStatus(_this.contestLocalCopy);
                     var previousStatus = contestsService.getContestStatus(_this.params.data.contest);
-                    _this.client.events.publish('topTeamer:contestUpdated', contest, previousStatus, currentStatus);
+                    _this.client.events.publish('app:contestUpdated', contest, previousStatus, currentStatus);
                     _this.client.nav.pop();
                 }
             }, function () {
@@ -438,6 +438,11 @@ var SetContestPage = (function () {
     SetContestPage.prototype.endDateSelected = function (dateSelection) {
         //Set the end date at the end of this day (e.g. 23:59:59.999)
         this.contestLocalCopy.endDate = dateSelection.epochLocal + this.currentTimeOnlyInMilliseconds;
+        if (this.contestLocalCopy.endDate < this.contestLocalCopy.startDate) {
+            var startDate = new Date(this.contestLocalCopy.startDate);
+            startDate.clearTime(); //Start of the day
+            this.contestLocalCopy.endDate = startDate.getTime() + 24 * 60 * 60 * 1000 - 1; //The end of the day of the start date (e.g. 23:59:59.999)
+        }
     };
     SetContestPage.prototype.getMaxEndDate = function () {
         if (!this.client.session.isAdmin) {

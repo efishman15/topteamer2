@@ -14,6 +14,7 @@ export class QuestionStatsPage {
   question:QuizQuestion;
   viewController:ViewController;
   correctRatioRounded:number;
+  private resizeHandler: () => void;
 
   // get the element with the #chessCanvas on it
   @ViewChild("questionStatsCanvas") questionStatsCanvasElementRef:ElementRef;
@@ -25,12 +26,20 @@ export class QuestionStatsPage {
     this.question = params.data.question;
     this.viewController = viewController;
 
-    this.client.events.subscribe('topTeamer:resize', (eventData) => {
+
+  }
+
+  ionViewLoaded() {
+    this.resizeHandler = () => {
       if (this.question.correctRatio || this.question.correctRatio === 0) {
         this.drawChart();
       }
-    });
+    }
+    this.client.events.subscribe('app:resize', this.resizeHandler);
+  }
 
+  ionViewWillUnload() {
+    this.client.events.unsubscribe('app:resize', this.resizeHandler);
   }
 
   //The only life cycle eve currently called in modals

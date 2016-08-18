@@ -35,6 +35,7 @@ export class QuizPage {
   @ViewChild('quizCanvas') quizCanvasElementRef:ElementRef;
   quizCanvas:HTMLCanvasElement;
   quizContext:CanvasRenderingContext2D;
+  private resizeHandler:() => void;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
@@ -49,9 +50,14 @@ export class QuizPage {
   }
 
   ionViewLoaded() {
-    this.client.subscribeUniqueEvent('topTeamer:resize', (eventData) => {
+    this.resizeHandler = () => {
       this.drawQuizProgress();
-    });
+    }
+    this.client.events.subscribe('app:resize', this.resizeHandler);
+  }
+
+  ionViewWillUnload() {
+    this.client.events.unsubscribe('app:resize', this.resizeHandler);
   }
 
   ngAfterViewInit() {
@@ -126,7 +132,9 @@ export class QuizPage {
           contestsService.setContestClientData(err.additionalInfo.contest);
           setTimeout(()=> {
             this.client.nav.pop().then(()=> {
-              this.client.events.publish('topTeamer:contestUpdated', err.additionalInfo.contest, this.params.data.contest.status, err.additionalInfo.contest.status);
+              console.log('quiz pop completed');
+              this.client.events.publish('app:contestUpdated', err.additionalInfo.contest, this.params.data.contest.status, err.additionalInfo.contest.status);
+              console.log('quiz results published to contest');
             }, () => {
             });
           }, 1000);
@@ -267,7 +275,7 @@ export class QuizPage {
       //Give enough time to draw the circle progress of the last question
       setTimeout(() => {
         this.client.nav.pop().then(() => {
-          this.client.events.publish('topTeamer:quizFinished', this.quizData.results);
+          this.client.events.publish('app:quizFinished', this.quizData.results);
           //For next time if view remains cached
           this.quizStarted = false;
         }, ()=> {

@@ -24,7 +24,7 @@ var ContestPage = (function () {
     }
     ContestPage.prototype.ionViewLoaded = function () {
         var _this = this;
-        this.client.subscribeUniqueEvent('topTeamer:quizFinished', function (eventData) {
+        this.quizFinishedHandler = function (eventData) {
             //Prepare some client calculated fields on the contest
             contestsService.setContestClientData(eventData[0].contest);
             //Refresh the contest chart and the contest details
@@ -62,7 +62,16 @@ var ContestPage = (function () {
             setTimeout(function () {
                 soundService.play(soundFile);
             }, 500);
-        });
+        };
+        this.contestUpdatedHandler = function (eventData) {
+            _this.refreshContestChart(eventData[0]);
+        };
+        this.client.events.subscribe('app:quizFinished', this.quizFinishedHandler);
+        this.client.events.subscribe('app:contestUpdated', this.contestUpdatedHandler);
+    };
+    ContestPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:quizFinished', this.quizFinishedHandler);
+        this.client.events.unsubscribe('app:contestUpdated', this.contestUpdatedHandler);
     };
     ContestPage.prototype.ionViewWillEnter = function () {
         analyticsService.track('page/contest', { contestId: this.contest._id });
@@ -103,7 +112,6 @@ var ContestPage = (function () {
         this.client.openPage('QuizPage', { contest: this.contest, source: source });
     };
     __decorate([
-        //0=no animation, 1=enter animation, 2=exit animation
         core_1.ViewChild(contest_chart_1.ContestChartComponent), 
         __metadata('design:type', contest_chart_1.ContestChartComponent)
     ], ContestPage.prototype, "contestChartComponent", void 0);

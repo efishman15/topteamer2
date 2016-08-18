@@ -61,7 +61,7 @@ var SetContestAdminPage = (function () {
             contestsService.removeContest(_this.params.data.contestLocalCopy._id).then(function () {
                 var now = (new Date()).getTime();
                 var finishedContest = (_this.params.data.contestLocalCopy.endDate < now);
-                _this.client.events.publish('topTeamer:contestRemoved', _this.params.data.contestLocalCopy._id, finishedContest);
+                _this.client.events.publish('app:contestRemoved', _this.params.data.contestLocalCopy._id, finishedContest);
                 setTimeout(function () {
                     _this.client.nav.popToRoot({ animate: false });
                 }, 1000);

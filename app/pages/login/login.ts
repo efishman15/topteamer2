@@ -10,22 +10,26 @@ import {ConnectInfo} from '../../objects/objects';
 export class LoginPage {
 
   client:Client;
+  private serverPopupHandler:(eventData:any) => Promise<any>;
 
   constructor() {
     this.client = Client.getInstance();
-
-    this.client.events.subscribe('topTeamer:serverPopup', (eventData) => {
-      this.client.showModalPage('ServerPopupPage', {'serverPopup': eventData[0]});
-    });
-
-  }
-
-  ngOnInit() {
-    this.client.hidePreloader();
   }
 
   ionViewLoaded() {
     this.client.setPageTitle('GAME_NAME');
+    this.serverPopupHandler = (eventData:any) => {
+      return this.client.showModalPage('ServerPopupPage', {serverPopup: eventData[0]});
+    }
+    this.client.events.subscribe('app:serverPopup', this.serverPopupHandler);
+  }
+
+  ionViewWillUnload() {
+    this.client.events.unsubscribe('app:serverPopup', this.serverPopupHandler);
+  }
+
+  ngOnInit() {
+    this.client.hidePreloader();
   }
 
   ionViewWillEnter() {

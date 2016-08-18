@@ -17,10 +17,12 @@ var client_1 = require('../../providers/client');
 var analyticsService = require('../../providers/analytics');
 var ContestParticipantsPage = (function () {
     function ContestParticipantsPage(params) {
-        var _this = this;
         this.client = client_1.Client.getInstance();
         this.params = params;
-        this.client.events.subscribe('topTeamer:leaderboardsUpdated', function () {
+    }
+    ContestParticipantsPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.leaderboardsUpdatedHandler = function () {
             switch (_this.tabId) {
                 case -1:
                     _this.showContestParticipants(true).then(function () {
@@ -34,8 +36,12 @@ var ContestParticipantsPage = (function () {
                     });
                     break;
             }
-        });
-    }
+        };
+        this.client.events.subscribe('app:leaderboardsUpdated', this.leaderboardsUpdatedHandler);
+    };
+    ContestParticipantsPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:leaderboardsUpdated', this.leaderboardsUpdatedHandler);
+    };
     ContestParticipantsPage.prototype.ionViewWillEnter = function () {
         analyticsService.track('page/contestParticipants', { contestId: this.params.data.contest._id });
         if (this.leadersComponent) {
@@ -78,7 +84,6 @@ var ContestParticipantsPage = (function () {
         }
     };
     __decorate([
-        //-1=general contest, 0=team0, 1=team1
         core_2.ViewChild(leaders_1.LeadersComponent), 
         __metadata('design:type', leaders_1.LeadersComponent)
     ], ContestParticipantsPage.prototype, "leadersComponent", void 0);

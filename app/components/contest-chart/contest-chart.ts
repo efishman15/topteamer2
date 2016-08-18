@@ -63,7 +63,7 @@ export class ContestChartComponent {
 
   }
 
-  refresh(contest?:Contest, animation?:string) {
+  refresh(contest:Contest, animation?:string) {
     this.contest = contest;
     this.animation = animation;
   }
@@ -95,7 +95,7 @@ export class ContestChartComponent {
         });
 
         //Notify outside that contest changed
-        this.client.events.publish('topTeamer:contestUpdated', data.contest, data.contest.status, data.contest.status);
+        this.client.events.publish('app:contestUpdated', data.contest, data.contest.status, data.contest.status);
 
         //Should get xp if fresh join
         var rankModal;

@@ -13,17 +13,21 @@ var connectService = require('../../providers/connect');
 var analyticsService = require('../../providers/analytics');
 var LoginPage = (function () {
     function LoginPage() {
-        var _this = this;
         this.client = client_1.Client.getInstance();
-        this.client.events.subscribe('topTeamer:serverPopup', function (eventData) {
-            _this.client.showModalPage('ServerPopupPage', { 'serverPopup': eventData[0] });
-        });
     }
+    LoginPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.client.setPageTitle('GAME_NAME');
+        this.serverPopupHandler = function (eventData) {
+            return _this.client.showModalPage('ServerPopupPage', { serverPopup: eventData[0] });
+        };
+        this.client.events.subscribe('app:serverPopup', this.serverPopupHandler);
+    };
+    LoginPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:serverPopup', this.serverPopupHandler);
+    };
     LoginPage.prototype.ngOnInit = function () {
         this.client.hidePreloader();
-    };
-    LoginPage.prototype.ionViewLoaded = function () {
-        this.client.setPageTitle('GAME_NAME');
     };
     LoginPage.prototype.ionViewWillEnter = function () {
         analyticsService.track('page/login');

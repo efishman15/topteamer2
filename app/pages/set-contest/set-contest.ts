@@ -413,7 +413,7 @@ export class SetContestPage {
 
         if (this.params.data.mode === 'add') {
           analyticsService.track('contest/created', contestParams);
-          this.client.events.publish('topTeamer:contestCreated', contest);
+          this.client.events.publish('app:contestCreated', contest);
           this.client.nav.pop({animate: false}).then(() => {
             let appPages : Array<AppPage> = new Array<AppPage>();
             appPages.push(new AppPage('ContestPage', {'contest': contest}));
@@ -428,7 +428,7 @@ export class SetContestPage {
           let currentStatus: string = contestsService.getContestStatus(this.contestLocalCopy);
           let previousStatus: string = contestsService.getContestStatus(this.params.data.contest);
 
-          this.client.events.publish('topTeamer:contestUpdated', contest, previousStatus, currentStatus);
+          this.client.events.publish('app:contestUpdated', contest, previousStatus, currentStatus);
           this.client.nav.pop();
         }
       }, () => {
@@ -533,6 +533,11 @@ export class SetContestPage {
   endDateSelected(dateSelection) {
     //Set the end date at the end of this day (e.g. 23:59:59.999)
     this.contestLocalCopy.endDate = dateSelection.epochLocal + this.currentTimeOnlyInMilliseconds;
+    if (this.contestLocalCopy.endDate < this.contestLocalCopy.startDate) {
+      let startDate:Date = new Date(this.contestLocalCopy.startDate);
+      startDate.clearTime(); //Start of the day
+      this.contestLocalCopy.endDate = startDate.getTime() + 24*60*60*1000 - 1; //The end of the day of the start date (e.g. 23:59:59.999)
+    }
   }
 
   getMaxEndDate() {

@@ -11,22 +11,25 @@ import {Contest} from '../../objects/objects';
 
 @Component({
   templateUrl: 'build/pages/contest-participants/contest-participants.html',
-  directives: [SimpleTabsComponent, SimpleTabComponent,LeadersComponent]
+  directives: [SimpleTabsComponent, SimpleTabComponent, LeadersComponent]
 })
 export class ContestParticipantsPage {
 
   client:Client;
-  params: NavParams;
-  tabId: number; //-1=general contest, 0=team0, 1=team1
+  params:NavParams;
+  tabId:number; //-1=general contest, 0=team0, 1=team1
+  private leaderboardsUpdatedHandler:() => void;
 
-  @ViewChild(LeadersComponent) leadersComponent : LeadersComponent;
+  @ViewChild(LeadersComponent) leadersComponent:LeadersComponent;
 
   constructor(params:NavParams) {
     this.client = Client.getInstance();
     this.params = params;
+  }
 
-    this.client.events.subscribe('topTeamer:leaderboardsUpdated', () => {
-      switch(this.tabId) {
+  ionViewLoaded() {
+    this.leaderboardsUpdatedHandler = () => {
+      switch (this.tabId) {
         case -1:
           this.showContestParticipants(true).then(() => {
           }, () => {
@@ -34,16 +37,21 @@ export class ContestParticipantsPage {
           break;
         case 0:
         case 1:
-          this.showTeamParticipants(this.tabId, true).then (() => {
-          },() => {
+          this.showTeamParticipants(this.tabId, true).then(() => {
+          }, () => {
           });
           break;
       }
-    });
+    }
+    this.client.events.subscribe('app:leaderboardsUpdated', this.leaderboardsUpdatedHandler);
+  }
+
+  ionViewWillUnload() {
+    this.client.events.unsubscribe('app:leaderboardsUpdated', this.leaderboardsUpdatedHandler);
   }
 
   ionViewWillEnter() {
-    analyticsService.track('page/contestParticipants',{contestId : this.params.data.contest._id});
+    analyticsService.track('page/contestParticipants', {contestId: this.params.data.contest._id});
     if (this.leadersComponent) {
       return this.tabGeneralParticipants();
     }
@@ -54,23 +62,23 @@ export class ContestParticipantsPage {
     return this.showContestParticipants(false);
   }
 
-  tabTeamParticipants(teamId: number) {
+  tabTeamParticipants(teamId:number) {
     this.tabId = teamId;
     return this.showTeamParticipants(teamId, false);
   }
 
-  showContestParticipants(forceRefresh? : boolean) {
+  showContestParticipants(forceRefresh?:boolean) {
     analyticsService.track('contest/participants/' + this.params.data.source + '/leaderboard/all');
     return this.leadersComponent.showContestParticipants(this.params.data.contest._id, null, forceRefresh)
   }
 
-  showTeamParticipants(teamId, forceRefresh? :boolean) {
+  showTeamParticipants(teamId, forceRefresh?:boolean) {
     analyticsService.track('contest/participants/' + this.params.data.source + '/leaderboard/team' + teamId);
     return this.leadersComponent.showContestParticipants(this.params.data.contest._id, teamId, forceRefresh);
   }
 
-  doRefresh(refresher: Refresher) {
-    switch(this.tabId) {
+  doRefresh(refresher:Refresher) {
+    switch (this.tabId) {
       case -1:
         this.showContestParticipants(true).then(() => {
           refresher.complete();
@@ -80,9 +88,9 @@ export class ContestParticipantsPage {
         break;
       case 0:
       case 1:
-        this.showTeamParticipants(this.tabId, true).then (() => {
+        this.showTeamParticipants(this.tabId, true).then(() => {
           refresher.complete();
-        },() => {
+        }, () => {
           refresher.complete();
         });
         break;

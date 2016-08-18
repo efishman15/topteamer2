@@ -13,23 +13,36 @@ export class RunningContestsPage {
 
   @ViewChild(ContestListComponent) contestList: ContestListComponent;
   client: Client;
+  private updateContestHandler:(eventData:any) => void;
+  private removeContestHandler:(eventData:any) => void;
+  private forceRefreshHandler:() => void;
 
   constructor() {
     this.client = Client.getInstance();
+  }
 
-    this.client.events.subscribe('topTeamer:runningContests:contestUpdated', (eventData) => {
+  ionViewLoaded() {
+    this.updateContestHandler = (eventData:any) => {
       this.contestList.updateContest(eventData[0]);
-    });
-
-    this.client.events.subscribe('topTeamer:runningContests:contestRemoved', (eventData) => {
+    }
+    this.removeContestHandler = (eventData:any) => {
       this.contestList.removeContest(eventData[0]);
-    });
-
-    this.client.events.subscribe('topTeamer:runningContests:forceRefresh', () => {
+    }
+    this.forceRefreshHandler = () => {
       this.refreshList(true).then(()=> {
       }, ()=> {
       });
-    });
+    }
+
+    this.client.events.subscribe('app:runningContests:contestUpdated', this.updateContestHandler);
+    this.client.events.subscribe('app:runningContests:contestRemoved', this.removeContestHandler);
+    this.client.events.subscribe('app:runningContests:forceRefresh', this.forceRefreshHandler);
+  }
+
+  ionViewWillUnload() {
+    this.client.events.unsubscribe('app:runningContests:contestUpdated', this.updateContestHandler);
+    this.client.events.unsubscribe('app:runningContests:contestRemoved', this.removeContestHandler);
+    this.client.events.unsubscribe('app:runningContests:forceRefresh', this.forceRefreshHandler);
   }
 
   ionViewWillEnter() {

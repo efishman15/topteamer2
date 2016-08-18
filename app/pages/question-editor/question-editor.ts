@@ -77,6 +77,7 @@ export class QuestionEditorPage {
     this.answer1TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
     this.answer2TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
     this.answer3TextArea['_native']._elementRef.nativeElement.maxLength = this.client.settings.quiz.question.answer.maxLength;
+
   }
 
   dismiss(applyChanges) {

@@ -13,20 +13,30 @@ var client_1 = require('../../providers/client');
 var analyticsService = require('../../providers/analytics');
 var RunningContestsPage = (function () {
     function RunningContestsPage() {
-        var _this = this;
         this.client = client_1.Client.getInstance();
-        this.client.events.subscribe('topTeamer:runningContests:contestUpdated', function (eventData) {
+    }
+    RunningContestsPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.updateContestHandler = function (eventData) {
             _this.contestList.updateContest(eventData[0]);
-        });
-        this.client.events.subscribe('topTeamer:runningContests:contestRemoved', function (eventData) {
+        };
+        this.removeContestHandler = function (eventData) {
             _this.contestList.removeContest(eventData[0]);
-        });
-        this.client.events.subscribe('topTeamer:runningContests:forceRefresh', function () {
+        };
+        this.forceRefreshHandler = function () {
             _this.refreshList(true).then(function () {
             }, function () {
             });
-        });
-    }
+        };
+        this.client.events.subscribe('app:runningContests:contestUpdated', this.updateContestHandler);
+        this.client.events.subscribe('app:runningContests:contestRemoved', this.removeContestHandler);
+        this.client.events.subscribe('app:runningContests:forceRefresh', this.forceRefreshHandler);
+    };
+    RunningContestsPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:runningContests:contestUpdated', this.updateContestHandler);
+        this.client.events.unsubscribe('app:runningContests:contestRemoved', this.removeContestHandler);
+        this.client.events.unsubscribe('app:runningContests:forceRefresh', this.forceRefreshHandler);
+    };
     RunningContestsPage.prototype.ionViewWillEnter = function () {
         analyticsService.track('page/runningContests');
         this.refreshList().then(function () {

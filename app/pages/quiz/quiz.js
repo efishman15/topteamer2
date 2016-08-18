@@ -34,9 +34,13 @@ var QuizPage = (function () {
     }
     QuizPage.prototype.ionViewLoaded = function () {
         var _this = this;
-        this.client.subscribeUniqueEvent('topTeamer:resize', function (eventData) {
+        this.resizeHandler = function () {
             _this.drawQuizProgress();
-        });
+        };
+        this.client.events.subscribe('app:resize', this.resizeHandler);
+    };
+    QuizPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:resize', this.resizeHandler);
     };
     QuizPage.prototype.ngAfterViewInit = function () {
         this.quizCanvas = this.quizCanvasElementRef.nativeElement;
@@ -101,7 +105,9 @@ var QuizPage = (function () {
                     contestsService.setContestClientData(err.additionalInfo.contest);
                     setTimeout(function () {
                         _this.client.nav.pop().then(function () {
-                            _this.client.events.publish('topTeamer:contestUpdated', err.additionalInfo.contest, _this.params.data.contest.status, err.additionalInfo.contest.status);
+                            console.log('quiz pop completed');
+                            _this.client.events.publish('app:contestUpdated', err.additionalInfo.contest, _this.params.data.contest.status, err.additionalInfo.contest.status);
+                            console.log('quiz results published to contest');
                         }, function () {
                         });
                     }, 1000);
@@ -217,7 +223,7 @@ var QuizPage = (function () {
             //Give enough time to draw the circle progress of the last question
             setTimeout(function () {
                 _this.client.nav.pop().then(function () {
-                    _this.client.events.publish('topTeamer:quizFinished', _this.quizData.results);
+                    _this.client.events.publish('app:quizFinished', _this.quizData.results);
                     //For next time if view remains cached
                     _this.quizStarted = false;
                 }, function () {

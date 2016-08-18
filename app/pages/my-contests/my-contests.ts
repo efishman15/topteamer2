@@ -16,22 +16,36 @@ export class MyContestsPage {
   client:Client;
   pageLoaded:boolean;
 
+  private updateContestHandler:(eventData:any) => void;
+  private removeContestHandler:(eventData:any) => void;
+  private forceRefreshHandler:() => void;
+
   constructor() {
     this.client = Client.getInstance();
+  }
 
-    this.client.events.subscribe('topTeamer:myContests:contestUpdated', (eventData) => {
+  ionViewLoaded() {
+    this.updateContestHandler = (eventData:any) => {
       this.contestList.updateContest(eventData[0]);
-    });
-
-    this.client.events.subscribe('topTeamer:myContests:contestRemoved', (eventData) => {
+    }
+    this.removeContestHandler = (eventData:any) => {
       this.contestList.removeContest(eventData[0]);
-    });
-
-    this.client.events.subscribe('topTeamer:myContests:forceRefresh', () => {
+    }
+    this.forceRefreshHandler = () => {
       this.refreshList(true).then(()=> {
       }, ()=> {
       });
-    });
+    }
+
+    this.client.events.subscribe('app:myContests:contestUpdated', this.updateContestHandler);
+    this.client.events.subscribe('app:myContests:contestRemoved', this.removeContestHandler);
+    this.client.events.subscribe('app:myContests:forceRefresh', this.forceRefreshHandler);
+  }
+
+  ionViewWillUnload() {
+    this.client.events.unsubscribe('app:myContests:contestUpdated', this.updateContestHandler);
+    this.client.events.unsubscribe('app:myContests:contestRemoved', this.removeContestHandler);
+    this.client.events.unsubscribe('app:myContests:forceRefresh', this.forceRefreshHandler);
   }
 
   ionViewWillEnter() {
@@ -39,7 +53,7 @@ export class MyContestsPage {
     this.refreshList().then(() => {
       if (this.contestList.contests.length === 0 && !this.pageLoaded) {
         //On load only - switch to "running contests" if no personal contests
-        this.client.events.publish('topTeamer:noPersonalContests');
+        this.client.events.publish('app:noPersonalContests');
       }
       this.pageLoaded = true;
     }, () => {
@@ -60,6 +74,6 @@ export class MyContestsPage {
   }
 
   showLeadingContests() {
-    this.client.events.publish('topTeamer:showLeadingContests');
+    this.client.events.publish('app:showLeadingContests');
   }
 }

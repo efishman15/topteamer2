@@ -258,6 +258,7 @@ export class TopTeamerApp {
     connectService.getLoginStatus().then((connectInfo:ConnectInfo) => {
       if (this.client.hasCredentials(connectInfo)) {
         this.client.serverConnect(connectInfo).then(() => {
+          connectService.storeCredentials(connectInfo);
           this.playerInfoComponent.init(this.client);
           let appPages:Array<AppPage> = new Array<AppPage>();
           appPages.push(new AppPage('MainTabsPage', {}));

@@ -13,16 +13,22 @@ var client_1 = require('../../providers/client');
 var analyticsService = require('../../providers/analytics');
 var QuestionStatsPage = (function () {
     function QuestionStatsPage(params, viewController) {
-        var _this = this;
         this.client = client_1.Client.getInstance();
         this.question = params.data.question;
         this.viewController = viewController;
-        this.client.events.subscribe('topTeamer:resize', function (eventData) {
+    }
+    QuestionStatsPage.prototype.ionViewLoaded = function () {
+        var _this = this;
+        this.resizeHandler = function () {
             if (_this.question.correctRatio || _this.question.correctRatio === 0) {
                 _this.drawChart();
             }
-        });
-    }
+        };
+        this.client.events.subscribe('app:resize', this.resizeHandler);
+    };
+    QuestionStatsPage.prototype.ionViewWillUnload = function () {
+        this.client.events.unsubscribe('app:resize', this.resizeHandler);
+    };
     //The only life cycle eve currently called in modals
     QuestionStatsPage.prototype.ngAfterViewInit = function () {
         if (this.question.correctRatio || this.question.correctRatio === 0) {

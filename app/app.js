@@ -196,6 +196,7 @@ var TopTeamerApp = (function () {
         connectService.getLoginStatus().then(function (connectInfo) {
             if (_this.client.hasCredentials(connectInfo)) {
                 _this.client.serverConnect(connectInfo).then(function () {
+                    connectService.storeCredentials(connectInfo);
                     _this.playerInfoComponent.init(_this.client);
                     var appPages = new Array();
                     appPages.push(new objects_1.AppPage('MainTabsPage', {}));

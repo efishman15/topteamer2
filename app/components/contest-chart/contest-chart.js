@@ -75,7 +75,7 @@ var ContestChartComponent = (function () {
                     sourceClick: source
                 });
                 //Notify outside that contest changed
-                _this.client.events.publish('topTeamer:contestUpdated', data.contest, data.contest.status, data.contest.status);
+                _this.client.events.publish('app:contestUpdated', data.contest, data.contest.status, data.contest.status);
                 //Should get xp if fresh join
                 var rankModal;
                 if (data.xpProgress && data.xpProgress.addition > 0) {

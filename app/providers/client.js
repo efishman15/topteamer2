@@ -187,7 +187,7 @@ var Client = (function () {
             }, function (err) {
                 if (err.type === 'SERVER_ERROR_FACEBOOK_EXISTS_DO_SWITCH' && err.additionalInfo && err.additionalInfo.confirmed) {
                     _this.serverConnect(connectInfo).then(function () {
-                        _this.events.publish('topTeamer:switchedToFacebook');
+                        _this.events.publish('app:switchedToFacebook');
                         _this.popToRoot().then(function () {
                             resolve();
                         }, function () {
@@ -206,9 +206,9 @@ var Client = (function () {
     Client.prototype.publishProfileChange = function (contests) {
         for (var i = 0; i < contests.length; i++) {
             contestsService.setContestClientData(contests[i]);
-            this.events.publish('topTeamer:contestUpdated', contests[i], contests[i].status, contests[i].status);
+            this.events.publish('app:contestUpdated', contests[i], contests[i].status, contests[i].status);
         }
-        this.events.publish('topTeamer:leaderboardsUpdated');
+        this.events.publish('app:leaderboardsUpdated');
     };
     Client.prototype.serverPost = function (path, postData) {
         var _this = this;
@@ -419,23 +419,7 @@ var Client = (function () {
         }
         this._chartWidth = null; //Will be recalculated upon first access to chartWidth property
         this._chartHeight = null; //Will be recalculated upon first access to chartHeight property
-        this.events.publish('topTeamer:resize');
-    };
-    Client.prototype.subscribeUniqueEvent = function (eventName, handler) {
-        //Bypass to what seems to be an IONIC bug since we "skip" views using insertPages
-        //events are defined twice and more and when publish occurs, this subscription is
-        //being called too many times...
-        if (this.events['_channels'] && this.events['_channels'][eventName]) {
-            for (var i = 0; i < this.events['_channels'][eventName].length; i++) {
-                if (this.events['_channels'][eventName][i].toString() === handler.toString()) {
-                    this.events['_channels'][eventName][i] = handler;
-                    return;
-                }
-            }
-        }
-        else {
-            this.events.subscribe(eventName, handler);
-        }
+        this.events.publish('app:resize');
     };
     Object.defineProperty(Client.prototype, "width", {
         get: function () {
@@ -771,7 +755,7 @@ var ServerGateway = (function () {
                 .map(function (res) { return res.json(); })
                 .subscribe(function (res) {
                 if (res['serverPopup']) {
-                    _this.eventQueue.push(new InternalEvent('topTeamer:serverPopup', res['serverPopup']));
+                    _this.eventQueue.push(new InternalEvent('app:serverPopup', res['serverPopup']));
                 }
                 resolve(res);
             });
