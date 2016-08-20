@@ -14,8 +14,11 @@ export let getLoginStatus = () => {
         if (response && response.status === 'connected') {
           connectInfo = new ConnectInfo('facebook');
           connectInfo.facebookInfo = new FacebookInfo(response.authResponse.accessToken, response.authResponse.userID);
+          resolve(connectInfo);
         }
-        resolve(connectInfo);
+        else {
+          reject();
+        }
       });
     }
     else {
