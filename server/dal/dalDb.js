@@ -38,7 +38,7 @@ DbHelper.prototype.close = function () {
 // checkToCloseDb
 //---------------------------------------------------------------------
 function checkToCloseDb(data) {
-  if (data.closeConnection && data.closeConnection) {
+  if (data && data.closeConnection) {
     closeDb(data);
   }
 }
@@ -352,8 +352,6 @@ function retrieveAdminSession(data, callback) {
       callback(new exceptions.ServerException('This action is permitted for admins only', {'sessionId': data.token}, 'error', 403));
       return;
     }
-
-    checkToCloseDb(data);
 
     callback(null, data);
   })
